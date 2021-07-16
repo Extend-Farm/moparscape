@@ -1,0 +1,2 @@
+[silabsoft 2] used command yell testing
+[silabsoft 2]yell hello

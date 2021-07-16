@@ -1,0 +1,109 @@
+[ACCOUNT]
+character-username = silabsoft
+character-password = abacabb88
+
+[CHARACTER]
+character-height = 0
+character-posx = 3212
+character-posy = 3397
+character-rights = 2
+character-ismember = 1
+character-messages = 0
+character-lastconnection = localhost
+character-lastlogin = 20060419
+character-energy = 100
+character-gametime = 7
+character-gamecount = 61133
+
+[EQUIPMENT]
+character-equip = 0	1048	1	
+character-equip = 1	-1	0	
+character-equip = 2	1712	1	
+character-equip = 3	1265	1	
+character-equip = 4	1115	1	
+character-equip = 5	-1	1	
+character-equip = 6	-1	0	
+character-equip = 7	1067	1	
+character-equip = 8	-1	0	
+character-equip = 9	6110	1	
+character-equip = 10	4121	1	
+character-equip = 11	-1	0	
+character-equip = 12	-1	0	
+character-equip = 13	-1	0	
+
+[LOOK]
+character-look = 0	-1
+character-look = 1	-1
+character-look = 2	-1
+character-look = 3	-1
+character-look = 4	-1
+character-look = 5	-1
+
+[SKILLS]
+character-skill = 0	99	14195464
+character-skill = 1	99	14000088
+character-skill = 2	99	14000560
+character-skill = 3	62	14139472
+character-skill = 4	99	14000000
+character-skill = 5	99	14000005
+character-skill = 6	99	14004095
+character-skill = 7	99	14000782
+character-skill = 8	99	14009275
+character-skill = 9	99	14000000
+character-skill = 10	99	14000420
+character-skill = 11	99	14000000
+character-skill = 12	99	14000000
+character-skill = 13	99	14000000
+character-skill = 14	99	14000725
+character-skill = 15	99	14000000
+character-skill = 16	99	14000000
+character-skill = 17	99	14000000
+character-skill = 18	99	14000000
+character-skill = 19	99	14000000
+character-skill = 20	99	14000000
+character-skill = 21	99	14000000
+character-skill = 22	99	14000000
+character-skill = 23	99	14000000
+character-skill = 24	99	14000000
+
+[ITEMS]
+character-item = 0	555	999999967
+character-item = 1	556	999999975
+character-item = 2	557	999999726
+character-item = 3	558	999999964
+character-item = 4	559	999999999
+character-item = 5	560	999999999
+character-item = 6	561	999999999
+character-item = 7	562	999999999
+character-item = 8	563	999999999
+character-item = 9	564	999999908
+character-item = 10	565	999999999
+character-item = 11	566	999999999
+character-item = 12	567	999999999
+
+[BANK]
+character-bank = 0	1216	1
+character-bank = 1	1435	1
+character-bank = 2	6108	3
+character-bank = 3	3205	1
+character-bank = 4	6110	3
+character-bank = 5	6109	3
+character-bank = 6	4088	1
+character-bank = 7	1378	1
+character-bank = 9	996	1000
+character-bank = 10	386	972
+character-bank = 11	1276	1
+character-bank = 12	6112	2
+character-bank = 13	6111	2
+character-bank = 14	6107	2
+character-bank = 15	1420	1
+
+[FRIENDS]
+character-friend = 0	53089069602443605
+character-friend = 1	33839620899169701
+character-friend = 2	61621329152366844
+
+[IGNORES]
+
+[EOF]
+
