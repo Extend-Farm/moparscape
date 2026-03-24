@@ -49,6 +49,31 @@ This project is now a Gradle multi-module build.
 - `Class30_Sub2_Sub4_Sub5` -> `DynamicObject`
 - `Class30_Sub2_Sub4_Sub6` -> `Model`
 
+### Phase 3 (core containers)
+
+- `Class30` -> `Node`
+- `Class30_Sub2` -> `CacheableNode`
+- `Class19` -> `Deque`
+- `Class2` -> `CacheableNodeDeque`
+
+### Phase 4 (utilities/infrastructure)
+
+- `Class1` -> `NodeHashTable`
+- `Class12` -> `NodeCache`
+- `Class13` -> `BZip2Decompressor`
+- `Class32` -> `BZip2State`
+- `Class24` -> `BufferedConnection`
+- `Class45` -> `Skills`
+- `Class50` -> `TextUtils`
+
+### Phase 5 (rendering primitives)
+
+- `Class30_Sub2_Sub1` -> `Rasterizer2D`
+- `Class30_Sub2_Sub1_Sub1` -> `Sprite`
+- `Class30_Sub2_Sub1_Sub2` -> `IndexedSprite`
+- `Class30_Sub2_Sub1_Sub3` -> `Rasterizer3D`
+- `Class30_Sub2_Sub1_Sub4` -> `FontRenderer`
+
 ## Next steps
 
 - Continue phased renaming of remaining `Class1`..`Class50` files.

@@ -254,11 +254,11 @@ final class Class8
         aBoolean176 = true;
     }
 
-    public static final Class30_Sub2_Sub1_Sub1 method200(int i, int j, int k, int l)
+    public static final Sprite method200(int i, int j, int k, int l)
     {
         if(k == 0)
         {
-            Class30_Sub2_Sub1_Sub1 class30_sub2_sub1_sub1 = (Class30_Sub2_Sub1_Sub1)aClass12_158.method222(i);
+            Sprite class30_sub2_sub1_sub1 = (Sprite)aClass12_158.method222(i);
             if(class30_sub2_sub1_sub1 != null && class30_sub2_sub1_sub1.anInt1445 != j && class30_sub2_sub1_sub1.anInt1445 != -1)
             {
                 class30_sub2_sub1_sub1.method329();
@@ -283,35 +283,35 @@ final class Class8
         Model class30_sub2_sub4_sub6 = class8.method201(1);
         if(class30_sub2_sub4_sub6 == null)
             return null;
-        Class30_Sub2_Sub1_Sub1 class30_sub2_sub1_sub1_2 = null;
+        Sprite class30_sub2_sub1_sub1_2 = null;
         if(class8.anInt163 != -1)
         {
             class30_sub2_sub1_sub1_2 = method200(class8.anInt179, 10, -1, 9);
             if(class30_sub2_sub1_sub1_2 == null)
                 return null;
         }
-        Class30_Sub2_Sub1_Sub1 class30_sub2_sub1_sub1_1 = new Class30_Sub2_Sub1_Sub1(32, 32);
-        int k1 = Class30_Sub2_Sub1_Sub3.anInt1466;
-        int l1 = Class30_Sub2_Sub1_Sub3.anInt1467;
-        int ai[] = Class30_Sub2_Sub1_Sub3.anIntArray1472;
-        int ai1[] = Class30_Sub2_Sub1.anIntArray1378;
-        int i2 = Class30_Sub2_Sub1.anInt1379;
-        int j2 = Class30_Sub2_Sub1.anInt1380;
-        int k2 = Class30_Sub2_Sub1.anInt1383;
-        int l2 = Class30_Sub2_Sub1.anInt1384;
-        int i3 = Class30_Sub2_Sub1.anInt1381;
-        int j3 = Class30_Sub2_Sub1.anInt1382;
-        Class30_Sub2_Sub1_Sub3.aBoolean1464 = false;
-        Class30_Sub2_Sub1.method331(32, 32, -293, class30_sub2_sub1_sub1_1.anIntArray1439);
-        Class30_Sub2_Sub1.method336(32, 0, 0, 0, 32, 0);
-        Class30_Sub2_Sub1_Sub3.method364((byte)6);
+        Sprite class30_sub2_sub1_sub1_1 = new Sprite(32, 32);
+        int k1 = Rasterizer3D.anInt1466;
+        int l1 = Rasterizer3D.anInt1467;
+        int ai[] = Rasterizer3D.anIntArray1472;
+        int ai1[] = Rasterizer2D.anIntArray1378;
+        int i2 = Rasterizer2D.anInt1379;
+        int j2 = Rasterizer2D.anInt1380;
+        int k2 = Rasterizer2D.anInt1383;
+        int l2 = Rasterizer2D.anInt1384;
+        int i3 = Rasterizer2D.anInt1381;
+        int j3 = Rasterizer2D.anInt1382;
+        Rasterizer3D.aBoolean1464 = false;
+        Rasterizer2D.method331(32, 32, -293, class30_sub2_sub1_sub1_1.anIntArray1439);
+        Rasterizer2D.method336(32, 0, 0, 0, 32, 0);
+        Rasterizer3D.method364((byte)6);
         int k3 = class8.anInt181;
         if(k == -1)
             k3 = (int)((double)k3 * 1.5D);
         if(k > 0)
             k3 = (int)((double)k3 * 1.04D);
-        int l3 = Class30_Sub2_Sub1_Sub3.anIntArray1470[class8.anInt190] * k3 >> 16;
-        int i4 = Class30_Sub2_Sub1_Sub3.anIntArray1471[class8.anInt190] * k3 >> 16;
+        int l3 = Rasterizer3D.anIntArray1470[class8.anInt190] * k3 >> 16;
+        int i4 = Rasterizer3D.anIntArray1471[class8.anInt190] * k3 >> 16;
         class30_sub2_sub4_sub6.method482(0, class8.anInt198, class8.anInt204, class8.anInt190, class8.anInt169, l3 + ((Class30_Sub2_Sub4) (class30_sub2_sub4_sub6)).anInt1426 / 2 + class8.anInt194, i4 + class8.anInt194);
         for(int i5 = 31; i5 >= 0; i5--)
         {
@@ -375,12 +375,12 @@ final class Class8
         }
         if(k == 0)
             aClass12_158.method223(class30_sub2_sub1_sub1_1, i, (byte)2);
-        Class30_Sub2_Sub1.method331(j2, i2, -293, ai1);
-        Class30_Sub2_Sub1.method333(j3, k2, false, l2, i3);
-        Class30_Sub2_Sub1_Sub3.anInt1466 = k1;
-        Class30_Sub2_Sub1_Sub3.anInt1467 = l1;
-        Class30_Sub2_Sub1_Sub3.anIntArray1472 = ai;
-        Class30_Sub2_Sub1_Sub3.aBoolean1464 = true;
+        Rasterizer2D.method331(j2, i2, -293, ai1);
+        Rasterizer2D.method333(j3, k2, false, l2, i3);
+        Rasterizer3D.anInt1466 = k1;
+        Rasterizer3D.anInt1467 = l1;
+        Rasterizer3D.anIntArray1472 = ai;
+        Rasterizer3D.aBoolean1464 = true;
         if(l < 9 || l > 9)
         {
             for(int i6 = 1; i6 > 0; i6++);

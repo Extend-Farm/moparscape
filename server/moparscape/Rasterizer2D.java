@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-public class Class30_Sub2_Sub1 extends CacheableNode
+public class Rasterizer2D extends CacheableNode
 {
 
     public static void method331(int i, int j, int k, int ai[])
@@ -255,7 +255,7 @@ public class Class30_Sub2_Sub1 extends CacheableNode
 
     }
 
-    public Class30_Sub2_Sub1()
+    public Rasterizer2D()
     {
     }
 

@@ -21,7 +21,7 @@ public class Class9
         anIntArray252[j] = k;
     }
 
-    public static void method205(Archive class44, Class30_Sub2_Sub1_Sub4 aclass30_sub2_sub1_sub4[], byte byte0, Archive class44_1)
+    public static void method205(Archive class44, FontRenderer aclass30_sub2_sub1_sub4[], byte byte0, Archive class44_1)
     {
         aClass12_238 = new NodeCache(false, 50000);
         PacketBuffer class30_sub2_sub2 = new PacketBuffer(class44.method571("data", null), 891);
@@ -109,7 +109,7 @@ public class Class9
                 class9.anInt244 = class30_sub2_sub2.method408();
                 class9.anIntArray215 = new int[20];
                 class9.anIntArray247 = new int[20];
-                class9.aClass30_Sub2_Sub1_Sub1Array209 = new Class30_Sub2_Sub1_Sub1[20];
+                class9.aClass30_Sub2_Sub1_Sub1Array209 = new Sprite[20];
                 for(int j2 = 0; j2 < 20; j2++)
                 {
                     int k3 = class30_sub2_sub2.method408();
@@ -269,17 +269,17 @@ public class Class9
         return class30_sub2_sub4_sub6;
     }
 
-    private static Class30_Sub2_Sub1_Sub1 method207(int i, boolean flag, Archive class44, String s)
+    private static Sprite method207(int i, boolean flag, Archive class44, String s)
     {
         long l = (TextUtils.method585((byte)1, s) << 8) + (long)i;
         if(flag)
             throw new NullPointerException();
-        Class30_Sub2_Sub1_Sub1 class30_sub2_sub1_sub1 = (Class30_Sub2_Sub1_Sub1)aClass12_238.method222(l);
+        Sprite class30_sub2_sub1_sub1 = (Sprite)aClass12_238.method222(l);
         if(class30_sub2_sub1_sub1 != null)
             return class30_sub2_sub1_sub1;
         try
         {
-            class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(class44, s, i);
+            class30_sub2_sub1_sub1 = new Sprite(class44, s, i);
             aClass12_238.method223(class30_sub2_sub1_sub1, l, (byte)2);
         }
         catch(Exception _ex)
@@ -329,9 +329,9 @@ public class Class9
         anInt229 = 891;
     }
 
-    public Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1_207;
+    public Sprite aClass30_Sub2_Sub1_Sub1_207;
     public int anInt208;
-    public Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1Array209[];
+    public Sprite aClass30_Sub2_Sub1_Sub1Array209[];
     public static Class9 aClass9Array210[];
     public int anInt211;
     public int anIntArray212[];
@@ -365,7 +365,7 @@ public class Class9
     public int anIntArray240[];
     public int anIntArray241[];
     public boolean aBoolean242;
-    public Class30_Sub2_Sub1_Sub4 aClass30_Sub2_Sub1_Sub4_243;
+    public FontRenderer aClass30_Sub2_Sub1_Sub4_243;
     public int anInt244;
     public int anIntArray245[];
     public int anInt246;
@@ -382,7 +382,7 @@ public class Class9
     public int anInt257;
     public int anInt258;
     public boolean aBoolean259;
-    public Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1_260;
+    public Sprite aClass30_Sub2_Sub1_Sub1_260;
     public int anInt261;
     public int anInt262;
     public int anInt263;

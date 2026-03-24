@@ -552,7 +552,7 @@ public class GameShell extends Applet
         anInt6 = 1;
         aLongArray7 = new long[10];
         aBoolean9 = false;
-        aClass30_Sub2_Sub1_Sub1Array14 = new Class30_Sub2_Sub1_Sub1[6];
+        aClass30_Sub2_Sub1_Sub1Array14 = new Sprite[6];
         aBoolean16 = true;
         aBoolean17 = true;
         anIntArray30 = new int[128];
@@ -572,7 +572,7 @@ public class GameShell extends Applet
     public int anInt11;
     public Graphics aGraphics12;
     public ProducingGraphicsBuffer aClass15_13;
-    public Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1Array14[];
+    public Sprite aClass30_Sub2_Sub1_Sub1Array14[];
     public GameFrame aFrame_Sub1_15;
     public boolean aBoolean16;
     public boolean aBoolean17;

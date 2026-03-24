@@ -132,7 +132,7 @@ public final class GameClient extends GameShell
     public final void method18(int i)
     {
         aClass15_1166.method237(0);
-        Class30_Sub2_Sub1_Sub3.anIntArray1472 = anIntArray1180;
+        Rasterizer3D.anIntArray1472 = anIntArray1180;
         aClass30_Sub2_Sub1_Sub2_1198.method361(0, 16083, 0);
         if(aBoolean1256)
         {
@@ -162,9 +162,9 @@ public final class GameClient extends GameShell
             method105(8, 0, 0, Class9.aClass9Array210[anInt1042], 0);
         } else
         {
-            Class30_Sub2_Sub1_Sub4 class30_sub2_sub1_sub4 = aClass30_Sub2_Sub1_Sub4_1271;
+            FontRenderer class30_sub2_sub1_sub4 = aClass30_Sub2_Sub1_Sub4_1271;
             int j = 0;
-            Class30_Sub2_Sub1.method333(77, 0, false, 463, 0);
+            Rasterizer2D.method333(77, 0, false, 463, 0);
             for(int k = 0; k < 100; k++)
                 if(aStringArray944[k] != null)
                 {
@@ -261,7 +261,7 @@ public final class GameClient extends GameShell
                     }
                 }
 
-            Class30_Sub2_Sub1.method332(4);
+            Rasterizer2D.method332(4);
             anInt1211 = j * 14 + 7;
             if(anInt1211 < 78)
                 anInt1211 = 78;
@@ -273,13 +273,13 @@ public final class GameClient extends GameShell
                 s = TextUtils.method587(-45804, aString1173);
             class30_sub2_sub1_sub4.method385(0, s + ":", 90, 822, 4);
             class30_sub2_sub1_sub4.method385(255, aString887 + "*", 90, 822, 6 + class30_sub2_sub1_sub4.method383(anInt1116, s + ": "));
-            Class30_Sub2_Sub1.method339(77, 0, 479, 0, (byte)4);
+            Rasterizer2D.method339(77, 0, 479, 0, (byte)4);
         }
         if(aBoolean885 && anInt948 == 2)
             method40((byte)9);
         aClass15_1166.method238(357, 23680, super.aGraphics12, 17);
         aClass15_1165.method237(0);
-        Class30_Sub2_Sub1_Sub3.anIntArray1472 = anIntArray1182;
+        Rasterizer3D.anIntArray1472 = anIntArray1182;
         if(i < 6 || i > 6)
             aBoolean991 = !aBoolean991;
     }
@@ -451,7 +451,7 @@ public final class GameClient extends GameShell
             anInt985 = -1;
             aClass19_1056.method256();
             aClass19_1013.method256();
-            Class30_Sub2_Sub1_Sub3.method366(anInt846);
+            Rasterizer3D.method366(anInt846);
             method23(false);
             aClass25_946.method274(619);
             System.gc();
@@ -633,7 +633,7 @@ public final class GameClient extends GameShell
 
         }
         System.gc();
-        Class30_Sub2_Sub1_Sub3.method367(20, true);
+        Rasterizer3D.method367(20, true);
         aClass42_Sub1_1068.method566(0);
         int k = (anInt1069 - 6) / 8 - 1;
         int j1 = (anInt1069 + 6) / 8 + 1;
@@ -1077,22 +1077,22 @@ public final class GameClient extends GameShell
     {
         aClass30_Sub2_Sub1_Sub2_1024.method361(i1, 16083, l);
         aClass30_Sub2_Sub1_Sub2_1025.method361(i1, 16083, (l + j) - 16);
-        Class30_Sub2_Sub1.method336(j - 32, l + 16, i1, anInt1002, 16, 0);
+        Rasterizer2D.method336(j - 32, l + 16, i1, anInt1002, 16, 0);
         int k1 = ((j - 32) * j) / j1;
         if(k1 < 8)
             k1 = 8;
         int l1 = ((j - 32 - k1) * k) / (j1 - j);
-        Class30_Sub2_Sub1.method336(k1, l + 16 + l1, i1, anInt1063, 16, 0);
-        Class30_Sub2_Sub1.method341(l + 16 + l1, anInt902, k1, i1, anInt1135);
-        Class30_Sub2_Sub1.method341(l + 16 + l1, anInt902, k1, i1 + 1, anInt1135);
-        Class30_Sub2_Sub1.method339(l + 16 + l1, anInt902, 16, i1, (byte)4);
-        Class30_Sub2_Sub1.method339(l + 17 + l1, anInt902, 16, i1, (byte)4);
+        Rasterizer2D.method336(k1, l + 16 + l1, i1, anInt1063, 16, 0);
+        Rasterizer2D.method341(l + 16 + l1, anInt902, k1, i1, anInt1135);
+        Rasterizer2D.method341(l + 16 + l1, anInt902, k1, i1 + 1, anInt1135);
+        Rasterizer2D.method339(l + 16 + l1, anInt902, 16, i1, (byte)4);
+        Rasterizer2D.method339(l + 17 + l1, anInt902, 16, i1, (byte)4);
         if(i <= 0)
             anInt1105 = aClass17_1000.method246();
-        Class30_Sub2_Sub1.method341(l + 16 + l1, anInt927, k1, i1 + 15, anInt1135);
-        Class30_Sub2_Sub1.method341(l + 17 + l1, anInt927, k1 - 1, i1 + 14, anInt1135);
-        Class30_Sub2_Sub1.method339(l + 15 + l1 + k1, anInt927, 16, i1, (byte)4);
-        Class30_Sub2_Sub1.method339(l + 14 + l1 + k1, anInt927, 15, i1 + 1, (byte)4);
+        Rasterizer2D.method341(l + 16 + l1, anInt927, k1, i1 + 15, anInt1135);
+        Rasterizer2D.method341(l + 17 + l1, anInt927, k1 - 1, i1 + 14, anInt1135);
+        Rasterizer2D.method339(l + 15 + l1 + k1, anInt927, 16, i1, (byte)4);
+        Rasterizer2D.method339(l + 14 + l1 + k1, anInt927, 15, i1 + 1, (byte)4);
     }
 
     private final void method31(PacketBuffer class30_sub2_sub2, int i, int j)
@@ -1216,13 +1216,13 @@ public final class GameClient extends GameShell
         if(j == 1)
         {
             if(k == 1)
-                Class30_Sub2_Sub1_Sub3.method372(0.90000000000000002D, aByte1200);
+                Rasterizer3D.method372(0.90000000000000002D, aByte1200);
             if(k == 2)
-                Class30_Sub2_Sub1_Sub3.method372(0.80000000000000004D, aByte1200);
+                Rasterizer3D.method372(0.80000000000000004D, aByte1200);
             if(k == 3)
-                Class30_Sub2_Sub1_Sub3.method372(0.69999999999999996D, aByte1200);
+                Rasterizer3D.method372(0.69999999999999996D, aByte1200);
             if(k == 4)
-                Class30_Sub2_Sub1_Sub3.method372(0.59999999999999998D, aByte1200);
+                Rasterizer3D.method372(0.59999999999999998D, aByte1200);
             Class8.aClass12_158.method224();
             aBoolean1255 = true;
         }
@@ -1398,8 +1398,8 @@ public final class GameClient extends GameShell
                     int i1 = (((Class30_Sub2_Sub4_Sub1) (obj)).anInt1533 * 30) / ((Class30_Sub2_Sub4_Sub1) (obj)).anInt1534;
                     if(i1 > 30)
                         i1 = 30;
-                    Class30_Sub2_Sub1.method336(5, anInt964 - 3, anInt963 - 15, 65280, i1, 0);
-                    Class30_Sub2_Sub1.method336(5, anInt964 - 3, (anInt963 - 15) + i1, 0xff0000, 30 - i1, 0);
+                    Rasterizer2D.method336(5, anInt964 - 3, anInt963 - 15, 65280, i1, 0);
+                    Rasterizer2D.method336(5, anInt964 - 3, (anInt963 - 15) + i1, 0xff0000, 30 - i1, 0);
                 }
             }
             for(int j1 = 0; j1 < 4; j1++)
@@ -1522,10 +1522,10 @@ public final class GameClient extends GameShell
                 {
                     int i4 = aClass30_Sub2_Sub1_Sub4_1272.method384(s, true);
                     int k4 = ((150 - anIntArray982[k]) * (i4 + 100)) / 150;
-                    Class30_Sub2_Sub1.method333(334, anInt963 - 50, false, anInt963 + 50, 0);
+                    Rasterizer2D.method333(334, anInt963 - 50, false, anInt963 + 50, 0);
                     aClass30_Sub2_Sub1_Sub4_1272.method385(0, s, anInt964 + 1, 822, (anInt963 + 50) - k4);
                     aClass30_Sub2_Sub1_Sub4_1272.method385(i3, s, anInt964, 822, (anInt963 + 50) - k4);
-                    Class30_Sub2_Sub1.method332(4);
+                    Rasterizer2D.method332(4);
                 }
                 if(anIntArray981[k] == 5)
                 {
@@ -1536,10 +1536,10 @@ public final class GameClient extends GameShell
                     else
                     if(j4 > 125)
                         l4 = j4 - 125;
-                    Class30_Sub2_Sub1.method333(anInt964 + 5, 0, false, 512, anInt964 - aClass30_Sub2_Sub1_Sub4_1272.anInt1497 - 1);
+                    Rasterizer2D.method333(anInt964 + 5, 0, false, 512, anInt964 - aClass30_Sub2_Sub1_Sub4_1272.anInt1497 - 1);
                     aClass30_Sub2_Sub1_Sub4_1272.method381(0, s, 23693, anInt964 + 1 + l4, anInt963);
                     aClass30_Sub2_Sub1_Sub4_1272.method381(i3, s, 23693, anInt964 + l4, anInt963);
-                    Class30_Sub2_Sub1.method332(4);
+                    Rasterizer2D.method332(4);
                 }
             } else
             {
@@ -1587,7 +1587,7 @@ public final class GameClient extends GameShell
     public final void method36(byte byte0)
     {
         aClass15_1163.method237(0);
-        Class30_Sub2_Sub1_Sub3.anIntArray1472 = anIntArray1181;
+        Rasterizer3D.anIntArray1472 = anIntArray1181;
         if(byte0 != -81)
             return;
         aClass30_Sub2_Sub1_Sub2_1196.method361(0, 16083, 0);
@@ -1600,7 +1600,7 @@ public final class GameClient extends GameShell
             method40((byte)9);
         aClass15_1163.method238(205, 23680, super.aGraphics12, 553);
         aClass15_1165.method237(0);
-        Class30_Sub2_Sub1_Sub3.anIntArray1472 = anIntArray1182;
+        Rasterizer3D.anIntArray1472 = anIntArray1182;
     }
 
     public final void method37(int i, int j)
@@ -1609,9 +1609,9 @@ public final class GameClient extends GameShell
             anInt1008 = -1;
         if(!aBoolean960)
         {
-            if(Class30_Sub2_Sub1_Sub3.anIntArray1480[17] >= j)
+            if(Rasterizer3D.anIntArray1480[17] >= j)
             {
-                Class30_Sub2_Sub1_Sub2 class30_sub2_sub1_sub2 = Class30_Sub2_Sub1_Sub3.aClass30_Sub2_Sub1_Sub2Array1474[17];
+                IndexedSprite class30_sub2_sub1_sub2 = Rasterizer3D.aClass30_Sub2_Sub1_Sub2Array1474[17];
                 int k = class30_sub2_sub1_sub2.anInt1452 * class30_sub2_sub1_sub2.anInt1453 - 1;
                 int j1 = class30_sub2_sub1_sub2.anInt1452 * anInt945 * 2;
                 byte abyte0[] = class30_sub2_sub1_sub2.aByteArray1450;
@@ -1621,7 +1621,7 @@ public final class GameClient extends GameShell
 
                 class30_sub2_sub1_sub2.aByteArray1450 = abyte3;
                 aByteArray912 = abyte0;
-                Class30_Sub2_Sub1_Sub3.method370(17, -477);
+                Rasterizer3D.method370(17, -477);
                 anInt854++;
                 if(anInt854 > 1235)
                 {
@@ -1643,9 +1643,9 @@ public final class GameClient extends GameShell
                     aClass30_Sub2_Sub2_1192.method407(aClass30_Sub2_Sub2_1192.anInt1406 - l2, (byte)0);
                 }
             }
-            if(Class30_Sub2_Sub1_Sub3.anIntArray1480[24] >= j)
+            if(Rasterizer3D.anIntArray1480[24] >= j)
             {
-                Class30_Sub2_Sub1_Sub2 class30_sub2_sub1_sub2_1 = Class30_Sub2_Sub1_Sub3.aClass30_Sub2_Sub1_Sub2Array1474[24];
+                IndexedSprite class30_sub2_sub1_sub2_1 = Rasterizer3D.aClass30_Sub2_Sub1_Sub2Array1474[24];
                 int l = class30_sub2_sub1_sub2_1.anInt1452 * class30_sub2_sub1_sub2_1.anInt1453 - 1;
                 int k1 = class30_sub2_sub1_sub2_1.anInt1452 * anInt945 * 2;
                 byte abyte1[] = class30_sub2_sub1_sub2_1.aByteArray1450;
@@ -1655,11 +1655,11 @@ public final class GameClient extends GameShell
 
                 class30_sub2_sub1_sub2_1.aByteArray1450 = abyte4;
                 aByteArray912 = abyte1;
-                Class30_Sub2_Sub1_Sub3.method370(24, -477);
+                Rasterizer3D.method370(24, -477);
             }
-            if(Class30_Sub2_Sub1_Sub3.anIntArray1480[34] >= j)
+            if(Rasterizer3D.anIntArray1480[34] >= j)
             {
-                Class30_Sub2_Sub1_Sub2 class30_sub2_sub1_sub2_2 = Class30_Sub2_Sub1_Sub3.aClass30_Sub2_Sub1_Sub2Array1474[34];
+                IndexedSprite class30_sub2_sub1_sub2_2 = Rasterizer3D.aClass30_Sub2_Sub1_Sub2Array1474[34];
                 int i1 = class30_sub2_sub1_sub2_2.anInt1452 * class30_sub2_sub1_sub2_2.anInt1453 - 1;
                 int l1 = class30_sub2_sub1_sub2_2.anInt1452 * anInt945 * 2;
                 byte abyte2[] = class30_sub2_sub1_sub2_2.aByteArray1450;
@@ -1669,7 +1669,7 @@ public final class GameClient extends GameShell
 
                 class30_sub2_sub1_sub2_2.aByteArray1450 = abyte5;
                 aByteArray912 = abyte2;
-                Class30_Sub2_Sub1_Sub3.method370(34, -477);
+                Rasterizer3D.method370(34, -477);
             }
         }
     }
@@ -1809,13 +1809,13 @@ public final class GameClient extends GameShell
         int k = anInt951;
         int l = anInt952;
         int i1 = 0x5d5447;
-        Class30_Sub2_Sub1.method336(l, j, i, i1, k, 0);
+        Rasterizer2D.method336(l, j, i, i1, k, 0);
         if(byte0 == 9)
             byte0 = 0;
         else
             return;
-        Class30_Sub2_Sub1.method336(16, j + 1, i + 1, 0, k - 2, 0);
-        Class30_Sub2_Sub1.method337(i + 1, k - 2, l - 19, 0, j + 18, true);
+        Rasterizer2D.method336(16, j + 1, i + 1, 0, k - 2, 0);
+        Rasterizer2D.method337(i + 1, k - 2, l - 19, 0, j + 18, true);
         aClass30_Sub2_Sub1_Sub4_1272.method385(i1, "Choose Option", j + 14, 822, i + 3);
         int j1 = super.anInt20;
         int k1 = super.anInt21;
@@ -2235,7 +2235,7 @@ public final class GameClient extends GameShell
             ObjectDefinition class46_2 = ObjectDefinition.method572(i5);
             if(class46_2.anInt758 != -1)
             {
-                Class30_Sub2_Sub1_Sub2 class30_sub2_sub1_sub2_2 = aClass30_Sub2_Sub1_Sub2Array1060[class46_2.anInt758];
+                IndexedSprite class30_sub2_sub1_sub2_2 = aClass30_Sub2_Sub1_Sub2Array1060[class46_2.anInt758];
                 if(class30_sub2_sub1_sub2_2 != null)
                 {
                     int i6 = (class46_2.anInt744 * 4 - class30_sub2_sub1_sub2_2.anInt1452) / 2;
@@ -2326,7 +2326,7 @@ public final class GameClient extends GameShell
             ObjectDefinition class46_1 = ObjectDefinition.method572(l3);
             if(class46_1.anInt758 != -1)
             {
-                Class30_Sub2_Sub1_Sub2 class30_sub2_sub1_sub2_1 = aClass30_Sub2_Sub1_Sub2Array1060[class46_1.anInt758];
+                IndexedSprite class30_sub2_sub1_sub2_1 = aClass30_Sub2_Sub1_Sub2Array1060[class46_1.anInt758];
                 if(class30_sub2_sub1_sub2_1 != null)
                 {
                     int j5 = (class46_1.anInt744 * 4 - class30_sub2_sub1_sub2_1.anInt1452) / 2;
@@ -2363,7 +2363,7 @@ public final class GameClient extends GameShell
             ObjectDefinition class46 = ObjectDefinition.method572(j2);
             if(class46.anInt758 != -1)
             {
-                Class30_Sub2_Sub1_Sub2 class30_sub2_sub1_sub2 = aClass30_Sub2_Sub1_Sub2Array1060[class46.anInt758];
+                IndexedSprite class30_sub2_sub1_sub2 = aClass30_Sub2_Sub1_Sub2Array1060[class46.anInt758];
                 if(class30_sub2_sub1_sub2 != null)
                 {
                     int i4 = (class46.anInt744 * 4 - class30_sub2_sub1_sub2.anInt1452) / 2;
@@ -2376,11 +2376,11 @@ public final class GameClient extends GameShell
 
     public final void method51(int i)
     {
-        aClass30_Sub2_Sub1_Sub2_966 = new Class30_Sub2_Sub1_Sub2(aClass44_1053, "titlebox", 0);
+        aClass30_Sub2_Sub1_Sub2_966 = new IndexedSprite(aClass44_1053, "titlebox", 0);
         if(i <= 0)
             aBoolean1231 = !aBoolean1231;
-        aClass30_Sub2_Sub1_Sub2_967 = new Class30_Sub2_Sub1_Sub2(aClass44_1053, "titlebutton", 0);
-        aClass30_Sub2_Sub1_Sub2Array1152 = new Class30_Sub2_Sub1_Sub2[12];
+        aClass30_Sub2_Sub1_Sub2_967 = new IndexedSprite(aClass44_1053, "titlebutton", 0);
+        aClass30_Sub2_Sub1_Sub2Array1152 = new IndexedSprite[12];
         int j = 0;
         try
         {
@@ -2390,16 +2390,16 @@ public final class GameClient extends GameShell
         if(j == 0)
         {
             for(int k = 0; k < 12; k++)
-                aClass30_Sub2_Sub1_Sub2Array1152[k] = new Class30_Sub2_Sub1_Sub2(aClass44_1053, "runes", k);
+                aClass30_Sub2_Sub1_Sub2Array1152[k] = new IndexedSprite(aClass44_1053, "runes", k);
 
         } else
         {
             for(int l = 0; l < 12; l++)
-                aClass30_Sub2_Sub1_Sub2Array1152[l] = new Class30_Sub2_Sub1_Sub2(aClass44_1053, "runes", 12 + (l & 3));
+                aClass30_Sub2_Sub1_Sub2Array1152[l] = new IndexedSprite(aClass44_1053, "runes", 12 + (l & 3));
 
         }
-        aClass30_Sub2_Sub1_Sub1_1201 = new Class30_Sub2_Sub1_Sub1(128, 265);
-        aClass30_Sub2_Sub1_Sub1_1202 = new Class30_Sub2_Sub1_Sub1(128, 265);
+        aClass30_Sub2_Sub1_Sub1_1201 = new Sprite(128, 265);
+        aClass30_Sub2_Sub1_Sub1_1202 = new Sprite(128, 265);
         for(int i1 = 0; i1 < 33920; i1++)
             aClass30_Sub2_Sub1_Sub1_1201.anIntArray1439[i1] = aClass15_1110.anIntArray315[i1];
 
@@ -2463,7 +2463,7 @@ public final class GameClient extends GameShell
     public static final void method52(boolean flag)
     {
         SceneGraph.aBoolean436 = false;
-        Class30_Sub2_Sub1_Sub3.aBoolean1461 = false;
+        Rasterizer3D.aBoolean1461 = false;
         aBoolean960 = false;
         MapRegion.aBoolean151 = false;
         if(flag)
@@ -2616,7 +2616,7 @@ public final class GameClient extends GameShell
     public final void method56(int i)
     {
         byte abyte0[] = aClass44_1053.method571("title.dat", null);
-        Class30_Sub2_Sub1_Sub1 class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(abyte0, this);
+        Sprite class30_sub2_sub1_sub1 = new Sprite(abyte0, this);
         aClass15_1110.method237(0);
         class30_sub2_sub1_sub1.method346(0, 0, -32357);
         aClass15_1111.method237(0);
@@ -2669,7 +2669,7 @@ public final class GameClient extends GameShell
         } else
         {
             class30_sub2_sub1_sub1.method346(-180, -171, -32357);
-            class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(aClass44_1053, "logo", 0);
+            class30_sub2_sub1_sub1 = new Sprite(aClass44_1053, "logo", 0);
             aClass15_1107.method237(0);
             class30_sub2_sub1_sub1.method348(382 - class30_sub2_sub1_sub1.anInt1440 / 2 - 128, 16083, 18);
             class30_sub2_sub1_sub1 = null;
@@ -3220,25 +3220,25 @@ public final class GameClient extends GameShell
         aClass15_1124 = null;
         aClass15_1125 = null;
         aClass15_1110 = new ProducingGraphicsBuffer(128, 265, method11(0), 0);
-        Class30_Sub2_Sub1.method334(aBoolean1206);
+        Rasterizer2D.method334(aBoolean1206);
         aClass15_1111 = new ProducingGraphicsBuffer(128, 265, method11(0), 0);
-        Class30_Sub2_Sub1.method334(aBoolean1206);
+        Rasterizer2D.method334(aBoolean1206);
         aClass15_1107 = new ProducingGraphicsBuffer(509, 171, method11(0), 0);
-        Class30_Sub2_Sub1.method334(aBoolean1206);
+        Rasterizer2D.method334(aBoolean1206);
         aClass15_1108 = new ProducingGraphicsBuffer(360, 132, method11(0), 0);
-        Class30_Sub2_Sub1.method334(aBoolean1206);
+        Rasterizer2D.method334(aBoolean1206);
         aClass15_1109 = new ProducingGraphicsBuffer(360, 200, method11(0), 0);
-        Class30_Sub2_Sub1.method334(aBoolean1206);
+        Rasterizer2D.method334(aBoolean1206);
         aClass15_1112 = new ProducingGraphicsBuffer(202, 238, method11(0), 0);
         if(i < 0 || i > 0)
             aClass19ArrayArrayArray827 = null;
-        Class30_Sub2_Sub1.method334(aBoolean1206);
+        Rasterizer2D.method334(aBoolean1206);
         aClass15_1113 = new ProducingGraphicsBuffer(203, 238, method11(0), 0);
-        Class30_Sub2_Sub1.method334(aBoolean1206);
+        Rasterizer2D.method334(aBoolean1206);
         aClass15_1114 = new ProducingGraphicsBuffer(74, 94, method11(0), 0);
-        Class30_Sub2_Sub1.method334(aBoolean1206);
+        Rasterizer2D.method334(aBoolean1206);
         aClass15_1115 = new ProducingGraphicsBuffer(75, 94, method11(0), 0);
-        Class30_Sub2_Sub1.method334(aBoolean1206);
+        Rasterizer2D.method334(aBoolean1206);
         if(aClass44_1053 != null)
         {
             method56(0);
@@ -3263,10 +3263,10 @@ public final class GameClient extends GameShell
         byte byte1 = 20;
         aClass30_Sub2_Sub1_Sub4_1272.method381(0xffffff, "MoparScape is loading - Hold onto your butts...", 23693, c1 / 2 - 26 - byte1, c / 2);
         int j = c1 / 2 - 18 - byte1;
-        Class30_Sub2_Sub1.method337(c / 2 - 152, 304, 34, 0x8c1111, j, true);
-        Class30_Sub2_Sub1.method337(c / 2 - 151, 302, 32, 0, j + 1, true);
-        Class30_Sub2_Sub1.method336(30, j + 2, c / 2 - 150, 0x8c1111, i * 3, 0);
-        Class30_Sub2_Sub1.method336(30, j + 2, (c / 2 - 150) + i * 3, 0, 300 - i * 3, 0);
+        Rasterizer2D.method337(c / 2 - 152, 304, 34, 0x8c1111, j, true);
+        Rasterizer2D.method337(c / 2 - 151, 302, 32, 0, j + 1, true);
+        Rasterizer2D.method336(30, j + 2, c / 2 - 150, 0x8c1111, i * 3, 0);
+        Rasterizer2D.method336(30, j + 2, (c / 2 - 150) + i * 3, 0, 300 - i * 3, 0);
         aClass30_Sub2_Sub1_Sub4_1272.method381(0xffffff, s, 23693, (c1 / 2 + 5) - byte1, c / 2);
         aClass15_1109.method238(171, 23680, super.aGraphics12, 202);
         if(byte0 != 4)
@@ -4775,7 +4775,7 @@ public final class GameClient extends GameShell
         Class41.aClass41Array701 = null;
         super.aClass15_13 = null;
         Class30_Sub2_Sub4_Sub1_Sub2.aClass12_1704 = null;
-        Class30_Sub2_Sub1_Sub3.method363(-501);
+        Rasterizer3D.method363(-501);
         SceneGraph.method273(-501);
         Model.method458(-501);
         Class36.method530(-501);
@@ -5522,7 +5522,7 @@ public final class GameClient extends GameShell
     {
         if(anInt1195 == 0)
             return;
-        Class30_Sub2_Sub1_Sub4 class30_sub2_sub1_sub4 = aClass30_Sub2_Sub1_Sub4_1271;
+        FontRenderer class30_sub2_sub1_sub4 = aClass30_Sub2_Sub1_Sub4_1271;
         if(byte0 != aByte1274)
             aBoolean1231 = !aBoolean1231;
         int i = 0;
@@ -5718,11 +5718,11 @@ public final class GameClient extends GameShell
         aClass15_1115 = null;
         aClass15_1166 = new ProducingGraphicsBuffer(479, 96, method11(0), 0);
         aClass15_1164 = new ProducingGraphicsBuffer(172, 156, method11(0), 0);
-        Class30_Sub2_Sub1.method334(aBoolean1206);
+        Rasterizer2D.method334(aBoolean1206);
         aClass30_Sub2_Sub1_Sub2_1197.method361(0, 16083, 0);
         aClass15_1163 = new ProducingGraphicsBuffer(190, 261, method11(0), 0);
         aClass15_1165 = new ProducingGraphicsBuffer(512, 334, method11(0), 0);
-        Class30_Sub2_Sub1.method334(aBoolean1206);
+        Rasterizer2D.method334(aBoolean1206);
         aClass15_1123 = new ProducingGraphicsBuffer(496, 50, method11(0), 0);
         if(i != 1)
             method6();
@@ -5742,7 +5742,7 @@ public final class GameClient extends GameShell
             return super.getDocumentBase().getHost().toLowerCase();
     }
 
-    public final void method81(Class30_Sub2_Sub1_Sub1 class30_sub2_sub1_sub1, int i, int j, int k)
+    public final void method81(Sprite class30_sub2_sub1_sub1, int i, int j, int k)
     {
         int l = k * k + j * j;
         if(i >= 0)
@@ -6809,10 +6809,10 @@ public final class GameClient extends GameShell
         {
             method16(533);
             aClass44_1053 = method67(1, "title screen", "title", anIntArray1090[1], (byte)-41, 25);
-            aClass30_Sub2_Sub1_Sub4_1270 = new Class30_Sub2_Sub1_Sub4(false, "p11_full", 0, aClass44_1053);
-            aClass30_Sub2_Sub1_Sub4_1271 = new Class30_Sub2_Sub1_Sub4(false, "p12_full", 0, aClass44_1053);
-            aClass30_Sub2_Sub1_Sub4_1272 = new Class30_Sub2_Sub1_Sub4(false, "b12_full", 0, aClass44_1053);
-            aClass30_Sub2_Sub1_Sub4_1273 = new Class30_Sub2_Sub1_Sub4(true, "q8_full", 0, aClass44_1053);
+            aClass30_Sub2_Sub1_Sub4_1270 = new FontRenderer(false, "p11_full", 0, aClass44_1053);
+            aClass30_Sub2_Sub1_Sub4_1271 = new FontRenderer(false, "p12_full", 0, aClass44_1053);
+            aClass30_Sub2_Sub1_Sub4_1272 = new FontRenderer(false, "b12_full", 0, aClass44_1053);
+            aClass30_Sub2_Sub1_Sub4_1273 = new FontRenderer(true, "q8_full", 0, aClass44_1053);
             method56(0);
             method51(215);
             Archive class44 = method67(2, "config", "config", anIntArray1090[2], (byte)-41, 30);
@@ -6827,7 +6827,7 @@ public final class GameClient extends GameShell
             for(int j = 0; j < 4; j++)
                 aClass11Array1230[j] = new CollisionMap(104, 104, true);
 
-            aClass30_Sub2_Sub1_Sub1_1263 = new Class30_Sub2_Sub1_Sub1(512, 512);
+            aClass30_Sub2_Sub1_Sub1_1263 = new Sprite(512, 512);
             Archive class44_6 = method67(5, "update list", "versionlist", anIntArray1090[5], (byte)-41, 60);
             method13(60, (byte)4, "Connecting to update server");
             aClass42_Sub1_1068 = new OnDemandFetcher();
@@ -6973,105 +6973,105 @@ public final class GameClient extends GameShell
 
             }
             method13(80, (byte)4, "Unpacking media");
-            aClass30_Sub2_Sub1_Sub2_1196 = new Class30_Sub2_Sub1_Sub2(class44_2, "invback", 0);
-            aClass30_Sub2_Sub1_Sub2_1198 = new Class30_Sub2_Sub1_Sub2(class44_2, "chatback", 0);
-            aClass30_Sub2_Sub1_Sub2_1197 = new Class30_Sub2_Sub1_Sub2(class44_2, "mapback", 0);
-            aClass30_Sub2_Sub1_Sub2_1027 = new Class30_Sub2_Sub1_Sub2(class44_2, "backbase1", 0);
-            aClass30_Sub2_Sub1_Sub2_1028 = new Class30_Sub2_Sub1_Sub2(class44_2, "backbase2", 0);
-            aClass30_Sub2_Sub1_Sub2_1029 = new Class30_Sub2_Sub1_Sub2(class44_2, "backhmid1", 0);
+            aClass30_Sub2_Sub1_Sub2_1196 = new IndexedSprite(class44_2, "invback", 0);
+            aClass30_Sub2_Sub1_Sub2_1198 = new IndexedSprite(class44_2, "chatback", 0);
+            aClass30_Sub2_Sub1_Sub2_1197 = new IndexedSprite(class44_2, "mapback", 0);
+            aClass30_Sub2_Sub1_Sub2_1027 = new IndexedSprite(class44_2, "backbase1", 0);
+            aClass30_Sub2_Sub1_Sub2_1028 = new IndexedSprite(class44_2, "backbase2", 0);
+            aClass30_Sub2_Sub1_Sub2_1029 = new IndexedSprite(class44_2, "backhmid1", 0);
             for(int j3 = 0; j3 < 13; j3++)
-                aClass30_Sub2_Sub1_Sub2Array947[j3] = new Class30_Sub2_Sub1_Sub2(class44_2, "sideicons", j3);
+                aClass30_Sub2_Sub1_Sub2Array947[j3] = new IndexedSprite(class44_2, "sideicons", j3);
 
-            aClass30_Sub2_Sub1_Sub1_1122 = new Class30_Sub2_Sub1_Sub1(class44_2, "compass", 0);
-            aClass30_Sub2_Sub1_Sub1_1001 = new Class30_Sub2_Sub1_Sub1(class44_2, "mapedge", 0);
+            aClass30_Sub2_Sub1_Sub1_1122 = new Sprite(class44_2, "compass", 0);
+            aClass30_Sub2_Sub1_Sub1_1001 = new Sprite(class44_2, "mapedge", 0);
             aClass30_Sub2_Sub1_Sub1_1001.method345(5059);
             try
             {
                 for(int k3 = 0; k3 < 100; k3++)
-                    aClass30_Sub2_Sub1_Sub2Array1060[k3] = new Class30_Sub2_Sub1_Sub2(class44_2, "mapscene", k3);
+                    aClass30_Sub2_Sub1_Sub2Array1060[k3] = new IndexedSprite(class44_2, "mapscene", k3);
 
             }
             catch(Exception _ex) { }
             try
             {
                 for(int l3 = 0; l3 < 100; l3++)
-                    aClass30_Sub2_Sub1_Sub1Array1033[l3] = new Class30_Sub2_Sub1_Sub1(class44_2, "mapfunction", l3);
+                    aClass30_Sub2_Sub1_Sub1Array1033[l3] = new Sprite(class44_2, "mapfunction", l3);
 
             }
             catch(Exception _ex) { }
             try
             {
                 for(int i4 = 0; i4 < 20; i4++)
-                    aClass30_Sub2_Sub1_Sub1Array987[i4] = new Class30_Sub2_Sub1_Sub1(class44_2, "hitmarks", i4);
+                    aClass30_Sub2_Sub1_Sub1Array987[i4] = new Sprite(class44_2, "hitmarks", i4);
 
             }
             catch(Exception _ex) { }
             try
             {
                 for(int j4 = 0; j4 < 20; j4++)
-                    aClass30_Sub2_Sub1_Sub1Array1095[j4] = new Class30_Sub2_Sub1_Sub1(class44_2, "headicons", j4);
+                    aClass30_Sub2_Sub1_Sub1Array1095[j4] = new Sprite(class44_2, "headicons", j4);
 
             }
             catch(Exception _ex) { }
-            aClass30_Sub2_Sub1_Sub1_870 = new Class30_Sub2_Sub1_Sub1(class44_2, "mapmarker", 0);
-            aClass30_Sub2_Sub1_Sub1_871 = new Class30_Sub2_Sub1_Sub1(class44_2, "mapmarker", 1);
+            aClass30_Sub2_Sub1_Sub1_870 = new Sprite(class44_2, "mapmarker", 0);
+            aClass30_Sub2_Sub1_Sub1_871 = new Sprite(class44_2, "mapmarker", 1);
             for(int k4 = 0; k4 < 8; k4++)
-                aClass30_Sub2_Sub1_Sub1Array1150[k4] = new Class30_Sub2_Sub1_Sub1(class44_2, "cross", k4);
+                aClass30_Sub2_Sub1_Sub1Array1150[k4] = new Sprite(class44_2, "cross", k4);
 
-            aClass30_Sub2_Sub1_Sub1_1074 = new Class30_Sub2_Sub1_Sub1(class44_2, "mapdots", 0);
-            aClass30_Sub2_Sub1_Sub1_1075 = new Class30_Sub2_Sub1_Sub1(class44_2, "mapdots", 1);
-            aClass30_Sub2_Sub1_Sub1_1076 = new Class30_Sub2_Sub1_Sub1(class44_2, "mapdots", 2);
-            aClass30_Sub2_Sub1_Sub1_1077 = new Class30_Sub2_Sub1_Sub1(class44_2, "mapdots", 3);
-            aClass30_Sub2_Sub1_Sub1_1078 = new Class30_Sub2_Sub1_Sub1(class44_2, "mapdots", 4);
-            aClass30_Sub2_Sub1_Sub2_1024 = new Class30_Sub2_Sub1_Sub2(class44_2, "scrollbar", 0);
-            aClass30_Sub2_Sub1_Sub2_1025 = new Class30_Sub2_Sub1_Sub2(class44_2, "scrollbar", 1);
-            aClass30_Sub2_Sub1_Sub2_1143 = new Class30_Sub2_Sub1_Sub2(class44_2, "redstone1", 0);
-            aClass30_Sub2_Sub1_Sub2_1144 = new Class30_Sub2_Sub1_Sub2(class44_2, "redstone2", 0);
-            aClass30_Sub2_Sub1_Sub2_1145 = new Class30_Sub2_Sub1_Sub2(class44_2, "redstone3", 0);
-            aClass30_Sub2_Sub1_Sub2_1146 = new Class30_Sub2_Sub1_Sub2(class44_2, "redstone1", 0);
+            aClass30_Sub2_Sub1_Sub1_1074 = new Sprite(class44_2, "mapdots", 0);
+            aClass30_Sub2_Sub1_Sub1_1075 = new Sprite(class44_2, "mapdots", 1);
+            aClass30_Sub2_Sub1_Sub1_1076 = new Sprite(class44_2, "mapdots", 2);
+            aClass30_Sub2_Sub1_Sub1_1077 = new Sprite(class44_2, "mapdots", 3);
+            aClass30_Sub2_Sub1_Sub1_1078 = new Sprite(class44_2, "mapdots", 4);
+            aClass30_Sub2_Sub1_Sub2_1024 = new IndexedSprite(class44_2, "scrollbar", 0);
+            aClass30_Sub2_Sub1_Sub2_1025 = new IndexedSprite(class44_2, "scrollbar", 1);
+            aClass30_Sub2_Sub1_Sub2_1143 = new IndexedSprite(class44_2, "redstone1", 0);
+            aClass30_Sub2_Sub1_Sub2_1144 = new IndexedSprite(class44_2, "redstone2", 0);
+            aClass30_Sub2_Sub1_Sub2_1145 = new IndexedSprite(class44_2, "redstone3", 0);
+            aClass30_Sub2_Sub1_Sub2_1146 = new IndexedSprite(class44_2, "redstone1", 0);
             aClass30_Sub2_Sub1_Sub2_1146.method358(0);
-            aClass30_Sub2_Sub1_Sub2_1147 = new Class30_Sub2_Sub1_Sub2(class44_2, "redstone2", 0);
+            aClass30_Sub2_Sub1_Sub2_1147 = new IndexedSprite(class44_2, "redstone2", 0);
             aClass30_Sub2_Sub1_Sub2_1147.method358(0);
-            aClass30_Sub2_Sub1_Sub2_865 = new Class30_Sub2_Sub1_Sub2(class44_2, "redstone1", 0);
+            aClass30_Sub2_Sub1_Sub2_865 = new IndexedSprite(class44_2, "redstone1", 0);
             aClass30_Sub2_Sub1_Sub2_865.method359(true);
-            aClass30_Sub2_Sub1_Sub2_866 = new Class30_Sub2_Sub1_Sub2(class44_2, "redstone2", 0);
+            aClass30_Sub2_Sub1_Sub2_866 = new IndexedSprite(class44_2, "redstone2", 0);
             aClass30_Sub2_Sub1_Sub2_866.method359(true);
-            aClass30_Sub2_Sub1_Sub2_867 = new Class30_Sub2_Sub1_Sub2(class44_2, "redstone3", 0);
+            aClass30_Sub2_Sub1_Sub2_867 = new IndexedSprite(class44_2, "redstone3", 0);
             aClass30_Sub2_Sub1_Sub2_867.method359(true);
-            aClass30_Sub2_Sub1_Sub2_868 = new Class30_Sub2_Sub1_Sub2(class44_2, "redstone1", 0);
+            aClass30_Sub2_Sub1_Sub2_868 = new IndexedSprite(class44_2, "redstone1", 0);
             aClass30_Sub2_Sub1_Sub2_868.method358(0);
             aClass30_Sub2_Sub1_Sub2_868.method359(true);
-            aClass30_Sub2_Sub1_Sub2_869 = new Class30_Sub2_Sub1_Sub2(class44_2, "redstone2", 0);
+            aClass30_Sub2_Sub1_Sub2_869 = new IndexedSprite(class44_2, "redstone2", 0);
             aClass30_Sub2_Sub1_Sub2_869.method358(0);
             aClass30_Sub2_Sub1_Sub2_869.method359(true);
             for(int l4 = 0; l4 < 2; l4++)
-                aClass30_Sub2_Sub1_Sub2Array1219[l4] = new Class30_Sub2_Sub1_Sub2(class44_2, "mod_icons", l4);
+                aClass30_Sub2_Sub1_Sub2Array1219[l4] = new IndexedSprite(class44_2, "mod_icons", l4);
 
-            Class30_Sub2_Sub1_Sub1 class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(class44_2, "backleft1", 0);
+            Sprite class30_sub2_sub1_sub1 = new Sprite(class44_2, "backleft1", 0);
             aClass15_903 = new ProducingGraphicsBuffer(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
             class30_sub2_sub1_sub1.method346(0, 0, -32357);
-            class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(class44_2, "backleft2", 0);
+            class30_sub2_sub1_sub1 = new Sprite(class44_2, "backleft2", 0);
             aClass15_904 = new ProducingGraphicsBuffer(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
             class30_sub2_sub1_sub1.method346(0, 0, -32357);
-            class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(class44_2, "backright1", 0);
+            class30_sub2_sub1_sub1 = new Sprite(class44_2, "backright1", 0);
             aClass15_905 = new ProducingGraphicsBuffer(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
             class30_sub2_sub1_sub1.method346(0, 0, -32357);
-            class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(class44_2, "backright2", 0);
+            class30_sub2_sub1_sub1 = new Sprite(class44_2, "backright2", 0);
             aClass15_906 = new ProducingGraphicsBuffer(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
             class30_sub2_sub1_sub1.method346(0, 0, -32357);
-            class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(class44_2, "backtop1", 0);
+            class30_sub2_sub1_sub1 = new Sprite(class44_2, "backtop1", 0);
             aClass15_907 = new ProducingGraphicsBuffer(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
             class30_sub2_sub1_sub1.method346(0, 0, -32357);
-            class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(class44_2, "backvmid1", 0);
+            class30_sub2_sub1_sub1 = new Sprite(class44_2, "backvmid1", 0);
             aClass15_908 = new ProducingGraphicsBuffer(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
             class30_sub2_sub1_sub1.method346(0, 0, -32357);
-            class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(class44_2, "backvmid2", 0);
+            class30_sub2_sub1_sub1 = new Sprite(class44_2, "backvmid2", 0);
             aClass15_909 = new ProducingGraphicsBuffer(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
             class30_sub2_sub1_sub1.method346(0, 0, -32357);
-            class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(class44_2, "backvmid3", 0);
+            class30_sub2_sub1_sub1 = new Sprite(class44_2, "backvmid3", 0);
             aClass15_910 = new ProducingGraphicsBuffer(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
             class30_sub2_sub1_sub1.method346(0, 0, -32357);
-            class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(class44_2, "backhmid2", 0);
+            class30_sub2_sub1_sub1 = new Sprite(class44_2, "backhmid2", 0);
             aClass15_911 = new ProducingGraphicsBuffer(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
             class30_sub2_sub1_sub1.method346(0, 0, -32357);
             int i5 = (int)(Math.random() * 21D) - 10;
@@ -7087,9 +7087,9 @@ public final class GameClient extends GameShell
             }
 
             method13(83, (byte)4, "Unpacking textures");
-            Class30_Sub2_Sub1_Sub3.method368(class44_3, 0);
-            Class30_Sub2_Sub1_Sub3.method372(0.80000000000000004D, aByte1200);
-            Class30_Sub2_Sub1_Sub3.method367(20, true);
+            Rasterizer3D.method368(class44_3, 0);
+            Rasterizer3D.method372(0.80000000000000004D, aByte1200);
+            Rasterizer3D.method367(20, true);
             method13(86, (byte)4, "Unpacking config");
             Class20.method257(0, class44);
             ObjectDefinition.method576(class44);
@@ -7109,7 +7109,7 @@ public final class GameClient extends GameShell
                 Class16.method240(0, class30_sub2_sub2);
             }
             method13(95, (byte)4, "Unpacking interfaces");
-            Class30_Sub2_Sub1_Sub4 aclass30_sub2_sub1_sub4[] = {
+            FontRenderer aclass30_sub2_sub1_sub4[] = {
                 aClass30_Sub2_Sub1_Sub4_1270, aClass30_Sub2_Sub1_Sub4_1271, aClass30_Sub2_Sub1_Sub4_1272, aClass30_Sub2_Sub1_Sub4_1273
             };
             Class9.method205(class44_1, aclass30_sub2_sub1_sub4, (byte)-84, class44_2);
@@ -7158,18 +7158,18 @@ public final class GameClient extends GameShell
                 anIntArray1229[l6 - 5] = l7 - j7;
             }
 
-            Class30_Sub2_Sub1_Sub3.method365(-950, 479, 96);
-            anIntArray1180 = Class30_Sub2_Sub1_Sub3.anIntArray1472;
-            Class30_Sub2_Sub1_Sub3.method365(-950, 190, 261);
-            anIntArray1181 = Class30_Sub2_Sub1_Sub3.anIntArray1472;
-            Class30_Sub2_Sub1_Sub3.method365(-950, 512, 334);
-            anIntArray1182 = Class30_Sub2_Sub1_Sub3.anIntArray1472;
+            Rasterizer3D.method365(-950, 479, 96);
+            anIntArray1180 = Rasterizer3D.anIntArray1472;
+            Rasterizer3D.method365(-950, 190, 261);
+            anIntArray1181 = Rasterizer3D.anIntArray1472;
+            Rasterizer3D.method365(-950, 512, 334);
+            anIntArray1182 = Rasterizer3D.anIntArray1472;
             int ai[] = new int[9];
             for(int i8 = 0; i8 < 9; i8++)
             {
                 int k8 = 128 + i8 * 32 + 15;
                 int l8 = 600 + k8 * 3;
-                int i9 = Class30_Sub2_Sub1_Sub3.anIntArray1470[k8];
+                int i9 = Rasterizer3D.anIntArray1470[k8];
                 ai[i8] = l8 * i9 >> 16;
             }
 
@@ -7238,8 +7238,8 @@ public final class GameClient extends GameShell
                 i -= 73;
                 j -= 75;
                 int k = anInt1185 + anInt1209 & 0x7ff;
-                int i1 = Class30_Sub2_Sub1_Sub3.anIntArray1470[k];
-                int j1 = Class30_Sub2_Sub1_Sub3.anIntArray1471[k];
+                int i1 = Rasterizer3D.anIntArray1470[k];
+                int j1 = Rasterizer3D.anIntArray1471[k];
                 i1 = i1 * (anInt1170 + 256) >> 8;
                 j1 = j1 * (anInt1170 + 256) >> 8;
                 int k1 = j * i1 + i * j1 >> 11;
@@ -7981,11 +7981,11 @@ public final class GameClient extends GameShell
             return;
         if(class9.aBoolean266 && anInt1026 != class9.anInt250 && anInt1048 != class9.anInt250 && anInt1039 != class9.anInt250)
             return;
-        int i1 = Class30_Sub2_Sub1.anInt1383;
-        int j1 = Class30_Sub2_Sub1.anInt1381;
-        int k1 = Class30_Sub2_Sub1.anInt1384;
-        int l1 = Class30_Sub2_Sub1.anInt1382;
-        Class30_Sub2_Sub1.method333(l + class9.anInt267, k, false, k + class9.anInt220, l);
+        int i1 = Rasterizer2D.anInt1383;
+        int j1 = Rasterizer2D.anInt1381;
+        int k1 = Rasterizer2D.anInt1384;
+        int l1 = Rasterizer2D.anInt1382;
+        Rasterizer2D.method333(l + class9.anInt267, k, false, k + class9.anInt220, l);
         int i2 = class9.anIntArray240.length;
         for(int j2 = 0; j2 < i2; j2++)
         {
@@ -8026,12 +8026,12 @@ public final class GameClient extends GameShell
                                 int k6 = 0;
                                 int j7 = 0;
                                 int j9 = class9_1.anIntArray253[i3] - 1;
-                                if(k5 > Class30_Sub2_Sub1.anInt1383 - 32 && k5 < Class30_Sub2_Sub1.anInt1384 && j6 > Class30_Sub2_Sub1.anInt1381 - 32 && j6 < Class30_Sub2_Sub1.anInt1382 || anInt1086 != 0 && anInt1085 == i3)
+                                if(k5 > Rasterizer2D.anInt1383 - 32 && k5 < Rasterizer2D.anInt1384 && j6 > Rasterizer2D.anInt1381 - 32 && j6 < Rasterizer2D.anInt1382 || anInt1086 != 0 && anInt1085 == i3)
                                 {
                                     int l9 = 0;
                                     if(anInt1282 == 1 && anInt1283 == i3 && anInt1284 == class9_1.anInt250)
                                         l9 = 0xffffff;
-                                    Class30_Sub2_Sub1_Sub1 class30_sub2_sub1_sub1_2 = Class8.method200(j9, class9_1.anIntArray252[i3], l9, 9);
+                                    Sprite class30_sub2_sub1_sub1_2 = Class8.method200(j9, class9_1.anIntArray252[i3], l9, 9);
                                     if(class30_sub2_sub1_sub1_2 != null)
                                     {
                                         if(anInt1086 != 0 && anInt1085 == i3 && anInt1084 == class9_1.anInt250)
@@ -8048,9 +8048,9 @@ public final class GameClient extends GameShell
                                                 j7 = 0;
                                             }
                                             class30_sub2_sub1_sub1_2.method350(k5 + k6, j6 + j7, 128, aBoolean1043);
-                                            if(j6 + j7 < Class30_Sub2_Sub1.anInt1381 && class9.anInt224 > 0)
+                                            if(j6 + j7 < Rasterizer2D.anInt1381 && class9.anInt224 > 0)
                                             {
-                                                int i10 = (anInt945 * (Class30_Sub2_Sub1.anInt1381 - j6 - j7)) / 3;
+                                                int i10 = (anInt945 * (Rasterizer2D.anInt1381 - j6 - j7)) / 3;
                                                 if(i10 > anInt945 * 10)
                                                     i10 = anInt945 * 10;
                                                 if(i10 > class9.anInt224)
@@ -8058,9 +8058,9 @@ public final class GameClient extends GameShell
                                                 class9.anInt224 -= i10;
                                                 anInt1088 += i10;
                                             }
-                                            if(j6 + j7 + 32 > Class30_Sub2_Sub1.anInt1382 && class9.anInt224 < class9.anInt261 - class9.anInt267)
+                                            if(j6 + j7 + 32 > Rasterizer2D.anInt1382 && class9.anInt224 < class9.anInt261 - class9.anInt267)
                                             {
-                                                int j10 = (anInt945 * ((j6 + j7 + 32) - Class30_Sub2_Sub1.anInt1382)) / 3;
+                                                int j10 = (anInt945 * ((j6 + j7 + 32) - Rasterizer2D.anInt1382)) / 3;
                                                 if(j10 > anInt945 * 10)
                                                     j10 = anInt945 * 10;
                                                 if(j10 > class9.anInt261 - class9.anInt267 - class9.anInt224)
@@ -8084,7 +8084,7 @@ public final class GameClient extends GameShell
                             } else
                             if(class9_1.aClass30_Sub2_Sub1_Sub1Array209 != null && i3 < 20)
                             {
-                                Class30_Sub2_Sub1_Sub1 class30_sub2_sub1_sub1_1 = class9_1.aClass30_Sub2_Sub1_Sub1Array209[i3];
+                                Sprite class30_sub2_sub1_sub1_1 = class9_1.aClass30_Sub2_Sub1_Sub1Array209[i3];
                                 if(class30_sub2_sub1_sub1_1 != null)
                                     class30_sub2_sub1_sub1_1.method348(k5, 16083, j6);
                             }
@@ -8114,18 +8114,18 @@ public final class GameClient extends GameShell
                     if(class9_1.aByte254 == 0)
                     {
                         if(class9_1.aBoolean227)
-                            Class30_Sub2_Sub1.method336(class9_1.anInt267, l2, k2, j3, class9_1.anInt220, 0);
+                            Rasterizer2D.method336(class9_1.anInt267, l2, k2, j3, class9_1.anInt220, 0);
                         else
-                            Class30_Sub2_Sub1.method337(k2, class9_1.anInt220, class9_1.anInt267, j3, l2, true);
+                            Rasterizer2D.method337(k2, class9_1.anInt220, class9_1.anInt267, j3, l2, true);
                     } else
                     if(class9_1.aBoolean227)
-                        Class30_Sub2_Sub1.method335(j3, l2, class9_1.anInt220, class9_1.anInt267, 256 - (class9_1.aByte254 & 0xff), 0, k2);
+                        Rasterizer2D.method335(j3, l2, class9_1.anInt220, class9_1.anInt267, 256 - (class9_1.aByte254 & 0xff), 0, k2);
                     else
-                        Class30_Sub2_Sub1.method338(l2, class9_1.anInt267, 256 - (class9_1.aByte254 & 0xff), j3, class9_1.anInt220, k2, -17319);
+                        Rasterizer2D.method338(l2, class9_1.anInt267, 256 - (class9_1.aByte254 & 0xff), j3, class9_1.anInt220, k2, -17319);
                 } else
                 if(class9_1.anInt262 == 4)
                 {
-                    Class30_Sub2_Sub1_Sub4 class30_sub2_sub1_sub4 = class9_1.aClass30_Sub2_Sub1_Sub4_243;
+                    FontRenderer class30_sub2_sub1_sub4 = class9_1.aClass30_Sub2_Sub1_Sub4_243;
                     String s = class9_1.aString248;
                     boolean flag1 = false;
                     if(anInt1039 == class9_1.anInt250 || anInt1048 == class9_1.anInt250 || anInt1026 == class9_1.anInt250)
@@ -8149,7 +8149,7 @@ public final class GameClient extends GameShell
                         s = "Please wait...";
                         i4 = class9_1.anInt232;
                     }
-                    if(Class30_Sub2_Sub1.anInt1379 == 479)
+                    if(Rasterizer2D.anInt1379 == 479)
                     {
                         if(i4 == 0xffff00)
                             i4 = 255;
@@ -8216,7 +8216,7 @@ public final class GameClient extends GameShell
                 } else
                 if(class9_1.anInt262 == 5)
                 {
-                    Class30_Sub2_Sub1_Sub1 class30_sub2_sub1_sub1;
+                    Sprite class30_sub2_sub1_sub1;
                     if(method131(class9_1, false))
                         class30_sub2_sub1_sub1 = class9_1.aClass30_Sub2_Sub1_Sub1_260;
                     else
@@ -8226,12 +8226,12 @@ public final class GameClient extends GameShell
                 } else
                 if(class9_1.anInt262 == 6)
                 {
-                    int k3 = Class30_Sub2_Sub1_Sub3.anInt1466;
-                    int j4 = Class30_Sub2_Sub1_Sub3.anInt1467;
-                    Class30_Sub2_Sub1_Sub3.anInt1466 = k2 + class9_1.anInt220 / 2;
-                    Class30_Sub2_Sub1_Sub3.anInt1467 = l2 + class9_1.anInt267 / 2;
-                    int i5 = Class30_Sub2_Sub1_Sub3.anIntArray1470[class9_1.anInt270] * class9_1.anInt269 >> 16;
-                    int l5 = Class30_Sub2_Sub1_Sub3.anIntArray1471[class9_1.anInt270] * class9_1.anInt269 >> 16;
+                    int k3 = Rasterizer3D.anInt1466;
+                    int j4 = Rasterizer3D.anInt1467;
+                    Rasterizer3D.anInt1466 = k2 + class9_1.anInt220 / 2;
+                    Rasterizer3D.anInt1467 = l2 + class9_1.anInt267 / 2;
+                    int i5 = Rasterizer3D.anIntArray1470[class9_1.anInt270] * class9_1.anInt269 >> 16;
+                    int l5 = Rasterizer3D.anIntArray1471[class9_1.anInt270] * class9_1.anInt269 >> 16;
                     boolean flag2 = method131(class9_1, false);
                     int i7;
                     if(flag2)
@@ -8249,12 +8249,12 @@ public final class GameClient extends GameShell
                     }
                     if(class30_sub2_sub4_sub6 != null)
                         class30_sub2_sub4_sub6.method482(0, class9_1.anInt271, 0, class9_1.anInt270, 0, i5, l5);
-                    Class30_Sub2_Sub1_Sub3.anInt1466 = k3;
-                    Class30_Sub2_Sub1_Sub3.anInt1467 = j4;
+                    Rasterizer3D.anInt1466 = k3;
+                    Rasterizer3D.anInt1467 = j4;
                 } else
                 if(class9_1.anInt262 == 7)
                 {
-                    Class30_Sub2_Sub1_Sub4 class30_sub2_sub1_sub4_1 = class9_1.aClass30_Sub2_Sub1_Sub4_243;
+                    FontRenderer class30_sub2_sub1_sub4_1 = class9_1.aClass30_Sub2_Sub1_Sub4_243;
                     int k4 = 0;
                     for(int j5 = 0; j5 < class9_1.anInt267; j5++)
                     {
@@ -8281,10 +8281,10 @@ public final class GameClient extends GameShell
                 }
         }
 
-        Class30_Sub2_Sub1.method333(l1, i1, false, k1, j1);
+        Rasterizer2D.method333(l1, i1, false, k1, j1);
     }
 
-    public final void method106(Class30_Sub2_Sub1_Sub2 class30_sub2_sub1_sub2, int i)
+    public final void method106(IndexedSprite class30_sub2_sub1_sub2, int i)
     {
         int j = 256;
         if(i >= 0)
@@ -9319,7 +9319,7 @@ public final class GameClient extends GameShell
         if(anInt1021 == 2)
         {
             byte abyte0[] = aClass30_Sub2_Sub1_Sub2_1197.aByteArray1450;
-            int ai[] = Class30_Sub2_Sub1.anIntArray1378;
+            int ai[] = Rasterizer2D.anIntArray1378;
             int k2 = abyte0.length;
             for(int i5 = 0; i5 < k2; i5++)
                 if(abyte0[i5] == 0)
@@ -9438,7 +9438,7 @@ public final class GameClient extends GameShell
             int l4 = (anInt1262 * 4 + 2) - ((Class30_Sub2_Sub4_Sub1) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anInt1551 / 32;
             method141(aClass30_Sub2_Sub1_Sub1_870, j2, l4, false);
         }
-        Class30_Sub2_Sub1.method336(3, 78, 97, 0xffffff, 3, 0);
+        Rasterizer2D.method336(3, 78, 97, 0xffffff, 3, 0);
         aClass15_1165.method237(0);
     }
 
@@ -9475,8 +9475,8 @@ public final class GameClient extends GameShell
         i1 = j2;
         if(l >= 50)
         {
-            anInt963 = Class30_Sub2_Sub1_Sub3.anInt1466 + (i << 9) / l;
-            anInt964 = Class30_Sub2_Sub1_Sub3.anInt1467 + (i1 << 9) / l;
+            anInt963 = Rasterizer3D.anInt1466 + (i << 9) / l;
+            anInt964 = Rasterizer3D.anInt1467 + (i1 << 9) / l;
             return;
         } else
         {
@@ -10242,7 +10242,7 @@ public final class GameClient extends GameShell
         {
             for(int i = 1; i > 0; i++);
         }
-        Class30_Sub2_Sub1_Sub3.aBoolean1461 = true;
+        Rasterizer3D.aBoolean1461 = true;
         aBoolean960 = true;
         MapRegion.aBoolean151 = true;
         ObjectDefinition.aBoolean752 = true;
@@ -10428,7 +10428,7 @@ public final class GameClient extends GameShell
         }
     }
 
-    public final void method141(Class30_Sub2_Sub1_Sub1 class30_sub2_sub1_sub1, int i, int j, boolean flag)
+    public final void method141(Sprite class30_sub2_sub1_sub1, int i, int j, boolean flag)
     {
         int k = anInt1185 + anInt1209 & 0x7ff;
         int l = i * i + j * j;
@@ -11885,7 +11885,7 @@ public final class GameClient extends GameShell
                 }
             }
 
-        int k2 = Class30_Sub2_Sub1_Sub3.anInt1481;
+        int k2 = Rasterizer3D.anInt1481;
         Model.aBoolean1684 = true;
         if(byte0 != 1)
         {
@@ -11895,7 +11895,7 @@ public final class GameClient extends GameShell
             Model.anInt1687 = 0;
             Model.anInt1685 = super.anInt20 - 4;
             Model.anInt1686 = super.anInt21 - 4;
-            Class30_Sub2_Sub1.method334(aBoolean1206);
+            Rasterizer2D.method334(aBoolean1206);
             aClass25_946.method313(anInt858, anInt860, anInt862, anInt859, j, anInt861, false);
             aClass25_946.method288((byte)104);
             method34(anInt898);
@@ -11986,7 +11986,7 @@ public final class GameClient extends GameShell
         anIntArray942 = new int[100];
         aStringArray943 = new String[100];
         aStringArray944 = new String[100];
-        aClass30_Sub2_Sub1_Sub2Array947 = new Class30_Sub2_Sub1_Sub2[13];
+        aClass30_Sub2_Sub1_Sub2Array947 = new IndexedSprite[13];
         aBoolean954 = true;
         aLongArray955 = new long[200];
         anInt956 = -1;
@@ -12009,7 +12009,7 @@ public final class GameClient extends GameShell
         anIntArray982 = new int[anInt975];
         aStringArray983 = new String[anInt975];
         anInt985 = -1;
-        aClass30_Sub2_Sub1_Sub1Array987 = new Class30_Sub2_Sub1_Sub1[20];
+        aClass30_Sub2_Sub1_Sub1Array987 = new Sprite[20];
         anIntArray990 = new int[5];
         aBoolean991 = false;
         aBoolean994 = false;
@@ -12021,7 +12021,7 @@ public final class GameClient extends GameShell
         anInt1018 = -1;
         anIntArray1030 = new int[5];
         aBoolean1031 = false;
-        aClass30_Sub2_Sub1_Sub1Array1033 = new Class30_Sub2_Sub1_Sub1[100];
+        aClass30_Sub2_Sub1_Sub1Array1033 = new Sprite[100];
         anInt1042 = -1;
         aBoolean1043 = false;
         anIntArray1044 = new int[Skills.anInt733];
@@ -12034,7 +12034,7 @@ public final class GameClient extends GameShell
         anIntArray1057 = new int[33];
         anInt1058 = 24869;
         aClass9_1059 = new Class9();
-        aClass30_Sub2_Sub1_Sub2Array1060 = new Class30_Sub2_Sub1_Sub2[100];
+        aClass30_Sub2_Sub1_Sub2Array1060 = new IndexedSprite[100];
         anInt1063 = 0x4d4233;
         anIntArray1065 = new int[7];
         anIntArray1072 = new int[1000];
@@ -12048,7 +12048,7 @@ public final class GameClient extends GameShell
         anIntArray1092 = new int[500];
         anIntArray1093 = new int[500];
         anIntArray1094 = new int[500];
-        aClass30_Sub2_Sub1_Sub1Array1095 = new Class30_Sub2_Sub1_Sub1[20];
+        aClass30_Sub2_Sub1_Sub1Array1095 = new Sprite[20];
         aBoolean1103 = false;
         anInt1105 = 519;
         aBoolean1106 = false;
@@ -12061,10 +12061,10 @@ public final class GameClient extends GameShell
         anIntArrayArrayArray1129 = new int[4][13][13];
         anInt1132 = 2;
         anInt1135 = -12499;
-        aClass30_Sub2_Sub1_Sub1Array1140 = new Class30_Sub2_Sub1_Sub1[1000];
+        aClass30_Sub2_Sub1_Sub1Array1140 = new Sprite[1000];
         aBoolean1141 = false;
         aBoolean1149 = false;
-        aClass30_Sub2_Sub1_Sub1Array1150 = new Class30_Sub2_Sub1_Sub1[8];
+        aClass30_Sub2_Sub1_Sub1Array1150 = new Sprite[8];
         aBoolean1151 = true;
         aBoolean1153 = false;
         aBoolean1157 = false;
@@ -12091,7 +12091,7 @@ public final class GameClient extends GameShell
         aString1212 = "";
         aByte1217 = 6;
         anInt1218 = -589;
-        aClass30_Sub2_Sub1_Sub2Array1219 = new Class30_Sub2_Sub1_Sub2[2];
+        aClass30_Sub2_Sub1_Sub2Array1219 = new IndexedSprite[2];
         anInt1221 = 3;
         aBoolean1223 = false;
         aBoolean1228 = true;
@@ -12159,13 +12159,13 @@ public final class GameClient extends GameShell
     private int anInt862;
     private int anInt863;
     private int anIntArray864[];
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_865;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_866;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_867;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_868;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_869;
-    private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1_870;
-    private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1_871;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_865;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_866;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_867;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_868;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_869;
+    private Sprite aClass30_Sub2_Sub1_Sub1_870;
+    private Sprite aClass30_Sub2_Sub1_Sub1_871;
     private boolean aBoolean872;
     private int anIntArray873[];
     private int anInt874;
@@ -12225,8 +12225,8 @@ public final class GameClient extends GameShell
     private int anIntArray928[];
     private int anIntArrayArray929[][];
     private CRC32 aCRC32_930;
-    private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1_931;
-    private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1_932;
+    private Sprite aClass30_Sub2_Sub1_Sub1_931;
+    private Sprite aClass30_Sub2_Sub1_Sub1_932;
     private int anInt933;
     private int anInt934;
     private int anInt935;
@@ -12241,7 +12241,7 @@ public final class GameClient extends GameShell
     private String aStringArray944[];
     private int anInt945;
     private SceneGraph aClass25_946;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2Array947[];
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2Array947[];
     private int anInt948;
     private int anInt949;
     private int anInt950;
@@ -12262,8 +12262,8 @@ public final class GameClient extends GameShell
     private int anIntArray965[] = {
         0xffff00, 0xff0000, 65280, 65535, 0xff00ff, 0xffffff
     };
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_966;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_967;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_966;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_967;
     private int anIntArray968[];
     private int anIntArray969[];
     CacheFileStore aClass14Array970[];
@@ -12283,7 +12283,7 @@ public final class GameClient extends GameShell
     private int anInt984;
     private int anInt985;
     private static int anInt986;
-    private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1Array987[];
+    private Sprite aClass30_Sub2_Sub1_Sub1Array987[];
     private int anInt988;
     private int anInt989;
     private int anIntArray990[];
@@ -12297,7 +12297,7 @@ public final class GameClient extends GameShell
     private int anInt998;
     private int anInt999;
     private IsaacCipher aClass17_1000;
-    private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1_1001;
+    private Sprite aClass30_Sub2_Sub1_Sub1_1001;
     private int anInt1002;
     static final int anIntArrayArray1003[][] = {
         {
@@ -12335,16 +12335,16 @@ public final class GameClient extends GameShell
     private int anInt1021;
     int anInt1022;
     private int anInt1023;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_1024;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_1025;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_1024;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_1025;
     private int anInt1026;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_1027;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_1028;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_1029;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_1027;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_1028;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_1029;
     private int anIntArray1030[];
     private boolean aBoolean1031;
     private static BigInteger aBigInteger1032 = new BigInteger("58778699976184461502525193738213253649000149147835990136706041084440742975821");
-    private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1Array1033[];
+    private Sprite aClass30_Sub2_Sub1_Sub1Array1033[];
     private int anInt1034;
     private int anInt1035;
     private int anInt1036;
@@ -12371,7 +12371,7 @@ public final class GameClient extends GameShell
     private int anIntArray1057[];
     private int anInt1058;
     private Class9 aClass9_1059;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2Array1060[];
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2Array1060[];
     static int anInt1061;
     private int anInt1062;
     private int anInt1063;
@@ -12385,11 +12385,11 @@ public final class GameClient extends GameShell
     private int anInt1071;
     private int anIntArray1072[];
     private int anIntArray1073[];
-    private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1_1074;
-    private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1_1075;
-    private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1_1076;
-    private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1_1077;
-    private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1_1078;
+    private Sprite aClass30_Sub2_Sub1_Sub1_1074;
+    private Sprite aClass30_Sub2_Sub1_Sub1_1075;
+    private Sprite aClass30_Sub2_Sub1_Sub1_1076;
+    private Sprite aClass30_Sub2_Sub1_Sub1_1077;
+    private Sprite aClass30_Sub2_Sub1_Sub1_1078;
     private int anInt1079;
     private boolean aBoolean1080;
     private int anInt1081;
@@ -12406,7 +12406,7 @@ public final class GameClient extends GameShell
     private int anIntArray1092[];
     private int anIntArray1093[];
     private int anIntArray1094[];
-    private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1Array1095[];
+    private Sprite aClass30_Sub2_Sub1_Sub1Array1095[];
     private static int anInt1096 = -192;
     private static int anInt1097;
     private int anInt1098;
@@ -12433,7 +12433,7 @@ public final class GameClient extends GameShell
     private int anInt1119;
     private int anInt1120;
     private String aString1121;
-    private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1_1122;
+    private Sprite aClass30_Sub2_Sub1_Sub1_1122;
     private ProducingGraphicsBuffer aClass15_1123;
     private ProducingGraphicsBuffer aClass15_1124;
     private ProducingGraphicsBuffer aClass15_1125;
@@ -12454,19 +12454,19 @@ public final class GameClient extends GameShell
     private int anInt1137;
     private int anInt1138;
     String aString1139;
-    private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1Array1140[];
+    private Sprite aClass30_Sub2_Sub1_Sub1Array1140[];
     private boolean aBoolean1141;
     private static int anInt1142;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_1143;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_1144;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_1145;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_1146;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_1147;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_1143;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_1144;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_1145;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_1146;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_1147;
     private int anInt1148;
     private boolean aBoolean1149;
-    private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1Array1150[];
+    private Sprite aClass30_Sub2_Sub1_Sub1Array1150[];
     private boolean aBoolean1151;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2Array1152[];
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2Array1152[];
     private boolean aBoolean1153;
     private int anInt1154;
     private static int anInt1155;
@@ -12515,13 +12515,13 @@ public final class GameClient extends GameShell
     private int anInt1193;
     private byte aByte1194;
     private int anInt1195;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_1196;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_1197;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_1198;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_1196;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_1197;
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2_1198;
     private String aStringArray1199[];
     private static byte aByte1200 = 9;
-    private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1_1201;
-    private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1_1202;
+    private Sprite aClass30_Sub2_Sub1_Sub1_1201;
+    private Sprite aClass30_Sub2_Sub1_Sub1_1202;
     private int anIntArray1203[];
     static final int anIntArray1204[] = {
         9104, 10275, 7595, 3610, 7975, 8526, 918, 38802, 24466, 10145, 
@@ -12541,7 +12541,7 @@ public final class GameClient extends GameShell
     private int anInt1216;
     private byte aByte1217;
     private int anInt1218;
-    private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2Array1219[];
+    private IndexedSprite aClass30_Sub2_Sub1_Sub2Array1219[];
     long aLong1220;
     private int anInt1221;
     private int anInt1222;
@@ -12585,17 +12585,17 @@ public final class GameClient extends GameShell
     private static int anInt1260;
     private int anInt1261;
     private int anInt1262;
-    private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1_1263;
+    private Sprite aClass30_Sub2_Sub1_Sub1_1263;
     private int anInt1264;
     private int anInt1265;
     private String aString1266;
     private String aString1267;
     private int anInt1268;
     private int anInt1269;
-    private Class30_Sub2_Sub1_Sub4 aClass30_Sub2_Sub1_Sub4_1270;
-    private Class30_Sub2_Sub1_Sub4 aClass30_Sub2_Sub1_Sub4_1271;
-    private Class30_Sub2_Sub1_Sub4 aClass30_Sub2_Sub1_Sub4_1272;
-    private Class30_Sub2_Sub1_Sub4 aClass30_Sub2_Sub1_Sub4_1273;
+    private FontRenderer aClass30_Sub2_Sub1_Sub4_1270;
+    private FontRenderer aClass30_Sub2_Sub1_Sub4_1271;
+    private FontRenderer aClass30_Sub2_Sub1_Sub4_1272;
+    private FontRenderer aClass30_Sub2_Sub1_Sub4_1273;
     private byte aByte1274;
     private int anInt1275;
     private int anInt1276;

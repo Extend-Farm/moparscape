@@ -4,10 +4,10 @@
 
 import sign.SignLink;
 
-public final class Class30_Sub2_Sub1_Sub2 extends Class30_Sub2_Sub1
+public final class IndexedSprite extends Rasterizer2D
 {
 
-    public Class30_Sub2_Sub1_Sub2(Archive class44, String s, int i)
+    public IndexedSprite(Archive class44, String s, int i)
     {
         aBoolean1447 = false;
         anInt1448 = 360;
@@ -174,37 +174,37 @@ public final class Class30_Sub2_Sub1_Sub2 extends Class30_Sub2_Sub1
     {
         i += anInt1454;
         k += anInt1455;
-        int l = i + k * Class30_Sub2_Sub1.anInt1379;
+        int l = i + k * Rasterizer2D.anInt1379;
         int i1 = 0;
         if(j != 16083)
             return;
         int j1 = anInt1453;
         int k1 = anInt1452;
-        int l1 = Class30_Sub2_Sub1.anInt1379 - k1;
+        int l1 = Rasterizer2D.anInt1379 - k1;
         int i2 = 0;
-        if(k < Class30_Sub2_Sub1.anInt1381)
+        if(k < Rasterizer2D.anInt1381)
         {
-            int j2 = Class30_Sub2_Sub1.anInt1381 - k;
+            int j2 = Rasterizer2D.anInt1381 - k;
             j1 -= j2;
-            k = Class30_Sub2_Sub1.anInt1381;
+            k = Rasterizer2D.anInt1381;
             i1 += j2 * k1;
-            l += j2 * Class30_Sub2_Sub1.anInt1379;
+            l += j2 * Rasterizer2D.anInt1379;
         }
-        if(k + j1 > Class30_Sub2_Sub1.anInt1382)
-            j1 -= (k + j1) - Class30_Sub2_Sub1.anInt1382;
-        if(i < Class30_Sub2_Sub1.anInt1383)
+        if(k + j1 > Rasterizer2D.anInt1382)
+            j1 -= (k + j1) - Rasterizer2D.anInt1382;
+        if(i < Rasterizer2D.anInt1383)
         {
-            int k2 = Class30_Sub2_Sub1.anInt1383 - i;
+            int k2 = Rasterizer2D.anInt1383 - i;
             k1 -= k2;
-            i = Class30_Sub2_Sub1.anInt1383;
+            i = Rasterizer2D.anInt1383;
             i1 += k2;
             l += k2;
             i2 += k2;
             l1 += k2;
         }
-        if(i + k1 > Class30_Sub2_Sub1.anInt1384)
+        if(i + k1 > Rasterizer2D.anInt1384)
         {
-            int l2 = (i + k1) - Class30_Sub2_Sub1.anInt1384;
+            int l2 = (i + k1) - Rasterizer2D.anInt1384;
             k1 -= l2;
             i2 += l2;
             l1 += l2;
@@ -214,7 +214,7 @@ public final class Class30_Sub2_Sub1_Sub2 extends Class30_Sub2_Sub1
             return;
         } else
         {
-            method362(j1, (byte)9, Class30_Sub2_Sub1.anIntArray1378, aByteArray1450, l1, l, k1, i1, anIntArray1451, i2);
+            method362(j1, (byte)9, Rasterizer2D.anIntArray1378, aByteArray1450, l1, l, k1, i1, anIntArray1451, i2);
             return;
         }
     }

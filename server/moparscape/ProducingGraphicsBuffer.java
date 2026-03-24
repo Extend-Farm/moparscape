@@ -32,7 +32,7 @@ public final class ProducingGraphicsBuffer
 
     public void method237(int i)
     {
-        Class30_Sub2_Sub1.method331(anInt317, anInt316, -293, anIntArray315);
+        Rasterizer2D.method331(anInt317, anInt316, -293, anIntArray315);
         if(i != 0)
         {
             for(int j = 1; j > 0; j++);

@@ -7,10 +7,10 @@ import java.awt.image.PixelGrabber;
 import java.io.PrintStream;
 import sign.SignLink;
 
-public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
+public final class Sprite extends Rasterizer2D
 {
 
-    public Class30_Sub2_Sub1_Sub1(int i, int j)
+    public Sprite(int i, int j)
     {
         aBoolean1428 = false;
         anInt1429 = 24869;
@@ -28,7 +28,7 @@ public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
         anInt1442 = anInt1443 = 0;
     }
 
-    public Class30_Sub2_Sub1_Sub1(byte abyte0[], Component component)
+    public Sprite(byte abyte0[], Component component)
     {
         aBoolean1428 = false;
         anInt1429 = 24869;
@@ -63,7 +63,7 @@ public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
         }
     }
 
-    public Class30_Sub2_Sub1_Sub1(Archive class44, String s, int i)
+    public Sprite(Archive class44, String s, int i)
     {
         aBoolean1428 = false;
         anInt1429 = 24869;
@@ -126,7 +126,7 @@ public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
     {
         if(i != 0)
             aBoolean1438 = !aBoolean1438;
-        Class30_Sub2_Sub1.method331(anInt1441, anInt1440, -293, anIntArray1439);
+        Rasterizer2D.method331(anInt1441, anInt1440, -293, anIntArray1439);
     }
 
     public void method344(int i, int j, int k, int l)
@@ -188,37 +188,37 @@ public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
     {
         i += anInt1442;
         j += anInt1443;
-        int l = i + j * Class30_Sub2_Sub1.anInt1379;
+        int l = i + j * Rasterizer2D.anInt1379;
         int i1 = 0;
         int j1 = anInt1441;
         int k1 = anInt1440;
-        int l1 = Class30_Sub2_Sub1.anInt1379 - k1;
+        int l1 = Rasterizer2D.anInt1379 - k1;
         int i2 = 0;
         if(k != anInt1431)
             aBoolean1438 = !aBoolean1438;
-        if(j < Class30_Sub2_Sub1.anInt1381)
+        if(j < Rasterizer2D.anInt1381)
         {
-            int j2 = Class30_Sub2_Sub1.anInt1381 - j;
+            int j2 = Rasterizer2D.anInt1381 - j;
             j1 -= j2;
-            j = Class30_Sub2_Sub1.anInt1381;
+            j = Rasterizer2D.anInt1381;
             i1 += j2 * k1;
-            l += j2 * Class30_Sub2_Sub1.anInt1379;
+            l += j2 * Rasterizer2D.anInt1379;
         }
-        if(j + j1 > Class30_Sub2_Sub1.anInt1382)
-            j1 -= (j + j1) - Class30_Sub2_Sub1.anInt1382;
-        if(i < Class30_Sub2_Sub1.anInt1383)
+        if(j + j1 > Rasterizer2D.anInt1382)
+            j1 -= (j + j1) - Rasterizer2D.anInt1382;
+        if(i < Rasterizer2D.anInt1383)
         {
-            int k2 = Class30_Sub2_Sub1.anInt1383 - i;
+            int k2 = Rasterizer2D.anInt1383 - i;
             k1 -= k2;
-            i = Class30_Sub2_Sub1.anInt1383;
+            i = Rasterizer2D.anInt1383;
             i1 += k2;
             l += k2;
             i2 += k2;
             l1 += k2;
         }
-        if(i + k1 > Class30_Sub2_Sub1.anInt1384)
+        if(i + k1 > Rasterizer2D.anInt1384)
         {
-            int l2 = (i + k1) - Class30_Sub2_Sub1.anInt1384;
+            int l2 = (i + k1) - Rasterizer2D.anInt1384;
             k1 -= l2;
             i2 += l2;
             l1 += l2;
@@ -228,7 +228,7 @@ public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
             return;
         } else
         {
-            method347(l, k1, j1, i2, i1, 28339, l1, anIntArray1439, Class30_Sub2_Sub1.anIntArray1378);
+            method347(l, k1, j1, i2, i1, 28339, l1, anIntArray1439, Rasterizer2D.anIntArray1378);
             return;
         }
     }
@@ -265,35 +265,35 @@ public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
         k += anInt1443;
         if(j != 16083)
             return;
-        int l = i + k * Class30_Sub2_Sub1.anInt1379;
+        int l = i + k * Rasterizer2D.anInt1379;
         int i1 = 0;
         int j1 = anInt1441;
         int k1 = anInt1440;
-        int l1 = Class30_Sub2_Sub1.anInt1379 - k1;
+        int l1 = Rasterizer2D.anInt1379 - k1;
         int i2 = 0;
-        if(k < Class30_Sub2_Sub1.anInt1381)
+        if(k < Rasterizer2D.anInt1381)
         {
-            int j2 = Class30_Sub2_Sub1.anInt1381 - k;
+            int j2 = Rasterizer2D.anInt1381 - k;
             j1 -= j2;
-            k = Class30_Sub2_Sub1.anInt1381;
+            k = Rasterizer2D.anInt1381;
             i1 += j2 * k1;
-            l += j2 * Class30_Sub2_Sub1.anInt1379;
+            l += j2 * Rasterizer2D.anInt1379;
         }
-        if(k + j1 > Class30_Sub2_Sub1.anInt1382)
-            j1 -= (k + j1) - Class30_Sub2_Sub1.anInt1382;
-        if(i < Class30_Sub2_Sub1.anInt1383)
+        if(k + j1 > Rasterizer2D.anInt1382)
+            j1 -= (k + j1) - Rasterizer2D.anInt1382;
+        if(i < Rasterizer2D.anInt1383)
         {
-            int k2 = Class30_Sub2_Sub1.anInt1383 - i;
+            int k2 = Rasterizer2D.anInt1383 - i;
             k1 -= k2;
-            i = Class30_Sub2_Sub1.anInt1383;
+            i = Rasterizer2D.anInt1383;
             i1 += k2;
             l += k2;
             i2 += k2;
             l1 += k2;
         }
-        if(i + k1 > Class30_Sub2_Sub1.anInt1384)
+        if(i + k1 > Rasterizer2D.anInt1384)
         {
-            int l2 = (i + k1) - Class30_Sub2_Sub1.anInt1384;
+            int l2 = (i + k1) - Rasterizer2D.anInt1384;
             k1 -= l2;
             i2 += l2;
             l1 += l2;
@@ -303,7 +303,7 @@ public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
             return;
         } else
         {
-            method349(Class30_Sub2_Sub1.anIntArray1378, anIntArray1439, 0, i1, l, k1, j1, l1, i2);
+            method349(Rasterizer2D.anIntArray1378, anIntArray1439, 0, i1, l, k1, j1, l1, i2);
             return;
         }
     }
@@ -362,35 +362,35 @@ public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
             for(int l = 1; l > 0; l++);
         }
         j += anInt1443;
-        int i1 = i + j * Class30_Sub2_Sub1.anInt1379;
+        int i1 = i + j * Rasterizer2D.anInt1379;
         int j1 = 0;
         int k1 = anInt1441;
         int l1 = anInt1440;
-        int i2 = Class30_Sub2_Sub1.anInt1379 - l1;
+        int i2 = Rasterizer2D.anInt1379 - l1;
         int j2 = 0;
-        if(j < Class30_Sub2_Sub1.anInt1381)
+        if(j < Rasterizer2D.anInt1381)
         {
-            int k2 = Class30_Sub2_Sub1.anInt1381 - j;
+            int k2 = Rasterizer2D.anInt1381 - j;
             k1 -= k2;
-            j = Class30_Sub2_Sub1.anInt1381;
+            j = Rasterizer2D.anInt1381;
             j1 += k2 * l1;
-            i1 += k2 * Class30_Sub2_Sub1.anInt1379;
+            i1 += k2 * Rasterizer2D.anInt1379;
         }
-        if(j + k1 > Class30_Sub2_Sub1.anInt1382)
-            k1 -= (j + k1) - Class30_Sub2_Sub1.anInt1382;
-        if(i < Class30_Sub2_Sub1.anInt1383)
+        if(j + k1 > Rasterizer2D.anInt1382)
+            k1 -= (j + k1) - Rasterizer2D.anInt1382;
+        if(i < Rasterizer2D.anInt1383)
         {
-            int l2 = Class30_Sub2_Sub1.anInt1383 - i;
+            int l2 = Rasterizer2D.anInt1383 - i;
             l1 -= l2;
-            i = Class30_Sub2_Sub1.anInt1383;
+            i = Rasterizer2D.anInt1383;
             j1 += l2;
             i1 += l2;
             j2 += l2;
             i2 += l2;
         }
-        if(i + l1 > Class30_Sub2_Sub1.anInt1384)
+        if(i + l1 > Rasterizer2D.anInt1384)
         {
-            int i3 = (i + l1) - Class30_Sub2_Sub1.anInt1384;
+            int i3 = (i + l1) - Rasterizer2D.anInt1384;
             l1 -= i3;
             j2 += i3;
             i2 += i3;
@@ -400,7 +400,7 @@ public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
             return;
         } else
         {
-            method351(j1, l1, Class30_Sub2_Sub1.anIntArray1378, 0, anIntArray1439, j2, k1, i2, k, i1, 8);
+            method351(j1, l1, Rasterizer2D.anIntArray1378, 0, anIntArray1439, j2, k1, i2, k, i1, 8);
             return;
         }
     }
@@ -447,7 +447,7 @@ public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
             i3 = i3 * k >> 8;
             int j3 = (i2 << 16) + (k2 * l2 + j2 * i3);
             int k3 = (i1 << 16) + (k2 * i3 - j2 * l2);
-            int l3 = k1 + j1 * Class30_Sub2_Sub1.anInt1379;
+            int l3 = k1 + j1 * Rasterizer2D.anInt1379;
             for(j1 = 0; j1 < i; j1++)
             {
                 int i4 = ai1[j1];
@@ -456,14 +456,14 @@ public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
                 int l4 = k3 - l2 * i4;
                 for(k1 = -ai[j1]; k1 < 0; k1++)
                 {
-                    Class30_Sub2_Sub1.anIntArray1378[j4++] = anIntArray1439[(k4 >> 16) + (l4 >> 16) * anInt1440];
+                    Rasterizer2D.anIntArray1378[j4++] = anIntArray1439[(k4 >> 16) + (l4 >> 16) * anInt1440];
                     k4 += i3;
                     l4 -= l2;
                 }
 
                 j3 += l2;
                 k3 += i3;
-                l3 += Class30_Sub2_Sub1.anInt1379;
+                l3 += Rasterizer2D.anInt1379;
             }
 
             return;
@@ -489,7 +489,7 @@ public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
             l2 = l2 * j1 >> 8;
             int i3 = (l << 16) + (j2 * k2 + i2 * l2);
             int j3 = (j << 16) + (j2 * l2 - i2 * k2);
-            int k3 = l1 + i * Class30_Sub2_Sub1.anInt1379;
+            int k3 = l1 + i * Rasterizer2D.anInt1379;
             for(i = 0; i < k1; i++)
             {
                 int l3 = k3;
@@ -499,7 +499,7 @@ public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
                 {
                     int k4 = anIntArray1439[(i4 >> 16) + (j4 >> 16) * anInt1440];
                     if(k4 != 0)
-                        Class30_Sub2_Sub1.anIntArray1378[l3++] = k4;
+                        Rasterizer2D.anIntArray1378[l3++] = k4;
                     else
                         l3++;
                     i4 += l2;
@@ -508,7 +508,7 @@ public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
 
                 i3 += k2;
                 j3 += l2;
-                k3 += Class30_Sub2_Sub1.anInt1379;
+                k3 += Rasterizer2D.anInt1379;
             }
 
             return;
@@ -519,41 +519,41 @@ public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
         }
     }
 
-    public void method354(Class30_Sub2_Sub1_Sub2 class30_sub2_sub1_sub2, boolean flag, int i, int j)
+    public void method354(IndexedSprite class30_sub2_sub1_sub2, boolean flag, int i, int j)
     {
         j += anInt1442;
         i += anInt1443;
-        int k = j + i * Class30_Sub2_Sub1.anInt1379;
+        int k = j + i * Rasterizer2D.anInt1379;
         int l = 0;
         if(flag)
             anInt1429 = -364;
         int i1 = anInt1441;
         int j1 = anInt1440;
-        int k1 = Class30_Sub2_Sub1.anInt1379 - j1;
+        int k1 = Rasterizer2D.anInt1379 - j1;
         int l1 = 0;
-        if(i < Class30_Sub2_Sub1.anInt1381)
+        if(i < Rasterizer2D.anInt1381)
         {
-            int i2 = Class30_Sub2_Sub1.anInt1381 - i;
+            int i2 = Rasterizer2D.anInt1381 - i;
             i1 -= i2;
-            i = Class30_Sub2_Sub1.anInt1381;
+            i = Rasterizer2D.anInt1381;
             l += i2 * j1;
-            k += i2 * Class30_Sub2_Sub1.anInt1379;
+            k += i2 * Rasterizer2D.anInt1379;
         }
-        if(i + i1 > Class30_Sub2_Sub1.anInt1382)
-            i1 -= (i + i1) - Class30_Sub2_Sub1.anInt1382;
-        if(j < Class30_Sub2_Sub1.anInt1383)
+        if(i + i1 > Rasterizer2D.anInt1382)
+            i1 -= (i + i1) - Rasterizer2D.anInt1382;
+        if(j < Rasterizer2D.anInt1383)
         {
-            int j2 = Class30_Sub2_Sub1.anInt1383 - j;
+            int j2 = Rasterizer2D.anInt1383 - j;
             j1 -= j2;
-            j = Class30_Sub2_Sub1.anInt1383;
+            j = Rasterizer2D.anInt1383;
             l += j2;
             k += j2;
             l1 += j2;
             k1 += j2;
         }
-        if(j + j1 > Class30_Sub2_Sub1.anInt1384)
+        if(j + j1 > Rasterizer2D.anInt1384)
         {
-            int k2 = (j + j1) - Class30_Sub2_Sub1.anInt1384;
+            int k2 = (j + j1) - Rasterizer2D.anInt1384;
             j1 -= k2;
             l1 += k2;
             k1 += k2;
@@ -563,7 +563,7 @@ public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
             return;
         } else
         {
-            method355(anIntArray1439, j1, class30_sub2_sub1_sub2.aByteArray1450, i1, Class30_Sub2_Sub1.anIntArray1378, 0, aBoolean1436, k1, k, l1, l);
+            method355(anIntArray1439, j1, class30_sub2_sub1_sub2.aByteArray1450, i1, Rasterizer2D.anIntArray1378, 0, aBoolean1436, k1, k, l1, l);
             return;
         }
     }

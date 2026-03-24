@@ -260,7 +260,7 @@ final class MapRegion {
                                 }
                                 n41 = 0;
                                 if (n50 != -1) {
-                                    n41 = Class30_Sub2_Sub1_Sub3.anIntArray1482[MapRegion.method187(n51, 96)];
+                                    n41 = Rasterizer3D.anIntArray1482[MapRegion.method187(n51, 96)];
                                 }
                                 if (n38 == 0) {
                                     class25.method279(n19, n9, n2, 0, 0, -1, n42, n43, n44, n45, MapRegion.method187(n50, n46), MapRegion.method187(n50, n47), MapRegion.method187(n50, n48), MapRegion.method187(n50, n49), 0, 0, 0, 0, n41, 0);
@@ -272,7 +272,7 @@ final class MapRegion {
                                     FloorDefinition class22 = FloorDefinition.aClass22Array388[n38 - 1];
                                     int n55 = class22.anInt391;
                                     if (n55 >= 0) {
-                                        n54 = Class30_Sub2_Sub1_Sub3.method369((int)n55, (int)12660);
+                                        n54 = Rasterizer3D.method369((int)n55, (int)12660);
                                         n53 = -1;
                                     } else if (class22.anInt390 == 0xFF00FF) {
                                         n54 = 0;
@@ -280,7 +280,7 @@ final class MapRegion {
                                         n55 = -1;
                                     } else {
                                         n53 = this.method177(class22.anInt394, class22.anInt395, class22.anInt396);
-                                        n54 = Class30_Sub2_Sub1_Sub3.anIntArray1482[this.method185(class22.anInt399, 96)];
+                                        n54 = Rasterizer3D.anIntArray1482[this.method185(class22.anInt399, 96)];
                                     }
                                     class25.method279(n19, n9, n2, n40, n39, n55, n42, n43, n44, n45, MapRegion.method187(n50, n46), MapRegion.method187(n50, n47), MapRegion.method187(n50, n48), MapRegion.method187(n50, n49), this.method185(n53, n46), this.method185(n53, n47), this.method185(n53, n48), this.method185(n53, n49), n41, n54);
                                 }
@@ -1048,7 +1048,7 @@ final class MapRegion {
     }
 
     private static final int method184(int n, int n2, int n3, int n4) {
-        int n5 = 65536 - Class30_Sub2_Sub1_Sub3.anIntArray1471[n3 * 1024 / n4] >> 1;
+        int n5 = 65536 - Rasterizer3D.anIntArray1471[n3 * 1024 / n4] >> 1;
         return (n * (65536 - n5) >> 16) + (n2 * n5 >> 16);
     }
 
