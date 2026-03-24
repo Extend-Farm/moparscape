@@ -6389,6 +6389,101 @@ public final class GameClient extends GameShell
         return i != 1;
     }
 
+    private void applyActorAnimationUpdate(Actor actor, PacketBuffer packetBuffer)
+    {
+        int animationId = packetBuffer.method434((byte)108);
+        if(animationId == 65535)
+            animationId = -1;
+        int animationDelay = packetBuffer.method408();
+        if(animationId == actor.anInt1526 && animationId != -1)
+        {
+            int replayMode = SequenceDefinition.aClass20Array351[animationId].anInt365;
+            if(replayMode == 1)
+            {
+                actor.anInt1527 = 0;
+                actor.anInt1528 = 0;
+                actor.anInt1529 = animationDelay;
+                actor.anInt1530 = 0;
+            }
+            if(replayMode == 2)
+                actor.anInt1530 = 0;
+        } else
+        if(animationId == -1 || actor.anInt1526 == -1 || SequenceDefinition.aClass20Array351[animationId].anInt359 >= SequenceDefinition.aClass20Array351[actor.anInt1526].anInt359)
+        {
+            actor.anInt1526 = animationId;
+            actor.anInt1527 = 0;
+            actor.anInt1528 = 0;
+            actor.anInt1529 = animationDelay;
+            actor.anInt1530 = 0;
+            actor.anInt1542 = actor.anInt1525;
+        }
+    }
+
+    private void applyNpcHitPrimaryUpdate(Npc npc, PacketBuffer packetBuffer)
+    {
+        int damage = packetBuffer.method426(0);
+        int hitType = packetBuffer.method427(false);
+        npc.method447(-35698, hitType, damage, anInt1161);
+        npc.anInt1532 = anInt1161 + 300;
+        npc.anInt1533 = packetBuffer.method426(0);
+        npc.anInt1534 = packetBuffer.method408();
+    }
+
+    private void applyNpcGraphicUpdate(Npc npc, PacketBuffer packetBuffer)
+    {
+        npc.anInt1520 = packetBuffer.method410();
+        int graphicData = packetBuffer.method413();
+        npc.anInt1524 = graphicData >> 16;
+        npc.anInt1523 = anInt1161 + (graphicData & 0xffff);
+        npc.anInt1521 = 0;
+        npc.anInt1522 = 0;
+        if(npc.anInt1523 > anInt1161)
+            npc.anInt1521 = -1;
+        if(npc.anInt1520 == 65535)
+            npc.anInt1520 = -1;
+    }
+
+    private void applyNpcInteractingEntityUpdate(Npc npc, PacketBuffer packetBuffer)
+    {
+        npc.anInt1502 = packetBuffer.method410();
+        if(npc.anInt1502 == 65535)
+            npc.anInt1502 = -1;
+    }
+
+    private void applyNpcForcedChatUpdate(Npc npc, PacketBuffer packetBuffer)
+    {
+        npc.aString1506 = packetBuffer.method415();
+        npc.anInt1535 = 100;
+    }
+
+    private void applyNpcHitSecondaryUpdate(Npc npc, PacketBuffer packetBuffer)
+    {
+        int damage = packetBuffer.method427(false);
+        int hitType = packetBuffer.method428(2);
+        npc.method447(-35698, hitType, damage, anInt1161);
+        npc.anInt1532 = anInt1161 + 300;
+        npc.anInt1533 = packetBuffer.method428(2);
+        npc.anInt1534 = packetBuffer.method427(false);
+    }
+
+    private void applyNpcTransformUpdate(Npc npc, PacketBuffer packetBuffer)
+    {
+        npc.aClass5_1696 = NpcDefinition.method159(packetBuffer.method436((byte)-74));
+        npc.anInt1540 = npc.aClass5_1696.aByte68;
+        npc.anInt1504 = npc.aClass5_1696.anInt79;
+        npc.anInt1554 = npc.aClass5_1696.anInt67;
+        npc.anInt1555 = npc.aClass5_1696.anInt58;
+        npc.anInt1556 = npc.aClass5_1696.anInt83;
+        npc.anInt1557 = npc.aClass5_1696.anInt55;
+        npc.anInt1511 = npc.aClass5_1696.anInt77;
+    }
+
+    private void applyNpcFaceCoordinatesUpdate(Npc npc, PacketBuffer packetBuffer)
+    {
+        npc.anInt1538 = packetBuffer.method434((byte)108);
+        npc.anInt1539 = packetBuffer.method434((byte)108);
+    }
+
     private final void method86(int i, PacketBuffer class30_sub2_sub2, boolean flag)
     {
         for(int j = 0; j < anInt893; j++)
@@ -6397,92 +6492,21 @@ public final class GameClient extends GameShell
             Npc class30_sub2_sub4_sub1_sub1 = aClass30_Sub2_Sub4_Sub1_Sub1Array835[k];
             int l = class30_sub2_sub2.method408();
             if((l & EntityUpdateMasks.Npc.ANIMATION) != 0)
-            {
-                int i1 = class30_sub2_sub2.method434((byte)108);
-                if(i1 == 65535)
-                    i1 = -1;
-                int i2 = class30_sub2_sub2.method408();
-                if(i1 == ((Actor) (class30_sub2_sub4_sub1_sub1)).anInt1526 && i1 != -1)
-                {
-                    int l2 = SequenceDefinition.aClass20Array351[i1].anInt365;
-                    if(l2 == 1)
-                    {
-                        class30_sub2_sub4_sub1_sub1.anInt1527 = 0;
-                        class30_sub2_sub4_sub1_sub1.anInt1528 = 0;
-                        class30_sub2_sub4_sub1_sub1.anInt1529 = i2;
-                        class30_sub2_sub4_sub1_sub1.anInt1530 = 0;
-                    }
-                    if(l2 == 2)
-                        class30_sub2_sub4_sub1_sub1.anInt1530 = 0;
-                } else
-                if(i1 == -1 || ((Actor) (class30_sub2_sub4_sub1_sub1)).anInt1526 == -1 || SequenceDefinition.aClass20Array351[i1].anInt359 >= SequenceDefinition.aClass20Array351[((Actor) (class30_sub2_sub4_sub1_sub1)).anInt1526].anInt359)
-                {
-                    class30_sub2_sub4_sub1_sub1.anInt1526 = i1;
-                    class30_sub2_sub4_sub1_sub1.anInt1527 = 0;
-                    class30_sub2_sub4_sub1_sub1.anInt1528 = 0;
-                    class30_sub2_sub4_sub1_sub1.anInt1529 = i2;
-                    class30_sub2_sub4_sub1_sub1.anInt1530 = 0;
-                    class30_sub2_sub4_sub1_sub1.anInt1542 = ((Actor) (class30_sub2_sub4_sub1_sub1)).anInt1525;
-                }
-            }
+                applyActorAnimationUpdate(class30_sub2_sub4_sub1_sub1, class30_sub2_sub2);
             if((l & EntityUpdateMasks.Npc.HIT_PRIMARY) != 0)
-            {
-                int j1 = class30_sub2_sub2.method426(0);
-                int j2 = class30_sub2_sub2.method427(false);
-                class30_sub2_sub4_sub1_sub1.method447(-35698, j2, j1, anInt1161);
-                class30_sub2_sub4_sub1_sub1.anInt1532 = anInt1161 + 300;
-                class30_sub2_sub4_sub1_sub1.anInt1533 = class30_sub2_sub2.method426(0);
-                class30_sub2_sub4_sub1_sub1.anInt1534 = class30_sub2_sub2.method408();
-            }
+                applyNpcHitPrimaryUpdate(class30_sub2_sub4_sub1_sub1, class30_sub2_sub2);
             if((l & EntityUpdateMasks.Npc.GRAPHIC) != 0)
-            {
-                class30_sub2_sub4_sub1_sub1.anInt1520 = class30_sub2_sub2.method410();
-                int k1 = class30_sub2_sub2.method413();
-                class30_sub2_sub4_sub1_sub1.anInt1524 = k1 >> 16;
-                class30_sub2_sub4_sub1_sub1.anInt1523 = anInt1161 + (k1 & 0xffff);
-                class30_sub2_sub4_sub1_sub1.anInt1521 = 0;
-                class30_sub2_sub4_sub1_sub1.anInt1522 = 0;
-                if(((Actor) (class30_sub2_sub4_sub1_sub1)).anInt1523 > anInt1161)
-                    class30_sub2_sub4_sub1_sub1.anInt1521 = -1;
-                if(((Actor) (class30_sub2_sub4_sub1_sub1)).anInt1520 == 65535)
-                    class30_sub2_sub4_sub1_sub1.anInt1520 = -1;
-            }
+                applyNpcGraphicUpdate(class30_sub2_sub4_sub1_sub1, class30_sub2_sub2);
             if((l & EntityUpdateMasks.Npc.INTERACTING_ENTITY) != 0)
-            {
-                class30_sub2_sub4_sub1_sub1.anInt1502 = class30_sub2_sub2.method410();
-                if(((Actor) (class30_sub2_sub4_sub1_sub1)).anInt1502 == 65535)
-                    class30_sub2_sub4_sub1_sub1.anInt1502 = -1;
-            }
+                applyNpcInteractingEntityUpdate(class30_sub2_sub4_sub1_sub1, class30_sub2_sub2);
             if((l & EntityUpdateMasks.Npc.FORCED_CHAT) != 0)
-            {
-                class30_sub2_sub4_sub1_sub1.aString1506 = class30_sub2_sub2.method415();
-                class30_sub2_sub4_sub1_sub1.anInt1535 = 100;
-            }
+                applyNpcForcedChatUpdate(class30_sub2_sub4_sub1_sub1, class30_sub2_sub2);
             if((l & EntityUpdateMasks.Npc.HIT_SECONDARY) != 0)
-            {
-                int l1 = class30_sub2_sub2.method427(false);
-                int k2 = class30_sub2_sub2.method428(2);
-                class30_sub2_sub4_sub1_sub1.method447(-35698, k2, l1, anInt1161);
-                class30_sub2_sub4_sub1_sub1.anInt1532 = anInt1161 + 300;
-                class30_sub2_sub4_sub1_sub1.anInt1533 = class30_sub2_sub2.method428(2);
-                class30_sub2_sub4_sub1_sub1.anInt1534 = class30_sub2_sub2.method427(false);
-            }
+                applyNpcHitSecondaryUpdate(class30_sub2_sub4_sub1_sub1, class30_sub2_sub2);
             if((l & EntityUpdateMasks.Npc.TRANSFORM) != 0)
-            {
-                class30_sub2_sub4_sub1_sub1.aClass5_1696 = NpcDefinition.method159(class30_sub2_sub2.method436((byte)-74));
-                class30_sub2_sub4_sub1_sub1.anInt1540 = class30_sub2_sub4_sub1_sub1.aClass5_1696.aByte68;
-                class30_sub2_sub4_sub1_sub1.anInt1504 = class30_sub2_sub4_sub1_sub1.aClass5_1696.anInt79;
-                class30_sub2_sub4_sub1_sub1.anInt1554 = class30_sub2_sub4_sub1_sub1.aClass5_1696.anInt67;
-                class30_sub2_sub4_sub1_sub1.anInt1555 = class30_sub2_sub4_sub1_sub1.aClass5_1696.anInt58;
-                class30_sub2_sub4_sub1_sub1.anInt1556 = class30_sub2_sub4_sub1_sub1.aClass5_1696.anInt83;
-                class30_sub2_sub4_sub1_sub1.anInt1557 = class30_sub2_sub4_sub1_sub1.aClass5_1696.anInt55;
-                class30_sub2_sub4_sub1_sub1.anInt1511 = class30_sub2_sub4_sub1_sub1.aClass5_1696.anInt77;
-            }
+                applyNpcTransformUpdate(class30_sub2_sub4_sub1_sub1, class30_sub2_sub2);
             if((l & EntityUpdateMasks.Npc.FACE_COORDINATES) != 0)
-            {
-                class30_sub2_sub4_sub1_sub1.anInt1538 = class30_sub2_sub2.method434((byte)108);
-                class30_sub2_sub4_sub1_sub1.anInt1539 = class30_sub2_sub2.method434((byte)108);
-            }
+                applyNpcFaceCoordinatesUpdate(class30_sub2_sub4_sub1_sub1, class30_sub2_sub2);
         }
 
         aBoolean1157 &= flag;
@@ -8308,77 +8332,102 @@ public final class GameClient extends GameShell
         }
     }
 
+    private void applyPlayerForceMovementUpdate(Player player, PacketBuffer packetBuffer)
+    {
+        player.anInt1543 = packetBuffer.method428(2);
+        player.anInt1545 = packetBuffer.method428(2);
+        player.anInt1544 = packetBuffer.method428(2);
+        player.anInt1546 = packetBuffer.method428(2);
+        player.anInt1547 = packetBuffer.method436((byte)-74) + anInt1161;
+        player.anInt1548 = packetBuffer.method435(true) + anInt1161;
+        player.anInt1549 = packetBuffer.method428(2);
+        player.method446(true);
+    }
+
+    private void applyPlayerGraphicUpdate(Player player, PacketBuffer packetBuffer)
+    {
+        player.anInt1520 = packetBuffer.method434((byte)108);
+        int graphicData = packetBuffer.method413();
+        player.anInt1524 = graphicData >> 16;
+        player.anInt1523 = anInt1161 + (graphicData & 0xffff);
+        player.anInt1521 = 0;
+        player.anInt1522 = 0;
+        if(player.anInt1523 > anInt1161)
+            player.anInt1521 = -1;
+        if(player.anInt1520 == 65535)
+            player.anInt1520 = -1;
+    }
+
+    private void applyPlayerForcedChatUpdate(Player player, PacketBuffer packetBuffer)
+    {
+        player.aString1506 = packetBuffer.method415();
+        if(player.aString1506.charAt(0) == '~')
+        {
+            player.aString1506 = player.aString1506.substring(1);
+            method77(player.aString1506, 2, player.aString1703, aBoolean991);
+        } else
+        if(player == aClass30_Sub2_Sub4_Sub1_Sub2_1126)
+            method77(player.aString1506, 2, player.aString1703, aBoolean991);
+        player.anInt1513 = 0;
+        player.anInt1531 = 0;
+        player.anInt1535 = 150;
+    }
+
+    private void applyPlayerInteractingEntityUpdate(Player player, PacketBuffer packetBuffer)
+    {
+        player.anInt1502 = packetBuffer.method434((byte)108);
+        if(player.anInt1502 == 65535)
+            player.anInt1502 = -1;
+    }
+
+    private void applyPlayerAppearanceUpdate(int playerIndex, Player player, PacketBuffer packetBuffer)
+    {
+        int appearanceLength = packetBuffer.method427(false);
+        byte appearanceData[] = new byte[appearanceLength];
+        PacketBuffer appearanceBuffer = new PacketBuffer(appearanceData, 891);
+        packetBuffer.method417(appearanceLength, aByte920, 0, appearanceData);
+        aClass30_Sub2_Sub2Array895[playerIndex] = appearanceBuffer;
+        player.method451(0, appearanceBuffer);
+    }
+
+    private void applyPlayerFaceCoordinatesUpdate(Player player, PacketBuffer packetBuffer)
+    {
+        player.anInt1538 = packetBuffer.method436((byte)-74);
+        player.anInt1539 = packetBuffer.method434((byte)108);
+    }
+
+    private void applyPlayerHitPrimaryUpdate(Player player, PacketBuffer packetBuffer)
+    {
+        int damage = packetBuffer.method408();
+        int hitType = packetBuffer.method426(0);
+        player.method447(-35698, hitType, damage, anInt1161);
+        player.anInt1532 = anInt1161 + 300;
+        player.anInt1533 = packetBuffer.method427(false);
+        player.anInt1534 = packetBuffer.method408();
+    }
+
+    private void applyPlayerHitSecondaryUpdate(Player player, PacketBuffer packetBuffer)
+    {
+        int damage = packetBuffer.method408();
+        int hitType = packetBuffer.method428(2);
+        player.method447(-35698, hitType, damage, anInt1161);
+        player.anInt1532 = anInt1161 + 300;
+        player.anInt1533 = packetBuffer.method408();
+        player.anInt1534 = packetBuffer.method427(false);
+    }
+
     private final void method107(int i, int j, PacketBuffer class30_sub2_sub2, byte byte0, Player class30_sub2_sub4_sub1_sub2)
     {
         if(byte0 != 25)
             aClass19ArrayArrayArray827 = null;
         if((i & EntityUpdateMasks.Player.FORCE_MOVEMENT) != 0)
-        {
-            class30_sub2_sub4_sub1_sub2.anInt1543 = class30_sub2_sub2.method428(2);
-            class30_sub2_sub4_sub1_sub2.anInt1545 = class30_sub2_sub2.method428(2);
-            class30_sub2_sub4_sub1_sub2.anInt1544 = class30_sub2_sub2.method428(2);
-            class30_sub2_sub4_sub1_sub2.anInt1546 = class30_sub2_sub2.method428(2);
-            class30_sub2_sub4_sub1_sub2.anInt1547 = class30_sub2_sub2.method436((byte)-74) + anInt1161;
-            class30_sub2_sub4_sub1_sub2.anInt1548 = class30_sub2_sub2.method435(true) + anInt1161;
-            class30_sub2_sub4_sub1_sub2.anInt1549 = class30_sub2_sub2.method428(2);
-            class30_sub2_sub4_sub1_sub2.method446(true);
-        }
+            applyPlayerForceMovementUpdate(class30_sub2_sub4_sub1_sub2, class30_sub2_sub2);
         if((i & EntityUpdateMasks.Player.GRAPHIC) != 0)
-        {
-            class30_sub2_sub4_sub1_sub2.anInt1520 = class30_sub2_sub2.method434((byte)108);
-            int k = class30_sub2_sub2.method413();
-            class30_sub2_sub4_sub1_sub2.anInt1524 = k >> 16;
-            class30_sub2_sub4_sub1_sub2.anInt1523 = anInt1161 + (k & 0xffff);
-            class30_sub2_sub4_sub1_sub2.anInt1521 = 0;
-            class30_sub2_sub4_sub1_sub2.anInt1522 = 0;
-            if(((Actor) (class30_sub2_sub4_sub1_sub2)).anInt1523 > anInt1161)
-                class30_sub2_sub4_sub1_sub2.anInt1521 = -1;
-            if(((Actor) (class30_sub2_sub4_sub1_sub2)).anInt1520 == 65535)
-                class30_sub2_sub4_sub1_sub2.anInt1520 = -1;
-        }
+            applyPlayerGraphicUpdate(class30_sub2_sub4_sub1_sub2, class30_sub2_sub2);
         if((i & EntityUpdateMasks.Player.ANIMATION) != 0)
-        {
-            int l = class30_sub2_sub2.method434((byte)108);
-            if(l == 65535)
-                l = -1;
-            int i2 = class30_sub2_sub2.method427(false);
-            if(l == ((Actor) (class30_sub2_sub4_sub1_sub2)).anInt1526 && l != -1)
-            {
-                int i3 = SequenceDefinition.aClass20Array351[l].anInt365;
-                if(i3 == 1)
-                {
-                    class30_sub2_sub4_sub1_sub2.anInt1527 = 0;
-                    class30_sub2_sub4_sub1_sub2.anInt1528 = 0;
-                    class30_sub2_sub4_sub1_sub2.anInt1529 = i2;
-                    class30_sub2_sub4_sub1_sub2.anInt1530 = 0;
-                }
-                if(i3 == 2)
-                    class30_sub2_sub4_sub1_sub2.anInt1530 = 0;
-            } else
-            if(l == -1 || ((Actor) (class30_sub2_sub4_sub1_sub2)).anInt1526 == -1 || SequenceDefinition.aClass20Array351[l].anInt359 >= SequenceDefinition.aClass20Array351[((Actor) (class30_sub2_sub4_sub1_sub2)).anInt1526].anInt359)
-            {
-                class30_sub2_sub4_sub1_sub2.anInt1526 = l;
-                class30_sub2_sub4_sub1_sub2.anInt1527 = 0;
-                class30_sub2_sub4_sub1_sub2.anInt1528 = 0;
-                class30_sub2_sub4_sub1_sub2.anInt1529 = i2;
-                class30_sub2_sub4_sub1_sub2.anInt1530 = 0;
-                class30_sub2_sub4_sub1_sub2.anInt1542 = ((Actor) (class30_sub2_sub4_sub1_sub2)).anInt1525;
-            }
-        }
+            applyActorAnimationUpdate(class30_sub2_sub4_sub1_sub2, class30_sub2_sub2);
         if((i & EntityUpdateMasks.Player.FORCED_CHAT) != 0)
-        {
-            class30_sub2_sub4_sub1_sub2.aString1506 = class30_sub2_sub2.method415();
-            if(((Actor) (class30_sub2_sub4_sub1_sub2)).aString1506.charAt(0) == '~')
-            {
-                class30_sub2_sub4_sub1_sub2.aString1506 = ((Actor) (class30_sub2_sub4_sub1_sub2)).aString1506.substring(1);
-                method77(((Actor) (class30_sub2_sub4_sub1_sub2)).aString1506, 2, class30_sub2_sub4_sub1_sub2.aString1703, aBoolean991);
-            } else
-            if(class30_sub2_sub4_sub1_sub2 == aClass30_Sub2_Sub4_Sub1_Sub2_1126)
-                method77(((Actor) (class30_sub2_sub4_sub1_sub2)).aString1506, 2, class30_sub2_sub4_sub1_sub2.aString1703, aBoolean991);
-            class30_sub2_sub4_sub1_sub2.anInt1513 = 0;
-            class30_sub2_sub4_sub1_sub2.anInt1531 = 0;
-            class30_sub2_sub4_sub1_sub2.anInt1535 = 150;
-        }
+            applyPlayerForcedChatUpdate(class30_sub2_sub4_sub1_sub2, class30_sub2_sub2);
         if((i & EntityUpdateMasks.Player.PUBLIC_CHAT) != 0)
         {
             int i1 = class30_sub2_sub2.method434((byte)108);
@@ -8428,43 +8477,15 @@ public final class GameClient extends GameShell
             class30_sub2_sub2.anInt1406 = k3 + j3;
         }
         if((i & EntityUpdateMasks.Player.INTERACTING_ENTITY) != 0)
-        {
-            class30_sub2_sub4_sub1_sub2.anInt1502 = class30_sub2_sub2.method434((byte)108);
-            if(((Actor) (class30_sub2_sub4_sub1_sub2)).anInt1502 == 65535)
-                class30_sub2_sub4_sub1_sub2.anInt1502 = -1;
-        }
+            applyPlayerInteractingEntityUpdate(class30_sub2_sub4_sub1_sub2, class30_sub2_sub2);
         if((i & EntityUpdateMasks.Player.APPEARANCE) != 0)
-        {
-            int j1 = class30_sub2_sub2.method427(false);
-            byte abyte0[] = new byte[j1];
-            PacketBuffer class30_sub2_sub2_1 = new PacketBuffer(abyte0, 891);
-            class30_sub2_sub2.method417(j1, aByte920, 0, abyte0);
-            aClass30_Sub2_Sub2Array895[j] = class30_sub2_sub2_1;
-            class30_sub2_sub4_sub1_sub2.method451(0, class30_sub2_sub2_1);
-        }
+            applyPlayerAppearanceUpdate(j, class30_sub2_sub4_sub1_sub2, class30_sub2_sub2);
         if((i & EntityUpdateMasks.Player.FACE_COORDINATES) != 0)
-        {
-            class30_sub2_sub4_sub1_sub2.anInt1538 = class30_sub2_sub2.method436((byte)-74);
-            class30_sub2_sub4_sub1_sub2.anInt1539 = class30_sub2_sub2.method434((byte)108);
-        }
+            applyPlayerFaceCoordinatesUpdate(class30_sub2_sub4_sub1_sub2, class30_sub2_sub2);
         if((i & EntityUpdateMasks.Player.HIT_PRIMARY) != 0)
-        {
-            int k1 = class30_sub2_sub2.method408();
-            int k2 = class30_sub2_sub2.method426(0);
-            class30_sub2_sub4_sub1_sub2.method447(-35698, k2, k1, anInt1161);
-            class30_sub2_sub4_sub1_sub2.anInt1532 = anInt1161 + 300;
-            class30_sub2_sub4_sub1_sub2.anInt1533 = class30_sub2_sub2.method427(false);
-            class30_sub2_sub4_sub1_sub2.anInt1534 = class30_sub2_sub2.method408();
-        }
+            applyPlayerHitPrimaryUpdate(class30_sub2_sub4_sub1_sub2, class30_sub2_sub2);
         if((i & EntityUpdateMasks.Player.HIT_SECONDARY) != 0)
-        {
-            int l1 = class30_sub2_sub2.method408();
-            int l2 = class30_sub2_sub2.method428(2);
-            class30_sub2_sub4_sub1_sub2.method447(-35698, l2, l1, anInt1161);
-            class30_sub2_sub4_sub1_sub2.anInt1532 = anInt1161 + 300;
-            class30_sub2_sub4_sub1_sub2.anInt1533 = class30_sub2_sub2.method408();
-            class30_sub2_sub4_sub1_sub2.anInt1534 = class30_sub2_sub2.method427(false);
-        }
+            applyPlayerHitSecondaryUpdate(class30_sub2_sub4_sub1_sub2, class30_sub2_sub2);
     }
 
     public final void method108(int i)
