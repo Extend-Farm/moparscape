@@ -47,4 +47,54 @@ public final class CameraPacketHandler {
             pitch, yaw
         };
     }
+
+    public static int[] readHintIconState(PacketBuffer packetBuffer)
+    {
+        int hintType = packetBuffer.method408();
+        int targetPlayerId = -1;
+        int hintOffsetX = 0;
+        int hintOffsetY = 0;
+        int hintTileX = 0;
+        int hintTileY = 0;
+        int hintHeight = 0;
+        if(hintType == 1)
+            targetPlayerId = packetBuffer.method410();
+        if(hintType >= 2 && hintType <= 6)
+        {
+            if(hintType == 2)
+            {
+                hintOffsetX = 64;
+                hintOffsetY = 64;
+            }
+            if(hintType == 3)
+            {
+                hintOffsetX = 0;
+                hintOffsetY = 64;
+            }
+            if(hintType == 4)
+            {
+                hintOffsetX = 128;
+                hintOffsetY = 64;
+            }
+            if(hintType == 5)
+            {
+                hintOffsetX = 64;
+                hintOffsetY = 0;
+            }
+            if(hintType == 6)
+            {
+                hintOffsetX = 64;
+                hintOffsetY = 128;
+            }
+            hintType = 2;
+            hintTileX = packetBuffer.method410();
+            hintTileY = packetBuffer.method410();
+            hintHeight = packetBuffer.method408();
+        }
+        if(hintType == 10)
+            targetPlayerId = packetBuffer.method410();
+        return new int[] {
+            hintType, targetPlayerId, hintOffsetX, hintOffsetY, hintTileX, hintTileY, hintHeight
+        };
+    }
 }

@@ -9577,7 +9577,7 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
             }
             if(anInt1008 == 208)
             {
-                int i3 = aClass30_Sub2_Sub2_1083.method437(-665);
+                int i3 = InterfacePacketHandler.readOverlayWidgetId(aClass30_Sub2_Sub2_1083);
                 if(i3 >= 0)
                     method60(i3, (byte)6);
                 anInt1018 = i3;
@@ -9623,9 +9623,10 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
             }
             if(anInt1008 == 174)
             {
-                int i4 = aClass30_Sub2_Sub2_1083.method410();
-                int l11 = aClass30_Sub2_Sub2_1083.method408();
-                int k17 = aClass30_Sub2_Sub2_1083.method410();
+                int areaSound[] = SystemAudioPacketHandler.readAreaSoundEffect(aClass30_Sub2_Sub2_1083);
+                int i4 = areaSound[0];
+                int l11 = areaSound[1];
+                int k17 = areaSound[2];
                 if(aBoolean848 && !aBoolean960 && anInt1062 < 50)
                 {
                     anIntArray1207[anInt1062] = i4;
@@ -9638,16 +9639,7 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
             }
             if(anInt1008 == 104)
             {
-                int j4 = aClass30_Sub2_Sub2_1083.method427(false);
-                int i12 = aClass30_Sub2_Sub2_1083.method426(0);
-                String s6 = aClass30_Sub2_Sub2_1083.method415();
-                if(j4 >= 1 && j4 <= 5)
-                {
-                    if(s6.equalsIgnoreCase("null"))
-                        s6 = null;
-                    aStringArray1127[j4 - 1] = s6;
-                    aBooleanArray1128[j4 - 1] = i12 == 0;
-                }
+                InterfacePacketHandler.applyPlayerMenuOption(aClass30_Sub2_Sub2_1083, aStringArray1127, aBooleanArray1128);
                 anInt1008 = -1;
                 return true;
             }
@@ -9695,43 +9687,16 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
             }
             if(anInt1008 == 254)
             {
-                anInt855 = aClass30_Sub2_Sub2_1083.method408();
-                if(anInt855 == 1)
-                    anInt1222 = aClass30_Sub2_Sub2_1083.method410();
-                if(anInt855 >= 2 && anInt855 <= 6)
-                {
-                    if(anInt855 == 2)
-                    {
-                        anInt937 = 64;
-                        anInt938 = 64;
-                    }
-                    if(anInt855 == 3)
-                    {
-                        anInt937 = 0;
-                        anInt938 = 64;
-                    }
-                    if(anInt855 == 4)
-                    {
-                        anInt937 = 128;
-                        anInt938 = 64;
-                    }
-                    if(anInt855 == 5)
-                    {
-                        anInt937 = 64;
-                        anInt938 = 0;
-                    }
-                    if(anInt855 == 6)
-                    {
-                        anInt937 = 64;
-                        anInt938 = 128;
-                    }
-                    anInt855 = 2;
-                    anInt934 = aClass30_Sub2_Sub2_1083.method410();
-                    anInt935 = aClass30_Sub2_Sub2_1083.method410();
-                    anInt936 = aClass30_Sub2_Sub2_1083.method408();
-                }
+                int hintIconState[] = CameraPacketHandler.readHintIconState(aClass30_Sub2_Sub2_1083);
+                anInt855 = hintIconState[0];
+                anInt1222 = hintIconState[1];
+                anInt937 = hintIconState[2];
+                anInt938 = hintIconState[3];
+                anInt934 = hintIconState[4];
+                anInt935 = hintIconState[5];
+                anInt936 = hintIconState[6];
                 if(anInt855 == 10)
-                    anInt933 = aClass30_Sub2_Sub2_1083.method410();
+                    anInt933 = anInt1222;
                 anInt1008 = -1;
                 return true;
             }
@@ -9848,7 +9813,7 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
             {
                 if(anInt1221 == 12)
                     aBoolean1153 = true;
-                anInt878 = aClass30_Sub2_Sub2_1083.method411();
+                anInt878 = InterfacePacketHandler.readPublicChatMode(aClass30_Sub2_Sub2_1083);
                 anInt1008 = -1;
                 return true;
             }
