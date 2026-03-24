@@ -98,6 +98,19 @@ This project is now a Gradle multi-module build.
 - `Class38` -> `IdentityKitDefinition`
 - `Class33` -> `VertexNormal`
 
+### Phase 8 (entities, renderables, and UI defs)
+
+- `Class30_Sub2_Sub4` -> `Renderable`
+- `Class30_Sub2_Sub4_Sub1` -> `Actor`
+- `Class30_Sub2_Sub4_Sub1_Sub1` -> `Npc`
+- `Class30_Sub2_Sub4_Sub1_Sub2` -> `Player`
+- `Class30_Sub2_Sub4_Sub3` -> `GraphicsObject`
+- `Class30_Sub2_Sub4_Sub4` -> `Projectile`
+- `Class8` -> `ItemDefinition`
+- `Class5` -> `NpcDefinition`
+- `Class9` -> `Widget`
+- `Class48` -> `MouseRecorder`
+
 ## Next steps
 
 - Continue phased renaming of remaining `Class1`..`Class50` files.

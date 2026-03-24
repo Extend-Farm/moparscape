@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-public class Class9
+public class Widget
 {
 
     public void method204(int i, byte byte0, int j)
@@ -27,7 +27,7 @@ public class Class9
         PacketBuffer class30_sub2_sub2 = new PacketBuffer(class44.method571("data", null), 891);
         int i = -1;
         int j = class30_sub2_sub2.method410();
-        aClass9Array210 = new Class9[j];
+        aClass9Array210 = new Widget[j];
         while(class30_sub2_sub2.anInt1406 < class30_sub2_sub2.aByteArray1405.length) 
         {
             int k = class30_sub2_sub2.method410();
@@ -36,7 +36,7 @@ public class Class9
                 i = class30_sub2_sub2.method410();
                 k = class30_sub2_sub2.method410();
             }
-            Class9 class9 = aClass9Array210[k] = new Class9();
+            Widget class9 = aClass9Array210[k] = new Widget();
             class9.anInt250 = k;
             class9.anInt236 = i;
             class9.anInt262 = class30_sub2_sub2.method408();
@@ -257,11 +257,11 @@ public class Class9
         if(i == 1)
             class30_sub2_sub4_sub6 = Model.method462(anInt213, j);
         if(i == 2)
-            class30_sub2_sub4_sub6 = Class5.method159(j).method160(true);
+            class30_sub2_sub4_sub6 = NpcDefinition.method159(j).method160(true);
         if(i == 3)
             class30_sub2_sub4_sub6 = GameClient.aClass30_Sub2_Sub4_Sub1_Sub2_1126.method453((byte)-41);
         if(i == 4)
-            class30_sub2_sub4_sub6 = Class8.method198(j).method202(50, true);
+            class30_sub2_sub4_sub6 = ItemDefinition.method198(j).method202(50, true);
         if(i == 5)
             class30_sub2_sub4_sub6 = null;
         if(class30_sub2_sub4_sub6 != null)
@@ -323,7 +323,7 @@ public class Class9
             return class30_sub2_sub4_sub6_1;
     }
 
-    public Class9()
+    public Widget()
     {
         anInt213 = 9;
         anInt229 = 891;
@@ -332,7 +332,7 @@ public class Class9
     public Sprite aClass30_Sub2_Sub1_Sub1_207;
     public int anInt208;
     public Sprite aClass30_Sub2_Sub1_Sub1Array209[];
-    public static Class9 aClass9Array210[];
+    public static Widget aClass9Array210[];
     public int anInt211;
     public int anIntArray212[];
     private int anInt213;

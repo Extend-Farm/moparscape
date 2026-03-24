@@ -14,7 +14,7 @@ public final class InteractiveObject
     int anInt518;
     int anInt519;
     int anInt520;
-    public Class30_Sub2_Sub4 aClass30_Sub2_Sub4_521;
+    public Renderable aClass30_Sub2_Sub4_521;
     public int anInt522;
     int anInt523;
     int anInt524;

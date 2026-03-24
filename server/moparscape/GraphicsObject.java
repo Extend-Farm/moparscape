@@ -4,10 +4,10 @@
 
 import sign.SignLink;
 
-final class Class30_Sub2_Sub4_Sub3 extends Class30_Sub2_Sub4
+final class GraphicsObject extends Renderable
 {
 
-    public Class30_Sub2_Sub4_Sub3(int i, int j, int k, int l, int i1, int j1, int k1, 
+    public GraphicsObject(int i, int j, int k, int l, int i1, int j1, int k1, 
             int l1)
     {
         aBoolean1565 = true;

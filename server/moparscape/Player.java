@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
+final class Player extends Actor
 {
 
     public final Model method444(int i)
@@ -16,7 +16,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
         Model class30_sub2_sub4_sub6 = method452(0);
         if(class30_sub2_sub4_sub6 == null)
             return null;
-        super.anInt1507 = ((Class30_Sub2_Sub4) (class30_sub2_sub4_sub6)).anInt1426;
+        super.anInt1507 = ((Renderable) (class30_sub2_sub4_sub6)).anInt1426;
         class30_sub2_sub4_sub6.aBoolean1659 = true;
         if(aBoolean1699)
             return class30_sub2_sub4_sub6;
@@ -108,12 +108,12 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
             anIntArray1717[j] = (k << 8) + i1;
             if(j == 0 && anIntArray1717[0] == 65535)
             {
-                aClass5_1698 = Class5.method159(class30_sub2_sub2.method410());
+                aClass5_1698 = NpcDefinition.method159(class30_sub2_sub2.method410());
                 break;
             }
-            if(anIntArray1717[j] >= 512 && anIntArray1717[j] - 512 < Class8.anInt203)
+            if(anIntArray1717[j] >= 512 && anIntArray1717[j] - 512 < ItemDefinition.anInt203)
             {
-                int l1 = Class8.method198(anIntArray1717[j] - 512).anInt202;
+                int l1 = ItemDefinition.method198(anIntArray1717[j] - 512).anInt202;
                 if(l1 != 0)
                     anInt1701 = l1;
             }
@@ -228,7 +228,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
                     k2 = j1;
                 if(k2 >= 256 && k2 < 512 && !IdentityKitDefinition.aClass38Array656[k2 - 256].method537((byte)2))
                     flag = true;
-                if(k2 >= 512 && !Class8.method198(k2 - 512).method195(40903, anInt1702))
+                if(k2 >= 512 && !ItemDefinition.method198(k2 - 512).method195(40903, anInt1702))
                     flag = true;
             }
 
@@ -259,7 +259,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
                 }
                 if(i3 >= 512)
                 {
-                    Model class30_sub2_sub4_sub6_4 = Class8.method198(i3 - 512).method196(false, anInt1702);
+                    Model class30_sub2_sub4_sub6_4 = ItemDefinition.method198(i3 - 512).method196(false, anInt1702);
                     if(class30_sub2_sub4_sub6_4 != null)
                         aclass30_sub2_sub4_sub6[j2++] = class30_sub2_sub4_sub6_4;
                 }
@@ -315,7 +315,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
             int j = anIntArray1717[i];
             if(j >= 256 && j < 512 && !IdentityKitDefinition.aClass38Array656[j - 256].method539(false))
                 flag = true;
-            if(j >= 512 && !Class8.method198(j - 512).method192(-2836, anInt1702))
+            if(j >= 512 && !ItemDefinition.method198(j - 512).method192(-2836, anInt1702))
                 flag = true;
         }
 
@@ -334,7 +334,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
             }
             if(i1 >= 512)
             {
-                Model class30_sub2_sub4_sub6_2 = Class8.method198(i1 - 512).method194(-705, anInt1702);
+                Model class30_sub2_sub4_sub6_2 = ItemDefinition.method198(i1 - 512).method194(-705, anInt1702);
                 if(class30_sub2_sub4_sub6_2 != null)
                     aclass30_sub2_sub4_sub6[k++] = class30_sub2_sub4_sub6_2;
             }
@@ -352,7 +352,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
         return class30_sub2_sub4_sub6;
     }
 
-    Class30_Sub2_Sub4_Sub1_Sub2()
+    Player()
     {
         aLong1697 = -1L;
         aBoolean1699 = false;
@@ -364,7 +364,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
     }
 
     long aLong1697;
-    Class5 aClass5_1698;
+    NpcDefinition aClass5_1698;
     boolean aBoolean1699;
     int anIntArray1700[];
     int anInt1701;

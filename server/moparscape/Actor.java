@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-class Class30_Sub2_Sub4_Sub1 extends Class30_Sub2_Sub4
+class Actor extends Renderable
 {
 
     public final void method445(int i, int j, boolean flag, boolean flag1)
@@ -132,7 +132,7 @@ class Class30_Sub2_Sub4_Sub1 extends Class30_Sub2_Sub4
         return false;
     }
 
-    Class30_Sub2_Sub4_Sub1()
+    Actor()
     {
         anIntArray1500 = new int[10];
         anIntArray1501 = new int[10];

@@ -15,8 +15,8 @@ public final class WallObject
     int anInt275;
     int anInt276;
     int anInt277;
-    public Class30_Sub2_Sub4 aClass30_Sub2_Sub4_278;
-    public Class30_Sub2_Sub4 aClass30_Sub2_Sub4_279;
+    public Renderable aClass30_Sub2_Sub4_278;
+    public Renderable aClass30_Sub2_Sub4_279;
     public int anInt280;
     byte aByte281;
 }

@@ -4,17 +4,17 @@
 
 import sign.SignLink;
 
-final class Class5
+final class NpcDefinition
 {
 
-    public static final Class5 method159(int i)
+    public static final NpcDefinition method159(int i)
     {
         for(int j = 0; j < 20; j++)
             if(aClass5Array80[j].aLong78 == (long)i)
                 return aClass5Array80[j];
 
         anInt56 = (anInt56 + 1) % 20;
-        Class5 class5 = aClass5Array80[anInt56] = new Class5();
+        NpcDefinition class5 = aClass5Array80[anInt56] = new NpcDefinition();
         aClass30_Sub2_Sub2_60.anInt1406 = anIntArray72[i];
         class5.aLong78 = i;
         class5.method165(true, aClass30_Sub2_Sub2_60);
@@ -25,7 +25,7 @@ final class Class5
     {
         if(anIntArray88 != null)
         {
-            Class5 class5 = method161(anInt64);
+            NpcDefinition class5 = method161(anInt64);
             if(class5 == null)
                 return null;
             else
@@ -60,7 +60,7 @@ final class Class5
         return class30_sub2_sub4_sub6;
     }
 
-    public final Class5 method161(int i)
+    public final NpcDefinition method161(int i)
     {
         int j = -1;
         if(i != 1834)
@@ -95,9 +95,9 @@ final class Class5
             i += class30_sub2_sub2.method410();
         }
 
-        aClass5Array80 = new Class5[20];
+        aClass5Array80 = new NpcDefinition[20];
         for(int k = 0; k < 20; k++)
-            aClass5Array80[k] = new Class5();
+            aClass5Array80[k] = new NpcDefinition();
 
     }
 
@@ -115,7 +115,7 @@ final class Class5
     {
         if(anIntArray88 != null)
         {
-            Class5 class5 = method161(anInt64);
+            NpcDefinition class5 = method161(anInt64);
             if(class5 == null)
                 return null;
             else
@@ -296,7 +296,7 @@ final class Class5
         } while(true);
     }
 
-    Class5()
+    NpcDefinition()
     {
         anInt55 = -1;
         anInt57 = -1;
@@ -349,7 +349,7 @@ final class Class5
     public int anInt77;
     public long aLong78;
     public int anInt79;
-    private static Class5 aClass5Array80[];
+    private static NpcDefinition aClass5Array80[];
     private boolean aBoolean81;
     public static GameClient aClient82;
     public int anInt83;

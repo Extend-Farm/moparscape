@@ -560,7 +560,7 @@ final class MapRegion {
                 return;
             }
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(22, n6, n8, n9, n10, n11, -1) : new DynamicObject(n5, n6, 22, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
-            class25.method280(n3, n12, n, 68, (Class30_Sub2_Sub4)object, by, n13, n4);
+            class25.method280(n3, n12, n, 68, (Renderable)object, by, n13, n4);
             if (class46.aBoolean767 && class46.aBoolean778 && class11 != null) {
                 class11.method213(n, 0, n4);
             }
@@ -583,7 +583,7 @@ final class MapRegion {
                     n15 = class46.anInt744;
                     n14 = class46.anInt761;
                 }
-                if (class25.method284(n13, by, n12, n14, (Class30_Sub2_Sub4)object, n15, n3, n16, (byte)110, n, n4) && class46.aBoolean779 && (object2 = object instanceof Model ? object : class46.method578(10, n6, n8, n9, n10, n11, -1)) != null) {
+                if (class25.method284(n13, by, n12, n14, (Renderable)object, n15, n3, n16, (byte)110, n, n4) && class46.aBoolean779 && (object2 = object instanceof Model ? object : class46.method578(10, n6, n8, n9, n10, n11, -1)) != null) {
                     int n17 = 0;
                     while (n17 <= n15) {
                         int n18 = 0;
@@ -608,7 +608,7 @@ final class MapRegion {
         }
         if (n2 >= 12) {
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(n2, n6, n8, n9, n10, n11, -1) : new DynamicObject(n5, n6, n2, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
-            class25.method284(n13, by, n12, 1, (Class30_Sub2_Sub4)object, 1, n3, 0, (byte)110, n, n4);
+            class25.method284(n13, by, n12, 1, (Renderable)object, 1, n3, 0, (byte)110, n, n4);
             if (n2 >= 12 && n2 <= 17 && n2 != 13 && n3 > 0) {
                 int[] nArray = this.anIntArrayArrayArray135[n3][n4];
                 int n20 = n;
@@ -621,7 +621,7 @@ final class MapRegion {
         }
         if (n2 == 0) {
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(0, n6, n8, n9, n10, n11, -1) : new DynamicObject(n5, n6, 0, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
-            class25.method282(anIntArray152[n6], (Class30_Sub2_Sub4)object, true, n13, n, by, n4, null, n12, 0, n3);
+            class25.method282(anIntArray152[n6], (Renderable)object, true, n13, n, by, n4, null, n12, 0, n3);
             if (n6 == 0) {
                 if (class46.aBoolean779) {
                     this.aByteArrayArrayArray134[n3][n4][n] = 50;
@@ -673,7 +673,7 @@ final class MapRegion {
         }
         if (n2 == 1) {
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(1, n6, n8, n9, n10, n11, -1) : new DynamicObject(n5, n6, 1, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
-            class25.method282(anIntArray140[n6], (Class30_Sub2_Sub4)object, true, n13, n, by, n4, null, n12, 0, n3);
+            class25.method282(anIntArray140[n6], (Renderable)object, true, n13, n, by, n4, null, n12, 0, n3);
             if (class46.aBoolean779) {
                 if (n6 == 0) {
                     this.aByteArrayArrayArray134[n3][n4][n + 1] = 50;
@@ -691,8 +691,8 @@ final class MapRegion {
             return;
         }
         if (n2 == 2) {
-            Class30_Sub2_Sub4 class30_Sub2_Sub4_Sub6;
-            Class30_Sub2_Sub4 class30_Sub2_Sub4_Sub62;
+            Renderable class30_Sub2_Sub4_Sub6;
+            Renderable class30_Sub2_Sub4_Sub62;
             int n25 = n6 + 1 & 3;
             if (class46.anInt781 == -1 && class46.anIntArray759 == null) {
                 class30_Sub2_Sub4_Sub62 = class46.method578(2, 4 + n6, n8, n9, n10, n11, -1);
@@ -701,7 +701,7 @@ final class MapRegion {
                 class30_Sub2_Sub4_Sub62 = new DynamicObject(n5, 4 + n6, 2, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
                 class30_Sub2_Sub4_Sub6 = new DynamicObject(n5, n25, 2, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
             }
-            class25.method282(anIntArray152[n6], (Class30_Sub2_Sub4)class30_Sub2_Sub4_Sub62, true, n13, n, by, n4, (Class30_Sub2_Sub4)class30_Sub2_Sub4_Sub6, n12, anIntArray152[n25], n3);
+            class25.method282(anIntArray152[n6], (Renderable)class30_Sub2_Sub4_Sub62, true, n13, n, by, n4, (Renderable)class30_Sub2_Sub4_Sub6, n12, anIntArray152[n25], n3);
             if (class46.aBoolean764) {
                 if (n6 == 0) {
                     int[] nArray = this.anIntArrayArrayArray135[n3][n4];
@@ -743,7 +743,7 @@ final class MapRegion {
         }
         if (n2 == 3) {
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(3, n6, n8, n9, n10, n11, -1) : new DynamicObject(n5, n6, 3, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
-            class25.method282(anIntArray140[n6], (Class30_Sub2_Sub4)object, true, n13, n, by, n4, null, n12, 0, n3);
+            class25.method282(anIntArray140[n6], (Renderable)object, true, n13, n, by, n4, null, n12, 0, n3);
             if (class46.aBoolean779) {
                 if (n6 == 0) {
                     this.aByteArrayArrayArray134[n3][n4][n + 1] = 50;
@@ -762,7 +762,7 @@ final class MapRegion {
         }
         if (n2 == 9) {
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(n2, n6, n8, n9, n10, n11, -1) : new DynamicObject(n5, n6, n2, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
-            class25.method284(n13, by, n12, 1, (Class30_Sub2_Sub4)object, 1, n3, 0, (byte)110, n, n4);
+            class25.method284(n13, by, n12, 1, (Renderable)object, 1, n3, 0, (byte)110, n, n4);
             if (class46.aBoolean767 && class11 != null) {
                 class11.method212(class46.aBoolean757, anInt138, class46.anInt744, class46.anInt761, n4, n, n6);
             }
@@ -792,7 +792,7 @@ final class MapRegion {
         }
         if (n2 == 4) {
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n8, n9, n10, n11, -1) : new DynamicObject(n5, 0, 4, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
-            class25.method283(n13, n, n6 * 512, -460, n3, 0, n12, (Class30_Sub2_Sub4)object, n4, by, 0, anIntArray152[n6]);
+            class25.method283(n13, n, n6 * 512, -460, n3, 0, n12, (Renderable)object, n4, by, 0, anIntArray152[n6]);
             return;
         }
         if (n2 == 5) {
@@ -802,22 +802,22 @@ final class MapRegion {
                 n7 = ObjectDefinition.method572((int)(n34 >> 14 & Short.MAX_VALUE)).anInt775;
             }
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n8, n9, n10, n11, -1) : new DynamicObject(n5, 0, 4, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
-            class25.method283(n13, n, n6 * 512, -460, n3, anIntArray137[n6] * n7, n12, (Class30_Sub2_Sub4)object, n4, by, anIntArray144[n6] * n7, anIntArray152[n6]);
+            class25.method283(n13, n, n6 * 512, -460, n3, anIntArray137[n6] * n7, n12, (Renderable)object, n4, by, anIntArray144[n6] * n7, anIntArray152[n6]);
             return;
         }
         if (n2 == 6) {
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n8, n9, n10, n11, -1) : new DynamicObject(n5, 0, 4, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
-            class25.method283(n13, n, n6, -460, n3, 0, n12, (Class30_Sub2_Sub4)object, n4, by, 0, 256);
+            class25.method283(n13, n, n6, -460, n3, 0, n12, (Renderable)object, n4, by, 0, 256);
             return;
         }
         if (n2 == 7) {
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n8, n9, n10, n11, -1) : new DynamicObject(n5, 0, 4, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
-            class25.method283(n13, n, n6, -460, n3, 0, n12, (Class30_Sub2_Sub4)object, n4, by, 0, 512);
+            class25.method283(n13, n, n6, -460, n3, 0, n12, (Renderable)object, n4, by, 0, 512);
             return;
         }
         if (n2 == 8) {
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n8, n9, n10, n11, -1) : new DynamicObject(n5, 0, 4, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
-            class25.method283(n13, n, n6, -460, n3, 0, n12, (Class30_Sub2_Sub4)object, n4, by, 0, 768);
+            class25.method283(n13, n, n6, -460, n3, 0, n12, (Renderable)object, n4, by, 0, 768);
         }
     }
 
@@ -1110,7 +1110,7 @@ final class MapRegion {
         byte by2 = (byte)((n << 6) + n3);
         if (n3 == 22) {
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(22, n, n9, n10, n11, n12, -1) : new DynamicObject(n6, n, 22, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
-            class25.method280(n7, n13, n2, 68, (Class30_Sub2_Sub4)object, by2, n14, n5);
+            class25.method280(n7, n13, n2, 68, (Renderable)object, by2, n14, n5);
             if (class46.aBoolean767 && class46.aBoolean778) {
                 class11.method213(n2, 0, n5);
             }
@@ -1132,7 +1132,7 @@ final class MapRegion {
                     n16 = class46.anInt744;
                     n15 = class46.anInt761;
                 }
-                class25.method284(n14, by2, n13, n15, (Class30_Sub2_Sub4)object, n16, n7, n17, (byte)110, n2, n5);
+                class25.method284(n14, by2, n13, n15, (Renderable)object, n16, n7, n17, (byte)110, n2, n5);
             }
             if (class46.aBoolean767) {
                 class11.method212(class46.aBoolean757, anInt138, class46.anInt744, class46.anInt761, n5, n2, n);
@@ -1141,7 +1141,7 @@ final class MapRegion {
         }
         if (n3 >= 12) {
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(n3, n, n9, n10, n11, n12, -1) : new DynamicObject(n6, n, n3, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
-            class25.method284(n14, by2, n13, 1, (Class30_Sub2_Sub4)object, 1, n7, 0, (byte)110, n2, n5);
+            class25.method284(n14, by2, n13, 1, (Renderable)object, 1, n7, 0, (byte)110, n2, n5);
             if (class46.aBoolean767) {
                 class11.method212(class46.aBoolean757, anInt138, class46.anInt744, class46.anInt761, n5, n2, n);
             }
@@ -1149,7 +1149,7 @@ final class MapRegion {
         }
         if (n3 == 0) {
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(0, n, n9, n10, n11, n12, -1) : new DynamicObject(n6, n, 0, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
-            class25.method282(anIntArray152[n], (Class30_Sub2_Sub4)object, true, n14, n2, by2, n5, null, n13, 0, n7);
+            class25.method282(anIntArray152[n], (Renderable)object, true, n14, n2, by2, n5, null, n13, 0, n7);
             if (class46.aBoolean767) {
                 class11.method211(n2, n, n5, n3, (byte)1, class46.aBoolean757);
             }
@@ -1157,15 +1157,15 @@ final class MapRegion {
         }
         if (n3 == 1) {
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(1, n, n9, n10, n11, n12, -1) : new DynamicObject(n6, n, 1, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
-            class25.method282(anIntArray140[n], (Class30_Sub2_Sub4)object, true, n14, n2, by2, n5, null, n13, 0, n7);
+            class25.method282(anIntArray140[n], (Renderable)object, true, n14, n2, by2, n5, null, n13, 0, n7);
             if (class46.aBoolean767) {
                 class11.method211(n2, n, n5, n3, (byte)1, class46.aBoolean757);
             }
             return;
         }
         if (n3 == 2) {
-            Class30_Sub2_Sub4 class30_Sub2_Sub4_Sub6;
-            Class30_Sub2_Sub4 class30_Sub2_Sub4_Sub62;
+            Renderable class30_Sub2_Sub4_Sub6;
+            Renderable class30_Sub2_Sub4_Sub62;
             int n18 = n + 1 & 3;
             if (class46.anInt781 == -1 && class46.anIntArray759 == null) {
                 class30_Sub2_Sub4_Sub62 = class46.method578(2, 4 + n, n9, n10, n11, n12, -1);
@@ -1174,7 +1174,7 @@ final class MapRegion {
                 class30_Sub2_Sub4_Sub62 = new DynamicObject(n6, 4 + n, 2, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
                 class30_Sub2_Sub4_Sub6 = new DynamicObject(n6, n18, 2, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
             }
-            class25.method282(anIntArray152[n], (Class30_Sub2_Sub4)class30_Sub2_Sub4_Sub62, true, n14, n2, by2, n5, (Class30_Sub2_Sub4)class30_Sub2_Sub4_Sub6, n13, anIntArray152[n18], n7);
+            class25.method282(anIntArray152[n], (Renderable)class30_Sub2_Sub4_Sub62, true, n14, n2, by2, n5, (Renderable)class30_Sub2_Sub4_Sub6, n13, anIntArray152[n18], n7);
             if (class46.aBoolean767) {
                 class11.method211(n2, n, n5, n3, (byte)1, class46.aBoolean757);
             }
@@ -1182,7 +1182,7 @@ final class MapRegion {
         }
         if (n3 == 3) {
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(3, n, n9, n10, n11, n12, -1) : new DynamicObject(n6, n, 3, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
-            class25.method282(anIntArray140[n], (Class30_Sub2_Sub4)object, true, n14, n2, by2, n5, null, n13, 0, n7);
+            class25.method282(anIntArray140[n], (Renderable)object, true, n14, n2, by2, n5, null, n13, 0, n7);
             if (class46.aBoolean767) {
                 class11.method211(n2, n, n5, n3, (byte)1, class46.aBoolean757);
             }
@@ -1190,7 +1190,7 @@ final class MapRegion {
         }
         if (n3 == 9) {
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(n3, n, n9, n10, n11, n12, -1) : new DynamicObject(n6, n, n3, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
-            class25.method284(n14, by2, n13, 1, (Class30_Sub2_Sub4)object, 1, n7, 0, (byte)110, n2, n5);
+            class25.method284(n14, by2, n13, 1, (Renderable)object, 1, n7, 0, (byte)110, n2, n5);
             if (class46.aBoolean767) {
                 class11.method212(class46.aBoolean757, anInt138, class46.anInt744, class46.anInt761, n5, n2, n);
             }
@@ -1220,7 +1220,7 @@ final class MapRegion {
         }
         if (n3 == 4) {
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n9, n10, n11, n12, -1) : new DynamicObject(n6, 0, 4, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
-            class25.method283(n14, n2, n * 512, -460, n7, 0, n13, (Class30_Sub2_Sub4)object, n5, by2, 0, anIntArray152[n]);
+            class25.method283(n14, n2, n * 512, -460, n7, 0, n13, (Renderable)object, n5, by2, 0, anIntArray152[n]);
             return;
         }
         if (n3 == 5) {
@@ -1230,22 +1230,22 @@ final class MapRegion {
                 n8 = ObjectDefinition.method572((int)(n19 >> 14 & Short.MAX_VALUE)).anInt775;
             }
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n9, n10, n11, n12, -1) : new DynamicObject(n6, 0, 4, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
-            class25.method283(n14, n2, n * 512, -460, n7, anIntArray137[n] * n8, n13, (Class30_Sub2_Sub4)object, n5, by2, anIntArray144[n] * n8, anIntArray152[n]);
+            class25.method283(n14, n2, n * 512, -460, n7, anIntArray137[n] * n8, n13, (Renderable)object, n5, by2, anIntArray144[n] * n8, anIntArray152[n]);
             return;
         }
         if (n3 == 6) {
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n9, n10, n11, n12, -1) : new DynamicObject(n6, 0, 4, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
-            class25.method283(n14, n2, n, -460, n7, 0, n13, (Class30_Sub2_Sub4)object, n5, by2, 0, 256);
+            class25.method283(n14, n2, n, -460, n7, 0, n13, (Renderable)object, n5, by2, 0, 256);
             return;
         }
         if (n3 == 7) {
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n9, n10, n11, n12, -1) : new DynamicObject(n6, 0, 4, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
-            class25.method283(n14, n2, n, -460, n7, 0, n13, (Class30_Sub2_Sub4)object, n5, by2, 0, 512);
+            class25.method283(n14, n2, n, -460, n7, 0, n13, (Renderable)object, n5, by2, 0, 512);
             return;
         }
         if (n3 == 8) {
             Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n9, n10, n11, n12, -1) : new DynamicObject(n6, 0, 4, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
-            class25.method283(n14, n2, n, -460, n7, 0, n13, (Class30_Sub2_Sub4)object, n5, by2, 0, 768);
+            class25.method283(n14, n2, n, -460, n7, 0, n13, (Renderable)object, n5, by2, 0, 768);
         }
     }
 

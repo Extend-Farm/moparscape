@@ -184,7 +184,7 @@ public class SceneGraph
         aClass30_Sub3ArrayArrayArray441[i][j][k].aClass40_1312 = class40;
     }
 
-    public void method280(int i, int j, int k, int l, Class30_Sub2_Sub4 class30_sub2_sub4, byte byte0, int i1, 
+    public void method280(int i, int j, int k, int l, Renderable class30_sub2_sub4, byte byte0, int i1, 
             int j1)
     {
         if(class30_sub2_sub4 == null)
@@ -203,7 +203,7 @@ public class SceneGraph
         aClass30_Sub3ArrayArrayArray441[i][j1][k].aClass49_1315 = class49;
     }
 
-    public void method281(byte byte0, int i, int j, Class30_Sub2_Sub4 class30_sub2_sub4, int k, Class30_Sub2_Sub4 class30_sub2_sub4_1, Class30_Sub2_Sub4 class30_sub2_sub4_2, 
+    public void method281(byte byte0, int i, int j, Renderable class30_sub2_sub4, int k, Renderable class30_sub2_sub4_1, Renderable class30_sub2_sub4_2, 
             int l, int i1)
     {
         GroundItemPile class3 = new GroundItemPile();
@@ -235,8 +235,8 @@ public class SceneGraph
         aClass30_Sub3ArrayArrayArray441[l][i][i1].aClass3_1316 = class3;
     }
 
-    public void method282(int i, Class30_Sub2_Sub4 class30_sub2_sub4, boolean flag, int j, int k, byte byte0, int l, 
-            Class30_Sub2_Sub4 class30_sub2_sub4_1, int i1, int j1, int k1)
+    public void method282(int i, Renderable class30_sub2_sub4, boolean flag, int j, int k, byte byte0, int l, 
+            Renderable class30_sub2_sub4_1, int i1, int j1, int k1)
     {
         if(!flag)
             aBoolean434 = !aBoolean434;
@@ -260,7 +260,7 @@ public class SceneGraph
     }
 
     public void method283(int i, int j, int k, int l, int i1, int j1, int k1, 
-            Class30_Sub2_Sub4 class30_sub2_sub4, int l1, byte byte0, int i2, int j2)
+            Renderable class30_sub2_sub4, int l1, byte byte0, int i2, int j2)
     {
         if(class30_sub2_sub4 == null)
             return;
@@ -282,7 +282,7 @@ public class SceneGraph
         aClass30_Sub3ArrayArrayArray441[i1][l1][j].aClass26_1314 = class26;
     }
 
-    public boolean method284(int i, byte byte0, int j, int k, Class30_Sub2_Sub4 class30_sub2_sub4, int l, int i1, 
+    public boolean method284(int i, byte byte0, int j, int k, Renderable class30_sub2_sub4, int l, int i1, 
             int j1, byte byte1, int k1, int l1)
     {
         if(byte1 != 110)
@@ -299,7 +299,7 @@ public class SceneGraph
     }
 
     public boolean method285(int i, int j, byte byte0, int k, int l, int i1, int j1, 
-            int k1, Class30_Sub2_Sub4 class30_sub2_sub4, boolean flag)
+            int k1, Renderable class30_sub2_sub4, boolean flag)
     {
         if(class30_sub2_sub4 == null)
             return true;
@@ -329,7 +329,7 @@ public class SceneGraph
         return method287(i, l1, i2, (j2 - l1) + 1, (k2 - i2) + 1, k1, i1, k, class30_sub2_sub4, j, true, l, (byte)0);
     }
 
-    public boolean method286(int i, int j, int k, Class30_Sub2_Sub4 class30_sub2_sub4, int l, int i1, int j1, 
+    public boolean method286(int i, int j, int k, Renderable class30_sub2_sub4, int l, int i1, int j1, 
             int k1, int l1, int i2, int j2, int k2, byte byte0)
     {
         if(byte0 != 35)
@@ -343,7 +343,7 @@ public class SceneGraph
     }
 
     private boolean method287(int i, int j, int k, int l, int i1, int j1, int k1, 
-            int l1, Class30_Sub2_Sub4 class30_sub2_sub4, int i2, boolean flag, int j2, byte byte0)
+            int l1, Renderable class30_sub2_sub4, int i2, boolean flag, int j2, byte byte0)
     {
         for(int k2 = j; k2 < j + l; k2++)
         {
@@ -804,7 +804,7 @@ public class SceneGraph
         int i1 = class30_sub2_sub4_sub6_1.anInt1626;
         for(int j1 = 0; j1 < class30_sub2_sub4_sub6.anInt1626; j1++)
         {
-            VertexNormal class33 = ((Class30_Sub2_Sub4) (class30_sub2_sub4_sub6)).aClass33Array1425[j1];
+            VertexNormal class33 = ((Renderable) (class30_sub2_sub4_sub6)).aClass33Array1425[j1];
             VertexNormal class33_1 = class30_sub2_sub4_sub6.aClass33Array1660[j1];
             if(class33_1.anInt605 != 0)
             {
@@ -819,7 +819,7 @@ public class SceneGraph
                         {
                             for(int l2 = 0; l2 < i1; l2++)
                             {
-                                VertexNormal class33_2 = ((Class30_Sub2_Sub4) (class30_sub2_sub4_sub6_1)).aClass33Array1425[l2];
+                                VertexNormal class33_2 = ((Renderable) (class30_sub2_sub4_sub6_1)).aClass33Array1425[l2];
                                 VertexNormal class33_3 = class30_sub2_sub4_sub6_1.aClass33Array1660[l2];
                                 if(j2 == ai[l2] && k2 == class30_sub2_sub4_sub6_1.anIntArray1629[l2] && i2 == class30_sub2_sub4_sub6_1.anIntArray1628[l2] && class33_3.anInt605 != 0)
                                 {

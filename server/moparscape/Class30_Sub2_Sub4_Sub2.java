@@ -4,12 +4,12 @@
 
 import sign.SignLink;
 
-final class Class30_Sub2_Sub4_Sub2 extends Class30_Sub2_Sub4
+final class Class30_Sub2_Sub4_Sub2 extends Renderable
 {
 
     public final Model method444(int i)
     {
-        Class8 class8 = Class8.method198(anInt1558);
+        ItemDefinition class8 = ItemDefinition.method198(anInt1558);
         if(i != 4016)
             throw new NullPointerException();
         else

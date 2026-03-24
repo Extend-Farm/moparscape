@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-final class Class30_Sub2_Sub4_Sub4 extends Class30_Sub2_Sub4
+final class Projectile extends Renderable
 {
 
     public final void method455(int i, int j, int k, int l, byte byte0)
@@ -55,7 +55,7 @@ final class Class30_Sub2_Sub4_Sub4 extends Class30_Sub2_Sub4
             return class30_sub2_sub4_sub6_1;
     }
 
-    public Class30_Sub2_Sub4_Sub4(int i, int j, int k, int l, int i1, int j1, int k1, 
+    public Projectile(int i, int j, int k, int l, int i1, int j1, int k1, 
             int l1, int i2, int j2, int k2, int l2)
     {
         anInt1573 = 9;

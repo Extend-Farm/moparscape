@@ -15,7 +15,7 @@ public final class WallDecoration
     int anInt501;
     int anInt502;
     int anInt503;
-    public Class30_Sub2_Sub4 aClass30_Sub2_Sub4_504;
+    public Renderable aClass30_Sub2_Sub4_504;
     public int anInt505;
     byte aByte506;
 }

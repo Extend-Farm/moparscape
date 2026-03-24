@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-final class Class8
+final class ItemDefinition
 {
 
     public static final void method191(int i)
@@ -52,9 +52,9 @@ final class Class8
             i += class30_sub2_sub2.method410();
         }
 
-        aClass8Array172 = new Class8[10];
+        aClass8Array172 = new ItemDefinition[10];
         for(int k = 0; k < 10; k++)
-            aClass8Array172[k] = new Class8();
+            aClass8Array172[k] = new ItemDefinition();
 
     }
 
@@ -203,14 +203,14 @@ final class Class8
         anInt202 = 0;
     }
 
-    public static final Class8 method198(int i)
+    public static final ItemDefinition method198(int i)
     {
         for(int j = 0; j < 10; j++)
             if(aClass8Array172[j].anInt157 == i)
                 return aClass8Array172[j];
 
         anInt180 = (anInt180 + 1) % 10;
-        Class8 class8 = aClass8Array172[anInt180];
+        ItemDefinition class8 = aClass8Array172[anInt180];
         aClass30_Sub2_Sub2_183.anInt1406 = anIntArray195[i];
         class8.anInt157 = i;
         class8.method197();
@@ -230,7 +230,7 @@ final class Class8
 
     public void method199(byte byte0)
     {
-        Class8 class8 = method198(anInt163);
+        ItemDefinition class8 = method198(anInt163);
         anInt174 = class8.anInt174;
         anInt181 = class8.anInt181;
         anInt190 = class8.anInt190;
@@ -242,7 +242,7 @@ final class Class8
             aBoolean186 = !aBoolean186;
         anIntArray156 = class8.anIntArray156;
         anIntArray160 = class8.anIntArray160;
-        Class8 class8_1 = method198(anInt179);
+        ItemDefinition class8_1 = method198(anInt179);
         aString170 = class8_1.aString170;
         aBoolean161 = class8_1.aBoolean161;
         anInt155 = class8_1.anInt155;
@@ -267,7 +267,7 @@ final class Class8
             if(class30_sub2_sub1_sub1 != null)
                 return class30_sub2_sub1_sub1;
         }
-        Class8 class8 = method198(i);
+        ItemDefinition class8 = method198(i);
         if(class8.anIntArray193 == null)
             j = -1;
         if(j > 1)
@@ -312,7 +312,7 @@ final class Class8
             k3 = (int)((double)k3 * 1.04D);
         int l3 = Rasterizer3D.anIntArray1470[class8.anInt190] * k3 >> 16;
         int i4 = Rasterizer3D.anIntArray1471[class8.anInt190] * k3 >> 16;
-        class30_sub2_sub4_sub6.method482(0, class8.anInt198, class8.anInt204, class8.anInt190, class8.anInt169, l3 + ((Class30_Sub2_Sub4) (class30_sub2_sub4_sub6)).anInt1426 / 2 + class8.anInt194, i4 + class8.anInt194);
+        class30_sub2_sub4_sub6.method482(0, class8.anInt198, class8.anInt204, class8.anInt190, class8.anInt169, l3 + ((Renderable) (class30_sub2_sub4_sub6)).anInt1426 / 2 + class8.anInt194, i4 + class8.anInt194);
         for(int i5 = 31; i5 >= 0; i5--)
         {
             for(int j4 = 31; j4 >= 0; j4--)
@@ -601,7 +601,7 @@ final class Class8
         } while(true);
     }
 
-    Class8()
+    ItemDefinition()
     {
         anInt157 = -1;
         anInt171 = 9;
@@ -628,7 +628,7 @@ final class Class8
     private int anInt169;
     public String aString170;
     private int anInt171;
-    private static Class8 aClass8Array172[];
+    private static ItemDefinition aClass8Array172[];
     public int anInt173;
     private int anInt174;
     private int anInt175;

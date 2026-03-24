@@ -83,6 +83,18 @@ The following high-impact renames are already completed:
   - `Class38` -> `IdentityKitDefinition`
   - `Class33` -> `VertexNormal`
 
+- Entities, renderables, and UI defs:
+  - `Class30_Sub2_Sub4` -> `Renderable`
+  - `Class30_Sub2_Sub4_Sub1` -> `Actor`
+  - `Class30_Sub2_Sub4_Sub1_Sub1` -> `Npc`
+  - `Class30_Sub2_Sub4_Sub1_Sub2` -> `Player`
+  - `Class30_Sub2_Sub4_Sub3` -> `GraphicsObject`
+  - `Class30_Sub2_Sub4_Sub4` -> `Projectile`
+  - `Class8` -> `ItemDefinition`
+  - `Class5` -> `NpcDefinition`
+  - `Class9` -> `Widget`
+  - `Class48` -> `MouseRecorder`
+
 ## Notes
 
 - Remaining obfuscated class names are intentionally being renamed in small batches.

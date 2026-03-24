@@ -288,7 +288,7 @@ final class ObjectDefinition
             class30_sub2_sub4_sub6_3.method475(anInt738, anInt745, 16384, anInt783);
         class30_sub2_sub4_sub6_3.method479(64 + aByte737, 768 + aByte742 * 5, -50, -10, -50, !aBoolean769);
         if(anInt760 == 1)
-            class30_sub2_sub4_sub6_3.anInt1654 = ((Class30_Sub2_Sub4) (class30_sub2_sub4_sub6_3)).anInt1426;
+            class30_sub2_sub4_sub6_3.anInt1654 = ((Renderable) (class30_sub2_sub4_sub6_3)).anInt1426;
         aClass12_780.method223(class30_sub2_sub4_sub6_3, l1, (byte)2);
         if(i != 0)
             anInt743 = 422;

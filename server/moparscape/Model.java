@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-public class Model extends Class30_Sub2_Sub4
+public class Model extends Renderable
 {
 
     public static void method458(int i)
@@ -692,7 +692,7 @@ public class Model extends Class30_Sub2_Sub4
             for(int j1 = 0; j1 < anInt1626; j1++)
             {
                 VertexNormal class33 = super.aClass33Array1425[j1] = new VertexNormal();
-                VertexNormal class33_1 = ((Class30_Sub2_Sub4) (class30_sub2_sub4_sub6)).aClass33Array1425[j1];
+                VertexNormal class33_1 = ((Renderable) (class30_sub2_sub4_sub6)).aClass33Array1425[j1];
                 class33.anInt602 = class33_1.anInt602;
                 class33.anInt603 = class33_1.anInt603;
                 class33.anInt604 = class33_1.anInt604;
@@ -719,7 +719,7 @@ public class Model extends Class30_Sub2_Sub4
         anIntArray1643 = class30_sub2_sub4_sub6.anIntArray1643;
         anIntArray1644 = class30_sub2_sub4_sub6.anIntArray1644;
         anIntArray1645 = class30_sub2_sub4_sub6.anIntArray1645;
-        super.anInt1426 = ((Class30_Sub2_Sub4) (class30_sub2_sub4_sub6)).anInt1426;
+        super.anInt1426 = ((Renderable) (class30_sub2_sub4_sub6)).anInt1426;
         for(anInt1651 = class30_sub2_sub4_sub6.anInt1651; i >= 0;)
             throw new NullPointerException();
 

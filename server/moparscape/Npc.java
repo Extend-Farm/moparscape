@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-final class Class30_Sub2_Sub4_Sub1_Sub1 extends Class30_Sub2_Sub4_Sub1
+final class Npc extends Actor
 {
 
     private final Model method450(int i)
@@ -34,7 +34,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub1 extends Class30_Sub2_Sub4_Sub1
         Model class30_sub2_sub4_sub6 = method450(0);
         if(class30_sub2_sub4_sub6 == null)
             return null;
-        super.anInt1507 = ((Class30_Sub2_Sub4) (class30_sub2_sub4_sub6)).anInt1426;
+        super.anInt1507 = ((Renderable) (class30_sub2_sub4_sub6)).anInt1426;
         if(i != 4016)
             anInt1693 = -403;
         if(super.anInt1520 != -1 && super.anInt1521 != -1)
@@ -71,7 +71,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub1 extends Class30_Sub2_Sub4_Sub1
         return aClass5_1696 != null;
     }
 
-    Class30_Sub2_Sub4_Sub1_Sub1()
+    Npc()
     {
         aBoolean1694 = false;
         anInt1695 = 9;
@@ -80,5 +80,5 @@ final class Class30_Sub2_Sub4_Sub1_Sub1 extends Class30_Sub2_Sub4_Sub1
     private int anInt1693;
     private boolean aBoolean1694;
     private int anInt1695;
-    Class5 aClass5_1696;
+    NpcDefinition aClass5_1696;
 }

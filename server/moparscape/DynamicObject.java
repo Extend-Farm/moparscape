@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-public class DynamicObject extends Class30_Sub2_Sub4
+public class DynamicObject extends Renderable
 {
 
     public final Model method444(int i)

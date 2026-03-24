@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-public class Class48
+public class MouseRecorder
     implements Runnable
 {
 
@@ -29,7 +29,7 @@ public class Class48
         }
     }
 
-    public Class48(GameClient client1, int i)
+    public MouseRecorder(GameClient client1, int i)
     {
         anObject806 = new Object();
         anIntArray807 = new int[500];
