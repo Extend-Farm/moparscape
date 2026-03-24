@@ -8107,30 +8107,7 @@ class GameClientCore extends GameShell
                 } else
                 if(class9_1.anInt262 == 7)
                 {
-                    FontRenderer class30_sub2_sub1_sub4_1 = class9_1.aClass30_Sub2_Sub1_Sub4_243;
-                    int k4 = 0;
-                    for(int j5 = 0; j5 < class9_1.anInt267; j5++)
-                    {
-                        for(int i6 = 0; i6 < class9_1.anInt220; i6++)
-                        {
-                            if(class9_1.anIntArray253[k4] > 0)
-                            {
-                                ItemDefinition class8 = ItemDefinition.method198(class9_1.anIntArray253[k4] - 1);
-                                String s2 = class8.aString170;
-                                if(class8.aBoolean176 || class9_1.anIntArray252[k4] != 1)
-                                    s2 = s2 + " x" + StackAmountFormatter.formatStackAmount(class9_1.anIntArray252[k4]);
-                                int i9 = k2 + i6 * (115 + class9_1.anInt231);
-                                int k9 = l2 + j5 * (12 + class9_1.anInt244);
-                                if(class9_1.aBoolean223)
-                                    class30_sub2_sub1_sub4_1.method382(class9_1.anInt232, i9 + class9_1.anInt220 / 2, anInt939, s2, k9, class9_1.aBoolean268);
-                                else
-                                    class30_sub2_sub1_sub4_1.method389(false, class9_1.aBoolean268, i9, class9_1.anInt232, s2, k9);
-                            }
-                            k4++;
-                        }
-
-                    }
-
+                    WidgetRenderHandler.renderType7ItemTextGrid(class9_1, class9_1.aClass30_Sub2_Sub1_Sub4_243, k2, l2, anInt939);
                 }
         }
 
