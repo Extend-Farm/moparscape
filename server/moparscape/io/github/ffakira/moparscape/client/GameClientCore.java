@@ -15,7 +15,7 @@ import java.util.zip.CRC32;
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-class GameClientCore extends GameShell
+class GameClientCore extends GameShell implements SocialOutputPort, WidgetConditionPort
 {
 	public static int cameratoggle;
 	public static int zoom;
@@ -155,11 +155,11 @@ class GameClientCore extends GameShell
             int j = 0;
             Rasterizer2D.method333(77, 0, false, 463, 0);
             for(int k = 0; k < 100; k++)
-                if(aStringArray944[k] != null)
+                if(chatMessages[k] != null)
                 {
-                    int l = anIntArray942[k];
+                    int l = chatTypes[k];
                     int i1 = (70 - j * 14) + anInt1089;
-                    String s1 = aStringArray943[k];
+                    String s1 = chatSenders[k];
                     byte byte0 = 0;
                     if(s1 != null && s1.startsWith("@cr1@"))
                     {
@@ -174,7 +174,7 @@ class GameClientCore extends GameShell
                     if(l == 0)
                     {
                         if(i1 > 0 && i1 < 110)
-                            class30_sub2_sub1_sub4.method385(0, aStringArray944[k], i1, 822, 4);
+                            class30_sub2_sub1_sub4.method385(0, chatMessages[k], i1, 822, 4);
                         j++;
                     }
                     if((l == 1 || l == 2) && (l == 1 || anInt1287 == 0 || anInt1287 == 1 && method109(false, s1)))
@@ -194,7 +194,7 @@ class GameClientCore extends GameShell
                             }
                             class30_sub2_sub1_sub4.method385(0, s1 + ":", i1, 822, j1);
                             j1 += class30_sub2_sub1_sub4.method383(anInt1116, s1) + 8;
-                            class30_sub2_sub1_sub4.method385(255, aStringArray944[k], i1, 822, j1);
+                            class30_sub2_sub1_sub4.method385(255, chatMessages[k], i1, 822, j1);
                         }
                         j++;
                     }
@@ -217,20 +217,20 @@ class GameClientCore extends GameShell
                             }
                             class30_sub2_sub1_sub4.method385(0, s1 + ":", i1, 822, k1);
                             k1 += class30_sub2_sub1_sub4.method383(anInt1116, s1) + 8;
-                            class30_sub2_sub1_sub4.method385(0x800000, aStringArray944[k], i1, 822, k1);
+                            class30_sub2_sub1_sub4.method385(0x800000, chatMessages[k], i1, 822, k1);
                         }
                         j++;
                     }
                     if(l == 4 && (anInt1248 == 0 || anInt1248 == 1 && method109(false, s1)))
                     {
                         if(i1 > 0 && i1 < 110)
-                            class30_sub2_sub1_sub4.method385(0x800080, s1 + " " + aStringArray944[k], i1, 822, 4);
+                            class30_sub2_sub1_sub4.method385(0x800080, s1 + " " + chatMessages[k], i1, 822, 4);
                         j++;
                     }
                     if(l == 5 && anInt1195 == 0 && anInt845 < 2)
                     {
                         if(i1 > 0 && i1 < 110)
-                            class30_sub2_sub1_sub4.method385(0x800000, aStringArray944[k], i1, 822, 4);
+                            class30_sub2_sub1_sub4.method385(0x800000, chatMessages[k], i1, 822, 4);
                         j++;
                     }
                     if(l == 6 && anInt1195 == 0 && anInt845 < 2)
@@ -238,14 +238,14 @@ class GameClientCore extends GameShell
                         if(i1 > 0 && i1 < 110)
                         {
                             class30_sub2_sub1_sub4.method385(0, "To " + s1 + ":", i1, 822, 4);
-                            class30_sub2_sub1_sub4.method385(0x800000, aStringArray944[k], i1, 822, 12 + class30_sub2_sub1_sub4.method383(anInt1116, "To " + s1));
+                            class30_sub2_sub1_sub4.method385(0x800000, chatMessages[k], i1, 822, 12 + class30_sub2_sub1_sub4.method383(anInt1116, "To " + s1));
                         }
                         j++;
                     }
                     if(l == 8 && (anInt1248 == 0 || anInt1248 == 1 && method109(false, s1)))
                     {
                         if(i1 > 0 && i1 < 110)
-                            class30_sub2_sub1_sub4.method385(0x7e3200, s1 + " " + aStringArray944[k], i1, 822, 4);
+                            class30_sub2_sub1_sub4.method385(0x7e3200, s1 + " " + chatMessages[k], i1, 822, 4);
                         j++;
                     }
                 }
@@ -319,7 +319,7 @@ class GameClientCore extends GameShell
     {
         if(i != 4)
             anInt1008 = aClass30_Sub2_Sub2_1083.method408();
-        if(anInt1086 != 0)
+        if(dragState != 0)
             return;
         int j = super.anInt26;
         if(anInt1136 == 1 && super.anInt27 >= 516 && super.anInt28 >= 160 && super.anInt27 <= 765 && super.anInt28 <= 205)
@@ -409,15 +409,15 @@ class GameClientCore extends GameShell
                     {
                         aBoolean1242 = false;
                         anInt989 = 0;
-                        anInt1084 = j2;
-                        anInt1085 = l1;
-                        anInt1086 = 2;
-                        anInt1087 = super.anInt27;
-                        anInt1088 = super.anInt28;
+                        dragWidgetId = j2;
+                        dragSlot = l1;
+                        dragState = 2;
+                        dragStartMouseX = super.anInt27;
+                        dragPointerY = super.anInt28;
                         if(Widget.aClass9Array210[j2].anInt236 == anInt857)
-                            anInt1086 = 1;
+                            dragState = 1;
                         if(Widget.aClass9Array210[j2].anInt236 == anInt1276)
-                            anInt1086 = 3;
+                            dragState = 3;
                         return;
                     }
                 }
@@ -946,11 +946,11 @@ class GameClientCore extends GameShell
                                 if(class9_1.anIntArray253[k2] > 0)
                                 {
                                     ItemDefinition class8 = ItemDefinition.method198(class9_1.anIntArray253[k2] - 1);
-                                    if(anInt1282 == 1 && class9_1.aBoolean249)
+                                    if(itemUseState == 1 && class9_1.aBoolean249)
                                     {
-                                        if(class9_1.anInt250 != anInt1284 || k2 != anInt1283)
+                                        if(class9_1.anInt250 != itemUseWidgetId || k2 != itemUseSlot)
                                         {
-                                            aStringArray1199[anInt1133] = "Use " + aString1286 + " with @lre@" + class8.aString170;
+                                            aStringArray1199[anInt1133] = "Use " + itemUseItemName + " with @lre@" + class8.aString170;
                                             anIntArray1093[anInt1133] = 870;
                                             anIntArray1094[anInt1133] = class8.anInt157;
                                             anIntArray1091[anInt1133] = k2;
@@ -1551,17 +1551,17 @@ class GameClientCore extends GameShell
         {
             if(l == 0L)
                 return;
-            for(int i = 0; i < anInt899; i++)
+            for(int i = 0; i < friendCount; i++)
             {
-                if(aLongArray955[i] != l)
+                if(friendNameHashes[i] != l)
                     continue;
-                anInt899--;
+                friendCount--;
                 aBoolean1153 = true;
-                for(int j = i; j < anInt899; j++)
+                for(int j = i; j < friendCount; j++)
                 {
-                    aStringArray1082[j] = aStringArray1082[j + 1];
-                    anIntArray826[j] = anIntArray826[j + 1];
-                    aLongArray955[j] = aLongArray955[j + 1];
+                    friendDisplayNames[j] = friendDisplayNames[j + 1];
+                    friendWorlds[j] = friendWorlds[j + 1];
+                    friendNameHashes[j] = friendNameHashes[j + 1];
                 }
 
                 aClass30_Sub2_Sub2_1192.method397((byte)6, 215);
@@ -1846,19 +1846,19 @@ class GameClientCore extends GameShell
         {
             if(l == 0L)
                 return;
-            if(anInt899 >= 100 && anInt1046 != 1)
+            if(friendCount >= 100 && anInt1046 != 1)
             {
                 method77("Your friendlist is full. Max of 100 for free users, and 200 for members", 0, "", aBoolean991);
                 return;
             }
-            if(anInt899 >= 200)
+            if(friendCount >= 200)
             {
                 method77("Your friendlist is full. Max of 100 for free users, and 200 for members", 0, "", aBoolean991);
                 return;
             }
             String s = TextUtils.method587(-45804, TextUtils.method584(l, (byte)-99));
-            for(int i = 0; i < anInt899; i++)
-                if(aLongArray955[i] == l)
+            for(int i = 0; i < friendCount; i++)
+                if(friendNameHashes[i] == l)
                 {
                     method77(s + " is already on your friend list", 0, "", aBoolean991);
                     return;
@@ -1866,8 +1866,8 @@ class GameClientCore extends GameShell
 
             if(byte0 != 68)
                 anInt1008 = -1;
-            for(int j = 0; j < anInt822; j++)
-                if(aLongArray925[j] == l)
+            for(int j = 0; j < ignoreCount; j++)
+                if(ignoredNameHashes[j] == l)
                 {
                     method77("Please remove " + s + " from your ignore list first", 0, "", aBoolean991);
                     return;
@@ -1878,10 +1878,10 @@ class GameClientCore extends GameShell
                 return;
             } else
             {
-                aStringArray1082[anInt899] = s;
-                aLongArray955[anInt899] = l;
-                anIntArray826[anInt899] = 0;
-                anInt899++;
+                friendDisplayNames[friendCount] = s;
+                friendNameHashes[friendCount] = l;
+                friendWorlds[friendCount] = 0;
+                friendCount++;
                 aBoolean1153 = true;
                 aClass30_Sub2_Sub2_1192.method397((byte)6, 188);
                 aClass30_Sub2_Sub2_1192.method404(5, l);
@@ -2835,15 +2835,7 @@ class GameClientCore extends GameShell
 
     public final void method62(int i)
     {
-        if(anInt1104 > 1)
-            anInt1104--;
-        if(anInt1011 > 0)
-            anInt1011--;
-        for(int j = 0; j < 5; j++)
-            if(!method145(true))
-                break;
-
-        if(!aBoolean1157)
+        if(!GameTickProcessor.processInboundPackets(this))
             return;
         synchronized(aClass48_879.anObject806)
         {
@@ -2994,37 +2986,37 @@ class GameClientCore extends GameShell
             if(anInt916 >= 400)
                 anInt917 = 0;
         }
-        if(anInt1246 != 0)
+        if(selectedDragState != 0)
         {
             anInt1243++;
             if(anInt1243 >= 15)
             {
-                if(anInt1246 == 2)
+                if(selectedDragState == 2)
                     aBoolean1153 = true;
-                if(anInt1246 == 3)
+                if(selectedDragState == 3)
                     aBoolean1223 = true;
-                anInt1246 = 0;
+                selectedDragState = 0;
             }
         }
-        if(anInt1086 != 0)
+        if(dragState != 0)
         {
             anInt989++;
-            if(super.anInt20 > anInt1087 + 5 || super.anInt20 < anInt1087 - 5 || super.anInt21 > anInt1088 + 5 || super.anInt21 < anInt1088 - 5)
+            if(super.anInt20 > dragStartMouseX + 5 || super.anInt20 < dragStartMouseX - 5 || super.anInt21 > dragPointerY + 5 || super.anInt21 < dragPointerY - 5)
                 aBoolean1242 = true;
             if(super.anInt19 == 0)
             {
-                if(anInt1086 == 2)
+                if(dragState == 2)
                     aBoolean1153 = true;
-                if(anInt1086 == 3)
+                if(dragState == 3)
                     aBoolean1223 = true;
-                anInt1086 = 0;
+                dragState = 0;
                 if(aBoolean1242 && anInt989 >= 5)
                 {
                     anInt1067 = -1;
                     method82(0);
-                    if(anInt1067 == anInt1084 && anInt1066 != anInt1085)
+                    if(anInt1067 == dragWidgetId && anInt1066 != dragSlot)
                     {
-                        Widget class9 = Widget.aClass9Array210[anInt1084];
+                        Widget class9 = Widget.aClass9Array210[dragWidgetId];
                         int j1 = 0;
                         if(anInt913 == 1 && class9.anInt214 == 206)
                             j1 = 1;
@@ -3032,7 +3024,7 @@ class GameClientCore extends GameShell
                             j1 = 0;
                         if(class9.aBoolean235)
                         {
-                            int l2 = anInt1085;
+                            int l2 = dragSlot;
                             int l3 = anInt1066;
                             class9.anIntArray253[l3] = class9.anIntArray253[l2];
                             class9.anIntArray252[l3] = class9.anIntArray252[l2];
@@ -3041,7 +3033,7 @@ class GameClientCore extends GameShell
                         } else
                         if(j1 == 1)
                         {
-                            int i3 = anInt1085;
+                            int i3 = dragSlot;
                             for(int i4 = anInt1066; i3 != i4;)
                                 if(i3 > i4)
                                 {
@@ -3056,12 +3048,12 @@ class GameClientCore extends GameShell
 
                         } else
                         {
-                            class9.method204(anInt1085, (byte)9, anInt1066);
+                            class9.method204(dragSlot, (byte)9, anInt1066);
                         }
                         aClass30_Sub2_Sub2_1192.method397((byte)6, 214);
-                        aClass30_Sub2_Sub2_1192.method433(0, anInt1084);
+                        aClass30_Sub2_Sub2_1192.method433(0, dragWidgetId);
                         aClass30_Sub2_Sub2_1192.method424(j1, 0);
-                        aClass30_Sub2_Sub2_1192.method433(0, anInt1085);
+                        aClass30_Sub2_Sub2_1192.method433(0, dragSlot);
                         aClass30_Sub2_Sub2_1192.method431(true, anInt1066);
                     }
                 } else
@@ -3567,21 +3559,15 @@ class GameClientCore extends GameShell
                 anInt917 = 2;
                 anInt916 = 0;
                 aClass30_Sub2_Sub2_1192.method397((byte)6, 57);
-                aClass30_Sub2_Sub2_1192.method432(-431, anInt1285);
+                aClass30_Sub2_Sub2_1192.method432(-431, itemUseItemId);
                 aClass30_Sub2_Sub2_1192.method432(-431, i1);
-                aClass30_Sub2_Sub2_1192.method431(true, anInt1283);
-                aClass30_Sub2_Sub2_1192.method432(-431, anInt1284);
+                aClass30_Sub2_Sub2_1192.method431(true, itemUseSlot);
+                aClass30_Sub2_Sub2_1192.method432(-431, itemUseWidgetId);
             }
         }
         if(l == 234)
         {
-            boolean flag1 = method85(2, 0, 0, -11308, 0, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1501[0], 0, 0, k, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1500[0], false, j);
-            if(!flag1)
-                flag1 = method85(2, 0, 1, -11308, 0, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1501[0], 1, 0, k, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1500[0], false, j);
-            anInt914 = super.anInt27;
-            anInt915 = super.anInt28;
-            anInt917 = 2;
-            anInt916 = 0;
+            routeToTileAndMarkCursor(j, k);
             aClass30_Sub2_Sub2_1192.method397((byte)6, 236);
             aClass30_Sub2_Sub2_1192.method431(true, k + anInt1035);
             aClass30_Sub2_Sub2_1192.method399(i1);
@@ -3590,12 +3576,12 @@ class GameClientCore extends GameShell
         if(l == 62 && method66(i1, k, j, -770))
         {
             aClass30_Sub2_Sub2_1192.method397((byte)6, 192);
-            aClass30_Sub2_Sub2_1192.method399(anInt1284);
+            aClass30_Sub2_Sub2_1192.method399(itemUseWidgetId);
             aClass30_Sub2_Sub2_1192.method431(true, i1 >> 14 & 0x7fff);
             aClass30_Sub2_Sub2_1192.method433(0, k + anInt1035);
-            aClass30_Sub2_Sub2_1192.method431(true, anInt1283);
+            aClass30_Sub2_Sub2_1192.method431(true, itemUseSlot);
             aClass30_Sub2_Sub2_1192.method433(0, j + anInt1034);
-            aClass30_Sub2_Sub2_1192.method399(anInt1285);
+            aClass30_Sub2_Sub2_1192.method399(itemUseItemId);
         }
         if(l == 511)
         {
@@ -3607,11 +3593,11 @@ class GameClientCore extends GameShell
             anInt917 = 2;
             anInt916 = 0;
             aClass30_Sub2_Sub2_1192.method397((byte)6, 25);
-            aClass30_Sub2_Sub2_1192.method431(true, anInt1284);
-            aClass30_Sub2_Sub2_1192.method432(-431, anInt1285);
+            aClass30_Sub2_Sub2_1192.method431(true, itemUseWidgetId);
+            aClass30_Sub2_Sub2_1192.method432(-431, itemUseItemId);
             aClass30_Sub2_Sub2_1192.method399(i1);
             aClass30_Sub2_Sub2_1192.method432(-431, k + anInt1035);
-            aClass30_Sub2_Sub2_1192.method433(0, anInt1283);
+            aClass30_Sub2_Sub2_1192.method433(0, itemUseSlot);
             aClass30_Sub2_Sub2_1192.method399(j + anInt1034);
         }
         if(l == 74)
@@ -3620,14 +3606,7 @@ class GameClientCore extends GameShell
             aClass30_Sub2_Sub2_1192.method433(0, k);
             aClass30_Sub2_Sub2_1192.method432(-431, j);
             aClass30_Sub2_Sub2_1192.method431(true, i1);
-            anInt1243 = 0;
-            anInt1244 = k;
-            anInt1245 = j;
-            anInt1246 = 2;
-            if(Widget.aClass9Array210[k].anInt236 == anInt857)
-                anInt1246 = 1;
-            if(Widget.aClass9Array210[k].anInt236 == anInt1276)
-                anInt1246 = 3;
+            MenuActionExecutor.applyDragSelection(this, k, j);
         }
         if(l == 315)
         {
@@ -3721,46 +3700,17 @@ class GameClientCore extends GameShell
             aClass30_Sub2_Sub2_1192.method432(-431, j);
             aClass30_Sub2_Sub2_1192.method399(k);
             aClass30_Sub2_Sub2_1192.method432(-431, i1);
-            anInt1243 = 0;
-            anInt1244 = k;
-            anInt1245 = j;
-            anInt1246 = 2;
-            if(Widget.aClass9Array210[k].anInt236 == anInt857)
-                anInt1246 = 1;
-            if(Widget.aClass9Array210[k].anInt236 == anInt1276)
-                anInt1246 = 3;
+            MenuActionExecutor.applyDragSelection(this, k, j);
         }
         if(l == 337 || l == 42 || l == 792 || l == 322)
-        {
-            String s = aStringArray1199[i];
-            int k1 = s.indexOf("@whi@");
-            if(k1 != -1)
-            {
-                long l3 = TextUtils.method583(s.substring(k1 + 5).trim());
-                if(l == 337)
-                    method41((byte)68, l3);
-                if(l == 42)
-                    method113(l3, 4);
-                if(l == 792)
-                    method35(false, l3);
-                if(l == 322)
-                    method122(3, l3);
-            }
-        }
+            MenuActionExecutor.applySocialListAction(this, l, aStringArray1199[i]);
         if(l == 53)
         {
             aClass30_Sub2_Sub2_1192.method397((byte)6, 135);
             aClass30_Sub2_Sub2_1192.method431(true, j);
             aClass30_Sub2_Sub2_1192.method432(-431, k);
             aClass30_Sub2_Sub2_1192.method431(true, i1);
-            anInt1243 = 0;
-            anInt1244 = k;
-            anInt1245 = j;
-            anInt1246 = 2;
-            if(Widget.aClass9Array210[k].anInt236 == anInt857)
-                anInt1246 = 1;
-            if(Widget.aClass9Array210[k].anInt236 == anInt1276)
-                anInt1246 = 3;
+            MenuActionExecutor.applyDragSelection(this, k, j);
         }
         if(l == 539)
         {
@@ -3768,14 +3718,7 @@ class GameClientCore extends GameShell
             aClass30_Sub2_Sub2_1192.method432(-431, i1);
             aClass30_Sub2_Sub2_1192.method433(0, j);
             aClass30_Sub2_Sub2_1192.method433(0, k);
-            anInt1243 = 0;
-            anInt1244 = k;
-            anInt1245 = j;
-            anInt1246 = 2;
-            if(Widget.aClass9Array210[k].anInt236 == anInt857)
-                anInt1246 = 1;
-            if(Widget.aClass9Array210[k].anInt236 == anInt1276)
-                anInt1246 = 3;
+            MenuActionExecutor.applyDragSelection(this, k, j);
         }
         if(l == 484 || l == 6)
         {
@@ -3820,19 +3763,12 @@ class GameClientCore extends GameShell
         {
             aClass30_Sub2_Sub2_1192.method397((byte)6, 53);
             aClass30_Sub2_Sub2_1192.method399(j);
-            aClass30_Sub2_Sub2_1192.method432(-431, anInt1283);
+            aClass30_Sub2_Sub2_1192.method432(-431, itemUseSlot);
             aClass30_Sub2_Sub2_1192.method433(0, i1);
-            aClass30_Sub2_Sub2_1192.method399(anInt1284);
-            aClass30_Sub2_Sub2_1192.method431(true, anInt1285);
+            aClass30_Sub2_Sub2_1192.method399(itemUseWidgetId);
+            aClass30_Sub2_Sub2_1192.method431(true, itemUseItemId);
             aClass30_Sub2_Sub2_1192.method399(k);
-            anInt1243 = 0;
-            anInt1244 = k;
-            anInt1245 = j;
-            anInt1246 = 2;
-            if(Widget.aClass9Array210[k].anInt236 == anInt857)
-                anInt1246 = 1;
-            if(Widget.aClass9Array210[k].anInt236 == anInt1276)
-                anInt1246 = 3;
+            MenuActionExecutor.applyDragSelection(this, k, j);
         }
         if(l == 847)
         {
@@ -3840,14 +3776,7 @@ class GameClientCore extends GameShell
             aClass30_Sub2_Sub2_1192.method432(-431, i1);
             aClass30_Sub2_Sub2_1192.method399(k);
             aClass30_Sub2_Sub2_1192.method432(-431, j);
-            anInt1243 = 0;
-            anInt1244 = k;
-            anInt1245 = j;
-            anInt1246 = 2;
-            if(Widget.aClass9Array210[k].anInt236 == anInt857)
-                anInt1246 = 1;
-            if(Widget.aClass9Array210[k].anInt236 == anInt1276)
-                anInt1246 = 3;
+            MenuActionExecutor.applyDragSelection(this, k, j);
         }
         if(l == 626)
         {
@@ -3855,7 +3784,7 @@ class GameClientCore extends GameShell
             anInt1136 = 1;
             anInt1137 = k;
             anInt1138 = class9_1.anInt237;
-            anInt1282 = 0;
+            itemUseState = 0;
             aBoolean1153 = true;
             String s4 = class9_1.aString222;
             if(s4.indexOf(" ") != -1)
@@ -3878,14 +3807,7 @@ class GameClientCore extends GameShell
             aClass30_Sub2_Sub2_1192.method433(0, k);
             aClass30_Sub2_Sub2_1192.method433(0, i1);
             aClass30_Sub2_Sub2_1192.method431(true, j);
-            anInt1243 = 0;
-            anInt1244 = k;
-            anInt1245 = j;
-            anInt1246 = 2;
-            if(Widget.aClass9Array210[k].anInt236 == anInt857)
-                anInt1246 = 1;
-            if(Widget.aClass9Array210[k].anInt236 == anInt1276)
-                anInt1246 = 3;
+            MenuActionExecutor.applyDragSelection(this, k, j);
         }
         if(l == 27)
         {
@@ -3910,13 +3832,7 @@ class GameClientCore extends GameShell
         }
         if(l == 213)
         {
-            boolean flag3 = method85(2, 0, 0, -11308, 0, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1501[0], 0, 0, k, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1500[0], false, j);
-            if(!flag3)
-                flag3 = method85(2, 0, 1, -11308, 0, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1501[0], 1, 0, k, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1500[0], false, j);
-            anInt914 = super.anInt27;
-            anInt915 = super.anInt28;
-            anInt917 = 2;
-            anInt916 = 0;
+            routeToTileAndMarkCursor(j, k);
             aClass30_Sub2_Sub2_1192.method397((byte)6, 79);
             aClass30_Sub2_Sub2_1192.method431(true, k + anInt1035);
             aClass30_Sub2_Sub2_1192.method399(i1);
@@ -3928,14 +3844,7 @@ class GameClientCore extends GameShell
             aClass30_Sub2_Sub2_1192.method432(-431, k);
             aClass30_Sub2_Sub2_1192.method432(-431, j);
             aClass30_Sub2_Sub2_1192.method432(-431, i1);
-            anInt1243 = 0;
-            anInt1244 = k;
-            anInt1245 = j;
-            anInt1246 = 2;
-            if(Widget.aClass9Array210[k].anInt236 == anInt857)
-                anInt1246 = 1;
-            if(Widget.aClass9Array210[k].anInt236 == anInt1276)
-                anInt1246 = 3;
+            MenuActionExecutor.applyDragSelection(this, k, j);
         }
         if(l == 493)
         {
@@ -3943,24 +3852,11 @@ class GameClientCore extends GameShell
             aClass30_Sub2_Sub2_1192.method433(0, k);
             aClass30_Sub2_Sub2_1192.method431(true, j);
             aClass30_Sub2_Sub2_1192.method432(-431, i1);
-            anInt1243 = 0;
-            anInt1244 = k;
-            anInt1245 = j;
-            anInt1246 = 2;
-            if(Widget.aClass9Array210[k].anInt236 == anInt857)
-                anInt1246 = 1;
-            if(Widget.aClass9Array210[k].anInt236 == anInt1276)
-                anInt1246 = 3;
+            MenuActionExecutor.applyDragSelection(this, k, j);
         }
         if(l == 652)
         {
-            boolean flag4 = method85(2, 0, 0, -11308, 0, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1501[0], 0, 0, k, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1500[0], false, j);
-            if(!flag4)
-                flag4 = method85(2, 0, 1, -11308, 0, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1501[0], 1, 0, k, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1500[0], false, j);
-            anInt914 = super.anInt27;
-            anInt915 = super.anInt28;
-            anInt917 = 2;
-            anInt916 = 0;
+            routeToTileAndMarkCursor(j, k);
             aClass30_Sub2_Sub2_1192.method397((byte)6, 156);
             aClass30_Sub2_Sub2_1192.method432(-431, j + anInt1034);
             aClass30_Sub2_Sub2_1192.method431(true, k + anInt1035);
@@ -3968,13 +3864,7 @@ class GameClientCore extends GameShell
         }
         if(l == 94)
         {
-            boolean flag5 = method85(2, 0, 0, -11308, 0, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1501[0], 0, 0, k, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1500[0], false, j);
-            if(!flag5)
-                flag5 = method85(2, 0, 1, -11308, 0, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1501[0], 1, 0, k, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1500[0], false, j);
-            anInt914 = super.anInt27;
-            anInt915 = super.anInt28;
-            anInt917 = 2;
-            anInt916 = 0;
+            routeToTileAndMarkCursor(j, k);
             aClass30_Sub2_Sub2_1192.method397((byte)6, 181);
             aClass30_Sub2_Sub2_1192.method431(true, k + anInt1035);
             aClass30_Sub2_Sub2_1192.method399(i1);
@@ -4150,13 +4040,7 @@ class GameClientCore extends GameShell
         }
         if(l == 567)
         {
-            boolean flag6 = method85(2, 0, 0, -11308, 0, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1501[0], 0, 0, k, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1500[0], false, j);
-            if(!flag6)
-                flag6 = method85(2, 0, 1, -11308, 0, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1501[0], 1, 0, k, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1500[0], false, j);
-            anInt914 = super.anInt27;
-            anInt915 = super.anInt28;
-            anInt917 = 2;
-            anInt916 = 0;
+            routeToTileAndMarkCursor(j, k);
             aClass30_Sub2_Sub2_1192.method397((byte)6, 23);
             aClass30_Sub2_Sub2_1192.method431(true, k + anInt1035);
             aClass30_Sub2_Sub2_1192.method431(true, i1);
@@ -4176,14 +4060,7 @@ class GameClientCore extends GameShell
             aClass30_Sub2_Sub2_1192.method431(true, k);
             aClass30_Sub2_Sub2_1192.method432(-431, i1);
             aClass30_Sub2_Sub2_1192.method432(-431, j);
-            anInt1243 = 0;
-            anInt1244 = k;
-            anInt1245 = j;
-            anInt1246 = 2;
-            if(Widget.aClass9Array210[k].anInt236 == anInt857)
-                anInt1246 = 1;
-            if(Widget.aClass9Array210[k].anInt236 == anInt1276)
-                anInt1246 = 3;
+            MenuActionExecutor.applyDragSelection(this, k, j);
         }
         if(l == 543)
         {
@@ -4192,14 +4069,7 @@ class GameClientCore extends GameShell
             aClass30_Sub2_Sub2_1192.method432(-431, i1);
             aClass30_Sub2_Sub2_1192.method399(k);
             aClass30_Sub2_Sub2_1192.method432(-431, anInt1137);
-            anInt1243 = 0;
-            anInt1244 = k;
-            anInt1245 = j;
-            anInt1246 = 2;
-            if(Widget.aClass9Array210[k].anInt236 == anInt857)
-                anInt1246 = 1;
-            if(Widget.aClass9Array210[k].anInt236 == anInt1276)
-                anInt1246 = 3;
+            MenuActionExecutor.applyDragSelection(this, k, j);
         }
         if(l == 606)
         {
@@ -4235,10 +4105,10 @@ class GameClientCore extends GameShell
                 anInt917 = 2;
                 anInt916 = 0;
                 aClass30_Sub2_Sub2_1192.method397((byte)6, 14);
-                aClass30_Sub2_Sub2_1192.method432(-431, anInt1284);
+                aClass30_Sub2_Sub2_1192.method432(-431, itemUseWidgetId);
                 aClass30_Sub2_Sub2_1192.method399(i1);
-                aClass30_Sub2_Sub2_1192.method399(anInt1285);
-                aClass30_Sub2_Sub2_1192.method431(true, anInt1283);
+                aClass30_Sub2_Sub2_1192.method399(itemUseItemId);
+                aClass30_Sub2_Sub2_1192.method431(true, itemUseSlot);
             }
         }
         if(l == 639)
@@ -4249,23 +4119,23 @@ class GameClientCore extends GameShell
             {
                 long l4 = TextUtils.method583(s3.substring(k2 + 5).trim());
                 int k3 = -1;
-                for(int i4 = 0; i4 < anInt899; i4++)
+                for(int i4 = 0; i4 < friendCount; i4++)
                 {
-                    if(aLongArray955[i4] != l4)
+                    if(friendNameHashes[i4] != l4)
                         continue;
                     k3 = i4;
                     break;
                 }
 
-                if(k3 != -1 && anIntArray826[k3] > 0)
+                if(k3 != -1 && friendWorlds[k3] > 0)
                 {
                     aBoolean1223 = true;
                     anInt1225 = 0;
                     aBoolean1256 = true;
                     aString1212 = "";
                     anInt1064 = 3;
-                    aLong953 = aLongArray955[k3];
-                    aString1121 = "Enter message to send to " + aStringArray1082[k3];
+                    aLong953 = friendNameHashes[k3];
+                    aString1121 = "Enter message to send to " + friendDisplayNames[k3];
                 }
             }
         }
@@ -4275,14 +4145,7 @@ class GameClientCore extends GameShell
             aClass30_Sub2_Sub2_1192.method399(i1);
             aClass30_Sub2_Sub2_1192.method432(-431, j);
             aClass30_Sub2_Sub2_1192.method432(-431, k);
-            anInt1243 = 0;
-            anInt1244 = k;
-            anInt1245 = j;
-            anInt1246 = 2;
-            if(Widget.aClass9Array210[k].anInt236 == anInt857)
-                anInt1246 = 1;
-            if(Widget.aClass9Array210[k].anInt236 == anInt1276)
-                anInt1246 = 3;
+            MenuActionExecutor.applyDragSelection(this, k, j);
         }
         if(l == 478)
         {
@@ -4359,11 +4222,11 @@ class GameClientCore extends GameShell
         }
         if(l == 447)
         {
-            anInt1282 = 1;
-            anInt1283 = j;
-            anInt1284 = k;
-            anInt1285 = i1;
-            aString1286 = ItemDefinition.method198(i1).aString170;
+            itemUseState = 1;
+            itemUseSlot = j;
+            itemUseWidgetId = k;
+            itemUseItemId = i1;
+            itemUseItemName = ItemDefinition.method198(i1).aString170;
             anInt1136 = 0;
             aBoolean1153 = true;
             return;
@@ -4381,13 +4244,7 @@ class GameClientCore extends GameShell
         }
         if(l == 244)
         {
-            boolean flag7 = method85(2, 0, 0, -11308, 0, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1501[0], 0, 0, k, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1500[0], false, j);
-            if(!flag7)
-                flag7 = method85(2, 0, 1, -11308, 0, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1501[0], 1, 0, k, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1500[0], false, j);
-            anInt914 = super.anInt27;
-            anInt915 = super.anInt28;
-            anInt917 = 2;
-            anInt916 = 0;
+            routeToTileAndMarkCursor(j, k);
             aClass30_Sub2_Sub2_1192.method397((byte)6, 253);
             aClass30_Sub2_Sub2_1192.method431(true, j + anInt1034);
             aClass30_Sub2_Sub2_1192.method433(0, k + anInt1035);
@@ -4403,7 +4260,7 @@ class GameClientCore extends GameShell
                 s6 = "It's a " + class8_1.aString170 + ".";
             method77(s6, 0, "", aBoolean991);
         }
-        anInt1282 = 0;
+        itemUseState = 0;
         if(flag)
         {
             return;
@@ -4413,6 +4270,186 @@ class GameClientCore extends GameShell
             aBoolean1153 = true;
             return;
         }
+    }
+
+    void updateSelectedDragTarget(int widgetId, int slot)
+    {
+        anInt1243 = 0;
+        selectedDragWidgetId = widgetId;
+        selectedDragSlot = slot;
+        selectedDragState = 2;
+        if(Widget.aClass9Array210[widgetId].anInt236 == anInt857)
+            selectedDragState = 1;
+        if(Widget.aClass9Array210[widgetId].anInt236 == anInt1276)
+            selectedDragState = 3;
+    }
+
+    void routeToActor(Actor targetActor)
+    {
+        method85(2, 0, 1, -11308, 0, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1501[0], 1, 0, targetActor.anIntArray1501[0], ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1500[0], false, targetActor.anIntArray1500[0]);
+    }
+
+    void markMenuInteractionCursor()
+    {
+        anInt914 = super.anInt27;
+        anInt915 = super.anInt28;
+        anInt917 = 2;
+        anInt916 = 0;
+    }
+
+    PacketBuffer getOutboundBuffer()
+    {
+        return aClass30_Sub2_Sub2_1192;
+    }
+
+    int getSystemUpdateTimer()
+    {
+        return anInt1104;
+    }
+
+    void setSystemUpdateTimer(int systemUpdateTimer)
+    {
+        anInt1104 = systemUpdateTimer;
+    }
+
+    int getLoginThrottleTicks()
+    {
+        return anInt1011;
+    }
+
+    void setLoginThrottleTicks(int loginThrottleTicks)
+    {
+        anInt1011 = loginThrottleTicks;
+    }
+
+    boolean isGameReadyForTick()
+    {
+        return aBoolean1157;
+    }
+
+    void routeToTileAndMarkCursor(int tileX, int tileY)
+    {
+        boolean routed = method85(2, 0, 0, -11308, 0, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1501[0], 0, 0, tileY, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1500[0], false, tileX);
+        if(!routed)
+            method85(2, 0, 1, -11308, 0, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1501[0], 1, 0, tileY, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1500[0], false, tileX);
+        markMenuInteractionCursor();
+    }
+
+    void beginWidgetSelection(int widgetId)
+    {
+        Widget widget = Widget.aClass9Array210[widgetId];
+        anInt1136 = 1;
+        anInt1137 = widgetId;
+        anInt1138 = widget.anInt237;
+        itemUseState = 0;
+        aBoolean1153 = true;
+        String actionPrefix = widget.aString222;
+        if(actionPrefix.indexOf(" ") != -1)
+            actionPrefix = actionPrefix.substring(0, actionPrefix.indexOf(" "));
+        String actionSuffix = widget.aString222;
+        if(actionSuffix.indexOf(" ") != -1)
+            actionSuffix = actionSuffix.substring(actionSuffix.indexOf(" ") + 1);
+        aString1139 = actionPrefix + " " + widget.aString218 + " " + actionSuffix;
+        if(anInt1138 == 16)
+        {
+            aBoolean1153 = true;
+            anInt1221 = 3;
+            aBoolean1103 = true;
+        }
+    }
+
+    void beginReportAbuseFromAction(String actionText)
+    {
+        int markerIndex = actionText.indexOf("@whi@");
+        if(markerIndex == -1)
+            return;
+        if(anInt857 != -1)
+        {
+            method77("Please close the interface you have open before using 'report abuse'", 0, "", aBoolean991);
+            return;
+        }
+        method147(537);
+        aString881 = actionText.substring(markerIndex + 5).trim();
+        aBoolean1158 = false;
+        for(int widgetIndex = 0; widgetIndex < Widget.aClass9Array210.length; widgetIndex++)
+        {
+            if(Widget.aClass9Array210[widgetIndex] == null || Widget.aClass9Array210[widgetIndex].anInt214 != 600)
+                continue;
+            anInt1178 = anInt857 = Widget.aClass9Array210[widgetIndex].anInt236;
+            break;
+        }
+    }
+
+    void beginPrivateMessagePrompt(long targetNameHash)
+    {
+        int friendIndex = -1;
+        for(int index = 0; index < friendCount; index++)
+        {
+            if(friendNameHashes[index] != targetNameHash)
+                continue;
+            friendIndex = index;
+            break;
+        }
+        if(friendIndex == -1 || friendWorlds[friendIndex] <= 0)
+            return;
+        aBoolean1223 = true;
+        anInt1225 = 0;
+        aBoolean1256 = true;
+        aString1212 = "";
+        anInt1064 = 3;
+        aLong953 = friendNameHashes[friendIndex];
+        aString1121 = "Enter message to send to " + friendDisplayNames[friendIndex];
+    }
+
+    private void closeMainInterfacesIfOpen()
+    {
+        if(anInt1189 != -1)
+        {
+            anInt1189 = -1;
+            aBoolean1153 = true;
+            aBoolean1103 = true;
+        }
+    }
+
+    private void clearDialogAndInputOverlayState()
+    {
+        if(anInt1276 != -1)
+        {
+            anInt1276 = -1;
+            aBoolean1223 = true;
+        }
+        if(anInt1225 != 0)
+        {
+            anInt1225 = 0;
+            aBoolean1223 = true;
+        }
+    }
+
+    private void setMainAndSidebarInterfaces(int mainInterfaceId, int sidebarInterfaceId)
+    {
+        clearDialogAndInputOverlayState();
+        anInt857 = mainInterfaceId;
+        anInt1189 = sidebarInterfaceId;
+        aBoolean1153 = true;
+        aBoolean1103 = true;
+        aBoolean1149 = false;
+    }
+
+    private void setTabInterface(int tabInterfaceId)
+    {
+        closeMainInterfacesIfOpen();
+        anInt1276 = tabInterfaceId;
+        aBoolean1223 = true;
+        anInt857 = -1;
+        aBoolean1149 = false;
+    }
+
+    private void clearAllOpenInterfaces()
+    {
+        closeMainInterfacesIfOpen();
+        clearDialogAndInputOverlayState();
+        anInt857 = -1;
+        aBoolean1149 = false;
     }
 
     public final void method70(int i)
@@ -4444,7 +4481,7 @@ class GameClientCore extends GameShell
 
     public final void method71(int i)
     {
-        if(anInt1282 == 0 && anInt1136 == 0)
+        if(itemUseState == 0 && anInt1136 == 0)
         {
             aStringArray1199[anInt1133] = "Walk here";
             anIntArray1093[anInt1133] = 516;
@@ -4470,9 +4507,9 @@ class GameClientCore extends GameShell
                     class46 = class46.method580(true);
                 if(class46 == null)
                     continue;
-                if(anInt1282 == 1)
+                if(itemUseState == 1)
                 {
-                    aStringArray1199[anInt1133] = "Use " + aString1286 + " with @cya@" + class46.aString739;
+                    aStringArray1199[anInt1133] = "Use " + itemUseItemName + " with @cya@" + class46.aString739;
                     anIntArray1093[anInt1133] = 62;
                     anIntArray1094[anInt1133] = l;
                     anIntArray1091[anInt1133] = i1;
@@ -4575,9 +4612,9 @@ class GameClientCore extends GameShell
                     for(GroundItem class30_sub2_sub4_sub2 = (GroundItem)class19.first(5); class30_sub2_sub4_sub2 != null; class30_sub2_sub4_sub2 = (GroundItem)class19.next(8))
                     {
                         ItemDefinition class8 = ItemDefinition.method198(class30_sub2_sub4_sub2.anInt1558);
-                        if(anInt1282 == 1)
+                        if(itemUseState == 1)
                         {
-                            aStringArray1199[anInt1133] = "Use " + aString1286 + " with @lre@" + class8.aString170;
+                            aStringArray1199[anInt1133] = "Use " + itemUseItemName + " with @lre@" + class8.aString170;
                             anIntArray1093[anInt1133] = 511;
                             anIntArray1094[anInt1133] = class30_sub2_sub4_sub2.anInt1558;
                             anIntArray1091[anInt1133] = i1;
@@ -4744,9 +4781,9 @@ class GameClientCore extends GameShell
         anIntArray1073 = null;
         aClass30_Sub2_Sub1_Sub1Array1140 = null;
         aClass30_Sub2_Sub1_Sub1_1263 = null;
-        aStringArray1082 = null;
-        aLongArray955 = null;
-        anIntArray826 = null;
+        friendDisplayNames = null;
+        friendNameHashes = null;
+        friendWorlds = null;
         aClass15_1110 = null;
         aClass15_1111 = null;
         aClass15_1107 = null;
@@ -4843,7 +4880,7 @@ class GameClientCore extends GameShell
                         long l = TextUtils.method583(aString1212);
                         method41((byte)68, l);
                     }
-                    if(anInt1064 == 2 && anInt899 > 0)
+                    if(anInt1064 == 2 && friendCount > 0)
                     {
                         long l1 = TextUtils.method583(aString1212);
                         method35(false, l1);
@@ -4869,12 +4906,12 @@ class GameClientCore extends GameShell
                             aClass30_Sub2_Sub2_1192.method398(anInt1248);
                         }
                     }
-                    if(anInt1064 == 4 && anInt822 < 100)
+                    if(anInt1064 == 4 && ignoreCount < 100)
                     {
                         long l2 = TextUtils.method583(aString1212);
                         method113(l2, 4);
                     }
-                    if(anInt1064 == 5 && anInt822 > 0)
+                    if(anInt1064 == 5 && ignoreCount > 0)
                     {
                         long l3 = TextUtils.method583(aString1212);
                         method122(3, l3);
@@ -5120,13 +5157,13 @@ class GameClientCore extends GameShell
         int l = 0;
         for(int i1 = 0; i1 < 100; i1++)
         {
-            if(aStringArray944[i1] == null)
+            if(chatMessages[i1] == null)
                 continue;
-            int j1 = anIntArray942[i1];
+            int j1 = chatTypes[i1];
             int k1 = (70 - l * 14) + anInt1089 + 4;
             if(k1 < -20)
                 break;
-            String s = ChatNameTagParser.parse(aStringArray943[i1]).name;
+            String s = ChatNameTagParser.parse(chatSenders[i1]).name;
             if(j1 == 0)
                 l++;
             if((j1 == 1 || j1 == 2) && (j1 == 1 || anInt1287 == 0 || anInt1287 == 1 && method109(false, s)))
@@ -5218,7 +5255,7 @@ class GameClientCore extends GameShell
                 class9.anInt217 = 0;
                 return;
             }
-            int k = anInt899;
+            int k = friendCount;
             if(anInt900 != 2)
                 k = 0;
             if(j > 700)
@@ -5232,14 +5269,14 @@ class GameClientCore extends GameShell
                 return;
             } else
             {
-                class9.aString248 = aStringArray1082[j];
+                class9.aString248 = friendDisplayNames[j];
                 class9.anInt217 = 1;
                 return;
             }
         }
         if(j >= 101 && j <= 200 || j >= 801 && j <= 900)
         {
-            int l = anInt899;
+            int l = friendCount;
             if(anInt900 != 2)
                 l = 0;
             if(j > 800)
@@ -5252,19 +5289,19 @@ class GameClientCore extends GameShell
                 class9.anInt217 = 0;
                 return;
             }
-            if(anIntArray826[j] == 0)
+            if(friendWorlds[j] == 0)
                 class9.aString248 = "@red@Offline";
             else
-            if(anIntArray826[j] == anInt957)
-                class9.aString248 = "@gre@World-" + (anIntArray826[j] - 9);
+            if(friendWorlds[j] == anInt957)
+                class9.aString248 = "@gre@World-" + (friendWorlds[j] - 9);
             else
-                class9.aString248 = "@yel@World-" + (anIntArray826[j] - 9);
+                class9.aString248 = "@yel@World-" + (friendWorlds[j] - 9);
             class9.anInt217 = 1;
             return;
         }
         if(j == 203)
         {
-            int i1 = anInt899;
+            int i1 = friendCount;
             if(anInt900 != 2)
                 i1 = 0;
             class9.anInt261 = i1 * 15 + 20;
@@ -5286,7 +5323,7 @@ class GameClientCore extends GameShell
                 class9.anInt217 = 0;
                 return;
             }
-            int j1 = anInt822;
+            int j1 = ignoreCount;
             if(anInt900 == 0)
                 j1 = 0;
             if(j >= j1)
@@ -5296,14 +5333,14 @@ class GameClientCore extends GameShell
                 return;
             } else
             {
-                class9.aString248 = TextUtils.method587(-45804, TextUtils.method584(aLongArray925[j], (byte)-99));
+                class9.aString248 = TextUtils.method587(-45804, TextUtils.method584(ignoredNameHashes[j], (byte)-99));
                 class9.anInt217 = 1;
                 return;
             }
         }
         if(j == 503)
         {
-            class9.anInt261 = anInt822 * 15 + 20;
+            class9.anInt261 = ignoreCount * 15 + 20;
             if(class9.anInt261 <= class9.anInt267)
                 class9.anInt261 = class9.anInt267 + 1;
             return;
@@ -5513,10 +5550,10 @@ class GameClientCore extends GameShell
         if(anInt1104 != 0)
             i = 1;
         for(int j = 0; j < 100; j++)
-            if(aStringArray944[j] != null)
+            if(chatMessages[j] != null)
             {
-                int k = anIntArray942[j];
-                ChatNameTagParser.ParsedChatName parsedName = ChatNameTagParser.parse(aStringArray943[j]);
+                int k = chatTypes[j];
+                ChatNameTagParser.ParsedChatName parsedName = ChatNameTagParser.parse(chatSenders[j]);
                 String s = parsedName.name;
                 byte byte1 = (byte)parsedName.crownIcon;
                 if((k == 3 || k == 7) && (k == 7 || anInt845 == 0 || anInt845 == 1 && method109(false, s)))
@@ -5536,24 +5573,24 @@ class GameClientCore extends GameShell
                         aClass30_Sub2_Sub1_Sub2Array1219[1].method361(k1, 16083, l - 12);
                         k1 += 14;
                     }
-                    class30_sub2_sub1_sub4.method385(0, s + ": " + aStringArray944[j], l, 822, k1);
-                    class30_sub2_sub1_sub4.method385(65535, s + ": " + aStringArray944[j], l - 1, 822, k1);
+                    class30_sub2_sub1_sub4.method385(0, s + ": " + chatMessages[j], l, 822, k1);
+                    class30_sub2_sub1_sub4.method385(65535, s + ": " + chatMessages[j], l - 1, 822, k1);
                     if(++i >= 5)
                         return;
                 }
                 if(k == 5 && anInt845 < 2)
                 {
                     int i1 = 329 - i * 13;
-                    class30_sub2_sub1_sub4.method385(0, aStringArray944[j], i1, 822, 4);
-                    class30_sub2_sub1_sub4.method385(65535, aStringArray944[j], i1 - 1, 822, 4);
+                    class30_sub2_sub1_sub4.method385(0, chatMessages[j], i1, 822, 4);
+                    class30_sub2_sub1_sub4.method385(65535, chatMessages[j], i1 - 1, 822, 4);
                     if(++i >= 5)
                         return;
                 }
                 if(k == 6 && anInt845 < 2)
                 {
                     int j1 = 329 - i * 13;
-                    class30_sub2_sub1_sub4.method385(0, "To " + s + ": " + aStringArray944[j], j1, 822, 4);
-                    class30_sub2_sub1_sub4.method385(65535, "To " + s + ": " + aStringArray944[j], j1 - 1, 822, 4);
+                    class30_sub2_sub1_sub4.method385(0, "To " + s + ": " + chatMessages[j], j1, 822, 4);
+                    class30_sub2_sub1_sub4.method385(65535, "To " + s + ": " + chatMessages[j], j1 - 1, 822, 4);
                     if(++i >= 5)
                         return;
                 }
@@ -5574,14 +5611,129 @@ class GameClientCore extends GameShell
             aBoolean1223 = true;
         for(int j = 99; j > 0; j--)
         {
-            anIntArray942[j] = anIntArray942[j - 1];
-            aStringArray943[j] = aStringArray943[j - 1];
-            aStringArray944[j] = aStringArray944[j - 1];
+            chatTypes[j] = chatTypes[j - 1];
+            chatSenders[j] = chatSenders[j - 1];
+            chatMessages[j] = chatMessages[j - 1];
         }
 
-        anIntArray942[0] = i;
-        aStringArray943[0] = s1;
-        aStringArray944[0] = s;
+        chatTypes[0] = i;
+        chatSenders[0] = s1;
+        chatMessages[0] = s;
+    }
+
+    public final void addChatMessage(String message, int chatType, String sender, boolean messageFilterFlag)
+    {
+        method77(message, chatType, sender, messageFilterFlag);
+    }
+
+    public final String formatWidgetValue(Widget widget, int valueIndex)
+    {
+        return method93(369, method124(341, widget, valueIndex));
+    }
+
+    int getIgnoreCount()
+    {
+        return ignoreCount;
+    }
+
+    long[] getIgnoredNameHashes()
+    {
+        return ignoredNameHashes;
+    }
+
+    int getFriendCount()
+    {
+        return friendCount;
+    }
+
+    void setFriendCount(int friendCount)
+    {
+        this.friendCount = friendCount;
+    }
+
+    long[] getFriendNameHashes()
+    {
+        return friendNameHashes;
+    }
+
+    String[] getFriendDisplayNames()
+    {
+        return friendDisplayNames;
+    }
+
+    int[] getFriendWorlds()
+    {
+        return friendWorlds;
+    }
+
+    int getRecentChatWriteIndex()
+    {
+        return recentChatWriteIndex;
+    }
+
+    void setRecentChatWriteIndex(int recentChatWriteIndex)
+    {
+        this.recentChatWriteIndex = recentChatWriteIndex;
+    }
+
+    int[] getRecentChatIds()
+    {
+        return recentChatIds;
+    }
+
+    int getDragState()
+    {
+        return dragState;
+    }
+
+    int getDragSlot()
+    {
+        return dragSlot;
+    }
+
+    int getDragWidgetId()
+    {
+        return dragWidgetId;
+    }
+
+    int getDragStartMouseX()
+    {
+        return dragStartMouseX;
+    }
+
+    int getDragPointerY()
+    {
+        return dragPointerY;
+    }
+
+    int getSelectedDragState()
+    {
+        return selectedDragState;
+    }
+
+    int getSelectedDragSlot()
+    {
+        return selectedDragSlot;
+    }
+
+    int getSelectedDragWidgetId()
+    {
+        return selectedDragWidgetId;
+    }
+
+    int getItemUseState()
+    {
+        return itemUseState;
+    }
+
+    int getItemUseSlot()
+    {
+        return itemUseSlot;
+    }
+
+    int getItemUseWidgetId()
+    {
+        return itemUseWidgetId;
     }
 
     public final void method78(int i)
@@ -5744,7 +5896,7 @@ class GameClientCore extends GameShell
 
     public final void method82(int i)
     {
-        if(anInt1086 != 0)
+        if(dragState != 0)
             return;
         aStringArray1199[0] = "Cancel";
         anIntArray1093[0] = 1107;
@@ -5824,7 +5976,7 @@ class GameClientCore extends GameShell
         SignLink.errorname = s;
         try
         {
-            if(!flag)
+            if(LoginProtocolHandler.shouldShowConnectingUi(flag))
             {
                 aString1266 = "";
                 aString1267 = "Connecting to server...";
@@ -5918,9 +6070,9 @@ class GameClientCore extends GameShell
                 aBoolean885 = false;
                 super.anInt18 = 0;
                 for(int j1 = 0; j1 < 100; j1++)
-                    aStringArray944[j1] = null;
+                    chatMessages[j1] = null;
 
-                anInt1282 = 0;
+                itemUseState = 0;
                 anInt1136 = 0;
                 anInt1023 = 0;
                 anInt1062 = 0;
@@ -5961,7 +6113,7 @@ class GameClientCore extends GameShell
 
                 aClass19_1179 = new Deque(169);
                 anInt900 = 0;
-                anInt899 = 0;
+                friendCount = 0;
                 anInt1042 = -1;
                 anInt1276 = -1;
                 anInt857 = -1;
@@ -6414,9 +6566,9 @@ class GameClientCore extends GameShell
             aBoolean919 = !aBoolean919;
         if(class5.anInt61 != 0)
             s = s + method110(aClass30_Sub2_Sub4_Sub1_Sub2_1126.anInt1705, class5.anInt61, true) + " (level-" + class5.anInt61 + ")";
-        if(anInt1282 == 1)
+        if(itemUseState == 1)
         {
-            aStringArray1199[anInt1133] = "Use " + aString1286 + " with @yel@" + s;
+            aStringArray1199[anInt1133] = "Use " + itemUseItemName + " with @yel@" + s;
             anIntArray1093[anInt1133] = 582;
             anIntArray1094[anInt1133] = i;
             anIntArray1091[anInt1133] = k;
@@ -6509,9 +6661,9 @@ class GameClientCore extends GameShell
             s = class30_sub2_sub4_sub1_sub2.aString1703 + method110(aClass30_Sub2_Sub4_Sub1_Sub2_1126.anInt1705, class30_sub2_sub4_sub1_sub2.anInt1705, true) + " (level-" + class30_sub2_sub4_sub1_sub2.anInt1705 + ")";
         else
             s = class30_sub2_sub4_sub1_sub2.aString1703 + " (skill-" + class30_sub2_sub4_sub1_sub2.anInt1723 + ")";
-        if(anInt1282 == 1)
+        if(itemUseState == 1)
         {
-            aStringArray1199[anInt1133] = "Use " + aString1286 + " with @whi@" + s;
+            aStringArray1199[anInt1133] = "Use " + itemUseItemName + " with @whi@" + s;
             anIntArray1093[anInt1133] = 491;
             anIntArray1094[anInt1133] = j;
             anIntArray1091[anInt1133] = i;
@@ -6674,7 +6826,7 @@ class GameClientCore extends GameShell
     public final void method6()
     {
         method13(20, (byte)4, "Starting up");
-        if(SignLink.sunjava)
+        if(ClientBootstrapLoader.shouldUseSunJavaLoopTuning())
             super.anInt6 = 5;
         if(aBoolean993)
         {
@@ -7618,7 +7770,7 @@ class GameClientCore extends GameShell
             if(flag1)
                 aBoolean1153 = true;
         }
-        aBoolean1153 = GameFrameHandler.applyMainViewportRedrawTriggers(anInt1023, aBoolean885, anInt948, anInt1189, anInt945, anInt1246, anInt1086, aBoolean1153);
+        aBoolean1153 = GameFrameHandler.applyMainViewportRedrawTriggers(anInt1023, aBoolean885, anInt948, anInt1189, anInt945, selectedDragState, dragState, aBoolean1153);
         if(aBoolean1153)
         {
             method36((byte)-81);
@@ -7646,13 +7798,7 @@ class GameClientCore extends GameShell
             if(flag2)
                 aBoolean1223 = true;
         }
-        if(anInt1246 == 3)
-            aBoolean1223 = true;
-        if(anInt1086 == 3)
-            aBoolean1223 = true;
-        if(aString844 != null)
-            aBoolean1223 = true;
-        if(aBoolean885 && anInt948 == 2)
+        if(GameFrameHandler.shouldRedrawChatbox(selectedDragState, dragState, aString844, aBoolean885, anInt948))
             aBoolean1223 = true;
         if(aBoolean1223)
         {
@@ -7784,9 +7930,9 @@ class GameClientCore extends GameShell
         anInt945 = 0;
     }
 
-    public final boolean method103(Widget class9, boolean flag)
+    public final boolean method103(Widget widget, boolean flag)
     {
-        int i = class9.anInt214;
+        int i = widget.anInt214;
         if(flag)
             method6();
         if(i >= 1 && i <= 200 || i >= 701 && i <= 900)
@@ -7801,17 +7947,17 @@ class GameClientCore extends GameShell
                 i -= 101;
             else
                 i--;
-            aStringArray1199[anInt1133] = "Remove @whi@" + aStringArray1082[i];
+            aStringArray1199[anInt1133] = "Remove @whi@" + friendDisplayNames[i];
             anIntArray1093[anInt1133] = 792;
             anInt1133++;
-            aStringArray1199[anInt1133] = "Message @whi@" + aStringArray1082[i];
+            aStringArray1199[anInt1133] = "Message @whi@" + friendDisplayNames[i];
             anIntArray1093[anInt1133] = 639;
             anInt1133++;
             return true;
         }
         if(i >= 401 && i <= 500)
         {
-            aStringArray1199[anInt1133] = "Remove @whi@" + class9.aString248;
+            aStringArray1199[anInt1133] = "Remove @whi@" + widget.aString248;
             anIntArray1093[anInt1133] = 322;
             anInt1133++;
             return true;
@@ -7826,148 +7972,47 @@ class GameClientCore extends GameShell
         aBoolean1157 = SceneEffectHandler.updateGraphicsObjects(aClass19_1056, anInt918, anInt1161, anInt945, aClass25_946, flag, aBoolean1157);
     }
 
-    public final void method105(int i, int j, int k, Widget class9, int l)
+    public final void method105(int drawModeGuard, int scrollY, int baseX, Widget parentWidget, int baseY)
     {
-        if(i != 8)
+        if(WidgetInteractionHandler.shouldFlipMenuStateGuard(drawModeGuard))
             aBoolean991 = !aBoolean991;
-        if(class9.anInt262 != 0 || class9.anIntArray240 == null)
+        if(!WidgetInteractionHandler.canRenderWidgetTree(parentWidget, anInt1026, anInt1048, anInt1039))
             return;
-        if(class9.aBoolean266 && anInt1026 != class9.anInt250 && anInt1048 != class9.anInt250 && anInt1039 != class9.anInt250)
-            return;
-        int i1 = Rasterizer2D.anInt1383;
-        int j1 = Rasterizer2D.anInt1381;
-        int k1 = Rasterizer2D.anInt1384;
-        int l1 = Rasterizer2D.anInt1382;
-        Rasterizer2D.method333(l + class9.anInt267, k, false, k + class9.anInt220, l);
-        int i2 = class9.anIntArray240.length;
-        for(int j2 = 0; j2 < i2; j2++)
-        {
-            int k2 = class9.anIntArray241[j2] + k;
-            int l2 = (class9.anIntArray272[j2] + l) - j;
-            Widget class9_1 = Widget.aClass9Array210[class9.anIntArray240[j2]];
-            k2 += class9_1.anInt263;
-            l2 += class9_1.anInt265;
-            if(class9_1.anInt262 == 0)
-            {
-                WidgetContainerHandler.renderType0Container(this, class9_1, k2, l2);
-            } else
-            if(class9_1.anInt262 != 1)
-                if(class9_1.anInt262 == 2)
-                {
-                    int i3 = 0;
-                    for(int l3 = 0; l3 < class9_1.anInt267; l3++)
-                    {
-                        for(int l4 = 0; l4 < class9_1.anInt220; l4++)
-                        {
-                            int k5 = k2 + l4 * (32 + class9_1.anInt231);
-                            int j6 = l2 + l3 * (32 + class9_1.anInt244);
-                            if(i3 < 20)
-                            {
-                                k5 += class9_1.anIntArray215[i3];
-                                j6 += class9_1.anIntArray247[i3];
-                            }
-                            if(class9_1.anIntArray253[i3] > 0)
-                            {
-                                int k6 = 0;
-                                int j7 = 0;
-                                int j9 = class9_1.anIntArray253[i3] - 1;
-                                if(k5 > Rasterizer2D.anInt1383 - 32 && k5 < Rasterizer2D.anInt1384 && j6 > Rasterizer2D.anInt1381 - 32 && j6 < Rasterizer2D.anInt1382 || anInt1086 != 0 && anInt1085 == i3)
-                                {
-                                    int l9 = 0;
-                                    if(anInt1282 == 1 && anInt1283 == i3 && anInt1284 == class9_1.anInt250)
-                                        l9 = 0xffffff;
-                                    Sprite class30_sub2_sub1_sub1_2 = ItemDefinition.method200(j9, class9_1.anIntArray252[i3], l9, 9);
-                                    if(class30_sub2_sub1_sub1_2 != null)
-                                    {
-                                        if(anInt1086 != 0 && anInt1085 == i3 && anInt1084 == class9_1.anInt250)
-                                        {
-                                            k6 = super.anInt20 - anInt1087;
-                                            j7 = super.anInt21 - anInt1088;
-                                            if(k6 < 5 && k6 > -5)
-                                                k6 = 0;
-                                            if(j7 < 5 && j7 > -5)
-                                                j7 = 0;
-                                            if(anInt989 < 5)
-                                            {
-                                                k6 = 0;
-                                                j7 = 0;
-                                            }
-                                            class30_sub2_sub1_sub1_2.method350(k5 + k6, j6 + j7, 128, aBoolean1043);
-                                            if(j6 + j7 < Rasterizer2D.anInt1381 && class9.anInt224 > 0)
-                                            {
-                                                int i10 = (anInt945 * (Rasterizer2D.anInt1381 - j6 - j7)) / 3;
-                                                if(i10 > anInt945 * 10)
-                                                    i10 = anInt945 * 10;
-                                                if(i10 > class9.anInt224)
-                                                    i10 = class9.anInt224;
-                                                class9.anInt224 -= i10;
-                                                anInt1088 += i10;
-                                            }
-                                            if(j6 + j7 + 32 > Rasterizer2D.anInt1382 && class9.anInt224 < class9.anInt261 - class9.anInt267)
-                                            {
-                                                int j10 = (anInt945 * ((j6 + j7 + 32) - Rasterizer2D.anInt1382)) / 3;
-                                                if(j10 > anInt945 * 10)
-                                                    j10 = anInt945 * 10;
-                                                if(j10 > class9.anInt261 - class9.anInt267 - class9.anInt224)
-                                                    j10 = class9.anInt261 - class9.anInt267 - class9.anInt224;
-                                                class9.anInt224 += j10;
-                                                anInt1088 -= j10;
-                                            }
-                                        } else
-                                        if(anInt1246 != 0 && anInt1245 == i3 && anInt1244 == class9_1.anInt250)
-                                            class30_sub2_sub1_sub1_2.method350(k5, j6, 128, aBoolean1043);
-                                        else
-                                            class30_sub2_sub1_sub1_2.method348(k5, 16083, j6);
-                                        if(class30_sub2_sub1_sub1_2.anInt1444 == 33 || class9_1.anIntArray252[i3] != 1)
-                                        {
-                                            int k10 = class9_1.anIntArray252[i3];
-                                            aClass30_Sub2_Sub1_Sub4_1270.method385(0, method43(-33245, k10), j6 + 10 + j7, 822, k5 + 1 + k6);
-                                            aClass30_Sub2_Sub1_Sub4_1270.method385(0xffff00, method43(-33245, k10), j6 + 9 + j7, 822, k5 + k6);
-                                        }
-                                    }
-                                }
-                            } else
-                            if(class9_1.aClass30_Sub2_Sub1_Sub1Array209 != null && i3 < 20)
-                            {
-                                Sprite class30_sub2_sub1_sub1_1 = class9_1.aClass30_Sub2_Sub1_Sub1Array209[i3];
-                                if(class30_sub2_sub1_sub1_1 != null)
-                                    class30_sub2_sub1_sub1_1.method348(k5, 16083, j6);
-                            }
-                            i3++;
-                        }
+        WidgetTreeRenderer.renderWidgetTree(
+            this,
+            scrollY,
+            baseX,
+            parentWidget,
+            baseY,
+            anInt945,
+            getDragState(),
+            getDragSlot(),
+            getDragWidgetId(),
+            getDragStartMouseX(),
+            getDragPointerY(),
+            anInt989,
+            aBoolean1043,
+            getSelectedDragState(),
+            getSelectedDragSlot(),
+            getSelectedDragWidgetId(),
+            getItemUseState(),
+            getItemUseSlot(),
+            getItemUseWidgetId(),
+            super.anInt20,
+            super.anInt21,
+            getDragPointerY(),
+            anInt1039,
+            anInt1048,
+            anInt1026,
+            anInt939,
+            aBoolean1149,
+            aClass30_Sub2_Sub1_Sub4_1270
+        );
+    }
 
-                    }
-
-                } else
-                if(class9_1.anInt262 == 3)
-                {
-                    boolean isFocusedWidget = false;
-                    if(anInt1039 == class9_1.anInt250 || anInt1048 == class9_1.anInt250 || anInt1026 == class9_1.anInt250)
-                        isFocusedWidget = true;
-                    WidgetRenderHandler.renderType3Rectangle(class9_1, k2, l2, isFocusedWidget, method131(class9_1, false));
-                } else
-                if(class9_1.anInt262 == 4)
-                {
-                    boolean isFocusedWidget = false;
-                    if(anInt1039 == class9_1.anInt250 || anInt1048 == class9_1.anInt250 || anInt1026 == class9_1.anInt250)
-                        isFocusedWidget = true;
-                    WidgetRenderHandler.renderType4Text(this, class9_1, k2, l2, anInt939, isFocusedWidget, method131(class9_1, false), aBoolean1149);
-                } else
-                if(class9_1.anInt262 == 5)
-                {
-                    WidgetRenderHandler.renderType5Sprite(class9_1, k2, l2, method131(class9_1, false));
-                } else
-                if(class9_1.anInt262 == 6)
-                {
-                    WidgetRenderHandler.renderType6Model(class9_1, k2, l2, method131(class9_1, false));
-                } else
-                if(class9_1.anInt262 == 7)
-                {
-                    WidgetRenderHandler.renderType7ItemTextGrid(class9_1, class9_1.aClass30_Sub2_Sub1_Sub4_243, k2, l2, anInt939);
-                }
-        }
-
-        Rasterizer2D.method333(l1, i1, false, k1, j1);
+    void setWidgetDragOffsetY(int dragOffsetY)
+    {
+        dragPointerY = dragOffsetY;
     }
 
     public final void method106(IndexedSprite class30_sub2_sub1_sub2, int i)
@@ -8022,7 +8067,7 @@ class GameClientCore extends GameShell
 
     private void applyPlayerPublicChatUpdate(Player player, PacketBuffer packetBuffer)
     {
-        PlayerUpdateMaskHandler.applyPlayerPublicChatUpdate((GameClient)this, player, packetBuffer, aClass30_Sub2_Sub2_834, anInt822, aLongArray925, anInt1251, aBoolean991);
+        PlayerUpdateMaskHandler.applyPlayerPublicChatUpdate((GameClient)this, player, packetBuffer, aClass30_Sub2_Sub2_834, ignoreCount, ignoredNameHashes, anInt1251, aBoolean991);
     }
 
     private void applyPlayerMaskStateGuard(byte stateGuard)
@@ -8183,8 +8228,8 @@ class GameClientCore extends GameShell
     {
         if(s == null)
             return false;
-        for(int i = 0; i < anInt899; i++)
-            if(s.equalsIgnoreCase(aStringArray1082[i]))
+        for(int i = 0; i < friendCount; i++)
+            if(s.equalsIgnoreCase(friendDisplayNames[i]))
                 return true;
 
         if(flag)
@@ -8304,14 +8349,14 @@ class GameClientCore extends GameShell
         {
             if(l == 0L)
                 return;
-            if(anInt822 >= 100)
+            if(ignoreCount >= 100)
             {
                 method77("Your ignore list is full. Max of 100 hit", 0, "", aBoolean991);
                 return;
             }
             String s = TextUtils.method587(-45804, TextUtils.method584(l, (byte)-99));
-            for(int j = 0; j < anInt822; j++)
-                if(aLongArray925[j] == l)
+            for(int j = 0; j < ignoreCount; j++)
+                if(ignoredNameHashes[j] == l)
                 {
                     method77(s + " is already on your ignore list", 0, "", aBoolean991);
                     return;
@@ -8319,14 +8364,14 @@ class GameClientCore extends GameShell
 
             if(i < 4 || i > 4)
                 return;
-            for(int k = 0; k < anInt899; k++)
-                if(aLongArray955[k] == l)
+            for(int k = 0; k < friendCount; k++)
+                if(friendNameHashes[k] == l)
                 {
                     method77("Please remove " + s + " from your friend list first", 0, "", aBoolean991);
                     return;
                 }
 
-            aLongArray925[anInt822++] = l;
+            ignoredNameHashes[ignoreCount++] = l;
             aBoolean1153 = true;
             aClass30_Sub2_Sub2_1192.method397((byte)6, 133);
             aClass30_Sub2_Sub2_1192.method404(5, l);
@@ -8695,13 +8740,13 @@ class GameClientCore extends GameShell
                 method6();
             if(l == 0L)
                 return;
-            for(int j = 0; j < anInt822; j++)
-                if(aLongArray925[j] == l)
+            for(int j = 0; j < ignoreCount; j++)
+                if(ignoredNameHashes[j] == l)
                 {
-                    anInt822--;
+                    ignoreCount--;
                     aBoolean1153 = true;
-                    for(int k = j; k < anInt822; k++)
-                        aLongArray925[k] = aLongArray925[k + 1];
+                    for(int k = j; k < ignoreCount; k++)
+                        ignoredNameHashes[k] = ignoredNameHashes[k + 1];
 
                     aClass30_Sub2_Sub2_1192.method397((byte)6, 74);
                     aClass30_Sub2_Sub2_1192.method404(5, l);
@@ -8860,11 +8905,11 @@ class GameClientCore extends GameShell
 
     public final void method125(int i)
     {
-        if(anInt1133 < 2 && anInt1282 == 0 && anInt1136 == 0)
+        if(anInt1133 < 2 && itemUseState == 0 && anInt1136 == 0)
             return;
         String s;
-        if(anInt1282 == 1 && anInt1133 < 2)
-            s = "Use " + aString1286 + " with...";
+        if(itemUseState == 1 && anInt1133 < 2)
+            s = "Use " + itemUseItemName + " with...";
         else
         if(anInt1136 == 1 && anInt1133 < 2)
             s = aString1139 + "...";
@@ -8950,9 +8995,9 @@ class GameClientCore extends GameShell
                 int l3 = ((Actor) (class30_sub2_sub4_sub1_sub2)).anInt1551 / 32 - ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anInt1551 / 32;
                 boolean flag1 = false;
                 long l6 = TextUtils.method583(class30_sub2_sub4_sub1_sub2.aString1703);
-                for(int k6 = 0; k6 < anInt899; k6++)
+                for(int k6 = 0; k6 < friendCount; k6++)
                 {
-                    if(l6 != aLongArray955[k6] || anIntArray826[k6] == 0)
+                    if(l6 != friendNameHashes[k6] || friendWorlds[k6] == 0)
                         continue;
                     flag1 = true;
                     break;
@@ -9064,16 +9109,16 @@ class GameClientCore extends GameShell
         if(anInt1104 != 0)
             i = 1;
         for(int j = 0; j < 100; j++)
-            if(aStringArray944[j] != null)
+            if(chatMessages[j] != null)
             {
-                int k = anIntArray942[j];
-                String s = ChatNameTagParser.parse(aStringArray943[j]).name;
+                int k = chatTypes[j];
+                String s = ChatNameTagParser.parse(chatSenders[j]).name;
                 if((k == 3 || k == 7) && (k == 7 || anInt845 == 0 || anInt845 == 1 && method109(false, s)))
                 {
                     int l = 329 - i * 13;
                     if(super.anInt20 > 4 && super.anInt21 - 4 > l - 10 && super.anInt21 - 4 <= l + 3)
                     {
-                        int i1 = aClass30_Sub2_Sub1_Sub4_1271.method383(anInt1116, "From:  " + s + aStringArray944[j]) + 25;
+                        int i1 = aClass30_Sub2_Sub1_Sub4_1271.method383(anInt1116, "From:  " + s + chatMessages[j]) + 25;
                         if(i1 > 450)
                             i1 = 450;
                         if(super.anInt20 < 4 + i1)
@@ -10255,12 +10300,7 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 185)
             {
-                int k = aClass30_Sub2_Sub2_1083.method436((byte)-74);
-                Widget.aClass9Array210[k].anInt233 = 3;
-                if(aClass30_Sub2_Sub4_Sub1_Sub2_1126.aClass5_1698 == null)
-                    Widget.aClass9Array210[k].anInt234 = (aClass30_Sub2_Sub4_Sub1_Sub2_1126.anIntArray1700[0] << 25) + (aClass30_Sub2_Sub4_Sub1_Sub2_1126.anIntArray1700[4] << 20) + (aClass30_Sub2_Sub4_Sub1_Sub2_1126.anIntArray1717[0] << 15) + (aClass30_Sub2_Sub4_Sub1_Sub2_1126.anIntArray1717[8] << 10) + (aClass30_Sub2_Sub4_Sub1_Sub2_1126.anIntArray1717[11] << 5) + aClass30_Sub2_Sub4_Sub1_Sub2_1126.anIntArray1717[1];
-                else
-                    Widget.aClass9Array210[k].anInt234 = (int)(0x12345678L + aClass30_Sub2_Sub4_Sub1_Sub2_1126.aClass5_1698.aLong78);
+                InterfacePacketHandler.applyPlayerIdentityWidget(aClass30_Sub2_Sub2_1083, aClass30_Sub2_Sub4_Sub1_Sub2_1126);
                 anInt1008 = -1;
                 return true;
             }
@@ -10279,7 +10319,7 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 214)
             {
-                anInt822 = IncomingPacketDispatcher.applyIgnoreListSnapshot(aClass30_Sub2_Sub2_1083, anInt1007, aLongArray925);
+                ignoreCount = IncomingPacketDispatcher.applyIgnoreListSnapshot(aClass30_Sub2_Sub2_1083, anInt1007, ignoredNameHashes);
                 anInt1008 = -1;
                 return true;
             }
@@ -10657,7 +10697,7 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 253)
             {
-                SocialPacketHandler.handleSocialRequestMessage((GameClient)this, aClass30_Sub2_Sub2_1083, anInt822, aLongArray925, anInt1251, aBoolean991);
+                SocialPacketHandler.handleSocialRequestMessage(this, aClass30_Sub2_Sub2_1083, getIgnoreCount(), getIgnoredNameHashes(), anInt1251, aBoolean991);
                 anInt1008 = -1;
                 return true;
             }
@@ -10676,8 +10716,8 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 50)
             {
-                int friendStatusUpdate[] = SocialPacketHandler.handleFriendStatusUpdate((GameClient)this, aClass30_Sub2_Sub2_1083, anInt899, anInt957, aLongArray955, aStringArray1082, anIntArray826, aBoolean991);
-                anInt899 = friendStatusUpdate[0];
+                int friendStatusUpdate[] = SocialPacketHandler.handleFriendStatusUpdate(this, aClass30_Sub2_Sub2_1083, getFriendCount(), anInt957, getFriendNameHashes(), getFriendDisplayNames(), getFriendWorlds(), aBoolean991);
+                setFriendCount(friendStatusUpdate[0]);
                 if(friendStatusUpdate[1] == 1)
                     aBoolean1153 = true;
                 anInt1008 = -1;
@@ -10737,21 +10777,7 @@ class GameClientCore extends GameShell
             {
                 int i5 = aClass30_Sub2_Sub2_1083.method435(true);
                 int k12 = aClass30_Sub2_Sub2_1083.method410();
-                if(anInt1276 != -1)
-                {
-                    anInt1276 = -1;
-                    aBoolean1223 = true;
-                }
-                if(anInt1225 != 0)
-                {
-                    anInt1225 = 0;
-                    aBoolean1223 = true;
-                }
-                anInt857 = i5;
-                anInt1189 = k12;
-                aBoolean1153 = true;
-                aBoolean1103 = true;
-                aBoolean1149 = false;
+                setMainAndSidebarInterfaces(i5, k12);
                 anInt1008 = -1;
                 return true;
             }
@@ -10776,7 +10802,19 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 196)
             {
-                anInt1169 = SocialPacketHandler.handlePublicChatPacket((GameClient)this, aClass30_Sub2_Sub2_1083, anInt1007, anIntArray1240, anInt1169, anInt822, aLongArray925, anInt1251, aBoolean991);
+                setRecentChatWriteIndex(
+                    SocialPacketHandler.handlePublicChatPacket(
+                        this,
+                        aClass30_Sub2_Sub2_1083,
+                        anInt1007,
+                        getRecentChatIds(),
+                        getRecentChatWriteIndex(),
+                        getIgnoreCount(),
+                        getIgnoredNameHashes(),
+                        anInt1251,
+                        aBoolean991
+                    )
+                );
                 anInt1008 = -1;
                 return true;
             }
@@ -10804,31 +10842,13 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 246)
             {
-                int i6 = aClass30_Sub2_Sub2_1083.method434((byte)108);
-                int i13 = aClass30_Sub2_Sub2_1083.method410();
-                int k18 = aClass30_Sub2_Sub2_1083.method410();
-                if(k18 == 65535)
-                {
-                    Widget.aClass9Array210[i6].anInt233 = 0;
-                    anInt1008 = -1;
-                    return true;
-                } else
-                {
-                    ItemDefinition class8 = ItemDefinition.method198(k18);
-                    Widget.aClass9Array210[i6].anInt233 = 4;
-                    Widget.aClass9Array210[i6].anInt234 = k18;
-                    Widget.aClass9Array210[i6].anInt270 = class8.anInt190;
-                    Widget.aClass9Array210[i6].anInt271 = class8.anInt198;
-                    Widget.aClass9Array210[i6].anInt269 = (class8.anInt181 * 100) / i13;
-                    anInt1008 = -1;
-                    return true;
-                }
+                InterfacePacketHandler.applyWidgetItemModel(aClass30_Sub2_Sub2_1083);
+                anInt1008 = -1;
+                return true;
             }
             if(anInt1008 == 171)
             {
-                boolean flag1 = aClass30_Sub2_Sub2_1083.method408() == 1;
-                int j13 = aClass30_Sub2_Sub2_1083.method410();
-                Widget.aClass9Array210[j13].aBoolean266 = flag1;
+                InterfacePacketHandler.applyWidgetVisibility(aClass30_Sub2_Sub2_1083);
                 anInt1008 = -1;
                 return true;
             }
@@ -10836,16 +10856,7 @@ class GameClientCore extends GameShell
             {
                 int j6 = aClass30_Sub2_Sub2_1083.method434((byte)108);
                 method60(j6, (byte)6);
-                if(anInt1276 != -1)
-                {
-                    anInt1276 = -1;
-                    aBoolean1223 = true;
-                }
-                if(anInt1225 != 0)
-                {
-                    anInt1225 = 0;
-                    aBoolean1223 = true;
-                }
+                clearDialogAndInputOverlayState();
                 anInt1189 = j6;
                 aBoolean1153 = true;
                 aBoolean1103 = true;
@@ -10856,10 +10867,7 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 126)
             {
-                String s1 = aClass30_Sub2_Sub2_1083.method415();
-                int k13 = aClass30_Sub2_Sub2_1083.method435(true);
-                Widget.aClass9Array210[k13].aString248 = s1;
-                if(Widget.aClass9Array210[k13].anInt236 == anIntArray1130[anInt1221])
+                if(InterfacePacketHandler.applyWidgetText(aClass30_Sub2_Sub2_1083, anIntArray1130, anInt1221))
                     aBoolean1153 = true;
                 anInt1008 = -1;
                 return true;
@@ -10884,57 +10892,26 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 8)
             {
-                int k6 = aClass30_Sub2_Sub2_1083.method436((byte)-74);
-                int l13 = aClass30_Sub2_Sub2_1083.method410();
-                Widget.aClass9Array210[k6].anInt233 = 1;
-                Widget.aClass9Array210[k6].anInt234 = l13;
+                InterfacePacketHandler.applyWidgetNpcHeadModel(aClass30_Sub2_Sub2_1083);
                 anInt1008 = -1;
                 return true;
             }
             if(anInt1008 == 122)
             {
-                int l6 = aClass30_Sub2_Sub2_1083.method436((byte)-74);
-                int i14 = aClass30_Sub2_Sub2_1083.method436((byte)-74);
-                int i19 = i14 >> 10 & 0x1f;
-                int i22 = i14 >> 5 & 0x1f;
-                int l24 = i14 & 0x1f;
-                Widget.aClass9Array210[l6].anInt232 = (i19 << 19) + (i22 << 11) + (l24 << 3);
+                InterfacePacketHandler.applyWidgetTextColor(aClass30_Sub2_Sub2_1083);
                 anInt1008 = -1;
                 return true;
             }
             if(anInt1008 == 53)
             {
                 aBoolean1153 = true;
-                int i7 = aClass30_Sub2_Sub2_1083.method410();
-                Widget class9_1 = Widget.aClass9Array210[i7];
-                int j19 = aClass30_Sub2_Sub2_1083.method410();
-                for(int j22 = 0; j22 < j19; j22++)
-                {
-                    int i25 = aClass30_Sub2_Sub2_1083.method408();
-                    if(i25 == 255)
-                        i25 = aClass30_Sub2_Sub2_1083.method440(true);
-                    class9_1.anIntArray253[j22] = aClass30_Sub2_Sub2_1083.method436((byte)-74);
-                    class9_1.anIntArray252[j22] = i25;
-                }
-
-                for(int j25 = j19; j25 < class9_1.anIntArray253.length; j25++)
-                {
-                    class9_1.anIntArray253[j25] = 0;
-                    class9_1.anIntArray252[j25] = 0;
-                }
-
+                InterfacePacketHandler.applyWidgetItemGridSnapshot(aClass30_Sub2_Sub2_1083);
                 anInt1008 = -1;
                 return true;
             }
             if(anInt1008 == 230)
             {
-                int j7 = aClass30_Sub2_Sub2_1083.method435(true);
-                int j14 = aClass30_Sub2_Sub2_1083.method410();
-                int k19 = aClass30_Sub2_Sub2_1083.method410();
-                int k22 = aClass30_Sub2_Sub2_1083.method436((byte)-74);
-                Widget.aClass9Array210[j14].anInt270 = k19;
-                Widget.aClass9Array210[j14].anInt271 = k22;
-                Widget.aClass9Array210[j14].anInt269 = j7;
+                InterfacePacketHandler.applyWidgetModelTransform(aClass30_Sub2_Sub2_1083);
                 anInt1008 = -1;
                 return true;
             }
@@ -11007,24 +10984,8 @@ class GameClientCore extends GameShell
             {
                 int l7 = aClass30_Sub2_Sub2_1083.method410();
                 method60(l7, (byte)6);
-                if(anInt1189 != -1)
-                {
-                    anInt1189 = -1;
-                    aBoolean1153 = true;
-                    aBoolean1103 = true;
-                }
-                if(anInt1276 != -1)
-                {
-                    anInt1276 = -1;
-                    aBoolean1223 = true;
-                }
-                if(anInt1225 != 0)
-                {
-                    anInt1225 = 0;
-                    aBoolean1223 = true;
-                }
+                clearAllOpenInterfaces();
                 anInt857 = l7;
-                aBoolean1149 = false;
                 anInt1008 = -1;
                 return true;
             }
@@ -11038,13 +10999,14 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 87)
             {
-                int j8 = aClass30_Sub2_Sub2_1083.method434((byte)108);
-                int l14 = aClass30_Sub2_Sub2_1083.method439((byte)41);
-                anIntArray1045[j8] = l14;
-                if(anIntArray971[j8] != l14)
+                int varpUpdate[] = InventoryPacketHandler.readVarpIntUpdate(aClass30_Sub2_Sub2_1083);
+                int index = varpUpdate[0];
+                int value = varpUpdate[1];
+                anIntArray1045[index] = value;
+                if(anIntArray971[index] != value)
                 {
-                    anIntArray971[j8] = l14;
-                    method33(false, j8);
+                    anIntArray971[index] = value;
+                    method33(false, index);
                     aBoolean1153 = true;
                     if(anInt1042 != -1)
                         aBoolean1223 = true;
@@ -11054,13 +11016,14 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 36)
             {
-                int k8 = aClass30_Sub2_Sub2_1083.method434((byte)108);
-                byte byte0 = aClass30_Sub2_Sub2_1083.method409();
-                anIntArray1045[k8] = byte0;
-                if(anIntArray971[k8] != byte0)
+                int varpUpdate[] = InventoryPacketHandler.readVarpByteUpdate(aClass30_Sub2_Sub2_1083);
+                int index = varpUpdate[0];
+                int value = varpUpdate[1];
+                anIntArray1045[index] = value;
+                if(anIntArray971[index] != value)
                 {
-                    anIntArray971[k8] = byte0;
-                    method33(false, k8);
+                    anIntArray971[index] = value;
+                    method33(false, index);
                     aBoolean1153 = true;
                     if(anInt1042 != -1)
                         aBoolean1223 = true;
@@ -11076,59 +11039,20 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 200)
             {
-                int l8 = aClass30_Sub2_Sub2_1083.method410();
-                int i15 = aClass30_Sub2_Sub2_1083.method411();
-                Widget class9_4 = Widget.aClass9Array210[l8];
-                class9_4.anInt257 = i15;
-                if(i15 == -1)
-                {
-                    class9_4.anInt246 = 0;
-                    class9_4.anInt208 = 0;
-                }
+                InterfacePacketHandler.applyWidgetAnimation(aClass30_Sub2_Sub2_1083);
                 anInt1008 = -1;
                 return true;
             }
             if(anInt1008 == 219)
             {
-                if(anInt1189 != -1)
-                {
-                    anInt1189 = -1;
-                    aBoolean1153 = true;
-                    aBoolean1103 = true;
-                }
-                if(anInt1276 != -1)
-                {
-                    anInt1276 = -1;
-                    aBoolean1223 = true;
-                }
-                if(anInt1225 != 0)
-                {
-                    anInt1225 = 0;
-                    aBoolean1223 = true;
-                }
-                anInt857 = -1;
-                aBoolean1149 = false;
+                clearAllOpenInterfaces();
                 anInt1008 = -1;
                 return true;
             }
             if(anInt1008 == 34)
             {
                 aBoolean1153 = true;
-                int i9 = aClass30_Sub2_Sub2_1083.method410();
-                Widget class9_2 = Widget.aClass9Array210[i9];
-                while(aClass30_Sub2_Sub2_1083.anInt1406 < anInt1007) 
-                {
-                    int j20 = aClass30_Sub2_Sub2_1083.method422();
-                    int i23 = aClass30_Sub2_Sub2_1083.method410();
-                    int l25 = aClass30_Sub2_Sub2_1083.method408();
-                    if(l25 == 255)
-                        l25 = aClass30_Sub2_Sub2_1083.method413();
-                    if(j20 >= 0 && j20 < class9_2.anIntArray253.length)
-                    {
-                        class9_2.anIntArray253[j20] = i23;
-                        class9_2.anIntArray252[j20] = l25;
-                    }
-                }
+                InterfacePacketHandler.applyWidgetItemSlotUpdates(aClass30_Sub2_Sub2_1083, anInt1007);
                 anInt1008 = -1;
                 return true;
             }
@@ -11150,16 +11074,7 @@ class GameClientCore extends GameShell
             {
                 int j9 = aClass30_Sub2_Sub2_1083.method434((byte)108);
                 method60(j9, (byte)6);
-                if(anInt1189 != -1)
-                {
-                    anInt1189 = -1;
-                    aBoolean1153 = true;
-                    aBoolean1103 = true;
-                }
-                anInt1276 = j9;
-                aBoolean1223 = true;
-                anInt857 = -1;
-                aBoolean1149 = false;
+                setTabInterface(j9);
                 anInt1008 = -1;
                 return true;
             }
@@ -11283,8 +11198,13 @@ class GameClientCore extends GameShell
 
     public GameClientCore()
     {
+        GameClientCoreConstructorInit.initialize(this);
+    }
+
+    void constructorInitWorldEntityAndBuffers()
+    {
         anIntArrayArray825 = new int[104][104];
-        anIntArray826 = new int[200];
+        friendWorlds = new int[200];
         aClass19ArrayArrayArray827 = new Deque[4][104][104];
         aBoolean830 = true;
         aBoolean831 = false;
@@ -11324,19 +11244,23 @@ class GameClientCore extends GameShell
         anInt921 = 732;
         anIntArray922 = new int[Skills.anInt733];
         aByte923 = 25;
-        aLongArray925 = new long[100];
+        ignoredNameHashes = new long[100];
         aBoolean926 = false;
         anInt927 = 0x332d25;
         anIntArray928 = new int[5];
         anIntArrayArray929 = new int[104][104];
         aCRC32_930 = new CRC32();
+    }
+
+    void constructorInitRuntimeCachesAndChat()
+    {
         anInt939 = 748;
-        anIntArray942 = new int[100];
-        aStringArray943 = new String[100];
-        aStringArray944 = new String[100];
+        chatTypes = new int[100];
+        chatSenders = new String[100];
+        chatMessages = new String[100];
         aClass30_Sub2_Sub1_Sub2Array947 = new IndexedSprite[13];
         aBoolean954 = true;
-        aLongArray955 = new long[200];
+        friendNameHashes = new long[200];
         anInt956 = -1;
         aBoolean962 = false;
         anInt963 = -1;
@@ -11357,6 +11281,10 @@ class GameClientCore extends GameShell
         anIntArray982 = new int[anInt975];
         aStringArray983 = new String[anInt975];
         anInt985 = -1;
+    }
+
+    void constructorInitUiWidgetsAndDeques()
+    {
         aClass30_Sub2_Sub1_Sub1Array987 = new Sprite[20];
         anIntArray990 = new int[5];
         aBoolean991 = false;
@@ -11389,8 +11317,12 @@ class GameClientCore extends GameShell
         anIntArray1073 = new int[1000];
         aBoolean1080 = false;
         anInt1081 = -733;
-        aStringArray1082 = new String[200];
+        friendDisplayNames = new String[200];
         aClass30_Sub2_Sub2_1083 = PacketBuffer.method396(1, 9);
+    }
+
+    void constructorInitNetworkingAndContextMenus()
+    {
         anIntArray1090 = new int[9];
         anIntArray1091 = new int[500];
         anIntArray1092 = new int[500];
@@ -11429,6 +11361,10 @@ class GameClientCore extends GameShell
         anInt1184 = 128;
         anInt1189 = -1;
         aClass30_Sub2_Sub2_1192 = PacketBuffer.method396(1, 9);
+    }
+
+    void constructorInitLateUiAndCollision()
+    {
         aByte1194 = 5;
         aStringArray1199 = new String[500];
         anIntArray1203 = new int[5];
@@ -11446,7 +11382,11 @@ class GameClientCore extends GameShell
         anIntArray1229 = new int[151];
         aClass11Array1230 = new CollisionMap[4];
         aBoolean1233 = false;
-        anIntArray1240 = new int[100];
+        recentChatIds = new int[100];
+    }
+
+    void constructorInitScratchArraysAndDefaults()
+    {
         anIntArray1241 = new int[50];
         aBoolean1242 = false;
         anIntArray1250 = new int[50];
@@ -11462,13 +11402,13 @@ class GameClientCore extends GameShell
         anIntArray1280 = new int[4000];
         anIntArray1281 = new int[4000];
         anInt1289 = -1;
-
     }
-    private int anInt822;
+
+    private int ignoreCount;
     private static byte aByte823 = 77;
     private long aLong824;
     private int anIntArrayArray825[][];
-    private int anIntArray826[];
+    private int friendWorlds[];
     private Deque aClass19ArrayArrayArray827[][][];
     private int anIntArray828[];
     private int anIntArray829[];
@@ -11541,7 +11481,7 @@ class GameClientCore extends GameShell
     private int anInt896;
     private int anInt897;
     private int anInt898;
-    private int anInt899;
+    private int friendCount;
     private int anInt900;
     private int anIntArrayArray901[][];
     private int anInt902;
@@ -11567,7 +11507,7 @@ class GameClientCore extends GameShell
     private int anIntArray922[];
     private byte aByte923;
     private static int anInt924;
-    private long aLongArray925[];
+    private long ignoredNameHashes[];
     private boolean aBoolean926;
     private int anInt927;
     private int anIntArray928[];
@@ -11584,9 +11524,9 @@ class GameClientCore extends GameShell
     private int anInt939;
     private static int anInt940;
     private static int anInt941;
-    private int anIntArray942[];
-    private String aStringArray943[];
-    private String aStringArray944[];
+    private int chatTypes[];
+    private String chatSenders[];
+    private String chatMessages[];
     private int anInt945;
     private SceneGraph aClass25_946;
     private IndexedSprite aClass30_Sub2_Sub1_Sub2Array947[];
@@ -11597,7 +11537,7 @@ class GameClientCore extends GameShell
     private int anInt952;
     private long aLong953;
     boolean aBoolean954;
-    private long aLongArray955[];
+    private long friendNameHashes[];
     private int anInt956;
     private static int anInt957 = 10;
     public static int anInt958;
@@ -11741,13 +11681,14 @@ class GameClientCore extends GameShell
     private int anInt1079;
     private boolean aBoolean1080;
     private int anInt1081;
-    private String aStringArray1082[];
+    private String friendDisplayNames[];
     private PacketBuffer aClass30_Sub2_Sub2_1083;
-    private int anInt1084;
-    private int anInt1085;
-    private int anInt1086;
-    private int anInt1087;
-    private int anInt1088;
+    private int dragWidgetId;
+    private int dragSlot;
+    private int dragState;
+    private int dragStartMouseX;
+    /** Press Y at drag start; updated while dragging/scrolling item grids. */
+    private int dragPointerY;
     private int anInt1089;
     private int anIntArray1090[];
     private int anIntArray1091[];
@@ -11831,7 +11772,7 @@ class GameClientCore extends GameShell
     private ProducingGraphicsBuffer aClass15_1166;
     private int anInt1167;
     private BufferedConnection aClass24_1168;
-    private int anInt1169;
+    private int recentChatWriteIndex;
     private int anInt1170;
     private int anInt1171;
     private long aLong1172;
@@ -11910,13 +11851,13 @@ class GameClientCore extends GameShell
     int anInt1237;
     int anInt1238;
     private final int anInt1239 = 100;
-    private int anIntArray1240[];
+    private int recentChatIds[];
     private int anIntArray1241[];
     private boolean aBoolean1242;
     private int anInt1243;
-    private int anInt1244;
-    private int anInt1245;
-    private int anInt1246;
+    private int selectedDragWidgetId;
+    private int selectedDragSlot;
+    private int selectedDragState;
     private byte aByteArrayArray1247[][];
     private int anInt1248;
     private int anInt1249;
@@ -11952,11 +11893,13 @@ class GameClientCore extends GameShell
     private int anInt1279;
     private int anIntArray1280[];
     private int anIntArray1281[];
-    private int anInt1282;
-    private int anInt1283;
-    private int anInt1284;
-    private int anInt1285;
-    String aString1286;
+    private int itemUseState;
+    private int itemUseSlot;
+    private int itemUseWidgetId;
+    /** Item definition id selected for use-on-target flows (menu 447). */
+    private int itemUseItemId;
+    /** Display name of the item in use-on-target flows (menu 447); used in context menu captions. */
+    String itemUseItemName;
     private int anInt1287;
     private static int anInt1288;
     private int anInt1289;
