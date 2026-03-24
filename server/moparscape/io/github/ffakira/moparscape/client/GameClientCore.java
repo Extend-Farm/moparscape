@@ -6355,80 +6355,15 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
                     }
                 }
             }
-            method13(65, (byte)4, "Requesting animations");
-            int k = aClass42_Sub1_1068.method555(79, 1);
-            for(int i1 = 0; i1 < k; i1++)
-                aClass42_Sub1_1068.method558(1, i1);
-
-            while(aClass42_Sub1_1068.method552() > 0) 
+            if(!BootstrapDemandLoader.requestAnimations(this, aClass42_Sub1_1068))
             {
-                int j1 = k - aClass42_Sub1_1068.method552();
-                if(j1 > 0)
-                    method13(65, (byte)4, "Loading animations - " + (j1 * 100) / k + "%");
-                method57(false);
-                try
-                {
-                    Thread.sleep(100L);
-                }
-                catch(Exception _ex) { }
-                if(aClass42_Sub1_1068.anInt1349 > 3)
-                {
-                    method28("ondemand");
-                    return;
-                }
+                method28("ondemand");
+                return;
             }
-            method13(70, (byte)4, "Requesting models");
-            k = aClass42_Sub1_1068.method555(79, 0);
-            for(int k1 = 0; k1 < k; k1++)
-            {
-                int l1 = aClass42_Sub1_1068.method559(k1, -203);
-                if((l1 & 1) != 0)
-                    aClass42_Sub1_1068.method558(0, k1);
-            }
-
-            k = aClass42_Sub1_1068.method552();
-            while(aClass42_Sub1_1068.method552() > 0) 
-            {
-                int i2 = k - aClass42_Sub1_1068.method552();
-                if(i2 > 0)
-                    method13(70, (byte)4, "Loading models - " + (i2 * 100) / k + "%");
-                method57(false);
-                try
-                {
-                    Thread.sleep(100L);
-                }
-                catch(Exception _ex) { }
-            }
+            BootstrapDemandLoader.requestModels(this, aClass42_Sub1_1068);
             if(aClass14Array970[0] != null)
-            {
-                method13(75, (byte)4, "Requesting maps");
-                aClass42_Sub1_1068.method558(3, aClass42_Sub1_1068.method562(0, 0, 48, 47));
-                aClass42_Sub1_1068.method558(3, aClass42_Sub1_1068.method562(1, 0, 48, 47));
-                aClass42_Sub1_1068.method558(3, aClass42_Sub1_1068.method562(0, 0, 48, 48));
-                aClass42_Sub1_1068.method558(3, aClass42_Sub1_1068.method562(1, 0, 48, 48));
-                aClass42_Sub1_1068.method558(3, aClass42_Sub1_1068.method562(0, 0, 48, 49));
-                aClass42_Sub1_1068.method558(3, aClass42_Sub1_1068.method562(1, 0, 48, 49));
-                aClass42_Sub1_1068.method558(3, aClass42_Sub1_1068.method562(0, 0, 47, 47));
-                aClass42_Sub1_1068.method558(3, aClass42_Sub1_1068.method562(1, 0, 47, 47));
-                aClass42_Sub1_1068.method558(3, aClass42_Sub1_1068.method562(0, 0, 47, 48));
-                aClass42_Sub1_1068.method558(3, aClass42_Sub1_1068.method562(1, 0, 47, 48));
-                aClass42_Sub1_1068.method558(3, aClass42_Sub1_1068.method562(0, 0, 148, 48));
-                aClass42_Sub1_1068.method558(3, aClass42_Sub1_1068.method562(1, 0, 148, 48));
-                k = aClass42_Sub1_1068.method552();
-                while(aClass42_Sub1_1068.method552() > 0) 
-                {
-                    int j2 = k - aClass42_Sub1_1068.method552();
-                    if(j2 > 0)
-                        method13(75, (byte)4, "Loading maps - " + (j2 * 100) / k + "%");
-                    method57(false);
-                    try
-                    {
-                        Thread.sleep(100L);
-                    }
-                    catch(Exception _ex) { }
-                }
-            }
-            k = aClass42_Sub1_1068.method555(79, 0);
+                BootstrapDemandLoader.requestStartupMaps(this, aClass42_Sub1_1068);
+            int k = aClass42_Sub1_1068.method555(79, 0);
             for(int k2 = 0; k2 < k; k2++)
             {
                 int l2 = aClass42_Sub1_1068.method559(k2, -203);
