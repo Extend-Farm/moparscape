@@ -74,4 +74,34 @@ final class LoginProtocolHandler {
             };
         return null;
     }
+
+    static String resolveTransferCountdownMessage(int seconds)
+    {
+        return "Your profile will be transferred in: " + seconds + " seconds";
+    }
+
+    static void sleepSilently(long millis)
+    {
+        try
+        {
+            Thread.sleep(millis);
+        }
+        catch(Exception _ex) { }
+    }
+
+    static boolean shouldRetryAfterNoResponse(int initialResponseCode, int retryCount)
+    {
+        return initialResponseCode == 0 && retryCount < 2;
+    }
+
+    static String[] resolveNoResponseError(int initialResponseCode)
+    {
+        if(initialResponseCode == 0)
+            return new String[] {
+                "No response from loginserver", "Please wait 1 minute and try again."
+            };
+        return new String[] {
+            "No response from server", "Please try using a different world."
+        };
+    }
 }
