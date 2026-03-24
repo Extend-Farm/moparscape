@@ -6252,32 +6252,14 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
 
     private final void method89(boolean flag, SceneObjectSpawnRequest class30_sub1)
     {
-        int i = 0;
-        int j = -1;
-        int k = 0;
-        int l = 0;
-        if(class30_sub1.anInt1296 == 0)
-            i = aClass25_946.method300(class30_sub1.anInt1295, class30_sub1.anInt1297, class30_sub1.anInt1298);
-        if(class30_sub1.anInt1296 == 1)
-            i = aClass25_946.method301(class30_sub1.anInt1295, class30_sub1.anInt1297, 0, class30_sub1.anInt1298);
-        if(class30_sub1.anInt1296 == 2)
-            i = aClass25_946.method302(class30_sub1.anInt1295, class30_sub1.anInt1297, class30_sub1.anInt1298);
-        if(class30_sub1.anInt1296 == 3)
-            i = aClass25_946.method303(class30_sub1.anInt1295, class30_sub1.anInt1297, class30_sub1.anInt1298);
-        if(i != 0)
-        {
-            int i1 = aClass25_946.method304(class30_sub1.anInt1295, class30_sub1.anInt1297, class30_sub1.anInt1298, i);
-            j = i >> 14 & 0x7fff;
-            k = i1 & 0x1f;
-            l = i1 >> 6;
-        }
-        class30_sub1.anInt1299 = j;
-        class30_sub1.anInt1301 = k;
+        int spawnAttributes[] = SceneObjectSpawnHandler.readSpawnAttributes(aClass25_946, class30_sub1);
+        class30_sub1.anInt1299 = spawnAttributes[0];
+        class30_sub1.anInt1301 = spawnAttributes[1];
         if(flag)
         {
             for(int j1 = 1; j1 > 0; j1++);
         }
-        class30_sub1.anInt1300 = l;
+        class30_sub1.anInt1300 = spawnAttributes[2];
     }
 
     public final void method90(boolean flag)
