@@ -6389,36 +6389,6 @@ class GameClientCore extends GameShell
         return i != 1;
     }
 
-    private void applyActorAnimationUpdate(Actor actor, PacketBuffer packetBuffer)
-    {
-        int animationId = packetBuffer.method434((byte)108);
-        if(animationId == 65535)
-            animationId = -1;
-        int animationDelay = packetBuffer.method408();
-        if(animationId == actor.anInt1526 && animationId != -1)
-        {
-            int replayMode = SequenceDefinition.aClass20Array351[animationId].anInt365;
-            if(replayMode == 1)
-            {
-                actor.anInt1527 = 0;
-                actor.anInt1528 = 0;
-                actor.anInt1529 = animationDelay;
-                actor.anInt1530 = 0;
-            }
-            if(replayMode == 2)
-                actor.anInt1530 = 0;
-        } else
-        if(animationId == -1 || actor.anInt1526 == -1 || SequenceDefinition.aClass20Array351[animationId].anInt359 >= SequenceDefinition.aClass20Array351[actor.anInt1526].anInt359)
-        {
-            actor.anInt1526 = animationId;
-            actor.anInt1527 = 0;
-            actor.anInt1528 = 0;
-            actor.anInt1529 = animationDelay;
-            actor.anInt1530 = 0;
-            actor.anInt1542 = actor.anInt1525;
-        }
-    }
-
     private void applyNpcUpdateMasks(int packetLength, PacketBuffer packetBuffer, boolean preserveConnectionFlag)
     {
         aBoolean1157 = NpcUpdateMaskHandler.applyNpcUpdateMasks(anInt893, anIntArray894, aClass30_Sub2_Sub4_Sub1_Sub1Array835, anInt1161, packetBuffer, preserveConnectionFlag, aBoolean1157);
@@ -8249,65 +8219,6 @@ class GameClientCore extends GameShell
         }
     }
 
-    private void applyPlayerForceMovementUpdate(Player player, PacketBuffer packetBuffer)
-    {
-        player.anInt1543 = packetBuffer.method428(2);
-        player.anInt1545 = packetBuffer.method428(2);
-        player.anInt1544 = packetBuffer.method428(2);
-        player.anInt1546 = packetBuffer.method428(2);
-        player.anInt1547 = packetBuffer.method436((byte)-74) + anInt1161;
-        player.anInt1548 = packetBuffer.method435(true) + anInt1161;
-        player.anInt1549 = packetBuffer.method428(2);
-        player.method446(true);
-    }
-
-    private void applyPlayerGraphicUpdate(Player player, PacketBuffer packetBuffer)
-    {
-        player.anInt1520 = packetBuffer.method434((byte)108);
-        int graphicData = packetBuffer.method413();
-        player.anInt1524 = graphicData >> 16;
-        player.anInt1523 = anInt1161 + (graphicData & 0xffff);
-        player.anInt1521 = 0;
-        player.anInt1522 = 0;
-        if(player.anInt1523 > anInt1161)
-            player.anInt1521 = -1;
-        if(player.anInt1520 == 65535)
-            player.anInt1520 = -1;
-    }
-
-    private void applyPlayerInteractingEntityUpdate(Player player, PacketBuffer packetBuffer)
-    {
-        player.anInt1502 = packetBuffer.method434((byte)108);
-        if(player.anInt1502 == 65535)
-            player.anInt1502 = -1;
-    }
-
-    private void applyPlayerFaceCoordinatesUpdate(Player player, PacketBuffer packetBuffer)
-    {
-        player.anInt1538 = packetBuffer.method436((byte)-74);
-        player.anInt1539 = packetBuffer.method434((byte)108);
-    }
-
-    private void applyPlayerHitPrimaryUpdate(Player player, PacketBuffer packetBuffer)
-    {
-        int damage = packetBuffer.method408();
-        int hitType = packetBuffer.method426(0);
-        player.method447(-35698, hitType, damage, anInt1161);
-        player.anInt1532 = anInt1161 + 300;
-        player.anInt1533 = packetBuffer.method427(false);
-        player.anInt1534 = packetBuffer.method408();
-    }
-
-    private void applyPlayerHitSecondaryUpdate(Player player, PacketBuffer packetBuffer)
-    {
-        int damage = packetBuffer.method408();
-        int hitType = packetBuffer.method428(2);
-        player.method447(-35698, hitType, damage, anInt1161);
-        player.anInt1532 = anInt1161 + 300;
-        player.anInt1533 = packetBuffer.method408();
-        player.anInt1534 = packetBuffer.method427(false);
-    }
-
     private void applyPlayerPublicChatUpdate(Player player, PacketBuffer packetBuffer)
     {
         PlayerUpdateMaskHandler.applyPlayerPublicChatUpdate((GameClient)this, player, packetBuffer, aClass30_Sub2_Sub2_834, anInt822, aLongArray925, anInt1251, aBoolean991);
@@ -8323,25 +8234,25 @@ class GameClientCore extends GameShell
     {
         applyPlayerMaskStateGuard(stateGuard);
         if((updateMask & EntityUpdateMasks.Player.FORCE_MOVEMENT) != 0)
-            applyPlayerForceMovementUpdate(player, packetBuffer);
+            PlayerUpdateMaskHandler.applyPlayerForceMovementUpdate(player, packetBuffer, anInt1161);
         if((updateMask & EntityUpdateMasks.Player.GRAPHIC) != 0)
-            applyPlayerGraphicUpdate(player, packetBuffer);
+            PlayerUpdateMaskHandler.applyPlayerGraphicUpdate(player, packetBuffer, anInt1161);
         if((updateMask & EntityUpdateMasks.Player.ANIMATION) != 0)
-            applyActorAnimationUpdate(player, packetBuffer);
+            PlayerUpdateMaskHandler.applyActorAnimationUpdate(player, packetBuffer);
         if((updateMask & EntityUpdateMasks.Player.FORCED_CHAT) != 0)
             PlayerUpdateMaskHandler.applyPlayerForcedChatUpdate((GameClient)this, player, packetBuffer, aClass30_Sub2_Sub4_Sub1_Sub2_1126, aBoolean991);
         if((updateMask & EntityUpdateMasks.Player.PUBLIC_CHAT) != 0)
             applyPlayerPublicChatUpdate(player, packetBuffer);
         if((updateMask & EntityUpdateMasks.Player.INTERACTING_ENTITY) != 0)
-            applyPlayerInteractingEntityUpdate(player, packetBuffer);
+            PlayerUpdateMaskHandler.applyPlayerInteractingEntityUpdate(player, packetBuffer);
         if((updateMask & EntityUpdateMasks.Player.APPEARANCE) != 0)
             PlayerUpdateMaskHandler.applyPlayerAppearanceUpdate(playerIndex, player, packetBuffer, aByte920, aClass30_Sub2_Sub2Array895);
         if((updateMask & EntityUpdateMasks.Player.FACE_COORDINATES) != 0)
-            applyPlayerFaceCoordinatesUpdate(player, packetBuffer);
+            PlayerUpdateMaskHandler.applyPlayerFaceCoordinatesUpdate(player, packetBuffer);
         if((updateMask & EntityUpdateMasks.Player.HIT_PRIMARY) != 0)
-            applyPlayerHitPrimaryUpdate(player, packetBuffer);
+            PlayerUpdateMaskHandler.applyPlayerHitPrimaryUpdate(player, packetBuffer, anInt1161);
         if((updateMask & EntityUpdateMasks.Player.HIT_SECONDARY) != 0)
-            applyPlayerHitSecondaryUpdate(player, packetBuffer);
+            PlayerUpdateMaskHandler.applyPlayerHitSecondaryUpdate(player, packetBuffer, anInt1161);
     }
 
     private final void method107(int i, int j, PacketBuffer class30_sub2_sub2, byte byte0, Player class30_sub2_sub4_sub1_sub2)

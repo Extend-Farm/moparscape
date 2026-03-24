@@ -79,6 +79,95 @@ final class PlayerUpdateMaskHandler {
         player.method451(0, appearanceBuffer);
     }
 
+    static void applyActorAnimationUpdate(Actor actor, PacketBuffer packetBuffer)
+    {
+        int animationId = packetBuffer.method434((byte)108);
+        if(animationId == 65535)
+            animationId = -1;
+        int animationDelay = packetBuffer.method408();
+        if(animationId == actor.anInt1526 && animationId != -1)
+        {
+            int replayMode = SequenceDefinition.aClass20Array351[animationId].anInt365;
+            if(replayMode == 1)
+            {
+                actor.anInt1527 = 0;
+                actor.anInt1528 = 0;
+                actor.anInt1529 = animationDelay;
+                actor.anInt1530 = 0;
+            }
+            if(replayMode == 2)
+                actor.anInt1530 = 0;
+        } else
+        if(animationId == -1 || actor.anInt1526 == -1 || SequenceDefinition.aClass20Array351[animationId].anInt359 >= SequenceDefinition.aClass20Array351[actor.anInt1526].anInt359)
+        {
+            actor.anInt1526 = animationId;
+            actor.anInt1527 = 0;
+            actor.anInt1528 = 0;
+            actor.anInt1529 = animationDelay;
+            actor.anInt1530 = 0;
+            actor.anInt1542 = actor.anInt1525;
+        }
+    }
+
+    static void applyPlayerForceMovementUpdate(Player player, PacketBuffer packetBuffer, int gameTick)
+    {
+        player.anInt1543 = packetBuffer.method428(2);
+        player.anInt1545 = packetBuffer.method428(2);
+        player.anInt1544 = packetBuffer.method428(2);
+        player.anInt1546 = packetBuffer.method428(2);
+        player.anInt1547 = packetBuffer.method436((byte)-74) + gameTick;
+        player.anInt1548 = packetBuffer.method435(true) + gameTick;
+        player.anInt1549 = packetBuffer.method428(2);
+        player.method446(true);
+    }
+
+    static void applyPlayerGraphicUpdate(Player player, PacketBuffer packetBuffer, int gameTick)
+    {
+        player.anInt1520 = packetBuffer.method434((byte)108);
+        int graphicData = packetBuffer.method413();
+        player.anInt1524 = graphicData >> 16;
+        player.anInt1523 = gameTick + (graphicData & 0xffff);
+        player.anInt1521 = 0;
+        player.anInt1522 = 0;
+        if(player.anInt1523 > gameTick)
+            player.anInt1521 = -1;
+        if(player.anInt1520 == 65535)
+            player.anInt1520 = -1;
+    }
+
+    static void applyPlayerInteractingEntityUpdate(Player player, PacketBuffer packetBuffer)
+    {
+        player.anInt1502 = packetBuffer.method434((byte)108);
+        if(player.anInt1502 == 65535)
+            player.anInt1502 = -1;
+    }
+
+    static void applyPlayerFaceCoordinatesUpdate(Player player, PacketBuffer packetBuffer)
+    {
+        player.anInt1538 = packetBuffer.method436((byte)-74);
+        player.anInt1539 = packetBuffer.method434((byte)108);
+    }
+
+    static void applyPlayerHitPrimaryUpdate(Player player, PacketBuffer packetBuffer, int gameTick)
+    {
+        int damage = packetBuffer.method408();
+        int hitType = packetBuffer.method426(0);
+        player.method447(-35698, hitType, damage, gameTick);
+        player.anInt1532 = gameTick + 300;
+        player.anInt1533 = packetBuffer.method427(false);
+        player.anInt1534 = packetBuffer.method408();
+    }
+
+    static void applyPlayerHitSecondaryUpdate(Player player, PacketBuffer packetBuffer, int gameTick)
+    {
+        int damage = packetBuffer.method408();
+        int hitType = packetBuffer.method428(2);
+        player.method447(-35698, hitType, damage, gameTick);
+        player.anInt1532 = gameTick + 300;
+        player.anInt1533 = packetBuffer.method408();
+        player.anInt1534 = packetBuffer.method427(false);
+    }
+
     private static boolean isIgnoredChatSender(long senderNameHash, int chatRank, int ignoreCount, long[] ignoredNameHashes)
     {
         if(chatRank > 1)
