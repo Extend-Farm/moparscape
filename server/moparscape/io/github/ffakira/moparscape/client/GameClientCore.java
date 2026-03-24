@@ -8069,41 +8069,11 @@ class GameClientCore extends GameShell
                 } else
                 if(class9_1.anInt262 == 5)
                 {
-                    Sprite class30_sub2_sub1_sub1;
-                    if(method131(class9_1, false))
-                        class30_sub2_sub1_sub1 = class9_1.aClass30_Sub2_Sub1_Sub1_260;
-                    else
-                        class30_sub2_sub1_sub1 = class9_1.aClass30_Sub2_Sub1_Sub1_207;
-                    if(class30_sub2_sub1_sub1 != null)
-                        class30_sub2_sub1_sub1.method348(k2, 16083, l2);
+                    WidgetRenderHandler.renderType5Sprite(class9_1, k2, l2, method131(class9_1, false));
                 } else
                 if(class9_1.anInt262 == 6)
                 {
-                    int k3 = Rasterizer3D.anInt1466;
-                    int j4 = Rasterizer3D.anInt1467;
-                    Rasterizer3D.anInt1466 = k2 + class9_1.anInt220 / 2;
-                    Rasterizer3D.anInt1467 = l2 + class9_1.anInt267 / 2;
-                    int i5 = Rasterizer3D.anIntArray1470[class9_1.anInt270] * class9_1.anInt269 >> 16;
-                    int l5 = Rasterizer3D.anIntArray1471[class9_1.anInt270] * class9_1.anInt269 >> 16;
-                    boolean flag2 = method131(class9_1, false);
-                    int i7;
-                    if(flag2)
-                        i7 = class9_1.anInt258;
-                    else
-                        i7 = class9_1.anInt257;
-                    Model class30_sub2_sub4_sub6;
-                    if(i7 == -1)
-                    {
-                        class30_sub2_sub4_sub6 = class9_1.method209(0, -1, -1, flag2);
-                    } else
-                    {
-                        SequenceDefinition class20 = SequenceDefinition.aClass20Array351[i7];
-                        class30_sub2_sub4_sub6 = class9_1.method209(0, class20.anIntArray354[class9_1.anInt246], class20.anIntArray353[class9_1.anInt246], flag2);
-                    }
-                    if(class30_sub2_sub4_sub6 != null)
-                        class30_sub2_sub4_sub6.method482(0, class9_1.anInt271, 0, class9_1.anInt270, 0, i5, l5);
-                    Rasterizer3D.anInt1466 = k3;
-                    Rasterizer3D.anInt1467 = j4;
+                    WidgetRenderHandler.renderType6Model(class9_1, k2, l2, method131(class9_1, false));
                 } else
                 if(class9_1.anInt262 == 7)
                 {
