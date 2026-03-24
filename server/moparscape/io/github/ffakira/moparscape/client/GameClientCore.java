@@ -6419,97 +6419,9 @@ class GameClientCore extends GameShell
         }
     }
 
-    private void applyNpcHitPrimaryUpdate(Npc npc, PacketBuffer packetBuffer)
-    {
-        int damage = packetBuffer.method426(0);
-        int hitType = packetBuffer.method427(false);
-        npc.method447(-35698, hitType, damage, anInt1161);
-        npc.anInt1532 = anInt1161 + 300;
-        npc.anInt1533 = packetBuffer.method426(0);
-        npc.anInt1534 = packetBuffer.method408();
-    }
-
-    private void applyNpcGraphicUpdate(Npc npc, PacketBuffer packetBuffer)
-    {
-        npc.anInt1520 = packetBuffer.method410();
-        int graphicData = packetBuffer.method413();
-        npc.anInt1524 = graphicData >> 16;
-        npc.anInt1523 = anInt1161 + (graphicData & 0xffff);
-        npc.anInt1521 = 0;
-        npc.anInt1522 = 0;
-        if(npc.anInt1523 > anInt1161)
-            npc.anInt1521 = -1;
-        if(npc.anInt1520 == 65535)
-            npc.anInt1520 = -1;
-    }
-
-    private void applyNpcInteractingEntityUpdate(Npc npc, PacketBuffer packetBuffer)
-    {
-        npc.anInt1502 = packetBuffer.method410();
-        if(npc.anInt1502 == 65535)
-            npc.anInt1502 = -1;
-    }
-
-    private void applyNpcForcedChatUpdate(Npc npc, PacketBuffer packetBuffer)
-    {
-        npc.aString1506 = packetBuffer.method415();
-        npc.anInt1535 = 100;
-    }
-
-    private void applyNpcHitSecondaryUpdate(Npc npc, PacketBuffer packetBuffer)
-    {
-        int damage = packetBuffer.method427(false);
-        int hitType = packetBuffer.method428(2);
-        npc.method447(-35698, hitType, damage, anInt1161);
-        npc.anInt1532 = anInt1161 + 300;
-        npc.anInt1533 = packetBuffer.method428(2);
-        npc.anInt1534 = packetBuffer.method427(false);
-    }
-
-    private void applyNpcTransformUpdate(Npc npc, PacketBuffer packetBuffer)
-    {
-        npc.aClass5_1696 = NpcDefinition.method159(packetBuffer.method436((byte)-74));
-        npc.anInt1540 = npc.aClass5_1696.aByte68;
-        npc.anInt1504 = npc.aClass5_1696.anInt79;
-        npc.anInt1554 = npc.aClass5_1696.anInt67;
-        npc.anInt1555 = npc.aClass5_1696.anInt58;
-        npc.anInt1556 = npc.aClass5_1696.anInt83;
-        npc.anInt1557 = npc.aClass5_1696.anInt55;
-        npc.anInt1511 = npc.aClass5_1696.anInt77;
-    }
-
-    private void applyNpcFaceCoordinatesUpdate(Npc npc, PacketBuffer packetBuffer)
-    {
-        npc.anInt1538 = packetBuffer.method434((byte)108);
-        npc.anInt1539 = packetBuffer.method434((byte)108);
-    }
-
     private void applyNpcUpdateMasks(int packetLength, PacketBuffer packetBuffer, boolean preserveConnectionFlag)
     {
-        for(int j = 0; j < anInt893; j++)
-        {
-            int k = anIntArray894[j];
-            Npc class30_sub2_sub4_sub1_sub1 = aClass30_Sub2_Sub4_Sub1_Sub1Array835[k];
-            int l = packetBuffer.method408();
-            if((l & EntityUpdateMasks.Npc.ANIMATION) != 0)
-                applyActorAnimationUpdate(class30_sub2_sub4_sub1_sub1, packetBuffer);
-            if((l & EntityUpdateMasks.Npc.HIT_PRIMARY) != 0)
-                applyNpcHitPrimaryUpdate(class30_sub2_sub4_sub1_sub1, packetBuffer);
-            if((l & EntityUpdateMasks.Npc.GRAPHIC) != 0)
-                applyNpcGraphicUpdate(class30_sub2_sub4_sub1_sub1, packetBuffer);
-            if((l & EntityUpdateMasks.Npc.INTERACTING_ENTITY) != 0)
-                applyNpcInteractingEntityUpdate(class30_sub2_sub4_sub1_sub1, packetBuffer);
-            if((l & EntityUpdateMasks.Npc.FORCED_CHAT) != 0)
-                applyNpcForcedChatUpdate(class30_sub2_sub4_sub1_sub1, packetBuffer);
-            if((l & EntityUpdateMasks.Npc.HIT_SECONDARY) != 0)
-                applyNpcHitSecondaryUpdate(class30_sub2_sub4_sub1_sub1, packetBuffer);
-            if((l & EntityUpdateMasks.Npc.TRANSFORM) != 0)
-                applyNpcTransformUpdate(class30_sub2_sub4_sub1_sub1, packetBuffer);
-            if((l & EntityUpdateMasks.Npc.FACE_COORDINATES) != 0)
-                applyNpcFaceCoordinatesUpdate(class30_sub2_sub4_sub1_sub1, packetBuffer);
-        }
-
-        aBoolean1157 &= preserveConnectionFlag;
+        aBoolean1157 = NpcUpdateMaskHandler.applyNpcUpdateMasks(anInt893, anIntArray894, aClass30_Sub2_Sub4_Sub1_Sub1Array835, anInt1161, packetBuffer, preserveConnectionFlag, aBoolean1157);
     }
 
     private final void method86(int i, PacketBuffer class30_sub2_sub2, boolean flag)
