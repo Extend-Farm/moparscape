@@ -10502,26 +10502,16 @@ class GameClientCore extends GameShell
             if(anInt1008 == 134)
             {
                 aBoolean1153 = true;
-                int k1 = aClass30_Sub2_Sub2_1083.method408();
-                int i10 = aClass30_Sub2_Sub2_1083.method439((byte)41);
-                int l15 = aClass30_Sub2_Sub2_1083.method408();
-                anIntArray864[k1] = i10;
-                anIntArray922[k1] = l15;
-                anIntArray1044[k1] = 1;
-                for(int k20 = 0; k20 < 98; k20++)
-                    if(i10 >= anIntArray1019[k20])
-                        anIntArray1044[k1] = k20 + 2;
-
+                IncomingPacketDispatcher.applySkillUpdate(aClass30_Sub2_Sub2_1083, anIntArray864, anIntArray922, anIntArray1044, anIntArray1019);
                 anInt1008 = -1;
                 return true;
             }
             if(anInt1008 == 71)
             {
-                int l1 = aClass30_Sub2_Sub2_1083.method410();
-                int j10 = aClass30_Sub2_Sub2_1083.method426(0);
-                if(l1 == 65535)
-                    l1 = -1;
-                anIntArray1130[j10] = l1;
+                int interfaceSettingUpdate[] = IncomingPacketDispatcher.readInterfaceSettingUpdate(aClass30_Sub2_Sub2_1083);
+                int settingIndex = interfaceSettingUpdate[0];
+                int settingValue = interfaceSettingUpdate[1];
+                anIntArray1130[settingIndex] = settingValue;
                 aBoolean1153 = true;
                 aBoolean1103 = true;
                 anInt1008 = -1;
@@ -10529,29 +10519,28 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 74)
             {
-                int i2 = aClass30_Sub2_Sub2_1083.method434((byte)108);
-                if(i2 == 65535)
-                    i2 = -1;
-                if(i2 != anInt956 && aBoolean1151 && !aBoolean960 && anInt1259 == 0)
+                int songId = IncomingPacketDispatcher.readSongId(aClass30_Sub2_Sub2_1083);
+                if(songId != anInt956 && aBoolean1151 && !aBoolean960 && anInt1259 == 0)
                 {
-                    anInt1227 = i2;
+                    anInt1227 = songId;
                     aBoolean1228 = true;
                     aClass42_Sub1_1068.method558(2, anInt1227);
                 }
-                anInt956 = i2;
+                anInt956 = songId;
                 anInt1008 = -1;
                 return true;
             }
             if(anInt1008 == 121)
             {
-                int j2 = aClass30_Sub2_Sub2_1083.method436((byte)-74);
-                int k10 = aClass30_Sub2_Sub2_1083.method435(true);
+                int songDelayUpdate[] = IncomingPacketDispatcher.readSongDelayUpdate(aClass30_Sub2_Sub2_1083);
+                int songId = songDelayUpdate[0];
+                int songDelay = songDelayUpdate[1];
                 if(aBoolean1151 && !aBoolean960)
                 {
-                    anInt1227 = j2;
+                    anInt1227 = songId;
                     aBoolean1228 = false;
                     aClass42_Sub1_1068.method558(2, anInt1227);
-                    anInt1259 = k10;
+                    anInt1259 = songDelay;
                 }
                 anInt1008 = -1;
                 return true;

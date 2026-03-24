@@ -72,4 +72,46 @@ final class IncomingPacketDispatcher {
     {
         return packetBuffer.method434((byte)108) * 30;
     }
+
+    static void applySkillUpdate(PacketBuffer packetBuffer, int[] currentLevels, int[] currentExperience, int[] computedLevels, int[] experienceThresholdTable)
+    {
+        int skillIndex = packetBuffer.method408();
+        int skillExperience = packetBuffer.method439((byte)41);
+        int skillCurrentLevel = packetBuffer.method408();
+        currentLevels[skillIndex] = skillExperience;
+        currentExperience[skillIndex] = skillCurrentLevel;
+        computedLevels[skillIndex] = 1;
+        for(int levelIndex = 0; levelIndex < 98; levelIndex++)
+            if(skillExperience >= experienceThresholdTable[levelIndex])
+                computedLevels[skillIndex] = levelIndex + 2;
+    }
+
+    static int[] readInterfaceSettingUpdate(PacketBuffer packetBuffer)
+    {
+        int settingValue = packetBuffer.method410();
+        int settingIndex = packetBuffer.method426(0);
+        if(settingValue == 65535)
+            settingValue = -1;
+        return new int[] {
+            settingIndex, settingValue
+        };
+    }
+
+    static int readSongId(PacketBuffer packetBuffer)
+    {
+        int songId = packetBuffer.method434((byte)108);
+        if(songId == 65535)
+            return -1;
+        else
+            return songId;
+    }
+
+    static int[] readSongDelayUpdate(PacketBuffer packetBuffer)
+    {
+        int songId = packetBuffer.method436((byte)-74);
+        int songDelay = packetBuffer.method435(true);
+        return new int[] {
+            songId, songDelay
+        };
+    }
 }
