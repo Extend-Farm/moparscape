@@ -6369,18 +6369,16 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
             if(!aBoolean960)
                 BootstrapDemandLoader.queueMemberSongs(aClass42_Sub1_1068);
             method13(80, (byte)4, "Unpacking media");
-            aClass30_Sub2_Sub1_Sub2_1196 = new IndexedSprite(class44_2, "invback", 0);
-            aClass30_Sub2_Sub1_Sub2_1198 = new IndexedSprite(class44_2, "chatback", 0);
-            aClass30_Sub2_Sub1_Sub2_1197 = new IndexedSprite(class44_2, "mapback", 0);
-            aClass30_Sub2_Sub1_Sub2_1027 = new IndexedSprite(class44_2, "backbase1", 0);
-            aClass30_Sub2_Sub1_Sub2_1028 = new IndexedSprite(class44_2, "backbase2", 0);
-            aClass30_Sub2_Sub1_Sub2_1029 = new IndexedSprite(class44_2, "backhmid1", 0);
-            for(int j3 = 0; j3 < 13; j3++)
-                aClass30_Sub2_Sub1_Sub2Array947[j3] = new IndexedSprite(class44_2, "sideicons", j3);
-
-            aClass30_Sub2_Sub1_Sub1_1122 = new Sprite(class44_2, "compass", 0);
-            aClass30_Sub2_Sub1_Sub1_1001 = new Sprite(class44_2, "mapedge", 0);
-            aClass30_Sub2_Sub1_Sub1_1001.method345(5059);
+            BootstrapMediaLoader.CoreMediaState coreMedia = BootstrapMediaLoader.loadCoreMedia(class44_2);
+            aClass30_Sub2_Sub1_Sub2_1196 = coreMedia.invBack;
+            aClass30_Sub2_Sub1_Sub2_1198 = coreMedia.chatBack;
+            aClass30_Sub2_Sub1_Sub2_1197 = coreMedia.mapBack;
+            aClass30_Sub2_Sub1_Sub2_1027 = coreMedia.backBase1;
+            aClass30_Sub2_Sub1_Sub2_1028 = coreMedia.backBase2;
+            aClass30_Sub2_Sub1_Sub2_1029 = coreMedia.backHMid1;
+            aClass30_Sub2_Sub1_Sub2Array947 = coreMedia.sideIcons;
+            aClass30_Sub2_Sub1_Sub1_1122 = coreMedia.compass;
+            aClass30_Sub2_Sub1_Sub1_1001 = coreMedia.mapEdge;
             BootstrapMediaLoader.loadMapSceneSprites(class44_2, aClass30_Sub2_Sub1_Sub2Array1060);
             BootstrapMediaLoader.loadMapFunctionSprites(class44_2, aClass30_Sub2_Sub1_Sub1Array1033);
             BootstrapMediaLoader.loadHitmarkSprites(class44_2, aClass30_Sub2_Sub1_Sub1Array987);
