@@ -21,21 +21,6 @@ public final class GameClient extends GameShell
 	public static int zoom;
 	public static int lftrit;
 	public static int fwdbwd;
-    private static final String method14(int i, int j)
-    {
-        String s = String.valueOf(i);
-        for(int k = s.length() - 3; k > 0; k -= 3)
-            s = s.substring(0, k) + "," + s.substring(k);
-
-        if(j != 0)
-            aBoolean1224 = !aBoolean1224;
-        if(s.length() > 8)
-            s = "@gre@" + s.substring(0, s.length() - 8) + " million @whi@(" + s + ")";
-        else
-        if(s.length() > 4)
-            s = "@cya@" + s.substring(0, s.length() - 4) + "K @whi@(" + s + ")";
-        return " " + s;
-    }
 
     public final void method15(int i)
     {
@@ -8269,7 +8254,7 @@ public final class GameClient extends GameShell
                                 ItemDefinition class8 = ItemDefinition.method198(class9_1.anIntArray253[k4] - 1);
                                 String s2 = class8.aString170;
                                 if(class8.aBoolean176 || class9_1.anIntArray252[k4] != 1)
-                                    s2 = s2 + " x" + method14(class9_1.anIntArray252[k4], 0);
+                                    s2 = s2 + " x" + StackAmountFormatter.formatStackAmount(class9_1.anIntArray252[k4]);
                                 int i9 = k2 + i6 * (115 + class9_1.anInt231);
                                 int k9 = l2 + j5 * (12 + class9_1.anInt244);
                                 if(class9_1.aBoolean223)

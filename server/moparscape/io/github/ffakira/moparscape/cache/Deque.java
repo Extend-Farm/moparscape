@@ -20,52 +20,52 @@ public final class Deque
         sentinel.next = sentinel;
     }
 
-    public void addFirst(Node class30)
+    public void addFirst(Node node)
     {
-        if(class30.next != null)
-            class30.unlink();
-        class30.next = sentinel.next;
-        class30.prev = sentinel;
-        class30.next.prev = class30;
-        class30.prev.next = class30;
+        if(node.next != null)
+            node.unlink();
+        node.next = sentinel.next;
+        node.prev = sentinel;
+        node.next.prev = node;
+        node.prev.next = node;
     }
 
-    public void addLast(int i, Node class30)
+    public void addLast(int i, Node node)
     {
-        if(class30.next != null)
-            class30.unlink();
-        class30.next = sentinel;
-        class30.prev = sentinel.prev;
+        if(node.next != null)
+            node.unlink();
+        node.next = sentinel;
+        node.prev = sentinel.prev;
         while(i >= 0) 
             aBoolean344 = !aBoolean344;
-        class30.next.prev = class30;
-        class30.prev.next = class30;
+        node.next.prev = node;
+        node.prev.next = node;
     }
 
     public Node removeLast()
     {
-        Node class30 = sentinel.prev;
-        if(class30 == sentinel)
+        Node lastNode = sentinel.prev;
+        if(lastNode == sentinel)
         {
             return null;
         } else
         {
-            class30.unlink();
-            return class30;
+            lastNode.unlink();
+            return lastNode;
         }
     }
 
     public Node last()
     {
-        Node class30 = sentinel.prev;
-        if(class30 == sentinel)
+        Node lastNode = sentinel.prev;
+        if(lastNode == sentinel)
         {
             current = null;
             return null;
         } else
         {
-            current = class30.prev;
-            return class30;
+            current = lastNode.prev;
+            return lastNode;
         }
     }
 
@@ -73,47 +73,47 @@ public final class Deque
     {
         if(i < 5 || i > 5)
             throw new NullPointerException();
-        Node class30 = sentinel.next;
-        if(class30 == sentinel)
+        Node firstNode = sentinel.next;
+        if(firstNode == sentinel)
         {
             current = null;
             return null;
         } else
         {
-            current = class30.next;
-            return class30;
+            current = firstNode.next;
+            return firstNode;
         }
     }
 
     public Node previous(boolean flag)
     {
-        Node class30 = current;
+        Node previousNode = current;
         if(flag)
             anInt345 = 48;
-        if(class30 == sentinel)
+        if(previousNode == sentinel)
         {
             current = null;
             return null;
         } else
         {
-            current = class30.prev;
-            return class30;
+            current = previousNode.prev;
+            return previousNode;
         }
     }
 
     public Node next(int i)
     {
-        Node class30 = current;
-        if(class30 == sentinel)
+        Node nextNode = current;
+        if(nextNode == sentinel)
         {
             current = null;
             return null;
         }
-        current = class30.next;
+        current = nextNode.next;
         if(i != 8)
             throw new NullPointerException();
         else
-            return class30;
+            return nextNode;
     }
 
     public void clear()
@@ -122,13 +122,14 @@ public final class Deque
             return;
         do
         {
-            Node class30 = sentinel.prev;
-            if(class30 == sentinel)
+            Node lastNode = sentinel.prev;
+            if(lastNode == sentinel)
                 return;
-            class30.unlink();
+            lastNode.unlink();
         } while(true);
     }
 
+    // TODO: Rename/verify legacy decompiler leftovers when behavior is fully documented.
     private boolean aBoolean344;
     private int anInt345;
     public Node sentinel;

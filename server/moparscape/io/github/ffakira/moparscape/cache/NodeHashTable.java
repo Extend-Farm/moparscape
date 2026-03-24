@@ -17,52 +17,53 @@ public final class NodeHashTable
             throw new NullPointerException();
         bucketCount = j;
         buckets = new Node[j];
-        for(int k = 0; k < j; k++)
+        for(int bucketIndex = 0; bucketIndex < j; bucketIndex++)
         {
-            Node class30 = buckets[k] = new Node();
-            class30.prev = class30;
-            class30.next = class30;
+            Node sentinelNode = buckets[bucketIndex] = new Node();
+            sentinelNode.prev = sentinelNode;
+            sentinelNode.next = sentinelNode;
         }
 
     }
 
-    public Node get(long l)
+    public Node get(long key)
     {
-        Node class30 = buckets[(int)(l & (long)(bucketCount - 1))];
-        for(Node class30_1 = class30.prev; class30_1 != class30; class30_1 = class30_1.prev)
-            if(class30_1.key == l)
-                return class30_1;
+        Node bucketSentinel = buckets[(int)(key & (long)(bucketCount - 1))];
+        for(Node current = bucketSentinel.prev; current != bucketSentinel; current = current.prev)
+            if(current.key == key)
+                return current;
 
         return null;
     }
 
-    public void put(Node class30, long l, byte byte0)
+    public void put(Node node, long key, byte controlByte)
     {
         try
         {
-            if(class30.next != null)
-                class30.unlink();
-            Node class30_1 = buckets[(int)(l & (long)(bucketCount - 1))];
-            if(byte0 != 7)
+            if(node.next != null)
+                node.unlink();
+            Node bucketSentinel = buckets[(int)(key & (long)(bucketCount - 1))];
+            if(controlByte != 7)
             {
                 return;
             } else
             {
-                class30.next = class30_1.next;
-                class30.prev = class30_1;
-                class30.next.prev = class30;
-                class30.prev.next = class30;
-                class30.key = l;
+                node.next = bucketSentinel.next;
+                node.prev = bucketSentinel;
+                node.next.prev = node;
+                node.prev.next = node;
+                node.key = key;
                 return;
             }
         }
         catch(RuntimeException runtimeexception)
         {
-            SignLink.reporterror("91499, " + class30 + ", " + l + ", " + byte0 + ", " + runtimeexception.toString());
+            SignLink.reporterror("91499, " + node + ", " + key + ", " + controlByte + ", " + runtimeexception.toString());
         }
         throw new RuntimeException();
     }
 
+    // TODO: Rename/verify legacy decompiler leftovers when behavior is fully documented.
     private boolean aBoolean37;
     private int anInt38;
     private int bucketCount;
