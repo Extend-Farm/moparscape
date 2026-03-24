@@ -469,7 +469,7 @@ public final class GameClient extends GameShell
 
             }
 
-            Class7 class7 = new Class7(aByteArrayArrayArray1258, -60, 104, 104, anIntArrayArrayArray1214);
+            MapRegion class7 = new MapRegion(aByteArrayArrayArray1258, -60, 104, 104, anIntArrayArrayArray1214);
             int k2 = aByteArrayArray1183.length;
             aClass30_Sub2_Sub2_1192.method397((byte)6, 0);
             if(!aBoolean1159)
@@ -589,13 +589,13 @@ public final class GameClient extends GameShell
             class7.method171(aClass11Array1230, aClass25_946, 2);
             aClass15_1165.method237(0);
             aClass30_Sub2_Sub2_1192.method397((byte)6, 0);
-            int k3 = Class7.anInt145;
+            int k3 = MapRegion.anInt145;
             if(k3 > anInt918)
                 k3 = anInt918;
             if(k3 < anInt918 - 1)
                 k3 = anInt918 - 1;
             if(aBoolean960)
-                aClass25_946.method275(Class7.anInt145, -34686);
+                aClass25_946.method275(MapRegion.anInt145, -34686);
             else
                 aClass25_946.method275(0, -34686);
             for(int i5 = 0; i5 < 104; i5++)
@@ -614,7 +614,7 @@ public final class GameClient extends GameShell
             method63(-919);
         }
         catch(Exception exception) { }
-        Class46.aClass12_785.method224();
+        ObjectDefinition.aClass12_785.method224();
         aBoolean1157 &= flag;
         if(super.aFrame_Sub1_15 != null)
         {
@@ -628,7 +628,7 @@ public final class GameClient extends GameShell
             {
                 int l1 = aClass42_Sub1_1068.method559(i1, -203);
                 if((l1 & 0x79) == 0)
-                    Class30_Sub2_Sub4_Sub6.method461(116, i1);
+                    Model.method461(116, i1);
             }
 
         }
@@ -665,8 +665,8 @@ public final class GameClient extends GameShell
 
     public final void method23(boolean flag)
     {
-        Class46.aClass12_785.method224();
-        Class46.aClass12_780.method224();
+        ObjectDefinition.aClass12_785.method224();
+        ObjectDefinition.aClass12_780.method224();
         Class5.aClass12_95.method224();
         Class8.aClass12_159.method224();
         Class8.aClass12_158.method224();
@@ -723,7 +723,7 @@ public final class GameClient extends GameShell
                 if(i3 != 0)
                 {
                     i3 = i3 >> 14 & 0x7fff;
-                    int j3 = Class46.method572(i3).anInt746;
+                    int j3 = ObjectDefinition.method572(i3).anInt746;
                     if(j3 >= 0)
                     {
                         int k3 = k2;
@@ -2232,7 +2232,7 @@ public final class GameClient extends GameShell
             int ai[] = aClass30_Sub2_Sub1_Sub1_1263.anIntArray1439;
             int k4 = 24624 + l * 4 + (103 - i) * 512 * 4;
             int i5 = k1 >> 14 & 0x7fff;
-            Class46 class46_2 = Class46.method572(i5);
+            ObjectDefinition class46_2 = ObjectDefinition.method572(i5);
             if(class46_2.anInt758 != -1)
             {
                 Class30_Sub2_Sub1_Sub2 class30_sub2_sub1_sub2_2 = aClass30_Sub2_Sub1_Sub2Array1060[class46_2.anInt758];
@@ -2323,7 +2323,7 @@ public final class GameClient extends GameShell
             int l2 = i2 >> 6 & 3;
             int j3 = i2 & 0x1f;
             int l3 = k1 >> 14 & 0x7fff;
-            Class46 class46_1 = Class46.method572(l3);
+            ObjectDefinition class46_1 = ObjectDefinition.method572(l3);
             if(class46_1.anInt758 != -1)
             {
                 Class30_Sub2_Sub1_Sub2 class30_sub2_sub1_sub2_1 = aClass30_Sub2_Sub1_Sub2Array1060[class46_1.anInt758];
@@ -2360,7 +2360,7 @@ public final class GameClient extends GameShell
         if(k1 != 0)
         {
             int j2 = k1 >> 14 & 0x7fff;
-            Class46 class46 = Class46.method572(j2);
+            ObjectDefinition class46 = ObjectDefinition.method572(j2);
             if(class46.anInt758 != -1)
             {
                 Class30_Sub2_Sub1_Sub2 class30_sub2_sub1_sub2 = aClass30_Sub2_Sub1_Sub2Array1060[class46.anInt758];
@@ -2462,13 +2462,13 @@ public final class GameClient extends GameShell
 
     public static final void method52(boolean flag)
     {
-        Class25.aBoolean436 = false;
+        SceneGraph.aBoolean436 = false;
         Class30_Sub2_Sub1_Sub3.aBoolean1461 = false;
         aBoolean960 = false;
-        Class7.aBoolean151 = false;
+        MapRegion.aBoolean151 = false;
         if(flag)
             aBoolean919 = !aBoolean919;
-        Class46.aBoolean752 = false;
+        ObjectDefinition.aBoolean752 = false;
     }
 
     public static final void main(String args[])
@@ -2503,7 +2503,7 @@ public final class GameClient extends GameShell
     {
         if(i != -48877)
             return;
-        if(aBoolean960 && anInt1023 == 2 && Class7.anInt131 != anInt918)
+        if(aBoolean960 && anInt1023 == 2 && MapRegion.anInt131 != anInt918)
         {
             aClass15_1165.method237(0);
             aClass30_Sub2_Sub1_Sub4_1271.method381(0, "Loading - please wait.", 23693, 151, 257);
@@ -2553,7 +2553,7 @@ public final class GameClient extends GameShell
                     k = 10;
                     l = 10;
                 }
-                flag &= Class7.method189(k, abyte0, l, 6);
+                flag &= MapRegion.method189(k, abyte0, l, 6);
             }
         }
 
@@ -2565,7 +2565,7 @@ public final class GameClient extends GameShell
         } else
         {
             anInt1023 = 2;
-            Class7.anInt131 = anInt918;
+            MapRegion.anInt131 = anInt918;
             method22(true);
             aClass30_Sub2_Sub2_1192.method397((byte)6, 121);
             return 0;
@@ -2694,7 +2694,7 @@ public final class GameClient extends GameShell
                     return;
                 if(class30_sub2_sub3.anInt1419 == 0)
                 {
-                    Class30_Sub2_Sub4_Sub6.method460(class30_sub2_sub3.aByteArray1420, -4036, class30_sub2_sub3.anInt1421);
+                    Model.method460(class30_sub2_sub3.aByteArray1420, -4036, class30_sub2_sub3.anInt1421);
                     if((aClass42_Sub1_1068.method559(class30_sub2_sub3.anInt1421, -203) & 0x62) != 0)
                     {
                         aBoolean1153 = true;
@@ -2727,7 +2727,7 @@ public final class GameClient extends GameShell
 
                 }
             } while(class30_sub2_sub3.anInt1419 != 93 || !aClass42_Sub1_1068.method564(class30_sub2_sub3.anInt1421, -520));
-            Class7.method173((byte)-107, new PacketBuffer(class30_sub2_sub3.aByteArray1420, 891), aClass42_Sub1_1068);
+            MapRegion.method173((byte)-107, new PacketBuffer(class30_sub2_sub3.aByteArray1420, 891), aClass42_Sub1_1068);
         } while(true);
     }
 
@@ -3079,12 +3079,12 @@ public final class GameClient extends GameShell
                 super.anInt26 = 0;
             }
         }
-        if(Class25.anInt470 != -1)
+        if(SceneGraph.anInt470 != -1)
         {
-            int k = Class25.anInt470;
-            int k1 = Class25.anInt471;
+            int k = SceneGraph.anInt470;
+            int k1 = SceneGraph.anInt471;
             boolean flag = method85(0, 0, 0, -11308, 0, ((Class30_Sub2_Sub4_Sub1) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1501[0], 0, 0, k1, ((Class30_Sub2_Sub4_Sub1) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1500[0], true, k);
-            Class25.anInt470 = -1;
+            SceneGraph.anInt470 = -1;
             if(flag)
             {
                 anInt914 = super.anInt27;
@@ -3343,7 +3343,7 @@ public final class GameClient extends GameShell
         int l1 = j1 >> 6 & 3;
         if(k1 == 10 || k1 == 11 || k1 == 22)
         {
-            Class46 class46 = Class46.method572(i1);
+            ObjectDefinition class46 = ObjectDefinition.method572(i1);
             int i2;
             int j2;
             if(l1 == 0 || l1 == 2)
@@ -4376,7 +4376,7 @@ public final class GameClient extends GameShell
         if(l == 1226)
         {
             int j1 = i1 >> 14 & 0x7fff;
-            Class46 class46 = Class46.method572(j1);
+            ObjectDefinition class46 = ObjectDefinition.method572(j1);
             String s10;
             if(class46.aByteArray777 != null)
                 s10 = new String(class46.aByteArray777);
@@ -4458,9 +4458,9 @@ public final class GameClient extends GameShell
             anInt1133++;
         }
         int j = -1;
-        for(int k = 0; k < Class30_Sub2_Sub4_Sub6.anInt1687; k++)
+        for(int k = 0; k < Model.anInt1687; k++)
         {
-            int l = Class30_Sub2_Sub4_Sub6.anIntArray1688[k];
+            int l = Model.anIntArray1688[k];
             int i1 = l & 0x7f;
             int j1 = l >> 7 & 0x7f;
             int k1 = l >> 29 & 3;
@@ -4470,7 +4470,7 @@ public final class GameClient extends GameShell
             j = l;
             if(k1 == 2 && aClass25_946.method304(anInt918, i1, j1, l) >= 0)
             {
-                Class46 class46 = Class46.method572(l1);
+                ObjectDefinition class46 = ObjectDefinition.method572(l1);
                 if(class46.anIntArray759 != null)
                     class46 = class46.method580(true);
                 if(class46 == null)
@@ -4762,10 +4762,10 @@ public final class GameClient extends GameShell
         aClass15_1114 = null;
         aClass15_1115 = null;
         method118(3);
-        Class46.method575(-501);
+        ObjectDefinition.method575(-501);
         Class5.method163(-501);
         Class8.method191(-501);
-        Class22.aClass22Array388 = null;
+        FloorDefinition.aClass22Array388 = null;
         Class38.aClass38Array656 = null;
         Class9.aClass9Array210 = null;
         Class27.aClass27Array507 = null;
@@ -4776,8 +4776,8 @@ public final class GameClient extends GameShell
         super.aClass15_13 = null;
         Class30_Sub2_Sub4_Sub1_Sub2.aClass12_1704 = null;
         Class30_Sub2_Sub1_Sub3.method363(-501);
-        Class25.method273(-501);
-        Class30_Sub2_Sub4_Sub6.method458(-501);
+        SceneGraph.method273(-501);
+        Model.method458(-501);
         Class36.method530(-501);
         System.gc();
     }
@@ -5338,7 +5338,7 @@ public final class GameClient extends GameShell
                 }
 
                 aBoolean1031 = false;
-                Class30_Sub2_Sub4_Sub6 aclass30_sub2_sub4_sub6[] = new Class30_Sub2_Sub4_Sub6[7];
+                Model aclass30_sub2_sub4_sub6[] = new Model[7];
                 int i2 = 0;
                 for(int j2 = 0; j2 < 7; j2++)
                 {
@@ -5347,7 +5347,7 @@ public final class GameClient extends GameShell
                         aclass30_sub2_sub4_sub6[i2++] = Class38.aClass38Array656[k2].method538(false);
                 }
 
-                Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6 = new Class30_Sub2_Sub4_Sub6(i2, aclass30_sub2_sub4_sub6, -38);
+                Model class30_sub2_sub4_sub6 = new Model(i2, aclass30_sub2_sub4_sub6, -38);
                 for(int l2 = 0; l2 < 5; l2++)
                     if(anIntArray990[l2] != 0)
                     {
@@ -5750,8 +5750,8 @@ public final class GameClient extends GameShell
         if(l > 4225 && l < 0x15f90)
         {
             int i1 = anInt1185 + anInt1209 & 0x7ff;
-            int j1 = Class30_Sub2_Sub4_Sub6.anIntArray1689[i1];
-            int k1 = Class30_Sub2_Sub4_Sub6.anIntArray1690[i1];
+            int j1 = Model.anIntArray1689[i1];
+            int k1 = Model.anIntArray1690[i1];
             j1 = (j1 * 256) / (anInt1170 + 256);
             k1 = (k1 * 256) / (anInt1170 + 256);
             int l1 = j * j1 + k * k1 >> 16;
@@ -6823,9 +6823,9 @@ public final class GameClient extends GameShell
             Archive class44_5 = method67(8, "sound effects", "sounds", anIntArray1090[8], (byte)-41, 55);
             aByteArrayArrayArray1258 = new byte[4][104][104];
             anIntArrayArrayArray1214 = new int[4][105][105];
-            aClass25_946 = new Class25(104, (byte)43, 104, anIntArrayArrayArray1214, 4);
+            aClass25_946 = new SceneGraph(104, (byte)43, 104, anIntArrayArrayArray1214, 4);
             for(int j = 0; j < 4; j++)
-                aClass11Array1230[j] = new Class11(104, 104, true);
+                aClass11Array1230[j] = new CollisionMap(104, 104, true);
 
             aClass30_Sub2_Sub1_Sub1_1263 = new Class30_Sub2_Sub1_Sub1(512, 512);
             Archive class44_6 = method67(5, "update list", "versionlist", anIntArray1090[5], (byte)-41, 60);
@@ -6833,7 +6833,7 @@ public final class GameClient extends GameShell
             aClass42_Sub1_1068 = new OnDemandFetcher();
             aClass42_Sub1_1068.method551(class44_6, this);
             Class36.method528(aClass42_Sub1_1068.method557(0));
-            Class30_Sub2_Sub4_Sub6.method459(aClass42_Sub1_1068.method555(79, 0), aClass42_Sub1_1068);
+            Model.method459(aClass42_Sub1_1068.method555(79, 0), aClass42_Sub1_1068);
             if(!aBoolean960)
             {
                 anInt1227 = 0;
@@ -7092,8 +7092,8 @@ public final class GameClient extends GameShell
             Class30_Sub2_Sub1_Sub3.method367(20, true);
             method13(86, (byte)4, "Unpacking config");
             Class20.method257(0, class44);
-            Class46.method576(class44);
-            Class22.method260(0, class44);
+            ObjectDefinition.method576(class44);
+            FloorDefinition.method260(0, class44);
             Class8.method193(class44);
             Class5.method162(class44);
             Class38.method535(0, class44);
@@ -7173,12 +7173,12 @@ public final class GameClient extends GameShell
                 ai[i8] = l8 * i9 >> 16;
             }
 
-            Class25.method310(500, 800, 512, 334, ai, aBoolean1231);
+            SceneGraph.method310(500, 800, 512, 334, ai, aBoolean1231);
             Class34.method487(class44_4);
             aClass48_879 = new Class48(this, anInt1096);
             method12(aClass48_879, 10);
-            Class30_Sub2_Sub4_Sub5.aClient1609 = this;
-            Class46.aClient765 = this;
+            DynamicObject.aClient1609 = this;
+            ObjectDefinition.aClient765 = this;
             Class5.aClient82 = this;
             return;
         }
@@ -8238,7 +8238,7 @@ public final class GameClient extends GameShell
                         i7 = class9_1.anInt258;
                     else
                         i7 = class9_1.anInt257;
-                    Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6;
+                    Model class30_sub2_sub4_sub6;
                     if(i7 == -1)
                     {
                         class30_sub2_sub4_sub6 = class9_1.method209(0, -1, -1, flag2);
@@ -8803,7 +8803,7 @@ public final class GameClient extends GameShell
                     class30_sub1.anInt1294--;
                 if(class30_sub1.anInt1294 == 0)
                 {
-                    if(class30_sub1.anInt1299 < 0 || Class7.method178(class30_sub1.anInt1299, class30_sub1.anInt1301, 8))
+                    if(class30_sub1.anInt1299 < 0 || MapRegion.method178(class30_sub1.anInt1299, class30_sub1.anInt1301, 8))
                     {
                         method142(class30_sub1.anInt1298, class30_sub1.anInt1295, class30_sub1.anInt1300, class30_sub1.anInt1301, class30_sub1.anInt1297, class30_sub1.anInt1296, class30_sub1.anInt1299, 4);
                         class30_sub1.method329();
@@ -8812,7 +8812,7 @@ public final class GameClient extends GameShell
                 {
                     if(class30_sub1.anInt1302 > 0)
                         class30_sub1.anInt1302--;
-                    if(class30_sub1.anInt1302 == 0 && class30_sub1.anInt1297 >= 1 && class30_sub1.anInt1298 >= 1 && class30_sub1.anInt1297 <= 102 && class30_sub1.anInt1298 <= 102 && (class30_sub1.anInt1291 < 0 || Class7.method178(class30_sub1.anInt1291, class30_sub1.anInt1293, 8)))
+                    if(class30_sub1.anInt1302 == 0 && class30_sub1.anInt1297 >= 1 && class30_sub1.anInt1298 >= 1 && class30_sub1.anInt1297 <= 102 && class30_sub1.anInt1298 <= 102 && (class30_sub1.anInt1291 < 0 || MapRegion.method178(class30_sub1.anInt1291, class30_sub1.anInt1293, 8)))
                     {
                         method142(class30_sub1.anInt1298, class30_sub1.anInt1295, class30_sub1.anInt1292, class30_sub1.anInt1293, class30_sub1.anInt1297, class30_sub1.anInt1296, class30_sub1.anInt1291, 4);
                         class30_sub1.anInt1302 = -1;
@@ -9461,10 +9461,10 @@ public final class GameClient extends GameShell
         i -= anInt858;
         i1 -= anInt859;
         l -= anInt860;
-        int j1 = Class30_Sub2_Sub4_Sub6.anIntArray1689[anInt861];
-        int k1 = Class30_Sub2_Sub4_Sub6.anIntArray1690[anInt861];
-        int l1 = Class30_Sub2_Sub4_Sub6.anIntArray1689[anInt862];
-        int i2 = Class30_Sub2_Sub4_Sub6.anIntArray1690[anInt862];
+        int j1 = Model.anIntArray1689[anInt861];
+        int k1 = Model.anIntArray1690[anInt861];
+        int l1 = Model.anIntArray1689[anInt862];
+        int i2 = Model.anIntArray1690[anInt862];
         int j2 = l * l1 + i * i2 >> 16;
         l = l * i2 - i * l1 >> 16;
         i = j2;
@@ -10048,11 +10048,11 @@ public final class GameClient extends GameShell
                         int k21 = class10.anInt280 >> 14 & 0x7fff;
                         if(j12 == 2)
                         {
-                            class10.aClass30_Sub2_Sub4_278 = new Class30_Sub2_Sub4_Sub5(k21, 4 + k14, 2, i19, (byte)7, l19, j18, k20, j17, false);
-                            class10.aClass30_Sub2_Sub4_279 = new Class30_Sub2_Sub4_Sub5(k21, k14 + 1 & 3, 2, i19, (byte)7, l19, j18, k20, j17, false);
+                            class10.aClass30_Sub2_Sub4_278 = new DynamicObject(k21, 4 + k14, 2, i19, (byte)7, l19, j18, k20, j17, false);
+                            class10.aClass30_Sub2_Sub4_279 = new DynamicObject(k21, k14 + 1 & 3, 2, i19, (byte)7, l19, j18, k20, j17, false);
                         } else
                         {
-                            class10.aClass30_Sub2_Sub4_278 = new Class30_Sub2_Sub4_Sub5(k21, k14, j12, i19, (byte)7, l19, j18, k20, j17, false);
+                            class10.aClass30_Sub2_Sub4_278 = new DynamicObject(k21, k14, j12, i19, (byte)7, l19, j18, k20, j17, false);
                         }
                     }
                 }
@@ -10060,7 +10060,7 @@ public final class GameClient extends GameShell
                 {
                     Class26 class26 = aClass25_946.method297(j4, 866, i7, anInt918);
                     if(class26 != null)
-                        class26.aClass30_Sub2_Sub4_504 = new Class30_Sub2_Sub4_Sub5(class26.anInt505 >> 14 & 0x7fff, 0, 4, i19, (byte)7, l19, j18, k20, j17, false);
+                        class26.aClass30_Sub2_Sub4_504 = new DynamicObject(class26.anInt505 >> 14 & 0x7fff, 0, 4, i19, (byte)7, l19, j18, k20, j17, false);
                 }
                 if(j16 == 2)
                 {
@@ -10068,13 +10068,13 @@ public final class GameClient extends GameShell
                     if(j12 == 11)
                         j12 = 10;
                     if(class28 != null)
-                        class28.aClass30_Sub2_Sub4_521 = new Class30_Sub2_Sub4_Sub5(class28.anInt529 >> 14 & 0x7fff, k14, j12, i19, (byte)7, l19, j18, k20, j17, false);
+                        class28.aClass30_Sub2_Sub4_521 = new DynamicObject(class28.anInt529 >> 14 & 0x7fff, k14, j12, i19, (byte)7, l19, j18, k20, j17, false);
                 }
                 if(j16 == 3)
                 {
                     Class49 class49 = aClass25_946.method299(i7, j4, anInt918, 0);
                     if(class49 != null)
-                        class49.aClass30_Sub2_Sub4_814 = new Class30_Sub2_Sub4_Sub5(class49.anInt815 >> 14 & 0x7fff, k14, 22, i19, (byte)7, l19, j18, k20, j17, false);
+                        class49.aClass30_Sub2_Sub4_814 = new DynamicObject(class49.anInt815 >> 14 & 0x7fff, k14, 22, i19, (byte)7, l19, j18, k20, j17, false);
                 }
             }
             return;
@@ -10103,12 +10103,12 @@ public final class GameClient extends GameShell
                 class30_sub2_sub4_sub1_sub2 = aClass30_Sub2_Sub4_Sub1_Sub2Array890[i10];
             if(class30_sub2_sub4_sub1_sub2 != null)
             {
-                Class46 class46 = Class46.method572(l21);
+                ObjectDefinition class46 = ObjectDefinition.method572(l21);
                 int i22 = anIntArrayArrayArray1214[anInt918][k4][j7];
                 int j22 = anIntArrayArrayArray1214[anInt918][k4 + 1][j7];
                 int k22 = anIntArrayArrayArray1214[anInt918][k4 + 1][j7 + 1];
                 int l22 = anIntArrayArrayArray1214[anInt918][k4][j7 + 1];
-                Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6 = class46.method578(j19, i20, i22, j22, k22, l22, -1);
+                Model class30_sub2_sub4_sub6 = class46.method578(j19, i20, i22, j22, k22, l22, -1);
                 if(class30_sub2_sub4_sub6 != null)
                 {
                     method130(404, k17 + 1, -1, 0, l20, j7, 0, anInt918, k4, l14 + 1);
@@ -10237,15 +10237,15 @@ public final class GameClient extends GameShell
 
     public static final void method138(byte byte0)
     {
-        Class25.aBoolean436 = true;
+        SceneGraph.aBoolean436 = true;
         if(byte0 != aByte823)
         {
             for(int i = 1; i > 0; i++);
         }
         Class30_Sub2_Sub1_Sub3.aBoolean1461 = true;
         aBoolean960 = true;
-        Class7.aBoolean151 = true;
-        Class46.aBoolean752 = true;
+        MapRegion.aBoolean151 = true;
+        ObjectDefinition.aBoolean752 = true;
     }
 
     private final void method139(PacketBuffer class30_sub2_sub2, int i, int j)
@@ -10436,8 +10436,8 @@ public final class GameClient extends GameShell
             return;
         if(l > 6400)
             return;
-        int i1 = Class30_Sub2_Sub4_Sub6.anIntArray1689[k];
-        int j1 = Class30_Sub2_Sub4_Sub6.anIntArray1690[k];
+        int i1 = Model.anIntArray1689[k];
+        int j1 = Model.anIntArray1690[k];
         i1 = (i1 * 256) / (anInt1170 + 256);
         j1 = (j1 * 256) / (anInt1170 + 256);
         int k1 = j * i1 + i * j1 >> 16;
@@ -10483,7 +10483,7 @@ public final class GameClient extends GameShell
                 if(j1 == 0)
                 {
                     aClass25_946.method291(i1, j, i, (byte)-119);
-                    Class46 class46 = Class46.method572(j2);
+                    ObjectDefinition class46 = ObjectDefinition.method572(j2);
                     if(class46.aBoolean767)
                         aClass11Array1230[j].method215(l2, k2, class46.aBoolean757, true, i1, i);
                 }
@@ -10492,7 +10492,7 @@ public final class GameClient extends GameShell
                 if(j1 == 2)
                 {
                     aClass25_946.method293(j, -978, i1, i);
-                    Class46 class46_1 = Class46.method572(j2);
+                    ObjectDefinition class46_1 = ObjectDefinition.method572(j2);
                     if(i1 + class46_1.anInt744 > 103 || i + class46_1.anInt744 > 103 || i1 + class46_1.anInt761 > 103 || i + class46_1.anInt761 > 103)
                         return;
                     if(class46_1.aBoolean767)
@@ -10501,7 +10501,7 @@ public final class GameClient extends GameShell
                 if(j1 == 3)
                 {
                     aClass25_946.method294((byte)9, j, i, i1);
-                    Class46 class46_2 = Class46.method572(j2);
+                    ObjectDefinition class46_2 = ObjectDefinition.method572(j2);
                     if(class46_2.aBoolean767 && class46_2.aBoolean778)
                         aClass11Array1230[j].method218(360, i, i1);
                 }
@@ -10511,7 +10511,7 @@ public final class GameClient extends GameShell
                 int j3 = j;
                 if(j3 < 3 && (aByteArrayArrayArray1258[1][i1][i] & 2) == 2)
                     j3++;
-                Class7.method188(aClass25_946, k, i, l, j3, aClass11Array1230[j], anIntArrayArrayArray1214, i1, k1, j, (byte)93);
+                MapRegion.method188(aClass25_946, k, i, l, j3, aClass11Array1230[j], anIntArrayArrayArray1214, i1, k1, j, (byte)93);
             }
         }
     }
@@ -10558,8 +10558,8 @@ public final class GameClient extends GameShell
             method6();
         if(l1 != 0)
         {
-            int i3 = Class30_Sub2_Sub4_Sub6.anIntArray1689[l1];
-            int k3 = Class30_Sub2_Sub4_Sub6.anIntArray1690[l1];
+            int i3 = Model.anIntArray1689[l1];
+            int k3 = Model.anIntArray1690[l1];
             int i4 = k2 * k3 - l2 * i3 >> 16;
             l2 = k2 * i3 + l2 * k3 >> 16;
             k2 = i4;
@@ -10577,8 +10577,8 @@ public final class GameClient extends GameShell
               j2 = lftrit;
               l2 = fwdbwd;
             }
-            int j3 = Class30_Sub2_Sub4_Sub6.anIntArray1689[i2];
-            int l3 = Class30_Sub2_Sub4_Sub6.anIntArray1690[i2];
+            int j3 = Model.anIntArray1689[i2];
+            int l3 = Model.anIntArray1690[i2];
             int j4 = l2 * j3 + j2 * l3 >> 16;
             l2 = l2 * l3 - j2 * j3 >> 16;
             j2 = j4;
@@ -11886,15 +11886,15 @@ public final class GameClient extends GameShell
             }
 
         int k2 = Class30_Sub2_Sub1_Sub3.anInt1481;
-        Class30_Sub2_Sub4_Sub6.aBoolean1684 = true;
+        Model.aBoolean1684 = true;
         if(byte0 != 1)
         {
             return;
         } else
         {
-            Class30_Sub2_Sub4_Sub6.anInt1687 = 0;
-            Class30_Sub2_Sub4_Sub6.anInt1685 = super.anInt20 - 4;
-            Class30_Sub2_Sub4_Sub6.anInt1686 = super.anInt21 - 4;
+            Model.anInt1687 = 0;
+            Model.anInt1685 = super.anInt20 - 4;
+            Model.anInt1686 = super.anInt21 - 4;
             Class30_Sub2_Sub1.method334(aBoolean1206);
             aClass25_946.method313(anInt858, anInt860, anInt862, anInt859, j, anInt861, false);
             aClass25_946.method288((byte)104);
@@ -12096,7 +12096,7 @@ public final class GameClient extends GameShell
         aBoolean1223 = false;
         aBoolean1228 = true;
         anIntArray1229 = new int[151];
-        aClass11Array1230 = new Class11[4];
+        aClass11Array1230 = new CollisionMap[4];
         aBoolean1233 = false;
         anIntArray1240 = new int[100];
         anIntArray1241 = new int[50];
@@ -12240,7 +12240,7 @@ public final class GameClient extends GameShell
     private String aStringArray943[];
     private String aStringArray944[];
     private int anInt945;
-    private Class25 aClass25_946;
+    private SceneGraph aClass25_946;
     private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2Array947[];
     private int anInt948;
     private int anInt949;
@@ -12552,7 +12552,7 @@ public final class GameClient extends GameShell
     private int anInt1227;
     private boolean aBoolean1228;
     private int anIntArray1229[];
-    private Class11 aClass11Array1230[];
+    private CollisionMap aClass11Array1230[];
     private static boolean aBoolean1231;
     public static int anIntArray1232[];
     private boolean aBoolean1233;

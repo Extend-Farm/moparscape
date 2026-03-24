@@ -5,7 +5,7 @@
 import java.io.PrintStream;
 import sign.SignLink;
 
-public class Class22
+public class FloorDefinition
 {
 
     public static void method260(int i, Archive class44)
@@ -15,11 +15,11 @@ public class Class22
         PacketBuffer class30_sub2_sub2 = new PacketBuffer(class44.method571("flo.dat", null), 891);
         anInt387 = class30_sub2_sub2.method410();
         if(aClass22Array388 == null)
-            aClass22Array388 = new Class22[anInt387];
+            aClass22Array388 = new FloorDefinition[anInt387];
         for(int j = 0; j < anInt387; j++)
         {
             if(aClass22Array388[j] == null)
-                aClass22Array388[j] = new Class22();
+                aClass22Array388[j] = new FloorDefinition();
             aClass22Array388[j].method261(true, class30_sub2_sub2);
         }
 
@@ -162,7 +162,7 @@ public class Class22
         return l;
     }
 
-    public Class22()
+    public FloorDefinition()
     {
         aBoolean385 = true;
         anInt391 = -1;
@@ -173,7 +173,7 @@ public class Class22
     private boolean aBoolean385;
     private static int anInt386;
     public static int anInt387;
-    public static Class22 aClass22Array388[];
+    public static FloorDefinition aClass22Array388[];
     public String aString389;
     public int anInt390;
     public int anInt391;

@@ -4,10 +4,10 @@
 
 import sign.SignLink;
 
-public class Class11
+public class CollisionMap
 {
 
-    public Class11(int i, int j, boolean flag)
+    public CollisionMap(int i, int j, boolean flag)
     {
         aBoolean282 = true;
         anInt283 = -32357;

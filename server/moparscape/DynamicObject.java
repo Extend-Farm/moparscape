@@ -4,10 +4,10 @@
 
 import sign.SignLink;
 
-public class Class30_Sub2_Sub4_Sub5 extends Class30_Sub2_Sub4
+public class DynamicObject extends Class30_Sub2_Sub4
 {
 
-    public final Class30_Sub2_Sub4_Sub6 method444(int i)
+    public final Model method444(int i)
     {
         int j = -1;
         if(i != 4016)
@@ -33,22 +33,22 @@ public class Class30_Sub2_Sub4_Sub5 extends Class30_Sub2_Sub4
             if(aClass20_1607 != null)
                 j = aClass20_1607.anIntArray353[anInt1599];
         }
-        Class46 class46;
+        ObjectDefinition class46;
         if(anIntArray1600 != null)
             class46 = method457(true);
         else
-            class46 = Class46.method572(anInt1610);
+            class46 = ObjectDefinition.method572(anInt1610);
         if(class46 == null)
         {
             return null;
         } else
         {
-            Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6 = class46.method578(anInt1611, anInt1612, anInt1603, anInt1604, anInt1605, anInt1606, j);
+            Model class30_sub2_sub4_sub6 = class46.method578(anInt1611, anInt1612, anInt1603, anInt1604, anInt1605, anInt1606, j);
             return class30_sub2_sub4_sub6;
         }
     }
 
-    public final Class46 method457(boolean flag)
+    public final ObjectDefinition method457(boolean flag)
     {
         int i = -1;
         if(!flag)
@@ -69,10 +69,10 @@ public class Class30_Sub2_Sub4_Sub5 extends Class30_Sub2_Sub4
         if(i < 0 || i >= anIntArray1600.length || anIntArray1600[i] == -1)
             return null;
         else
-            return Class46.method572(anIntArray1600[i]);
+            return ObjectDefinition.method572(anIntArray1600[i]);
     }
 
-    public Class30_Sub2_Sub4_Sub5(int i, int j, int k, int l, byte byte0, int i1, int j1, 
+    public DynamicObject(int i, int j, int k, int l, byte byte0, int i1, int j1, 
             int k1, int l1, boolean flag)
     {
         aByte1598 = 7;
@@ -98,7 +98,7 @@ public class Class30_Sub2_Sub4_Sub5 extends Class30_Sub2_Sub4
                 anInt1608 -= (int)(Math.random() * (double)aClass20_1607.method258(anInt1599, (byte)-39));
             }
         }
-        Class46 class46 = Class46.method572(anInt1610);
+        ObjectDefinition class46 = ObjectDefinition.method572(anInt1610);
         anInt1601 = class46.anInt774;
         anInt1602 = class46.anInt749;
         anIntArray1600 = class46.anIntArray759;

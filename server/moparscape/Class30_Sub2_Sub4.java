@@ -10,7 +10,7 @@ public class Class30_Sub2_Sub4 extends Class30_Sub2
     public void method443(int i, int j, int k, int l, int i1, int j1, int k1, 
             int l1, int i2)
     {
-        Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6 = method444(4016);
+        Model class30_sub2_sub4_sub6 = method444(4016);
         if(class30_sub2_sub4_sub6 != null)
         {
             anInt1426 = ((Class30_Sub2_Sub4) (class30_sub2_sub4_sub6)).anInt1426;
@@ -18,7 +18,7 @@ public class Class30_Sub2_Sub4 extends Class30_Sub2
         }
     }
 
-    public Class30_Sub2_Sub4_Sub6 method444(int i)
+    public Model method444(int i)
     {
         if(i != 4016)
             anInt1424 = -185;

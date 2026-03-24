@@ -29,15 +29,15 @@ final class Class30_Sub2_Sub4_Sub4 extends Class30_Sub2_Sub4
         aDouble1578 = (2D * ((double)k - aDouble1587 - aDouble1577 * d1)) / (d1 * d1);
     }
 
-    public final Class30_Sub2_Sub4_Sub6 method444(int i)
+    public final Model method444(int i)
     {
-        Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6 = aClass23_1592.method266();
+        Model class30_sub2_sub4_sub6 = aClass23_1592.method266();
         if(class30_sub2_sub4_sub6 == null)
             return null;
         int j = -1;
         if(aClass23_1592.aClass20_407 != null)
             j = aClass23_1592.aClass20_407.anIntArray353[anInt1593];
-        Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_1 = new Class30_Sub2_Sub4_Sub6(9, true, Class36.method532(j, false), false, class30_sub2_sub4_sub6);
+        Model class30_sub2_sub4_sub6_1 = new Model(9, true, Class36.method532(j, false), false, class30_sub2_sub4_sub6);
         if(j != -1)
         {
             class30_sub2_sub4_sub6_1.method469((byte)-71);

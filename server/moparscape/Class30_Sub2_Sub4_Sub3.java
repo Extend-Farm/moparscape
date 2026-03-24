@@ -29,15 +29,15 @@ final class Class30_Sub2_Sub4_Sub3 extends Class30_Sub2_Sub4
         }
     }
 
-    public final Class30_Sub2_Sub4_Sub6 method444(int i)
+    public final Model method444(int i)
     {
         if(i != 4016)
             throw new NullPointerException();
-        Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6 = aClass23_1568.method266();
+        Model class30_sub2_sub4_sub6 = aClass23_1568.method266();
         if(class30_sub2_sub4_sub6 == null)
             return null;
         int j = aClass23_1568.aClass20_407.anIntArray353[anInt1569];
-        Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_1 = new Class30_Sub2_Sub4_Sub6(9, true, Class36.method532(j, false), false, class30_sub2_sub4_sub6);
+        Model class30_sub2_sub4_sub6_1 = new Model(9, true, Class36.method532(j, false), false, class30_sub2_sub4_sub6);
         if(!aBoolean1567)
         {
             class30_sub2_sub4_sub6_1.method469((byte)-71);

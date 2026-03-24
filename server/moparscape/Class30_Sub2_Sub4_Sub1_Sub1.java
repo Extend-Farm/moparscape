@@ -7,7 +7,7 @@ import sign.SignLink;
 final class Class30_Sub2_Sub4_Sub1_Sub1 extends Class30_Sub2_Sub4_Sub1
 {
 
-    private final Class30_Sub2_Sub4_Sub6 method450(int i)
+    private final Model method450(int i)
     {
         if(i != 0)
         {
@@ -27,11 +27,11 @@ final class Class30_Sub2_Sub4_Sub1_Sub1 extends Class30_Sub2_Sub4_Sub1
         return aClass5_1696.method164(0, -1, l, null);
     }
 
-    public final Class30_Sub2_Sub4_Sub6 method444(int i)
+    public final Model method444(int i)
     {
         if(aClass5_1696 == null)
             return null;
-        Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6 = method450(0);
+        Model class30_sub2_sub4_sub6 = method450(0);
         if(class30_sub2_sub4_sub6 == null)
             return null;
         super.anInt1507 = ((Class30_Sub2_Sub4) (class30_sub2_sub4_sub6)).anInt1426;
@@ -40,11 +40,11 @@ final class Class30_Sub2_Sub4_Sub1_Sub1 extends Class30_Sub2_Sub4_Sub1
         if(super.anInt1520 != -1 && super.anInt1521 != -1)
         {
             Class23 class23 = Class23.aClass23Array403[super.anInt1520];
-            Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_1 = class23.method266();
+            Model class30_sub2_sub4_sub6_1 = class23.method266();
             if(class30_sub2_sub4_sub6_1 != null)
             {
                 int j = class23.aClass20_407.anIntArray353[super.anInt1521];
-                Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_2 = new Class30_Sub2_Sub4_Sub6(9, true, Class36.method532(j, false), false, class30_sub2_sub4_sub6_1);
+                Model class30_sub2_sub4_sub6_2 = new Model(9, true, Class36.method532(j, false), false, class30_sub2_sub4_sub6_1);
                 class30_sub2_sub4_sub6_2.method475(0, -super.anInt1524, 16384, 0);
                 class30_sub2_sub4_sub6_2.method469((byte)-71);
                 class30_sub2_sub4_sub6_2.method470(j, 40542);
@@ -53,10 +53,10 @@ final class Class30_Sub2_Sub4_Sub1_Sub1 extends Class30_Sub2_Sub4_Sub1
                 if(class23.anInt410 != 128 || class23.anInt411 != 128)
                     class30_sub2_sub4_sub6_2.method478(class23.anInt410, class23.anInt410, anInt1695, class23.anInt411);
                 class30_sub2_sub4_sub6_2.method479(64 + class23.anInt413, 850 + class23.anInt414, -30, -50, -30, true);
-                Class30_Sub2_Sub4_Sub6 aclass30_sub2_sub4_sub6[] = {
+                Model aclass30_sub2_sub4_sub6[] = {
                     class30_sub2_sub4_sub6, class30_sub2_sub4_sub6_2
                 };
-                class30_sub2_sub4_sub6 = new Class30_Sub2_Sub4_Sub6(2, -819, true, aclass30_sub2_sub4_sub6);
+                class30_sub2_sub4_sub6 = new Model(2, -819, true, aclass30_sub2_sub4_sub6);
             }
         }
         if(aClass5_1696.aByte68 == 1)

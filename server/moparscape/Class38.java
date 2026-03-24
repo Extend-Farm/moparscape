@@ -73,27 +73,27 @@ public class Class38
             for(int i = 1; i > 0; i++);
         }
         for(int j = 0; j < anIntArray658.length; j++)
-            if(!Class30_Sub2_Sub4_Sub6.method463(anIntArray658[j]))
+            if(!Model.method463(anIntArray658[j]))
                 flag = false;
 
         return flag;
     }
 
-    public Class30_Sub2_Sub4_Sub6 method538(boolean flag)
+    public Model method538(boolean flag)
     {
         if(flag)
             throw new NullPointerException();
         if(anIntArray658 == null)
             return null;
-        Class30_Sub2_Sub4_Sub6 aclass30_sub2_sub4_sub6[] = new Class30_Sub2_Sub4_Sub6[anIntArray658.length];
+        Model aclass30_sub2_sub4_sub6[] = new Model[anIntArray658.length];
         for(int i = 0; i < anIntArray658.length; i++)
-            aclass30_sub2_sub4_sub6[i] = Class30_Sub2_Sub4_Sub6.method462(anInt654, anIntArray658[i]);
+            aclass30_sub2_sub4_sub6[i] = Model.method462(anInt654, anIntArray658[i]);
 
-        Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6;
+        Model class30_sub2_sub4_sub6;
         if(aclass30_sub2_sub4_sub6.length == 1)
             class30_sub2_sub4_sub6 = aclass30_sub2_sub4_sub6[0];
         else
-            class30_sub2_sub4_sub6 = new Class30_Sub2_Sub4_Sub6(aclass30_sub2_sub4_sub6.length, aclass30_sub2_sub4_sub6, -38);
+            class30_sub2_sub4_sub6 = new Model(aclass30_sub2_sub4_sub6.length, aclass30_sub2_sub4_sub6, -38);
         for(int j = 0; j < 6; j++)
         {
             if(anIntArray659[j] == 0)
@@ -110,23 +110,23 @@ public class Class38
             throw new NullPointerException();
         boolean flag1 = true;
         for(int i = 0; i < 5; i++)
-            if(anIntArray661[i] != -1 && !Class30_Sub2_Sub4_Sub6.method463(anIntArray661[i]))
+            if(anIntArray661[i] != -1 && !Model.method463(anIntArray661[i]))
                 flag1 = false;
 
         return flag1;
     }
 
-    public Class30_Sub2_Sub4_Sub6 method540(int i)
+    public Model method540(int i)
     {
         if(i != 0)
             throw new NullPointerException();
-        Class30_Sub2_Sub4_Sub6 aclass30_sub2_sub4_sub6[] = new Class30_Sub2_Sub4_Sub6[5];
+        Model aclass30_sub2_sub4_sub6[] = new Model[5];
         int j = 0;
         for(int k = 0; k < 5; k++)
             if(anIntArray661[k] != -1)
-                aclass30_sub2_sub4_sub6[j++] = Class30_Sub2_Sub4_Sub6.method462(anInt654, anIntArray661[k]);
+                aclass30_sub2_sub4_sub6[j++] = Model.method462(anInt654, anIntArray661[k]);
 
-        Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6 = new Class30_Sub2_Sub4_Sub6(j, aclass30_sub2_sub4_sub6, -38);
+        Model class30_sub2_sub4_sub6 = new Model(j, aclass30_sub2_sub4_sub6, -38);
         for(int l = 0; l < 6; l++)
         {
             if(anIntArray659[l] == 0)

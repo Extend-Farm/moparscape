@@ -1,5 +1,5 @@
-// Reconstructed from Class7.class in moparclient.jar (CFR 0.152); adjusted for javac (casts, buffer types).
-final class Class7 {
+// Reconstructed from MapRegion.class in moparclient.jar (CFR 0.152); adjusted for javac (casts, buffer types).
+final class MapRegion {
     private static int anInt123 = (int)(Math.random() * 17.0) - 8;
     private int[] anIntArray124;
     private int[] anIntArray125;
@@ -32,7 +32,7 @@ final class Class7 {
     private static final int[] anIntArray152;
     private static int anInt153;
 
-    public Class7(byte[][][] byArray, int n, int n2, int n3, int[][][] nArray) {
+    public MapRegion(byte[][][] byArray, int n, int n2, int n3, int[][][] nArray) {
         anInt145 = 99;
         this.anInt146 = n3;
         this.anInt147 = n2;
@@ -62,7 +62,7 @@ final class Class7 {
         return n4 >> 19 & 0xFF;
     }
 
-    public final void method171(Class11[] class11Array, Class25 class25, int n) {
+    public final void method171(CollisionMap[] class11Array, SceneGraph class25, int n) {
         int n2;
         int n3;
         int n4;
@@ -160,7 +160,7 @@ final class Class7 {
                     int n22;
                     n7 = n9 + 5;
                     if (n7 >= 0 && n7 < this.anInt146 && (n6 = this.aByteArrayArrayArray142[n19][n7][n8] & 0xFF) > 0) {
-                        Class22 class22 = Class22.aClass22Array388[n6 - 1];
+                        FloorDefinition class22 = FloorDefinition.aClass22Array388[n6 - 1];
                         int n23 = n8;
                         this.anIntArray124[n23] = this.anIntArray124[n23] + class22.anInt397;
                         int n24 = n8;
@@ -173,7 +173,7 @@ final class Class7 {
                         this.anIntArray128[n27] = this.anIntArray128[n27] + 1;
                     }
                     if ((n6 = n9 - 5) >= 0 && n6 < this.anInt146 && (n22 = this.aByteArrayArrayArray142[n19][n6][n8] & 0xFF) > 0) {
-                        Class22 class22 = Class22.aClass22Array388[n22 - 1];
+                        FloorDefinition class22 = FloorDefinition.aClass22Array388[n22 - 1];
                         int n28 = n8;
                         this.anIntArray124[n28] = this.anIntArray124[n28] - class22.anInt397;
                         int n29 = n8;
@@ -249,7 +249,7 @@ final class Class7 {
                                     if (n37 == 0 && this.aByteArrayArrayArray136[n19][n9][n2] != 0) {
                                         n41 = 0;
                                     }
-                                    if (n38 > 0 && !Class22.aClass22Array388[n38 - 1].aBoolean393) {
+                                    if (n38 > 0 && !FloorDefinition.aClass22Array388[n38 - 1].aBoolean393) {
                                         n41 = 0;
                                     }
                                     if (n41 != 0 && n42 == n43 && n42 == n44 && n42 == n45) {
@@ -260,16 +260,16 @@ final class Class7 {
                                 }
                                 n41 = 0;
                                 if (n50 != -1) {
-                                    n41 = Class30_Sub2_Sub1_Sub3.anIntArray1482[Class7.method187(n51, 96)];
+                                    n41 = Class30_Sub2_Sub1_Sub3.anIntArray1482[MapRegion.method187(n51, 96)];
                                 }
                                 if (n38 == 0) {
-                                    class25.method279(n19, n9, n2, 0, 0, -1, n42, n43, n44, n45, Class7.method187(n50, n46), Class7.method187(n50, n47), Class7.method187(n50, n48), Class7.method187(n50, n49), 0, 0, 0, 0, n41, 0);
+                                    class25.method279(n19, n9, n2, 0, 0, -1, n42, n43, n44, n45, MapRegion.method187(n50, n46), MapRegion.method187(n50, n47), MapRegion.method187(n50, n48), MapRegion.method187(n50, n49), 0, 0, 0, 0, n41, 0);
                                 } else {
                                     int n53;
                                     int n54;
                                     n40 = this.aByteArrayArrayArray136[n19][n9][n2] + 1;
                                     n39 = this.aByteArrayArrayArray148[n19][n9][n2];
-                                    Class22 class22 = Class22.aClass22Array388[n38 - 1];
+                                    FloorDefinition class22 = FloorDefinition.aClass22Array388[n38 - 1];
                                     int n55 = class22.anInt391;
                                     if (n55 >= 0) {
                                         n54 = Class30_Sub2_Sub1_Sub3.method369((int)n55, (int)12660);
@@ -282,7 +282,7 @@ final class Class7 {
                                         n53 = this.method177(class22.anInt394, class22.anInt395, class22.anInt396);
                                         n54 = Class30_Sub2_Sub1_Sub3.anIntArray1482[this.method185(class22.anInt399, 96)];
                                     }
-                                    class25.method279(n19, n9, n2, n40, n39, n55, n42, n43, n44, n45, Class7.method187(n50, n46), Class7.method187(n50, n47), Class7.method187(n50, n48), Class7.method187(n50, n49), this.method185(n53, n46), this.method185(n53, n47), this.method185(n53, n48), this.method185(n53, n49), n41, n54);
+                                    class25.method279(n19, n9, n2, n40, n39, n55, n42, n43, n44, n45, MapRegion.method187(n50, n46), MapRegion.method187(n50, n47), MapRegion.method187(n50, n48), MapRegion.method187(n50, n49), this.method185(n53, n46), this.method185(n53, n47), this.method185(n53, n48), this.method185(n53, n49), n41, n54);
                                 }
                             }
                         }
@@ -362,7 +362,7 @@ final class Class7 {
                                 n6 = 240;
                                 n5 = this.anIntArrayArrayArray129[n8][n12][n11] - n6;
                                 n4 = this.anIntArrayArrayArray129[n9][n12][n11];
-                                Class25.method277((int)n15, (int)(n12 * 128), (int)n4, (int)(n12 * 128), (int)(n10 * 128 + 128), (int)n5, (int)this.anInt150, (int)(n11 * 128), (int)1);
+                                SceneGraph.method277((int)n15, (int)(n12 * 128), (int)n4, (int)(n12 * 128), (int)(n10 * 128 + 128), (int)n5, (int)this.anInt150, (int)(n11 * 128), (int)1);
                                 n3 = n9;
                                 while (n3 <= n8) {
                                     n2 = n11;
@@ -407,7 +407,7 @@ final class Class7 {
                                 n6 = 240;
                                 n5 = this.anIntArrayArrayArray129[n8][n11][n13] - n6;
                                 n4 = this.anIntArrayArrayArray129[n9][n11][n13];
-                                Class25.method277((int)n15, (int)(n11 * 128), (int)n4, (int)(n10 * 128 + 128), (int)(n13 * 128), (int)n5, (int)this.anInt150, (int)(n13 * 128), (int)2);
+                                SceneGraph.method277((int)n15, (int)(n11 * 128), (int)n4, (int)(n10 * 128 + 128), (int)(n13 * 128), (int)n5, (int)this.anInt150, (int)(n13 * 128), (int)2);
                                 n3 = n9;
                                 while (n3 <= n8) {
                                     n2 = n11;
@@ -450,7 +450,7 @@ final class Class7 {
                             }
                             if ((n10 - n11 + 1) * (n8 - n9 + 1) >= 4) {
                                 n7 = this.anIntArrayArrayArray129[n14][n11][n9];
-                                Class25.method277((int)n15, (int)(n11 * 128), (int)n7, (int)(n10 * 128 + 128), (int)(n8 * 128 + 128), (int)n7, (int)this.anInt150, (int)(n9 * 128), (int)4);
+                                SceneGraph.method277((int)n15, (int)(n11 * 128), (int)n7, (int)(n10 * 128 + 128), (int)(n8 * 128 + 128), (int)n7, (int)this.anInt150, (int)(n9 * 128), (int)4);
                                 n6 = n11;
                                 while (n6 <= n10) {
                                     n5 = n9;
@@ -474,7 +474,7 @@ final class Class7 {
     }
 
     private static final int method172(int n, int n2) {
-        int n3 = Class7.method176(n + 45365, n2 + 91923, 4) - 128 + (Class7.method176(n + 10294, n2 + 37821, 2) - 128 >> 1) + (Class7.method176(n, n2, 1) - 128 >> 2);
+        int n3 = MapRegion.method176(n + 45365, n2 + 91923, 4) - 128 + (MapRegion.method176(n + 10294, n2 + 37821, 2) - 128 >> 1) + (MapRegion.method176(n, n2, 1) - 128 >> 2);
         if ((n3 = (int)((double)n3 * 0.3) + 35) < 10) {
             n3 = 10;
         } else if (n3 > 60) {
@@ -491,7 +491,7 @@ final class Class7 {
         }
         while ((n = class30_Sub2_Sub2.method422()) != 0) {
             int n3;
-            Class46 class46 = Class46.method572((int)(n2 += n));
+            ObjectDefinition class46 = ObjectDefinition.method572((int)(n2 += n));
             class46.method574(class42_Sub1, -235);
             while ((n3 = class30_Sub2_Sub2.method422()) != 0) {
                 class30_Sub2_Sub2.method408();
@@ -528,7 +528,7 @@ final class Class7 {
         }
     }
 
-    private final void method175(int n, Class25 class25, Class11 class11, int n2, int n3, int n4, int n5, boolean bl, int n6) {
+    private final void method175(int n, SceneGraph class25, CollisionMap class11, int n2, int n3, int n4, int n5, boolean bl, int n6) {
         int n7;
         if (aBoolean151 && (this.aByteArrayArrayArray149[0][n4][n] & 2) == 0) {
             if ((this.aByteArrayArrayArray149[n3][n4][n] & 0x10) != 0) {
@@ -546,7 +546,7 @@ final class Class7 {
         int n10 = this.anIntArrayArrayArray129[n3][n4 + 1][n + 1];
         int n11 = this.anIntArrayArrayArray129[n3][n4][n + 1];
         int n12 = n8 + n9 + n10 + n11 >> 2;
-        Class46 class46 = Class46.method572((int)n5);
+        ObjectDefinition class46 = ObjectDefinition.method572((int)n5);
         int n13 = n4 + (n << 7) + (n5 << 14) + 0x40000000;
         if (!class46.aBoolean778) {
             n13 += Integer.MIN_VALUE;
@@ -559,7 +559,7 @@ final class Class7 {
             if (aBoolean151 && !class46.aBoolean778 && !class46.aBoolean736) {
                 return;
             }
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(22, n6, n8, n9, n10, n11, -1) : new Class30_Sub2_Sub4_Sub5(n5, n6, 22, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(22, n6, n8, n9, n10, n11, -1) : new DynamicObject(n5, n6, 22, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
             class25.method280(n3, n12, n, 68, (Class30_Sub2_Sub4)object, by, n13, n4);
             if (class46.aBoolean767 && class46.aBoolean778 && class11 != null) {
                 class11.method213(n, 0, n4);
@@ -567,7 +567,7 @@ final class Class7 {
             return;
         }
         if (n2 == 10 || n2 == 11) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(10, n6, n8, n9, n10, n11, -1) : new Class30_Sub2_Sub4_Sub5(n5, n6, 10, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(10, n6, n8, n9, n10, n11, -1) : new DynamicObject(n5, n6, 10, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
             if (object != null) {
                 Object object2;
                 int n14;
@@ -583,12 +583,12 @@ final class Class7 {
                     n15 = class46.anInt744;
                     n14 = class46.anInt761;
                 }
-                if (class25.method284(n13, by, n12, n14, (Class30_Sub2_Sub4)object, n15, n3, n16, (byte)110, n, n4) && class46.aBoolean779 && (object2 = object instanceof Class30_Sub2_Sub4_Sub6 ? object : class46.method578(10, n6, n8, n9, n10, n11, -1)) != null) {
+                if (class25.method284(n13, by, n12, n14, (Class30_Sub2_Sub4)object, n15, n3, n16, (byte)110, n, n4) && class46.aBoolean779 && (object2 = object instanceof Model ? object : class46.method578(10, n6, n8, n9, n10, n11, -1)) != null) {
                     int n17 = 0;
                     while (n17 <= n15) {
                         int n18 = 0;
                         while (n18 <= n14) {
-                            int n19 = ((Class30_Sub2_Sub4_Sub6)object2).anInt1650 / 4;
+                            int n19 = ((Model)object2).anInt1650 / 4;
                             if (n19 > 30) {
                                 n19 = 30;
                             }
@@ -607,7 +607,7 @@ final class Class7 {
             return;
         }
         if (n2 >= 12) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(n2, n6, n8, n9, n10, n11, -1) : new Class30_Sub2_Sub4_Sub5(n5, n6, n2, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(n2, n6, n8, n9, n10, n11, -1) : new DynamicObject(n5, n6, n2, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
             class25.method284(n13, by, n12, 1, (Class30_Sub2_Sub4)object, 1, n3, 0, (byte)110, n, n4);
             if (n2 >= 12 && n2 <= 17 && n2 != 13 && n3 > 0) {
                 int[] nArray = this.anIntArrayArrayArray135[n3][n4];
@@ -620,7 +620,7 @@ final class Class7 {
             return;
         }
         if (n2 == 0) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(0, n6, n8, n9, n10, n11, -1) : new Class30_Sub2_Sub4_Sub5(n5, n6, 0, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(0, n6, n8, n9, n10, n11, -1) : new DynamicObject(n5, n6, 0, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
             class25.method282(anIntArray152[n6], (Class30_Sub2_Sub4)object, true, n13, n, by, n4, null, n12, 0, n3);
             if (n6 == 0) {
                 if (class46.aBoolean779) {
@@ -672,7 +672,7 @@ final class Class7 {
             return;
         }
         if (n2 == 1) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(1, n6, n8, n9, n10, n11, -1) : new Class30_Sub2_Sub4_Sub5(n5, n6, 1, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(1, n6, n8, n9, n10, n11, -1) : new DynamicObject(n5, n6, 1, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
             class25.method282(anIntArray140[n6], (Class30_Sub2_Sub4)object, true, n13, n, by, n4, null, n12, 0, n3);
             if (class46.aBoolean779) {
                 if (n6 == 0) {
@@ -698,8 +698,8 @@ final class Class7 {
                 class30_Sub2_Sub4_Sub62 = class46.method578(2, 4 + n6, n8, n9, n10, n11, -1);
                 class30_Sub2_Sub4_Sub6 = class46.method578(2, n25, n8, n9, n10, n11, -1);
             } else {
-                class30_Sub2_Sub4_Sub62 = new Class30_Sub2_Sub4_Sub5(n5, 4 + n6, 2, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
-                class30_Sub2_Sub4_Sub6 = new Class30_Sub2_Sub4_Sub5(n5, n25, 2, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
+                class30_Sub2_Sub4_Sub62 = new DynamicObject(n5, 4 + n6, 2, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
+                class30_Sub2_Sub4_Sub6 = new DynamicObject(n5, n25, 2, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
             }
             class25.method282(anIntArray152[n6], (Class30_Sub2_Sub4)class30_Sub2_Sub4_Sub62, true, n13, n, by, n4, (Class30_Sub2_Sub4)class30_Sub2_Sub4_Sub6, n12, anIntArray152[n25], n3);
             if (class46.aBoolean764) {
@@ -742,7 +742,7 @@ final class Class7 {
             return;
         }
         if (n2 == 3) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(3, n6, n8, n9, n10, n11, -1) : new Class30_Sub2_Sub4_Sub5(n5, n6, 3, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(3, n6, n8, n9, n10, n11, -1) : new DynamicObject(n5, n6, 3, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
             class25.method282(anIntArray140[n6], (Class30_Sub2_Sub4)object, true, n13, n, by, n4, null, n12, 0, n3);
             if (class46.aBoolean779) {
                 if (n6 == 0) {
@@ -761,7 +761,7 @@ final class Class7 {
             return;
         }
         if (n2 == 9) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(n2, n6, n8, n9, n10, n11, -1) : new Class30_Sub2_Sub4_Sub5(n5, n6, n2, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(n2, n6, n8, n9, n10, n11, -1) : new DynamicObject(n5, n6, n2, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
             class25.method284(n13, by, n12, 1, (Class30_Sub2_Sub4)object, 1, n3, 0, (byte)110, n, n4);
             if (class46.aBoolean767 && class11 != null) {
                 class11.method212(class46.aBoolean757, anInt138, class46.anInt744, class46.anInt761, n4, n, n6);
@@ -791,7 +791,7 @@ final class Class7 {
             }
         }
         if (n2 == 4) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n8, n9, n10, n11, -1) : new Class30_Sub2_Sub4_Sub5(n5, 0, 4, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n8, n9, n10, n11, -1) : new DynamicObject(n5, 0, 4, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
             class25.method283(n13, n, n6 * 512, -460, n3, 0, n12, (Class30_Sub2_Sub4)object, n4, by, 0, anIntArray152[n6]);
             return;
         }
@@ -799,24 +799,24 @@ final class Class7 {
             n7 = 16;
             int n34 = class25.method300(n3, n4, n);
             if (n34 > 0) {
-                n7 = Class46.method572((int)(n34 >> 14 & Short.MAX_VALUE)).anInt775;
+                n7 = ObjectDefinition.method572((int)(n34 >> 14 & Short.MAX_VALUE)).anInt775;
             }
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n8, n9, n10, n11, -1) : new Class30_Sub2_Sub4_Sub5(n5, 0, 4, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n8, n9, n10, n11, -1) : new DynamicObject(n5, 0, 4, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
             class25.method283(n13, n, n6 * 512, -460, n3, anIntArray137[n6] * n7, n12, (Class30_Sub2_Sub4)object, n4, by, anIntArray144[n6] * n7, anIntArray152[n6]);
             return;
         }
         if (n2 == 6) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n8, n9, n10, n11, -1) : new Class30_Sub2_Sub4_Sub5(n5, 0, 4, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n8, n9, n10, n11, -1) : new DynamicObject(n5, 0, 4, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
             class25.method283(n13, n, n6, -460, n3, 0, n12, (Class30_Sub2_Sub4)object, n4, by, 0, 256);
             return;
         }
         if (n2 == 7) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n8, n9, n10, n11, -1) : new Class30_Sub2_Sub4_Sub5(n5, 0, 4, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n8, n9, n10, n11, -1) : new DynamicObject(n5, 0, 4, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
             class25.method283(n13, n, n6, -460, n3, 0, n12, (Class30_Sub2_Sub4)object, n4, by, 0, 512);
             return;
         }
         if (n2 == 8) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n8, n9, n10, n11, -1) : new Class30_Sub2_Sub4_Sub5(n5, 0, 4, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n8, n9, n10, n11, -1) : new DynamicObject(n5, 0, 4, n9, (byte)7, n10, n8, n11, class46.anInt781, true);
             class25.method283(n13, n, n6, -460, n3, 0, n12, (Class30_Sub2_Sub4)object, n4, by, 0, 768);
         }
     }
@@ -826,13 +826,13 @@ final class Class7 {
         int n5 = n & n3 - 1;
         int n6 = n2 / n3;
         int n7 = n2 & n3 - 1;
-        int n8 = Class7.method186(n4, n6);
-        int n9 = Class7.method186(n4 + 1, n6);
-        int n10 = Class7.method186(n4, n6 + 1);
-        int n11 = Class7.method186(n4 + 1, n6 + 1);
-        int n12 = Class7.method184(n8, n9, n5, n3);
-        int n13 = Class7.method184(n10, n11, n5, n3);
-        return Class7.method184(n12, n13, n7, n3);
+        int n8 = MapRegion.method186(n4, n6);
+        int n9 = MapRegion.method186(n4 + 1, n6);
+        int n10 = MapRegion.method186(n4, n6 + 1);
+        int n11 = MapRegion.method186(n4 + 1, n6 + 1);
+        int n12 = MapRegion.method184(n8, n9, n5, n3);
+        int n13 = MapRegion.method184(n10, n11, n5, n3);
+        return MapRegion.method184(n12, n13, n7, n3);
     }
 
     private final int method177(int n, int n2, int n3) {
@@ -853,7 +853,7 @@ final class Class7 {
     }
 
     public static final boolean method178(int n, int n2, int n3) {
-        Class46 class46 = Class46.method572((int)n);
+        ObjectDefinition class46 = ObjectDefinition.method572((int)n);
         if (n3 != 8) {
             int n4 = 1;
             while (n4 > 0) {
@@ -869,7 +869,7 @@ final class Class7 {
         return class46.method577(n2, true);
     }
 
-    public final void method179(int n, int n2, Class11[] class11Array, int n3, int n4, int n5, byte[] byArray, int n6, int n7, int n8) {
+    public final void method179(int n, int n2, CollisionMap[] class11Array, int n3, int n4, int n5, byte[] byArray, int n6, int n7, int n8) {
         int n9;
         int n10 = 0;
         while (n10 < 8) {
@@ -910,7 +910,7 @@ final class Class7 {
         }
     }
 
-    public final void method180(byte[] byArray, int n, int n2, int n3, int n4, byte by, Class11[] class11Array) {
+    public final void method180(byte[] byArray, int n, int n2, int n3, int n4, byte by, CollisionMap[] class11Array) {
         int n5;
         int n6 = 0;
         while (n6 < 4) {
@@ -957,7 +957,7 @@ final class Class7 {
                 int n9;
                 if ((n9 = class30_Sub2_Sub2.method408()) == 0) {
                     if (n4 == 0) {
-                        this.anIntArrayArrayArray129[0][n3][n] = -Class7.method172(932731 + n3 + n7, 556238 + n + n2) * 8;
+                        this.anIntArrayArrayArray129[0][n3][n] = -MapRegion.method172(932731 + n3 + n7, 556238 + n + n2) * 8;
                         return;
                     }
                     this.anIntArrayArrayArray129[n4][n3][n] = this.anIntArrayArrayArray129[n4 - 1][n3][n] - 240;
@@ -1011,7 +1011,7 @@ final class Class7 {
         return n2;
     }
 
-    public final void method183(Class11[] class11Array, Class25 class25, int n, int n2, int n3, boolean bl, int n4, byte[] byArray, int n5, int n6, int n7) {
+    public final void method183(CollisionMap[] class11Array, SceneGraph class25, int n, int n2, int n3, boolean bl, int n4, byte[] byArray, int n5, int n6, int n7) {
         int n8;
         PacketBuffer class30_Sub2_Sub2 = new PacketBuffer(byArray, 891);
         int n9 = -1;
@@ -1030,7 +1030,7 @@ final class Class7 {
                 int n16 = n15 >> 2;
                 int n17 = n15 & 3;
                 if (n14 != n || n13 < n5 || n13 >= n5 + 8 || n12 < n3 || n12 >= n3 + 8) continue;
-                Class46 class46 = Class46.method572((int)n9);
+                ObjectDefinition class46 = ObjectDefinition.method572((int)n9);
                 int n18 = n2 + Class4.method157((int)n6, (int)class46.anInt761, (int)(n13 & 7), (byte)113, (int)(n12 & 7), (int)class46.anInt744);
                 int n19 = n7 + Class4.method158((int)-433, (int)(n12 & 7), (int)class46.anInt761, (int)n6, (int)class46.anInt744, (int)(n13 & 7));
                 if (n18 <= 0 || n19 <= 0 || n18 >= 103 || n19 >= 103) continue;
@@ -1038,7 +1038,7 @@ final class Class7 {
                 if ((this.aByteArrayArrayArray149[1][n18][n19] & 2) == 2) {
                     --n20;
                 }
-                Class11 class11 = null;
+                CollisionMap class11 = null;
                 if (n20 >= 0) {
                     class11 = class11Array[n20];
                 }
@@ -1074,9 +1074,9 @@ final class Class7 {
     }
 
     private static final int method186(int n, int n2) {
-        int n3 = Class7.method170(n - 1, n2 - 1) + Class7.method170(n + 1, n2 - 1) + Class7.method170(n - 1, n2 + 1) + Class7.method170(n + 1, n2 + 1);
-        int n4 = Class7.method170(n - 1, n2) + Class7.method170(n + 1, n2) + Class7.method170(n, n2 - 1) + Class7.method170(n, n2 + 1);
-        int n5 = Class7.method170(n, n2);
+        int n3 = MapRegion.method170(n - 1, n2 - 1) + MapRegion.method170(n + 1, n2 - 1) + MapRegion.method170(n - 1, n2 + 1) + MapRegion.method170(n + 1, n2 + 1);
+        int n4 = MapRegion.method170(n - 1, n2) + MapRegion.method170(n + 1, n2) + MapRegion.method170(n, n2 - 1) + MapRegion.method170(n, n2 + 1);
+        int n5 = MapRegion.method170(n, n2);
         return n3 / 16 + n4 / 8 + n5 / 4;
     }
 
@@ -1092,7 +1092,7 @@ final class Class7 {
         return (n & 0xFF80) + n2;
     }
 
-    public static final void method188(Class25 class25, int n, int n2, int n3, int n4, Class11 class11, int[][][] nArray, int n5, int n6, int n7, byte by) {
+    public static final void method188(SceneGraph class25, int n, int n2, int n3, int n4, CollisionMap class11, int[][][] nArray, int n5, int n6, int n7, byte by) {
         int n8;
         int n9 = nArray[n4][n5][n2];
         int n10 = nArray[n4][n5 + 1][n2];
@@ -1102,14 +1102,14 @@ final class Class7 {
             anInt153 = -145;
         }
         int n13 = n9 + n10 + n11 + n12 >> 2;
-        Class46 class46 = Class46.method572((int)n6);
+        ObjectDefinition class46 = ObjectDefinition.method572((int)n6);
         int n14 = n5 + (n2 << 7) + (n6 << 14) + 0x40000000;
         if (!class46.aBoolean778) {
             n14 += Integer.MIN_VALUE;
         }
         byte by2 = (byte)((n << 6) + n3);
         if (n3 == 22) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(22, n, n9, n10, n11, n12, -1) : new Class30_Sub2_Sub4_Sub5(n6, n, 22, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(22, n, n9, n10, n11, n12, -1) : new DynamicObject(n6, n, 22, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
             class25.method280(n7, n13, n2, 68, (Class30_Sub2_Sub4)object, by2, n14, n5);
             if (class46.aBoolean767 && class46.aBoolean778) {
                 class11.method213(n2, 0, n5);
@@ -1117,7 +1117,7 @@ final class Class7 {
             return;
         }
         if (n3 == 10 || n3 == 11) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(10, n, n9, n10, n11, n12, -1) : new Class30_Sub2_Sub4_Sub5(n6, n, 10, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(10, n, n9, n10, n11, n12, -1) : new DynamicObject(n6, n, 10, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
             if (object != null) {
                 int n15;
                 int n16;
@@ -1140,7 +1140,7 @@ final class Class7 {
             return;
         }
         if (n3 >= 12) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(n3, n, n9, n10, n11, n12, -1) : new Class30_Sub2_Sub4_Sub5(n6, n, n3, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(n3, n, n9, n10, n11, n12, -1) : new DynamicObject(n6, n, n3, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
             class25.method284(n14, by2, n13, 1, (Class30_Sub2_Sub4)object, 1, n7, 0, (byte)110, n2, n5);
             if (class46.aBoolean767) {
                 class11.method212(class46.aBoolean757, anInt138, class46.anInt744, class46.anInt761, n5, n2, n);
@@ -1148,7 +1148,7 @@ final class Class7 {
             return;
         }
         if (n3 == 0) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(0, n, n9, n10, n11, n12, -1) : new Class30_Sub2_Sub4_Sub5(n6, n, 0, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(0, n, n9, n10, n11, n12, -1) : new DynamicObject(n6, n, 0, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
             class25.method282(anIntArray152[n], (Class30_Sub2_Sub4)object, true, n14, n2, by2, n5, null, n13, 0, n7);
             if (class46.aBoolean767) {
                 class11.method211(n2, n, n5, n3, (byte)1, class46.aBoolean757);
@@ -1156,7 +1156,7 @@ final class Class7 {
             return;
         }
         if (n3 == 1) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(1, n, n9, n10, n11, n12, -1) : new Class30_Sub2_Sub4_Sub5(n6, n, 1, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(1, n, n9, n10, n11, n12, -1) : new DynamicObject(n6, n, 1, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
             class25.method282(anIntArray140[n], (Class30_Sub2_Sub4)object, true, n14, n2, by2, n5, null, n13, 0, n7);
             if (class46.aBoolean767) {
                 class11.method211(n2, n, n5, n3, (byte)1, class46.aBoolean757);
@@ -1171,8 +1171,8 @@ final class Class7 {
                 class30_Sub2_Sub4_Sub62 = class46.method578(2, 4 + n, n9, n10, n11, n12, -1);
                 class30_Sub2_Sub4_Sub6 = class46.method578(2, n18, n9, n10, n11, n12, -1);
             } else {
-                class30_Sub2_Sub4_Sub62 = new Class30_Sub2_Sub4_Sub5(n6, 4 + n, 2, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
-                class30_Sub2_Sub4_Sub6 = new Class30_Sub2_Sub4_Sub5(n6, n18, 2, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
+                class30_Sub2_Sub4_Sub62 = new DynamicObject(n6, 4 + n, 2, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
+                class30_Sub2_Sub4_Sub6 = new DynamicObject(n6, n18, 2, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
             }
             class25.method282(anIntArray152[n], (Class30_Sub2_Sub4)class30_Sub2_Sub4_Sub62, true, n14, n2, by2, n5, (Class30_Sub2_Sub4)class30_Sub2_Sub4_Sub6, n13, anIntArray152[n18], n7);
             if (class46.aBoolean767) {
@@ -1181,7 +1181,7 @@ final class Class7 {
             return;
         }
         if (n3 == 3) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(3, n, n9, n10, n11, n12, -1) : new Class30_Sub2_Sub4_Sub5(n6, n, 3, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(3, n, n9, n10, n11, n12, -1) : new DynamicObject(n6, n, 3, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
             class25.method282(anIntArray140[n], (Class30_Sub2_Sub4)object, true, n14, n2, by2, n5, null, n13, 0, n7);
             if (class46.aBoolean767) {
                 class11.method211(n2, n, n5, n3, (byte)1, class46.aBoolean757);
@@ -1189,7 +1189,7 @@ final class Class7 {
             return;
         }
         if (n3 == 9) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(n3, n, n9, n10, n11, n12, -1) : new Class30_Sub2_Sub4_Sub5(n6, n, n3, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(n3, n, n9, n10, n11, n12, -1) : new DynamicObject(n6, n, n3, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
             class25.method284(n14, by2, n13, 1, (Class30_Sub2_Sub4)object, 1, n7, 0, (byte)110, n2, n5);
             if (class46.aBoolean767) {
                 class11.method212(class46.aBoolean757, anInt138, class46.anInt744, class46.anInt761, n5, n2, n);
@@ -1219,7 +1219,7 @@ final class Class7 {
             }
         }
         if (n3 == 4) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n9, n10, n11, n12, -1) : new Class30_Sub2_Sub4_Sub5(n6, 0, 4, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n9, n10, n11, n12, -1) : new DynamicObject(n6, 0, 4, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
             class25.method283(n14, n2, n * 512, -460, n7, 0, n13, (Class30_Sub2_Sub4)object, n5, by2, 0, anIntArray152[n]);
             return;
         }
@@ -1227,24 +1227,24 @@ final class Class7 {
             n8 = 16;
             int n19 = class25.method300(n7, n5, n2);
             if (n19 > 0) {
-                n8 = Class46.method572((int)(n19 >> 14 & Short.MAX_VALUE)).anInt775;
+                n8 = ObjectDefinition.method572((int)(n19 >> 14 & Short.MAX_VALUE)).anInt775;
             }
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n9, n10, n11, n12, -1) : new Class30_Sub2_Sub4_Sub5(n6, 0, 4, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n9, n10, n11, n12, -1) : new DynamicObject(n6, 0, 4, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
             class25.method283(n14, n2, n * 512, -460, n7, anIntArray137[n] * n8, n13, (Class30_Sub2_Sub4)object, n5, by2, anIntArray144[n] * n8, anIntArray152[n]);
             return;
         }
         if (n3 == 6) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n9, n10, n11, n12, -1) : new Class30_Sub2_Sub4_Sub5(n6, 0, 4, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n9, n10, n11, n12, -1) : new DynamicObject(n6, 0, 4, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
             class25.method283(n14, n2, n, -460, n7, 0, n13, (Class30_Sub2_Sub4)object, n5, by2, 0, 256);
             return;
         }
         if (n3 == 7) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n9, n10, n11, n12, -1) : new Class30_Sub2_Sub4_Sub5(n6, 0, 4, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n9, n10, n11, n12, -1) : new DynamicObject(n6, 0, 4, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
             class25.method283(n14, n2, n, -460, n7, 0, n13, (Class30_Sub2_Sub4)object, n5, by2, 0, 512);
             return;
         }
         if (n3 == 8) {
-            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n9, n10, n11, n12, -1) : new Class30_Sub2_Sub4_Sub5(n6, 0, 4, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
+            Object object = class46.anInt781 == -1 && class46.anIntArray759 == null ? class46.method578(4, 0, n9, n10, n11, n12, -1) : new DynamicObject(n6, 0, 4, n10, (byte)7, n11, n9, n12, class46.anInt781, true);
             class25.method283(n14, n2, n, -460, n7, 0, n13, (Class30_Sub2_Sub4)object, n5, by2, 0, 768);
         }
     }
@@ -1277,7 +1277,7 @@ final class Class7 {
                 int n11 = n9 + n;
                 int n12 = n8 + n2;
                 if (n11 <= 0 || n12 <= 0 || n11 >= 103 || n12 >= 103) continue;
-                Class46 class46 = Class46.method572((int)n5);
+                ObjectDefinition class46 = ObjectDefinition.method572((int)n5);
                 if (n10 == 22 && aBoolean151 && !class46.aBoolean778 && !class46.aBoolean736) continue;
                 bl &= class46.method579(true);
                 bl2 = true;
@@ -1286,7 +1286,7 @@ final class Class7 {
         return bl;
     }
 
-    public final void method190(int n, Class11[] class11Array, int n2, int n3, Class25 class25, byte[] byArray) {
+    public final void method190(int n, CollisionMap[] class11Array, int n2, int n3, SceneGraph class25, byte[] byArray) {
         int n4;
         if (n3 < 7 || n3 > 7) {
             return;
@@ -1311,7 +1311,7 @@ final class Class7 {
                 if ((this.aByteArrayArrayArray149[1][n14][n15] & 2) == 2) {
                     --n16;
                 }
-                Class11 class11 = null;
+                CollisionMap class11 = null;
                 if (n16 >= 0) {
                     class11 = class11Array[n16];
                 }

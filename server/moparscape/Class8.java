@@ -32,9 +32,9 @@ final class Class8
         if(k == -1)
             return true;
         boolean flag = true;
-        if(!Class30_Sub2_Sub4_Sub6.method463(k))
+        if(!Model.method463(k))
             flag = false;
-        if(l != -1 && !Class30_Sub2_Sub4_Sub6.method463(l))
+        if(l != -1 && !Model.method463(l))
             flag = false;
         return flag;
     }
@@ -58,7 +58,7 @@ final class Class8
 
     }
 
-    public final Class30_Sub2_Sub4_Sub6 method194(int i, int j)
+    public final Model method194(int i, int j)
     {
         while(i >= 0) 
             aBoolean186 = !aBoolean186;
@@ -71,14 +71,14 @@ final class Class8
         }
         if(k == -1)
             return null;
-        Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6 = Class30_Sub2_Sub4_Sub6.method462(anInt171, k);
+        Model class30_sub2_sub4_sub6 = Model.method462(anInt171, k);
         if(l != -1)
         {
-            Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_1 = Class30_Sub2_Sub4_Sub6.method462(anInt171, l);
-            Class30_Sub2_Sub4_Sub6 aclass30_sub2_sub4_sub6[] = {
+            Model class30_sub2_sub4_sub6_1 = Model.method462(anInt171, l);
+            Model aclass30_sub2_sub4_sub6[] = {
                 class30_sub2_sub4_sub6, class30_sub2_sub4_sub6_1
             };
-            class30_sub2_sub4_sub6 = new Class30_Sub2_Sub4_Sub6(2, aclass30_sub2_sub4_sub6, -38);
+            class30_sub2_sub4_sub6 = new Model(2, aclass30_sub2_sub4_sub6, -38);
         }
         if(anIntArray156 != null)
         {
@@ -105,16 +105,16 @@ final class Class8
         if(k == -1)
             return true;
         boolean flag = true;
-        if(!Class30_Sub2_Sub4_Sub6.method463(k))
+        if(!Model.method463(k))
             flag = false;
-        if(l != -1 && !Class30_Sub2_Sub4_Sub6.method463(l))
+        if(l != -1 && !Model.method463(l))
             flag = false;
-        if(i1 != -1 && !Class30_Sub2_Sub4_Sub6.method463(i1))
+        if(i1 != -1 && !Model.method463(i1))
             flag = false;
         return flag;
     }
 
-    public final Class30_Sub2_Sub4_Sub6 method196(boolean flag, int i)
+    public final Model method196(boolean flag, int i)
     {
         if(flag)
             throw new NullPointerException();
@@ -129,23 +129,23 @@ final class Class8
         }
         if(j == -1)
             return null;
-        Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6 = Class30_Sub2_Sub4_Sub6.method462(anInt171, j);
+        Model class30_sub2_sub4_sub6 = Model.method462(anInt171, j);
         if(k != -1)
             if(l != -1)
             {
-                Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_1 = Class30_Sub2_Sub4_Sub6.method462(anInt171, k);
-                Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_3 = Class30_Sub2_Sub4_Sub6.method462(anInt171, l);
-                Class30_Sub2_Sub4_Sub6 aclass30_sub2_sub4_sub6_1[] = {
+                Model class30_sub2_sub4_sub6_1 = Model.method462(anInt171, k);
+                Model class30_sub2_sub4_sub6_3 = Model.method462(anInt171, l);
+                Model aclass30_sub2_sub4_sub6_1[] = {
                     class30_sub2_sub4_sub6, class30_sub2_sub4_sub6_1, class30_sub2_sub4_sub6_3
                 };
-                class30_sub2_sub4_sub6 = new Class30_Sub2_Sub4_Sub6(3, aclass30_sub2_sub4_sub6_1, -38);
+                class30_sub2_sub4_sub6 = new Model(3, aclass30_sub2_sub4_sub6_1, -38);
             } else
             {
-                Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_2 = Class30_Sub2_Sub4_Sub6.method462(anInt171, k);
-                Class30_Sub2_Sub4_Sub6 aclass30_sub2_sub4_sub6[] = {
+                Model class30_sub2_sub4_sub6_2 = Model.method462(anInt171, k);
+                Model aclass30_sub2_sub4_sub6[] = {
                     class30_sub2_sub4_sub6, class30_sub2_sub4_sub6_2
                 };
-                class30_sub2_sub4_sub6 = new Class30_Sub2_Sub4_Sub6(2, aclass30_sub2_sub4_sub6, -38);
+                class30_sub2_sub4_sub6 = new Model(2, aclass30_sub2_sub4_sub6, -38);
             }
         if(i == 0 && aByte205 != 0)
             class30_sub2_sub4_sub6.method475(0, aByte205, 16384, 0);
@@ -280,7 +280,7 @@ final class Class8
             if(i1 != -1)
                 class8 = method198(i1);
         }
-        Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6 = class8.method201(1);
+        Model class30_sub2_sub4_sub6 = class8.method201(1);
         if(class30_sub2_sub4_sub6 == null)
             return null;
         Class30_Sub2_Sub1_Sub1 class30_sub2_sub1_sub1_2 = null;
@@ -393,7 +393,7 @@ final class Class8
         return class30_sub2_sub1_sub1_1;
     }
 
-    public final Class30_Sub2_Sub4_Sub6 method201(int i)
+    public final Model method201(int i)
     {
         if(anIntArray193 != null && i > 1)
         {
@@ -405,10 +405,10 @@ final class Class8
             if(j != -1)
                 return method198(j).method201(1);
         }
-        Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6 = (Class30_Sub2_Sub4_Sub6)aClass12_159.method222(anInt157);
+        Model class30_sub2_sub4_sub6 = (Model)aClass12_159.method222(anInt157);
         if(class30_sub2_sub4_sub6 != null)
             return class30_sub2_sub4_sub6;
-        class30_sub2_sub4_sub6 = Class30_Sub2_Sub4_Sub6.method462(anInt171, anInt174);
+        class30_sub2_sub4_sub6 = Model.method462(anInt171, anInt174);
         if(class30_sub2_sub4_sub6 == null)
             return null;
         if(anInt167 != 128 || anInt192 != 128 || anInt191 != 128)
@@ -425,7 +425,7 @@ final class Class8
         return class30_sub2_sub4_sub6;
     }
 
-    public final Class30_Sub2_Sub4_Sub6 method202(int i, boolean flag)
+    public final Model method202(int i, boolean flag)
     {
         if(anIntArray193 != null && i > 1)
         {
@@ -437,7 +437,7 @@ final class Class8
             if(j != -1)
                 return method198(j).method202(1, true);
         }
-        Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6 = Class30_Sub2_Sub4_Sub6.method462(anInt171, anInt174);
+        Model class30_sub2_sub4_sub6 = Model.method462(anInt171, anInt174);
         if(!flag)
             throw new NullPointerException();
         if(class30_sub2_sub4_sub6 == null)

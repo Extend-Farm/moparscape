@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
+public class Model extends Class30_Sub2_Sub4
 {
 
     public static void method458(int i)
@@ -118,7 +118,7 @@ public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
             anInt1619 = -219;
     }
 
-    public static Class30_Sub2_Sub4_Sub6 method462(int i, int j)
+    public static Model method462(int i, int j)
     {
         if(aClass21Array1661 == null)
             return null;
@@ -133,7 +133,7 @@ public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
             return null;
         } else
         {
-            return new Class30_Sub2_Sub4_Sub6(j, -870);
+            return new Model(j, -870);
         }
     }
 
@@ -152,7 +152,7 @@ public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
         }
     }
 
-    private Class30_Sub2_Sub4_Sub6(boolean flag)
+    private Model(boolean flag)
     {
         anInt1614 = 9;
         aBoolean1615 = false;
@@ -164,7 +164,7 @@ public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
             aBoolean1618 = !aBoolean1618;
     }
 
-    private Class30_Sub2_Sub4_Sub6(int i, int j)
+    private Model(int i, int j)
     {
         anInt1614 = 9;
         aBoolean1615 = false;
@@ -318,7 +318,7 @@ public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
 
     }
 
-    public Class30_Sub2_Sub4_Sub6(int i, Class30_Sub2_Sub4_Sub6 aclass30_sub2_sub4_sub6[], int j)
+    public Model(int i, Model aclass30_sub2_sub4_sub6[], int j)
     {
         anInt1614 = 9;
         aBoolean1615 = false;
@@ -337,7 +337,7 @@ public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
         anInt1641 = -1;
         for(int k = 0; k < i; k++)
         {
-            Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6 = aclass30_sub2_sub4_sub6[k];
+            Model class30_sub2_sub4_sub6 = aclass30_sub2_sub4_sub6[k];
             if(class30_sub2_sub4_sub6 != null)
             {
                 anInt1626 += class30_sub2_sub4_sub6.anInt1626;
@@ -386,7 +386,7 @@ public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
         int l = 0;
         for(int i1 = 0; i1 < i; i1++)
         {
-            Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_1 = aclass30_sub2_sub4_sub6[i1];
+            Model class30_sub2_sub4_sub6_1 = aclass30_sub2_sub4_sub6[i1];
             if(class30_sub2_sub4_sub6_1 != null)
             {
                 for(int j1 = 0; j1 < class30_sub2_sub4_sub6_1.anInt1630; j1++)
@@ -435,7 +435,7 @@ public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
 
     }
 
-    public Class30_Sub2_Sub4_Sub6(int i, int j, boolean flag, Class30_Sub2_Sub4_Sub6 aclass30_sub2_sub4_sub6[])
+    public Model(int i, int j, boolean flag, Model aclass30_sub2_sub4_sub6[])
     {
         anInt1614 = 9;
         aBoolean1615 = false;
@@ -454,7 +454,7 @@ public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
         anInt1641 = -1;
         for(int k = 0; k < i; k++)
         {
-            Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6 = aclass30_sub2_sub4_sub6[k];
+            Model class30_sub2_sub4_sub6 = aclass30_sub2_sub4_sub6[k];
             if(class30_sub2_sub4_sub6 != null)
             {
                 anInt1626 += class30_sub2_sub4_sub6.anInt1626;
@@ -506,7 +506,7 @@ public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
         int i1 = 0;
         for(int j1 = 0; j1 < i; j1++)
         {
-            Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_1 = aclass30_sub2_sub4_sub6[j1];
+            Model class30_sub2_sub4_sub6_1 = aclass30_sub2_sub4_sub6[j1];
             if(class30_sub2_sub4_sub6_1 != null)
             {
                 int k1 = anInt1626;
@@ -567,7 +567,7 @@ public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
         method466(false);
     }
 
-    public Class30_Sub2_Sub4_Sub6(int i, boolean flag, boolean flag1, boolean flag2, Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6)
+    public Model(int i, boolean flag, boolean flag1, boolean flag2, Model class30_sub2_sub4_sub6)
     {
         anInt1614 = 9;
         aBoolean1615 = false;
@@ -642,7 +642,7 @@ public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
         anIntArray1645 = class30_sub2_sub4_sub6.anIntArray1645;
     }
 
-    public Class30_Sub2_Sub4_Sub6(boolean flag, int i, boolean flag1, Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6)
+    public Model(boolean flag, int i, boolean flag1, Model class30_sub2_sub4_sub6)
     {
         anInt1614 = 9;
         aBoolean1615 = false;
@@ -732,7 +732,7 @@ public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
         anInt1647 = class30_sub2_sub4_sub6.anInt1647;
     }
 
-    public void method464(int i, Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6, boolean flag)
+    public void method464(int i, Model class30_sub2_sub4_sub6, boolean flag)
     {
         anInt1626 = class30_sub2_sub4_sub6.anInt1626;
         if(i != 7)
@@ -794,7 +794,7 @@ public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
         anIntArray1645 = class30_sub2_sub4_sub6.anIntArray1645;
     }
 
-    private final int method465(Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6, int i)
+    private final int method465(Model class30_sub2_sub4_sub6, int i)
     {
         int j = -1;
         int k = class30_sub2_sub4_sub6.anIntArray1627[i];
@@ -2054,7 +2054,7 @@ public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
     private boolean aBoolean1618;
     private static int anInt1619 = -192;
     public static int anInt1620;
-    public static Class30_Sub2_Sub4_Sub6 aClass30_Sub2_Sub4_Sub6_1621 = new Class30_Sub2_Sub4_Sub6(true);
+    public static Model aClass30_Sub2_Sub4_Sub6_1621 = new Model(true);
     private static int anIntArray1622[] = new int[2000];
     private static int anIntArray1623[] = new int[2000];
     private static int anIntArray1624[] = new int[2000];

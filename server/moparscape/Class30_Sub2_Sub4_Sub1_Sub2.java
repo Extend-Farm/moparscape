@@ -7,13 +7,13 @@ import sign.SignLink;
 final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
 {
 
-    public final Class30_Sub2_Sub4_Sub6 method444(int i)
+    public final Model method444(int i)
     {
         if(i != 4016)
             aBoolean1716 = !aBoolean1716;
         if(!aBoolean1710)
             return null;
-        Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6 = method452(0);
+        Model class30_sub2_sub4_sub6 = method452(0);
         if(class30_sub2_sub4_sub6 == null)
             return null;
         super.anInt1507 = ((Class30_Sub2_Sub4) (class30_sub2_sub4_sub6)).anInt1426;
@@ -23,10 +23,10 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
         if(super.anInt1520 != -1 && super.anInt1521 != -1)
         {
             Class23 class23 = Class23.aClass23Array403[super.anInt1520];
-            Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_2 = class23.method266();
+            Model class30_sub2_sub4_sub6_2 = class23.method266();
             if(class30_sub2_sub4_sub6_2 != null)
             {
-                Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_3 = new Class30_Sub2_Sub4_Sub6(9, true, Class36.method532(super.anInt1521, false), false, class30_sub2_sub4_sub6_2);
+                Model class30_sub2_sub4_sub6_3 = new Model(9, true, Class36.method532(super.anInt1521, false), false, class30_sub2_sub4_sub6_2);
                 class30_sub2_sub4_sub6_3.method475(0, -super.anInt1524, 16384, 0);
                 class30_sub2_sub4_sub6_3.method469((byte)-71);
                 class30_sub2_sub4_sub6_3.method470(class23.aClass20_407.anIntArray353[super.anInt1521], 40542);
@@ -35,10 +35,10 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
                 if(class23.anInt410 != 128 || class23.anInt411 != 128)
                     class30_sub2_sub4_sub6_3.method478(class23.anInt410, class23.anInt410, anInt1715, class23.anInt411);
                 class30_sub2_sub4_sub6_3.method479(64 + class23.anInt413, 850 + class23.anInt414, -30, -50, -30, true);
-                Class30_Sub2_Sub4_Sub6 aclass30_sub2_sub4_sub6_1[] = {
+                Model aclass30_sub2_sub4_sub6_1[] = {
                     class30_sub2_sub4_sub6, class30_sub2_sub4_sub6_3
                 };
-                class30_sub2_sub4_sub6 = new Class30_Sub2_Sub4_Sub6(2, -819, true, aclass30_sub2_sub4_sub6_1);
+                class30_sub2_sub4_sub6 = new Model(2, -819, true, aclass30_sub2_sub4_sub6_1);
             }
         }
         if(aClass30_Sub2_Sub4_Sub6_1714 != null)
@@ -47,7 +47,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
                 aClass30_Sub2_Sub4_Sub6_1714 = null;
             if(GameClient.anInt1161 >= anInt1707 && GameClient.anInt1161 < anInt1708)
             {
-                Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_1 = aClass30_Sub2_Sub4_Sub6_1714;
+                Model class30_sub2_sub4_sub6_1 = aClass30_Sub2_Sub4_Sub6_1714;
                 class30_sub2_sub4_sub6_1.method475(anInt1711 - super.anInt1550, anInt1712 - anInt1709, 16384, anInt1713 - super.anInt1551);
                 if(super.anInt1510 == 512)
                 {
@@ -62,10 +62,10 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
                 } else
                 if(super.anInt1510 == 1536)
                     class30_sub2_sub4_sub6_1.method473(360);
-                Class30_Sub2_Sub4_Sub6 aclass30_sub2_sub4_sub6[] = {
+                Model aclass30_sub2_sub4_sub6[] = {
                     class30_sub2_sub4_sub6, class30_sub2_sub4_sub6_1
                 };
-                class30_sub2_sub4_sub6 = new Class30_Sub2_Sub4_Sub6(2, -819, true, aclass30_sub2_sub4_sub6);
+                class30_sub2_sub4_sub6 = new Model(2, -819, true, aclass30_sub2_sub4_sub6);
                 if(super.anInt1510 == 512)
                     class30_sub2_sub4_sub6_1.method473(360);
                 else
@@ -174,7 +174,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
         aLong1718 += anInt1702;
     }
 
-    private final Class30_Sub2_Sub4_Sub6 method452(int i)
+    private final Model method452(int i)
     {
         if(aClass5_1698 != null)
         {
@@ -184,7 +184,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
             else
             if(super.anInt1517 >= 0)
                 j = Class20.aClass20Array351[super.anInt1517].anIntArray353[super.anInt1518];
-            Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6 = aClass5_1698.method164(0, -1, j, null);
+            Model class30_sub2_sub4_sub6 = aClass5_1698.method164(0, -1, j, null);
             return class30_sub2_sub4_sub6;
         }
         long l = aLong1718;
@@ -211,7 +211,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
         } else
         if(super.anInt1517 >= 0)
             k = Class20.aClass20Array351[super.anInt1517].anIntArray353[super.anInt1518];
-        Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_1 = (Class30_Sub2_Sub4_Sub6)aClass12_1704.method222(l);
+        Model class30_sub2_sub4_sub6_1 = (Model)aClass12_1704.method222(l);
         if(i != 0)
         {
             for(int l1 = 1; l1 > 0; l1++);
@@ -235,14 +235,14 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
             if(flag)
             {
                 if(aLong1697 != -1L)
-                    class30_sub2_sub4_sub6_1 = (Class30_Sub2_Sub4_Sub6)aClass12_1704.method222(aLong1697);
+                    class30_sub2_sub4_sub6_1 = (Model)aClass12_1704.method222(aLong1697);
                 if(class30_sub2_sub4_sub6_1 == null)
                     return null;
             }
         }
         if(class30_sub2_sub4_sub6_1 == null)
         {
-            Class30_Sub2_Sub4_Sub6 aclass30_sub2_sub4_sub6[] = new Class30_Sub2_Sub4_Sub6[12];
+            Model aclass30_sub2_sub4_sub6[] = new Model[12];
             int j2 = 0;
             for(int l2 = 0; l2 < 12; l2++)
             {
@@ -253,19 +253,19 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
                     i3 = j1;
                 if(i3 >= 256 && i3 < 512)
                 {
-                    Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_3 = Class38.aClass38Array656[i3 - 256].method538(false);
+                    Model class30_sub2_sub4_sub6_3 = Class38.aClass38Array656[i3 - 256].method538(false);
                     if(class30_sub2_sub4_sub6_3 != null)
                         aclass30_sub2_sub4_sub6[j2++] = class30_sub2_sub4_sub6_3;
                 }
                 if(i3 >= 512)
                 {
-                    Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_4 = Class8.method198(i3 - 512).method196(false, anInt1702);
+                    Model class30_sub2_sub4_sub6_4 = Class8.method198(i3 - 512).method196(false, anInt1702);
                     if(class30_sub2_sub4_sub6_4 != null)
                         aclass30_sub2_sub4_sub6[j2++] = class30_sub2_sub4_sub6_4;
                 }
             }
 
-            class30_sub2_sub4_sub6_1 = new Class30_Sub2_Sub4_Sub6(j2, aclass30_sub2_sub4_sub6, -38);
+            class30_sub2_sub4_sub6_1 = new Model(j2, aclass30_sub2_sub4_sub6, -38);
             for(int j3 = 0; j3 < 5; j3++)
                 if(anIntArray1700[j3] != 0)
                 {
@@ -281,7 +281,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
         }
         if(aBoolean1699)
             return class30_sub2_sub4_sub6_1;
-        Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_2 = Class30_Sub2_Sub4_Sub6.aClass30_Sub2_Sub4_Sub6_1621;
+        Model class30_sub2_sub4_sub6_2 = Model.aClass30_Sub2_Sub4_Sub6_1621;
         class30_sub2_sub4_sub6_2.method464(7, class30_sub2_sub4_sub6_1, Class36.method532(k, false) & Class36.method532(i1, false));
         if(k != -1 && i1 != -1)
             class30_sub2_sub4_sub6_2.method471(-20491, Class20.aClass20Array351[super.anInt1526].anIntArray357, i1, k);
@@ -301,7 +301,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
         return aBoolean1710;
     }
 
-    public final Class30_Sub2_Sub4_Sub6 method453(byte byte0)
+    public final Model method453(byte byte0)
     {
         if(byte0 != -41)
             anInt1715 = 132;
@@ -321,26 +321,26 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
 
         if(flag)
             return null;
-        Class30_Sub2_Sub4_Sub6 aclass30_sub2_sub4_sub6[] = new Class30_Sub2_Sub4_Sub6[12];
+        Model aclass30_sub2_sub4_sub6[] = new Model[12];
         int k = 0;
         for(int l = 0; l < 12; l++)
         {
             int i1 = anIntArray1717[l];
             if(i1 >= 256 && i1 < 512)
             {
-                Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_1 = Class38.aClass38Array656[i1 - 256].method540(0);
+                Model class30_sub2_sub4_sub6_1 = Class38.aClass38Array656[i1 - 256].method540(0);
                 if(class30_sub2_sub4_sub6_1 != null)
                     aclass30_sub2_sub4_sub6[k++] = class30_sub2_sub4_sub6_1;
             }
             if(i1 >= 512)
             {
-                Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_2 = Class8.method198(i1 - 512).method194(-705, anInt1702);
+                Model class30_sub2_sub4_sub6_2 = Class8.method198(i1 - 512).method194(-705, anInt1702);
                 if(class30_sub2_sub4_sub6_2 != null)
                     aclass30_sub2_sub4_sub6[k++] = class30_sub2_sub4_sub6_2;
             }
         }
 
-        Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6 = new Class30_Sub2_Sub4_Sub6(k, aclass30_sub2_sub4_sub6, -38);
+        Model class30_sub2_sub4_sub6 = new Model(k, aclass30_sub2_sub4_sub6, -38);
         for(int j1 = 0; j1 < 5; j1++)
             if(anIntArray1700[j1] != 0)
             {
@@ -380,7 +380,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
     int anInt1711;
     int anInt1712;
     int anInt1713;
-    Class30_Sub2_Sub4_Sub6 aClass30_Sub2_Sub4_Sub6_1714;
+    Model aClass30_Sub2_Sub4_Sub6_1714;
     private int anInt1715;
     private boolean aBoolean1716;
     int anIntArray1717[];

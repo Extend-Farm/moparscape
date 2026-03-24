@@ -5,10 +5,10 @@
 import java.io.PrintStream;
 import sign.SignLink;
 
-public class Class25
+public class SceneGraph
 {
 
-    public Class25(int i, byte byte0, int j, int ai[][][], int k)
+    public SceneGraph(int i, byte byte0, int j, int ai[][][], int k)
     {
         aBoolean429 = true;
         aBoolean434 = true;
@@ -221,9 +221,9 @@ public class Class25
         if(class30_sub3 != null)
         {
             for(int k1 = 0; k1 < class30_sub3.anInt1317; k1++)
-                if(class30_sub3.aClass28Array1318[k1].aClass30_Sub2_Sub4_521 instanceof Class30_Sub2_Sub4_Sub6)
+                if(class30_sub3.aClass28Array1318[k1].aClass30_Sub2_Sub4_521 instanceof Model)
                 {
-                    int l1 = ((Class30_Sub2_Sub4_Sub6)class30_sub3.aClass28Array1318[k1].aClass30_Sub2_Sub4_521).anInt1654;
+                    int l1 = ((Model)class30_sub3.aClass28Array1318[k1].aClass30_Sub2_Sub4_521).anInt1654;
                     if(l1 > j1)
                         j1 = l1;
                 }
@@ -681,30 +681,30 @@ public class Class25
                         Class10 class10 = class30_sub3.aClass10_1313;
                         if(class10 != null && class10.aClass30_Sub2_Sub4_278 != null && class10.aClass30_Sub2_Sub4_278.aClass33Array1425 != null)
                         {
-                            method307(l1, 1, 1, i2, (byte)115, j2, (Class30_Sub2_Sub4_Sub6)class10.aClass30_Sub2_Sub4_278);
+                            method307(l1, 1, 1, i2, (byte)115, j2, (Model)class10.aClass30_Sub2_Sub4_278);
                             if(class10.aClass30_Sub2_Sub4_279 != null && class10.aClass30_Sub2_Sub4_279.aClass33Array1425 != null)
                             {
-                                method307(l1, 1, 1, i2, (byte)115, j2, (Class30_Sub2_Sub4_Sub6)class10.aClass30_Sub2_Sub4_279);
-                                method308((Class30_Sub2_Sub4_Sub6)class10.aClass30_Sub2_Sub4_278, (Class30_Sub2_Sub4_Sub6)class10.aClass30_Sub2_Sub4_279, 0, 0, 0, false);
-                                ((Class30_Sub2_Sub4_Sub6)class10.aClass30_Sub2_Sub4_279).method480(j, k1, k, i, i1);
+                                method307(l1, 1, 1, i2, (byte)115, j2, (Model)class10.aClass30_Sub2_Sub4_279);
+                                method308((Model)class10.aClass30_Sub2_Sub4_278, (Model)class10.aClass30_Sub2_Sub4_279, 0, 0, 0, false);
+                                ((Model)class10.aClass30_Sub2_Sub4_279).method480(j, k1, k, i, i1);
                             }
-                            ((Class30_Sub2_Sub4_Sub6)class10.aClass30_Sub2_Sub4_278).method480(j, k1, k, i, i1);
+                            ((Model)class10.aClass30_Sub2_Sub4_278).method480(j, k1, k, i, i1);
                         }
                         for(int k2 = 0; k2 < class30_sub3.anInt1317; k2++)
                         {
                             Class28 class28 = class30_sub3.aClass28Array1318[k2];
                             if(class28 != null && class28.aClass30_Sub2_Sub4_521 != null && class28.aClass30_Sub2_Sub4_521.aClass33Array1425 != null)
                             {
-                                method307(l1, (class28.anInt524 - class28.anInt523) + 1, (class28.anInt526 - class28.anInt525) + 1, i2, (byte)115, j2, (Class30_Sub2_Sub4_Sub6)class28.aClass30_Sub2_Sub4_521);
-                                ((Class30_Sub2_Sub4_Sub6)class28.aClass30_Sub2_Sub4_521).method480(j, k1, k, i, i1);
+                                method307(l1, (class28.anInt524 - class28.anInt523) + 1, (class28.anInt526 - class28.anInt525) + 1, i2, (byte)115, j2, (Model)class28.aClass30_Sub2_Sub4_521);
+                                ((Model)class28.aClass30_Sub2_Sub4_521).method480(j, k1, k, i, i1);
                             }
                         }
 
                         Class49 class49 = class30_sub3.aClass49_1315;
                         if(class49 != null && class49.aClass30_Sub2_Sub4_814.aClass33Array1425 != null)
                         {
-                            method306(i2, l1, (Class30_Sub2_Sub4_Sub6)class49.aClass30_Sub2_Sub4_814, (byte)37, j2);
-                            ((Class30_Sub2_Sub4_Sub6)class49.aClass30_Sub2_Sub4_814).method480(j, k1, k, i, i1);
+                            method306(i2, l1, (Model)class49.aClass30_Sub2_Sub4_814, (byte)37, j2);
+                            ((Model)class49.aClass30_Sub2_Sub4_814).method480(j, k1, k, i, i1);
                         }
                     }
                 }
@@ -715,7 +715,7 @@ public class Class25
 
     }
 
-    private void method306(int i, int j, Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6, byte byte0, int k)
+    private void method306(int i, int j, Model class30_sub2_sub4_sub6, byte byte0, int k)
     {
         if(byte0 != 37)
         {
@@ -725,29 +725,29 @@ public class Class25
         {
             Class30_Sub3 class30_sub3 = aClass30_Sub3ArrayArrayArray441[j][i + 1][k];
             if(class30_sub3 != null && class30_sub3.aClass49_1315 != null && class30_sub3.aClass49_1315.aClass30_Sub2_Sub4_814.aClass33Array1425 != null)
-                method308(class30_sub2_sub4_sub6, (Class30_Sub2_Sub4_Sub6)class30_sub3.aClass49_1315.aClass30_Sub2_Sub4_814, 128, 0, 0, true);
+                method308(class30_sub2_sub4_sub6, (Model)class30_sub3.aClass49_1315.aClass30_Sub2_Sub4_814, 128, 0, 0, true);
         }
         if(k < anInt438)
         {
             Class30_Sub3 class30_sub3_1 = aClass30_Sub3ArrayArrayArray441[j][i][k + 1];
             if(class30_sub3_1 != null && class30_sub3_1.aClass49_1315 != null && class30_sub3_1.aClass49_1315.aClass30_Sub2_Sub4_814.aClass33Array1425 != null)
-                method308(class30_sub2_sub4_sub6, (Class30_Sub2_Sub4_Sub6)class30_sub3_1.aClass49_1315.aClass30_Sub2_Sub4_814, 0, 0, 128, true);
+                method308(class30_sub2_sub4_sub6, (Model)class30_sub3_1.aClass49_1315.aClass30_Sub2_Sub4_814, 0, 0, 128, true);
         }
         if(i < anInt438 && k < anInt439)
         {
             Class30_Sub3 class30_sub3_2 = aClass30_Sub3ArrayArrayArray441[j][i + 1][k + 1];
             if(class30_sub3_2 != null && class30_sub3_2.aClass49_1315 != null && class30_sub3_2.aClass49_1315.aClass30_Sub2_Sub4_814.aClass33Array1425 != null)
-                method308(class30_sub2_sub4_sub6, (Class30_Sub2_Sub4_Sub6)class30_sub3_2.aClass49_1315.aClass30_Sub2_Sub4_814, 128, 0, 128, true);
+                method308(class30_sub2_sub4_sub6, (Model)class30_sub3_2.aClass49_1315.aClass30_Sub2_Sub4_814, 128, 0, 128, true);
         }
         if(i < anInt438 && k > 0)
         {
             Class30_Sub3 class30_sub3_3 = aClass30_Sub3ArrayArrayArray441[j][i + 1][k - 1];
             if(class30_sub3_3 != null && class30_sub3_3.aClass49_1315 != null && class30_sub3_3.aClass49_1315.aClass30_Sub2_Sub4_814.aClass33Array1425 != null)
-                method308(class30_sub2_sub4_sub6, (Class30_Sub2_Sub4_Sub6)class30_sub3_3.aClass49_1315.aClass30_Sub2_Sub4_814, 128, 0, -128, true);
+                method308(class30_sub2_sub4_sub6, (Model)class30_sub3_3.aClass49_1315.aClass30_Sub2_Sub4_814, 128, 0, -128, true);
         }
     }
 
-    private void method307(int i, int j, int k, int l, byte byte0, int i1, Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6)
+    private void method307(int i, int j, int k, int l, byte byte0, int i1, Model class30_sub2_sub4_sub6)
     {
         boolean flag = true;
         if(byte0 != 115)
@@ -771,9 +771,9 @@ public class Class25
                                     int i3 = (anIntArrayArrayArray440[j2][k2][l2] + anIntArrayArrayArray440[j2][k2 + 1][l2] + anIntArrayArrayArray440[j2][k2][l2 + 1] + anIntArrayArrayArray440[j2][k2 + 1][l2 + 1]) / 4 - (anIntArrayArrayArray440[i][l][i1] + anIntArrayArrayArray440[i][l + 1][i1] + anIntArrayArrayArray440[i][l][i1 + 1] + anIntArrayArrayArray440[i][l + 1][i1 + 1]) / 4;
                                     Class10 class10 = class30_sub3.aClass10_1313;
                                     if(class10 != null && class10.aClass30_Sub2_Sub4_278 != null && class10.aClass30_Sub2_Sub4_278.aClass33Array1425 != null)
-                                        method308(class30_sub2_sub4_sub6, (Class30_Sub2_Sub4_Sub6)class10.aClass30_Sub2_Sub4_278, (k2 - l) * 128 + (1 - j) * 64, i3, (l2 - i1) * 128 + (1 - k) * 64, flag);
+                                        method308(class30_sub2_sub4_sub6, (Model)class10.aClass30_Sub2_Sub4_278, (k2 - l) * 128 + (1 - j) * 64, i3, (l2 - i1) * 128 + (1 - k) * 64, flag);
                                     if(class10 != null && class10.aClass30_Sub2_Sub4_279 != null && class10.aClass30_Sub2_Sub4_279.aClass33Array1425 != null)
-                                        method308(class30_sub2_sub4_sub6, (Class30_Sub2_Sub4_Sub6)class10.aClass30_Sub2_Sub4_279, (k2 - l) * 128 + (1 - j) * 64, i3, (l2 - i1) * 128 + (1 - k) * 64, flag);
+                                        method308(class30_sub2_sub4_sub6, (Model)class10.aClass30_Sub2_Sub4_279, (k2 - l) * 128 + (1 - j) * 64, i3, (l2 - i1) * 128 + (1 - k) * 64, flag);
                                     for(int j3 = 0; j3 < class30_sub3.anInt1317; j3++)
                                     {
                                         Class28 class28 = class30_sub3.aClass28Array1318[j3];
@@ -781,7 +781,7 @@ public class Class25
                                         {
                                             int k3 = (class28.anInt524 - class28.anInt523) + 1;
                                             int l3 = (class28.anInt526 - class28.anInt525) + 1;
-                                            method308(class30_sub2_sub4_sub6, (Class30_Sub2_Sub4_Sub6)class28.aClass30_Sub2_Sub4_521, (class28.anInt523 - l) * 128 + (k3 - j) * 64, i3, (class28.anInt525 - i1) * 128 + (l3 - k) * 64, flag);
+                                            method308(class30_sub2_sub4_sub6, (Model)class28.aClass30_Sub2_Sub4_521, (class28.anInt523 - l) * 128 + (k3 - j) * 64, i3, (class28.anInt525 - i1) * 128 + (l3 - k) * 64, flag);
                                         }
                                     }
 
@@ -796,7 +796,7 @@ public class Class25
 
     }
 
-    private void method308(Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6, Class30_Sub2_Sub4_Sub6 class30_sub2_sub4_sub6_1, int i, int j, int k, boolean flag)
+    private void method308(Model class30_sub2_sub4_sub6, Model class30_sub2_sub4_sub6_1, int i, int j, int k, boolean flag)
     {
         anInt488++;
         int l = 0;
@@ -930,10 +930,10 @@ public class Class25
         {
             for(int j1 = 0; j1 < 2048; j1 += 64)
             {
-                anInt458 = Class30_Sub2_Sub4_Sub6.anIntArray1689[i1];
-                anInt459 = Class30_Sub2_Sub4_Sub6.anIntArray1690[i1];
-                anInt460 = Class30_Sub2_Sub4_Sub6.anIntArray1689[j1];
-                anInt461 = Class30_Sub2_Sub4_Sub6.anIntArray1690[j1];
+                anInt458 = Model.anIntArray1689[i1];
+                anInt459 = Model.anIntArray1690[i1];
+                anInt460 = Model.anIntArray1689[j1];
+                anInt461 = Model.anIntArray1690[j1];
                 int l1 = (i1 - 128) / 32;
                 int j2 = j1 / 64;
                 for(int l2 = -26; l2 <= 26; l2++)
@@ -1046,12 +1046,12 @@ label0:
         if(j >= anInt439 * 128)
             j = anInt439 * 128 - 1;
         anInt448++;
-        anInt458 = Class30_Sub2_Sub4_Sub6.anIntArray1689[j1];
-        anInt459 = Class30_Sub2_Sub4_Sub6.anIntArray1690[j1];
+        anInt458 = Model.anIntArray1689[j1];
+        anInt459 = Model.anIntArray1690[j1];
         if(flag)
             return;
-        anInt460 = Class30_Sub2_Sub4_Sub6.anIntArray1689[k];
-        anInt461 = Class30_Sub2_Sub4_Sub6.anIntArray1690[k];
+        anInt460 = Model.anIntArray1689[k];
+        anInt461 = Model.anIntArray1690[k];
         aBooleanArrayArray492 = aBooleanArrayArrayArrayArray491[(j1 - 128) / 32][k / 64];
         anInt455 = i;
         anInt456 = l;
