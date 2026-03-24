@@ -137,4 +137,36 @@ final class IncomingPacketDispatcher {
             regionX, regionY
         };
     }
+
+    static int readDynamicRegionY(PacketBuffer packetBuffer)
+    {
+        return packetBuffer.method435(true);
+    }
+
+    static void readDynamicRegionChunks(PacketBuffer packetBuffer, int bitAccessGuard, int[][][] chunkTemplates)
+    {
+        packetBuffer.method418(bitAccessGuard);
+        for(int plane = 0; plane < 4; plane++)
+        {
+            for(int chunkX = 0; chunkX < 13; chunkX++)
+            {
+                for(int chunkY = 0; chunkY < 13; chunkY++)
+                {
+                    int hasChunk = packetBuffer.method419(1, 0);
+                    if(hasChunk == 1)
+                        chunkTemplates[plane][chunkX][chunkY] = packetBuffer.method419(26, 0);
+                    else
+                        chunkTemplates[plane][chunkX][chunkY] = -1;
+                }
+
+            }
+
+        }
+        packetBuffer.method420(true);
+    }
+
+    static int readDynamicRegionX(PacketBuffer packetBuffer)
+    {
+        return packetBuffer.method410();
+    }
 }

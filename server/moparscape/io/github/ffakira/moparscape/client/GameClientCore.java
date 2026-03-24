@@ -10566,27 +10566,9 @@ class GameClientCore extends GameShell
                     aBoolean1159 = false;
                 if(anInt1008 == 241)
                 {
-                    i11 = aClass30_Sub2_Sub2_1083.method435(true);
-                    aClass30_Sub2_Sub2_1083.method418(anInt1118);
-                    for(int j16 = 0; j16 < 4; j16++)
-                    {
-                        for(int l20 = 0; l20 < 13; l20++)
-                        {
-                            for(int j23 = 0; j23 < 13; j23++)
-                            {
-                                int i26 = aClass30_Sub2_Sub2_1083.method419(1, 0);
-                                if(i26 == 1)
-                                    anIntArrayArrayArray1129[j16][l20][j23] = aClass30_Sub2_Sub2_1083.method419(26, 0);
-                                else
-                                    anIntArrayArrayArray1129[j16][l20][j23] = -1;
-                            }
-
-                        }
-
-                    }
-
-                    aClass30_Sub2_Sub2_1083.method420(true);
-                    l2 = aClass30_Sub2_Sub2_1083.method410();
+                    i11 = IncomingPacketDispatcher.readDynamicRegionY(aClass30_Sub2_Sub2_1083);
+                    IncomingPacketDispatcher.readDynamicRegionChunks(aClass30_Sub2_Sub2_1083, anInt1118, anIntArrayArrayArray1129);
+                    l2 = IncomingPacketDispatcher.readDynamicRegionX(aClass30_Sub2_Sub2_1083);
                     aBoolean1159 = true;
                 }
                 if(anInt1069 == l2 && anInt1070 == i11 && anInt1023 == 2)
