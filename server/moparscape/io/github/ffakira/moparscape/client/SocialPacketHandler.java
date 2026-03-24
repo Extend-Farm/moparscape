@@ -1,6 +1,7 @@
 package io.github.ffakira.moparscape.client;
 
 import io.github.ffakira.moparscape.net.PacketBuffer;
+import io.github.ffakira.moparscape.sign.SignLink;
 
 final class SocialPacketHandler {
 
@@ -109,6 +110,64 @@ final class SocialPacketHandler {
         return new int[] {
             friendCount, shouldRefreshFriends ? 1 : 0
         };
+    }
+
+    // Exact extraction of legacy public-chat packet (opcode 196) logic.
+    static int handlePublicChatPacket(
+        GameClient gameClient,
+        PacketBuffer packetBuffer,
+        int packetSize,
+        int[] recentChatIds,
+        int recentChatWriteIndex,
+        int ignoreCount,
+        long[] ignoredNameHashes,
+        int chatPrivacyMode,
+        boolean messageFilterFlag
+    ) {
+        long senderNameHash = packetBuffer.method414(-35089);
+        int chatId = packetBuffer.method413();
+        int chatPrivilege = packetBuffer.method408();
+        boolean shouldSkip = false;
+        for(int index = 0; index < 100; index++)
+        {
+            if(recentChatIds[index] != chatId)
+                continue;
+            shouldSkip = true;
+            break;
+        }
+
+        if(chatPrivilege <= 1)
+        {
+            for(int ignoredIndex = 0; ignoredIndex < ignoreCount; ignoredIndex++)
+            {
+                if(ignoredNameHashes[ignoredIndex] != senderNameHash)
+                    continue;
+                shouldSkip = true;
+                break;
+            }
+
+        }
+        if(!shouldSkip && chatPrivacyMode == 0)
+            try
+            {
+                recentChatIds[recentChatWriteIndex] = chatId;
+                recentChatWriteIndex = (recentChatWriteIndex + 1) % 100;
+                String message = ChatMessageCodec.method525(packetSize - 13, true, packetBuffer);
+                if(chatPrivilege != 3)
+                    message = ChatCensor.method497(message, 0);
+                if(chatPrivilege == 2 || chatPrivilege == 3)
+                    gameClient.method77(message, 7, "@cr2@" + TextUtils.method587(-45804, TextUtils.method584(senderNameHash, (byte)-99)), messageFilterFlag);
+                else
+                if(chatPrivilege == 1)
+                    gameClient.method77(message, 7, "@cr1@" + TextUtils.method587(-45804, TextUtils.method584(senderNameHash, (byte)-99)), messageFilterFlag);
+                else
+                    gameClient.method77(message, 3, TextUtils.method587(-45804, TextUtils.method584(senderNameHash, (byte)-99)), messageFilterFlag);
+            }
+            catch(Exception exception)
+            {
+                SignLink.reporterror("cde1");
+            }
+        return recentChatWriteIndex;
     }
 
     private static boolean isIgnored(long playerNameHash, int ignoreCount, long[] ignoredNameHashes)

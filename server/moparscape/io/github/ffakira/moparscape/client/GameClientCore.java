@@ -10985,49 +10985,7 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 196)
             {
-                long l5 = aClass30_Sub2_Sub2_1083.method414(-35089);
-                int j18 = aClass30_Sub2_Sub2_1083.method413();
-                int l21 = aClass30_Sub2_Sub2_1083.method408();
-                boolean flag5 = false;
-                for(int i28 = 0; i28 < 100; i28++)
-                {
-                    if(anIntArray1240[i28] != j18)
-                        continue;
-                    flag5 = true;
-                    break;
-                }
-
-                if(l21 <= 1)
-                {
-                    for(int l29 = 0; l29 < anInt822; l29++)
-                    {
-                        if(aLongArray925[l29] != l5)
-                            continue;
-                        flag5 = true;
-                        break;
-                    }
-
-                }
-                if(!flag5 && anInt1251 == 0)
-                    try
-                    {
-                        anIntArray1240[anInt1169] = j18;
-                        anInt1169 = (anInt1169 + 1) % 100;
-                        String s9 = ChatMessageCodec.method525(anInt1007 - 13, true, aClass30_Sub2_Sub2_1083);
-                        if(l21 != 3)
-                            s9 = ChatCensor.method497(s9, 0);
-                        if(l21 == 2 || l21 == 3)
-                            method77(s9, 7, "@cr2@" + TextUtils.method587(-45804, TextUtils.method584(l5, (byte)-99)), aBoolean991);
-                        else
-                        if(l21 == 1)
-                            method77(s9, 7, "@cr1@" + TextUtils.method587(-45804, TextUtils.method584(l5, (byte)-99)), aBoolean991);
-                        else
-                            method77(s9, 3, TextUtils.method587(-45804, TextUtils.method584(l5, (byte)-99)), aBoolean991);
-                    }
-                    catch(Exception exception1)
-                    {
-                        SignLink.reporterror("cde1");
-                    }
+                anInt1169 = SocialPacketHandler.handlePublicChatPacket((GameClient)this, aClass30_Sub2_Sub2_1083, anInt1007, anIntArray1240, anInt1169, anInt822, aLongArray925, anInt1251, aBoolean991);
                 anInt1008 = -1;
                 return true;
             }
