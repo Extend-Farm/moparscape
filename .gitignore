@@ -2,3 +2,6 @@
 cache.zip
 moparscape.zip
 OriginalMopar.zip
+
+.gradle/
+build/
