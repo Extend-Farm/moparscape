@@ -2844,113 +2844,13 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
             return;
         synchronized(aClass48_879.anObject806)
         {
-            if(aBoolean1205)
-            {
-                if(super.anInt26 != 0 || aClass48_879.anInt810 >= 40)
-                {
-                    aClass30_Sub2_Sub2_1192.method397((byte)6, 45);
-                    aClass30_Sub2_Sub2_1192.method398(0);
-                    int j2 = aClass30_Sub2_Sub2_1192.anInt1406;
-                    int j3 = 0;
-                    for(int j4 = 0; j4 < aClass48_879.anInt810; j4++)
-                    {
-                        if(j2 - aClass30_Sub2_Sub2_1192.anInt1406 >= 240)
-                            break;
-                        j3++;
-                        int l4 = aClass48_879.anIntArray807[j4];
-                        if(l4 < 0)
-                            l4 = 0;
-                        else
-                        if(l4 > 502)
-                            l4 = 502;
-                        int k5 = aClass48_879.anIntArray809[j4];
-                        if(k5 < 0)
-                            k5 = 0;
-                        else
-                        if(k5 > 764)
-                            k5 = 764;
-                        int i6 = l4 * 765 + k5;
-                        if(aClass48_879.anIntArray807[j4] == -1 && aClass48_879.anIntArray809[j4] == -1)
-                        {
-                            k5 = -1;
-                            l4 = -1;
-                            i6 = 0x7ffff;
-                        }
-                        if(k5 == anInt1237 && l4 == anInt1238)
-                        {
-                            if(anInt1022 < 2047)
-                                anInt1022++;
-                        } else
-                        {
-                            int j6 = k5 - anInt1237;
-                            anInt1237 = k5;
-                            int k6 = l4 - anInt1238;
-                            anInt1238 = l4;
-                            if(anInt1022 < 8 && j6 >= -32 && j6 <= 31 && k6 >= -32 && k6 <= 31)
-                            {
-                                j6 += 32;
-                                k6 += 32;
-                                aClass30_Sub2_Sub2_1192.method399((anInt1022 << 12) + (j6 << 6) + k6);
-                                anInt1022 = 0;
-                            } else
-                            if(anInt1022 < 8)
-                            {
-                                aClass30_Sub2_Sub2_1192.method401(0x800000 + (anInt1022 << 19) + i6);
-                                anInt1022 = 0;
-                            } else
-                            {
-                                aClass30_Sub2_Sub2_1192.method402(0xc0000000 + (anInt1022 << 19) + i6);
-                                anInt1022 = 0;
-                            }
-                        }
-                    }
-
-                    aClass30_Sub2_Sub2_1192.method407(aClass30_Sub2_Sub2_1192.anInt1406 - j2, (byte)0);
-                    if(j3 >= aClass48_879.anInt810)
-                    {
-                        aClass48_879.anInt810 = 0;
-                    } else
-                    {
-                        aClass48_879.anInt810 -= j3;
-                        for(int i5 = 0; i5 < aClass48_879.anInt810; i5++)
-                        {
-                            aClass48_879.anIntArray809[i5] = aClass48_879.anIntArray809[i5 + j3];
-                            aClass48_879.anIntArray807[i5] = aClass48_879.anIntArray807[i5 + j3];
-                        }
-
-                    }
-                }
-            } else
-            {
-                aClass48_879.anInt810 = 0;
-            }
+            GameTickIoProcessor.MouseBatchState mouseBatchState = GameTickIoProcessor.processMouseRecorderBatch(aClass48_879, aClass30_Sub2_Sub2_1192, aBoolean1205, anInt1237, anInt1238, anInt1022);
+            anInt1237 = mouseBatchState.lastMouseX;
+            anInt1238 = mouseBatchState.lastMouseY;
+            anInt1022 = mouseBatchState.repeatCount;
         }
         if(super.anInt26 != 0)
-        {
-            long l = (super.aLong29 - aLong1220) / 50L;
-            if(l > 4095L)
-                l = 4095L;
-            aLong1220 = super.aLong29;
-            int k2 = super.anInt28;
-            if(k2 < 0)
-                k2 = 0;
-            else
-            if(k2 > 502)
-                k2 = 502;
-            int k3 = super.anInt27;
-            if(k3 < 0)
-                k3 = 0;
-            else
-            if(k3 > 764)
-                k3 = 764;
-            int k4 = k2 * 765 + k3;
-            int j5 = 0;
-            if(super.anInt26 == 2)
-                j5 = 1;
-            int l5 = (int)l;
-            aClass30_Sub2_Sub2_1192.method397((byte)6, 241);
-            aClass30_Sub2_Sub2_1192.method402((l5 << 20) + (j5 << 19) + k4);
-        }
+            aLong1220 = GameTickIoProcessor.encodeMouseClickPacket(aClass30_Sub2_Sub2_1192, super.anInt26, super.anInt28, super.anInt27, super.aLong29, aLong1220);
         if(anInt1016 > 0)
             anInt1016--;
         if(super.anIntArray30[1] == 1 || super.anIntArray30[2] == 1 || super.anIntArray30[3] == 1 || super.anIntArray30[4] == 1)
@@ -3142,41 +3042,38 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
         if(anInt1254 > 500)
         {
             anInt1254 = 0;
-            int i2 = (int)(Math.random() * 8D);
-            if((i2 & 1) == 1)
-                anInt1209 += anInt1210;
-            if((i2 & 2) == 2)
-                anInt1170 += anInt1171;
         }
-        if(anInt1209 < -60)
-            anInt1210 = 2;
-        if(anInt1209 > 60)
-            anInt1210 = -2;
-        if(anInt1170 < -20)
-            anInt1171 = 1;
-        if(anInt1170 > 10)
-            anInt1171 = -1;
+        CameraDriftUpdater.DriftState driftState = CameraDriftUpdater.update(anInt988, anInt1278, anInt1131, anInt1279, anInt1132, anInt896, anInt897, anInt1254, anInt1209, anInt1170, anInt1210, anInt1171);
+        anInt988 = driftState.primaryTimer;
+        anInt1278 = driftState.primaryX;
+        anInt1131 = driftState.primaryY;
+        anInt1279 = driftState.primaryDeltaX;
+        anInt1132 = driftState.primaryDeltaY;
+        anInt896 = driftState.primaryShake;
+        anInt897 = driftState.primaryDeltaShake;
+        anInt1254 = driftState.secondaryTimer;
+        anInt1209 = driftState.secondaryPitchOffset;
+        anInt1170 = driftState.secondaryYawOffset;
+        anInt1210 = driftState.secondaryPitchDelta;
+        anInt1171 = driftState.secondaryYawDelta;
         anInt1010++;
         if(anInt1010 > 50)
             aClass30_Sub2_Sub2_1192.method397((byte)6, 0);
-        try
-        {
-            if(aClass24_1168 != null && aClass30_Sub2_Sub2_1192.anInt1406 > 0)
-            {
-                aClass24_1168.method271(aClass30_Sub2_Sub2_1192.anInt1406, 0, aClass30_Sub2_Sub2_1192.aByteArray1405, 0);
-                aClass30_Sub2_Sub2_1192.anInt1406 = 0;
-                anInt1010 = 0;
-                return;
-            }
-        }
-        catch(IOException _ex)
+        int flushStatus = GameTickIoProcessor.flushOutbound(aClass24_1168, aClass30_Sub2_Sub2_1192);
+        if(flushStatus == -1)
         {
             method68(-670);
             return;
         }
-        catch(Exception exception)
+        if(flushStatus == -2)
         {
             method44(true);
+            return;
+        }
+        if(flushStatus == 1)
+        {
+            anInt1010 = 0;
+            return;
         }
     }
 
