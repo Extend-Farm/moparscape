@@ -5,7 +5,7 @@
 import java.io.PrintStream;
 import sign.SignLink;
 
-public class Class41
+public class VarpDefinition
 {
 
     public static void method546(int i, Archive class44)
@@ -14,13 +14,13 @@ public class Class41
         anInt702 = 0;
         anInt700 = class30_sub2_sub2.method410();
         if(aClass41Array701 == null)
-            aClass41Array701 = new Class41[anInt700];
+            aClass41Array701 = new VarpDefinition[anInt700];
         if(anIntArray703 == null)
             anIntArray703 = new int[anInt700];
         for(int j = 0; j < anInt700; j++)
         {
             if(aClass41Array701[j] == null)
-                aClass41Array701[j] = new Class41();
+                aClass41Array701[j] = new VarpDefinition();
             aClass41Array701[j].method547(class30_sub2_sub2, false, j);
         }
 
@@ -83,7 +83,7 @@ public class Class41
         } while(true);
     }
 
-    public Class41()
+    public VarpDefinition()
     {
         anInt699 = -32357;
         aBoolean707 = false;
@@ -96,7 +96,7 @@ public class Class41
     private static boolean aBoolean698 = true;
     private int anInt699;
     public static int anInt700;
-    public static Class41 aClass41Array701[];
+    public static VarpDefinition aClass41Array701[];
     public static int anInt702;
     public static int anIntArray703[];
     public String aString704;

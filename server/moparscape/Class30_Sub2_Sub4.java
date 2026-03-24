@@ -32,7 +32,7 @@ public class Class30_Sub2_Sub4 extends CacheableNode
     }
 
     private int anInt1424;
-    Class33 aClass33Array1425[];
+    VertexNormal aClass33Array1425[];
     public int anInt1426;
     public static boolean aBoolean1427;
 }

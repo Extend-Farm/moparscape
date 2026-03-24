@@ -57,7 +57,7 @@ public class DynamicObject extends Class30_Sub2_Sub4
         }
         if(anInt1601 != -1)
         {
-            Class37 class37 = Class37.aClass37Array646[anInt1601];
+            VarBitDefinition class37 = VarBitDefinition.aClass37Array646[anInt1601];
             int k = class37.anInt648;
             int l = class37.anInt649;
             int i1 = class37.anInt650;

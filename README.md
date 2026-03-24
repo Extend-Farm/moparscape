@@ -87,6 +87,17 @@ This project is now a Gradle multi-module build.
 - `Class3` -> `GroundItemPile`
 - `Class47` -> `Occluder`
 
+### Phase 7 (definitions and animation metadata)
+
+- `Class23` -> `SpotAnimationDefinition`
+- `Class36` -> `AnimationFrame`
+- `Class18` -> `AnimationSkeleton`
+- `Class21` -> `ModelHeader`
+- `Class37` -> `VarBitDefinition`
+- `Class41` -> `VarpDefinition`
+- `Class38` -> `IdentityKitDefinition`
+- `Class33` -> `VertexNormal`
+
 ## Next steps
 
 - Continue phased renaming of remaining `Class1`..`Class50` files.

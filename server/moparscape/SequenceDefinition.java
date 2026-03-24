@@ -36,7 +36,7 @@ public class SequenceDefinition
         }
         if(j == 0)
         {
-            Class36 class36 = Class36.method531(anInt348, anIntArray353[i]);
+            AnimationFrame class36 = AnimationFrame.method531(anInt348, anIntArray353[i]);
             if(class36 != null)
                 j = anIntArray355[i] = class36.anInt636;
         }

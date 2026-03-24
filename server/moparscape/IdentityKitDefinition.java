@@ -5,7 +5,7 @@
 import java.io.PrintStream;
 import sign.SignLink;
 
-public class Class38
+public class IdentityKitDefinition
 {
 
     public static void method535(int i, Archive class44)
@@ -13,11 +13,11 @@ public class Class38
         PacketBuffer class30_sub2_sub2 = new PacketBuffer(class44.method571("idk.dat", null), 891);
         anInt655 = class30_sub2_sub2.method410();
         if(aClass38Array656 == null)
-            aClass38Array656 = new Class38[anInt655];
+            aClass38Array656 = new IdentityKitDefinition[anInt655];
         for(int j = 0; j < anInt655; j++)
         {
             if(aClass38Array656[j] == null)
-                aClass38Array656[j] = new Class38();
+                aClass38Array656[j] = new IdentityKitDefinition();
             aClass38Array656[j].method536(true, class30_sub2_sub2);
         }
 
@@ -137,7 +137,7 @@ public class Class38
         return class30_sub2_sub4_sub6;
     }
 
-    public Class38()
+    public IdentityKitDefinition()
     {
         anInt654 = 9;
         anInt657 = -1;
@@ -148,7 +148,7 @@ public class Class38
 
     private int anInt654;
     public static int anInt655;
-    public static Class38 aClass38Array656[];
+    public static IdentityKitDefinition aClass38Array656[];
     public int anInt657;
     public int anIntArray658[];
     public int anIntArray659[];

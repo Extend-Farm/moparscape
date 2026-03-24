@@ -39,12 +39,12 @@ final class Class30_Sub2_Sub4_Sub1_Sub1 extends Class30_Sub2_Sub4_Sub1
             anInt1693 = -403;
         if(super.anInt1520 != -1 && super.anInt1521 != -1)
         {
-            Class23 class23 = Class23.aClass23Array403[super.anInt1520];
+            SpotAnimationDefinition class23 = SpotAnimationDefinition.aClass23Array403[super.anInt1520];
             Model class30_sub2_sub4_sub6_1 = class23.method266();
             if(class30_sub2_sub4_sub6_1 != null)
             {
                 int j = class23.aClass20_407.anIntArray353[super.anInt1521];
-                Model class30_sub2_sub4_sub6_2 = new Model(9, true, Class36.method532(j, false), false, class30_sub2_sub4_sub6_1);
+                Model class30_sub2_sub4_sub6_2 = new Model(9, true, AnimationFrame.method532(j, false), false, class30_sub2_sub4_sub6_1);
                 class30_sub2_sub4_sub6_2.method475(0, -super.anInt1524, 16384, 0);
                 class30_sub2_sub4_sub6_2.method469((byte)-71);
                 class30_sub2_sub4_sub6_2.method470(j, 40542);

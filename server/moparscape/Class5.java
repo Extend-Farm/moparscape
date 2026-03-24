@@ -67,7 +67,7 @@ final class Class5
             aBoolean81 = !aBoolean81;
         if(anInt57 != -1)
         {
-            Class37 class37 = Class37.aClass37Array646[anInt57];
+            VarBitDefinition class37 = VarBitDefinition.aClass37Array646[anInt57];
             int k = class37.anInt648;
             int l = class37.anInt649;
             int i1 = class37.anInt650;
@@ -154,7 +154,7 @@ final class Class5
             aClass12_95.method223(class30_sub2_sub4_sub6, aLong78, (byte)2);
         }
         Model class30_sub2_sub4_sub6_1 = Model.aClass30_Sub2_Sub4_Sub6_1621;
-        class30_sub2_sub4_sub6_1.method464(7, class30_sub2_sub4_sub6, Class36.method532(k, false) & Class36.method532(j, false));
+        class30_sub2_sub4_sub6_1.method464(7, class30_sub2_sub4_sub6, AnimationFrame.method532(k, false) & AnimationFrame.method532(j, false));
         if(k != -1 && j != -1)
             class30_sub2_sub4_sub6_1.method471(-20491, ai, j, k);
         else

@@ -309,7 +309,7 @@ public class Class9
             return null;
         if(k == -1 && j == -1 && class30_sub2_sub4_sub6.anIntArray1640 == null)
             return class30_sub2_sub4_sub6;
-        Model class30_sub2_sub4_sub6_1 = new Model(9, true, Class36.method532(k, false) & Class36.method532(j, false), false, class30_sub2_sub4_sub6);
+        Model class30_sub2_sub4_sub6_1 = new Model(9, true, AnimationFrame.method532(k, false) & AnimationFrame.method532(j, false), false, class30_sub2_sub4_sub6);
         if(k != -1 || j != -1)
             class30_sub2_sub4_sub6_1.method469((byte)-71);
         if(k != -1)

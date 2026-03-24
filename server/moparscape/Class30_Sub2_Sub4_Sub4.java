@@ -37,7 +37,7 @@ final class Class30_Sub2_Sub4_Sub4 extends Class30_Sub2_Sub4
         int j = -1;
         if(aClass23_1592.aClass20_407 != null)
             j = aClass23_1592.aClass20_407.anIntArray353[anInt1593];
-        Model class30_sub2_sub4_sub6_1 = new Model(9, true, Class36.method532(j, false), false, class30_sub2_sub4_sub6);
+        Model class30_sub2_sub4_sub6_1 = new Model(9, true, AnimationFrame.method532(j, false), false, class30_sub2_sub4_sub6);
         if(j != -1)
         {
             class30_sub2_sub4_sub6_1.method469((byte)-71);
@@ -61,7 +61,7 @@ final class Class30_Sub2_Sub4_Sub4 extends Class30_Sub2_Sub4
         anInt1573 = 9;
         aBoolean1579 = false;
         aBoolean1591 = true;
-        aClass23_1592 = Class23.aClass23Array403[l2];
+        aClass23_1592 = SpotAnimationDefinition.aClass23Array403[l2];
         if(k != 46883)
             aBoolean1591 = !aBoolean1591;
         anInt1597 = k1;
@@ -120,7 +120,7 @@ final class Class30_Sub2_Sub4_Sub4 extends Class30_Sub2_Sub4
     public int anInt1589;
     public int anInt1590;
     private boolean aBoolean1591;
-    private Class23 aClass23_1592;
+    private SpotAnimationDefinition aClass23_1592;
     private int anInt1593;
     private int anInt1594;
     public int anInt1595;

@@ -4,12 +4,12 @@
 
 import sign.SignLink;
 
-public class Class36
+public class AnimationFrame
 {
 
     public static void method528(int i)
     {
-        aClass36Array635 = new Class36[i + 1];
+        aClass36Array635 = new AnimationFrame[i + 1];
         aBooleanArray643 = new boolean[i + 1];
         for(int j = 0; j < i + 1; j++)
             aBooleanArray643[j] = true;
@@ -43,7 +43,7 @@ public class Class36
         {
             for(int j1 = 1; j1 > 0; j1++);
         }
-        Class18 class18 = new Class18(0, class30_sub2_sub2_5);
+        AnimationSkeleton class18 = new AnimationSkeleton(0, class30_sub2_sub2_5);
         int k1 = class30_sub2_sub2_1.method410();
         int ai[] = new int[500];
         int ai1[] = new int[500];
@@ -52,7 +52,7 @@ public class Class36
         for(int l1 = 0; l1 < k1; l1++)
         {
             int i2 = class30_sub2_sub2_1.method410();
-            Class36 class36 = aClass36Array635[i2] = new Class36();
+            AnimationFrame class36 = aClass36Array635[i2] = new AnimationFrame();
             class36.anInt636 = class30_sub2_sub2_4.method408();
             class36.aClass18_637 = class18;
             int j2 = class30_sub2_sub2_1.method408();
@@ -125,7 +125,7 @@ public class Class36
         aClass36Array635 = null;
     }
 
-    public static Class36 method531(int i, int j)
+    public static AnimationFrame method531(int i, int j)
     {
         if(i != 9)
             throw new NullPointerException();
@@ -142,14 +142,14 @@ public class Class36
         return i == -1;
     }
 
-    public Class36()
+    public AnimationFrame()
     {
     }
 
     private static int anInt634 = -715;
-    private static Class36 aClass36Array635[];
+    private static AnimationFrame aClass36Array635[];
     public int anInt636;
-    public Class18 aClass18_637;
+    public AnimationSkeleton aClass18_637;
     public int anInt638;
     public int anIntArray639[];
     public int anIntArray640[];

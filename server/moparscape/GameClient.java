@@ -673,7 +673,7 @@ public final class GameClient extends GameShell
         if(flag)
             anInt1008 = -1;
         Class30_Sub2_Sub4_Sub1_Sub2.aClass12_1704.method224();
-        Class23.aClass12_415.method224();
+        SpotAnimationDefinition.aClass12_415.method224();
     }
 
     public final void method24(boolean flag, int i)
@@ -1207,7 +1207,7 @@ public final class GameClient extends GameShell
 
     public final void method33(boolean flag, int i)
     {
-        int j = Class41.aClass41Array701[i].anInt709;
+        int j = VarpDefinition.aClass41Array701[i].anInt709;
         if(j == 0)
             return;
         int k = anIntArray971[i];
@@ -1964,9 +1964,9 @@ public final class GameClient extends GameShell
         for(int j = 0; j < 7; j++)
         {
             anIntArray1065[j] = -1;
-            for(int k = 0; k < Class38.anInt655; k++)
+            for(int k = 0; k < IdentityKitDefinition.anInt655; k++)
             {
-                if(Class38.aClass38Array656[k].aBoolean662 || Class38.aClass38Array656[k].anInt657 != j + (aBoolean1047 ? 0 : 7))
+                if(IdentityKitDefinition.aClass38Array656[k].aBoolean662 || IdentityKitDefinition.aClass38Array656[k].anInt657 != j + (aBoolean1047 ? 0 : 7))
                     continue;
                 anIntArray1065[j] = k;
                 break;
@@ -2140,10 +2140,10 @@ public final class GameClient extends GameShell
                 do
                 {
                     if(j1 == 0 && --i2 < 0)
-                        i2 = Class38.anInt655 - 1;
-                    if(j1 == 1 && ++i2 >= Class38.anInt655)
+                        i2 = IdentityKitDefinition.anInt655 - 1;
+                    if(j1 == 1 && ++i2 >= IdentityKitDefinition.anInt655)
                         i2 = 0;
-                } while(Class38.aClass38Array656[i2].aBoolean662 || Class38.aClass38Array656[i2].anInt657 != k + (aBoolean1047 ? 0 : 7));
+                } while(IdentityKitDefinition.aClass38Array656[i2].aBoolean662 || IdentityKitDefinition.aClass38Array656[i2].anInt657 != k + (aBoolean1047 ? 0 : 7));
                 anIntArray1065[k] = i2;
                 aBoolean1031 = true;
             }
@@ -2703,7 +2703,7 @@ public final class GameClient extends GameShell
                     }
                 }
                 if(class30_sub2_sub3.anInt1419 == 1 && class30_sub2_sub3.aByteArray1420 != null)
-                    Class36.method529(class30_sub2_sub3.aByteArray1420, false);
+                    AnimationFrame.method529(class30_sub2_sub3.aByteArray1420, false);
                 if(class30_sub2_sub3.anInt1419 == 2 && class30_sub2_sub3.anInt1421 == anInt1227 && class30_sub2_sub3.aByteArray1420 != null)
                     method21(aBoolean1228, 0, class30_sub2_sub3.aByteArray1420);
                 if(class30_sub2_sub3.anInt1419 == 3 && anInt1023 == 1)
@@ -4766,19 +4766,19 @@ public final class GameClient extends GameShell
         Class5.method163(-501);
         Class8.method191(-501);
         FloorDefinition.aClass22Array388 = null;
-        Class38.aClass38Array656 = null;
+        IdentityKitDefinition.aClass38Array656 = null;
         Class9.aClass9Array210 = null;
         Class27.aClass27Array507 = null;
         SequenceDefinition.aClass20Array351 = null;
-        Class23.aClass23Array403 = null;
-        Class23.aClass12_415 = null;
-        Class41.aClass41Array701 = null;
+        SpotAnimationDefinition.aClass23Array403 = null;
+        SpotAnimationDefinition.aClass12_415 = null;
+        VarpDefinition.aClass41Array701 = null;
         super.aClass15_13 = null;
         Class30_Sub2_Sub4_Sub1_Sub2.aClass12_1704 = null;
         Rasterizer3D.method363(-501);
         SceneGraph.method273(-501);
         Model.method458(-501);
-        Class36.method530(-501);
+        AnimationFrame.method530(-501);
         System.gc();
     }
 
@@ -5333,7 +5333,7 @@ public final class GameClient extends GameShell
                 for(int k1 = 0; k1 < 7; k1++)
                 {
                     int l1 = anIntArray1065[k1];
-                    if(l1 >= 0 && !Class38.aClass38Array656[l1].method537((byte)2))
+                    if(l1 >= 0 && !IdentityKitDefinition.aClass38Array656[l1].method537((byte)2))
                         return;
                 }
 
@@ -5344,7 +5344,7 @@ public final class GameClient extends GameShell
                 {
                     int k2 = anIntArray1065[j2];
                     if(k2 >= 0)
-                        aclass30_sub2_sub4_sub6[i2++] = Class38.aClass38Array656[k2].method538(false);
+                        aclass30_sub2_sub4_sub6[i2++] = IdentityKitDefinition.aClass38Array656[k2].method538(false);
                 }
 
                 Model class30_sub2_sub4_sub6 = new Model(i2, aclass30_sub2_sub4_sub6, -38);
@@ -6832,7 +6832,7 @@ public final class GameClient extends GameShell
             method13(60, (byte)4, "Connecting to update server");
             aClass42_Sub1_1068 = new OnDemandFetcher();
             aClass42_Sub1_1068.method551(class44_6, this);
-            Class36.method528(aClass42_Sub1_1068.method557(0));
+            AnimationFrame.method528(aClass42_Sub1_1068.method557(0));
             Model.method459(aClass42_Sub1_1068.method555(79, 0), aClass42_Sub1_1068);
             if(!aBoolean960)
             {
@@ -7096,10 +7096,10 @@ public final class GameClient extends GameShell
             FloorDefinition.method260(0, class44);
             Class8.method193(class44);
             Class5.method162(class44);
-            Class38.method535(0, class44);
-            Class23.method264(0, class44);
-            Class41.method546(0, class44);
-            Class37.method533(0, class44);
+            IdentityKitDefinition.method535(0, class44);
+            SpotAnimationDefinition.method264(0, class44);
+            VarpDefinition.method546(0, class44);
+            VarBitDefinition.method533(0, class44);
             Class8.aBoolean182 = aBoolean959;
             if(!aBoolean960)
             {
@@ -7675,7 +7675,7 @@ public final class GameClient extends GameShell
         {
             if(class30_sub2_sub4_sub1.anInt1521 < 0)
                 class30_sub2_sub4_sub1.anInt1521 = 0;
-            SequenceDefinition class20_1 = Class23.aClass23Array403[class30_sub2_sub4_sub1.anInt1520].aClass20_407;
+            SequenceDefinition class20_1 = SpotAnimationDefinition.aClass23Array403[class30_sub2_sub4_sub1.anInt1520].aClass20_407;
             for(class30_sub2_sub4_sub1.anInt1522++; class30_sub2_sub4_sub1.anInt1521 < class20_1.anInt352 && class30_sub2_sub4_sub1.anInt1522 > class20_1.method258(class30_sub2_sub4_sub1.anInt1521, (byte)-39); class30_sub2_sub4_sub1.anInt1521++)
                 class30_sub2_sub4_sub1.anInt1522 -= class20_1.method258(class30_sub2_sub4_sub1.anInt1521, (byte)-39);
 
@@ -9248,7 +9248,7 @@ public final class GameClient extends GameShell
                 if(j1 == 14)
                 {
                     int j2 = ai[l++];
-                    Class37 class37 = Class37.aClass37Array646[j2];
+                    VarBitDefinition class37 = VarBitDefinition.aClass37Array646[j2];
                     int l3 = class37.anInt648;
                     int i4 = class37.anInt649;
                     int j4 = class37.anInt650;

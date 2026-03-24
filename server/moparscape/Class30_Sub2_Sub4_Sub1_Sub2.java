@@ -22,11 +22,11 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
             return class30_sub2_sub4_sub6;
         if(super.anInt1520 != -1 && super.anInt1521 != -1)
         {
-            Class23 class23 = Class23.aClass23Array403[super.anInt1520];
+            SpotAnimationDefinition class23 = SpotAnimationDefinition.aClass23Array403[super.anInt1520];
             Model class30_sub2_sub4_sub6_2 = class23.method266();
             if(class30_sub2_sub4_sub6_2 != null)
             {
-                Model class30_sub2_sub4_sub6_3 = new Model(9, true, Class36.method532(super.anInt1521, false), false, class30_sub2_sub4_sub6_2);
+                Model class30_sub2_sub4_sub6_3 = new Model(9, true, AnimationFrame.method532(super.anInt1521, false), false, class30_sub2_sub4_sub6_2);
                 class30_sub2_sub4_sub6_3.method475(0, -super.anInt1524, 16384, 0);
                 class30_sub2_sub4_sub6_3.method469((byte)-71);
                 class30_sub2_sub4_sub6_3.method470(class23.aClass20_407.anIntArray353[super.anInt1521], 40542);
@@ -226,7 +226,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
                     k2 = k1;
                 if(j1 >= 0 && i2 == 5)
                     k2 = j1;
-                if(k2 >= 256 && k2 < 512 && !Class38.aClass38Array656[k2 - 256].method537((byte)2))
+                if(k2 >= 256 && k2 < 512 && !IdentityKitDefinition.aClass38Array656[k2 - 256].method537((byte)2))
                     flag = true;
                 if(k2 >= 512 && !Class8.method198(k2 - 512).method195(40903, anInt1702))
                     flag = true;
@@ -253,7 +253,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
                     i3 = j1;
                 if(i3 >= 256 && i3 < 512)
                 {
-                    Model class30_sub2_sub4_sub6_3 = Class38.aClass38Array656[i3 - 256].method538(false);
+                    Model class30_sub2_sub4_sub6_3 = IdentityKitDefinition.aClass38Array656[i3 - 256].method538(false);
                     if(class30_sub2_sub4_sub6_3 != null)
                         aclass30_sub2_sub4_sub6[j2++] = class30_sub2_sub4_sub6_3;
                 }
@@ -282,7 +282,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
         if(aBoolean1699)
             return class30_sub2_sub4_sub6_1;
         Model class30_sub2_sub4_sub6_2 = Model.aClass30_Sub2_Sub4_Sub6_1621;
-        class30_sub2_sub4_sub6_2.method464(7, class30_sub2_sub4_sub6_1, Class36.method532(k, false) & Class36.method532(i1, false));
+        class30_sub2_sub4_sub6_2.method464(7, class30_sub2_sub4_sub6_1, AnimationFrame.method532(k, false) & AnimationFrame.method532(i1, false));
         if(k != -1 && i1 != -1)
             class30_sub2_sub4_sub6_2.method471(-20491, SequenceDefinition.aClass20Array351[super.anInt1526].anIntArray357, i1, k);
         else
@@ -313,7 +313,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
         for(int i = 0; i < 12; i++)
         {
             int j = anIntArray1717[i];
-            if(j >= 256 && j < 512 && !Class38.aClass38Array656[j - 256].method539(false))
+            if(j >= 256 && j < 512 && !IdentityKitDefinition.aClass38Array656[j - 256].method539(false))
                 flag = true;
             if(j >= 512 && !Class8.method198(j - 512).method192(-2836, anInt1702))
                 flag = true;
@@ -328,7 +328,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
             int i1 = anIntArray1717[l];
             if(i1 >= 256 && i1 < 512)
             {
-                Model class30_sub2_sub4_sub6_1 = Class38.aClass38Array656[i1 - 256].method540(0);
+                Model class30_sub2_sub4_sub6_1 = IdentityKitDefinition.aClass38Array656[i1 - 256].method540(0);
                 if(class30_sub2_sub4_sub6_1 != null)
                     aclass30_sub2_sub4_sub6[k++] = class30_sub2_sub4_sub6_1;
             }

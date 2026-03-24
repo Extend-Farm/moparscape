@@ -3,10 +3,10 @@
 // Decompiler options: packimports(3) 
 
 
-public class Class33
+public class VertexNormal
 {
 
-    public Class33()
+    public VertexNormal()
     {
     }
 

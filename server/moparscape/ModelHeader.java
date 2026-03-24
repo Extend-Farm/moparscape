@@ -3,10 +3,10 @@
 // Decompiler options: packimports(3) 
 
 
-public class Class21
+public class ModelHeader
 {
 
-    public Class21()
+    public ModelHeader()
     {
     }
 

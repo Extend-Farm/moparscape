@@ -804,8 +804,8 @@ public class SceneGraph
         int i1 = class30_sub2_sub4_sub6_1.anInt1626;
         for(int j1 = 0; j1 < class30_sub2_sub4_sub6.anInt1626; j1++)
         {
-            Class33 class33 = ((Class30_Sub2_Sub4) (class30_sub2_sub4_sub6)).aClass33Array1425[j1];
-            Class33 class33_1 = class30_sub2_sub4_sub6.aClass33Array1660[j1];
+            VertexNormal class33 = ((Class30_Sub2_Sub4) (class30_sub2_sub4_sub6)).aClass33Array1425[j1];
+            VertexNormal class33_1 = class30_sub2_sub4_sub6.aClass33Array1660[j1];
             if(class33_1.anInt605 != 0)
             {
                 int i2 = class30_sub2_sub4_sub6.anIntArray1628[j1] - j;
@@ -819,8 +819,8 @@ public class SceneGraph
                         {
                             for(int l2 = 0; l2 < i1; l2++)
                             {
-                                Class33 class33_2 = ((Class30_Sub2_Sub4) (class30_sub2_sub4_sub6_1)).aClass33Array1425[l2];
-                                Class33 class33_3 = class30_sub2_sub4_sub6_1.aClass33Array1660[l2];
+                                VertexNormal class33_2 = ((Class30_Sub2_Sub4) (class30_sub2_sub4_sub6_1)).aClass33Array1425[l2];
+                                VertexNormal class33_3 = class30_sub2_sub4_sub6_1.aClass33Array1660[l2];
                                 if(j2 == ai[l2] && k2 == class30_sub2_sub4_sub6_1.anIntArray1629[l2] && i2 == class30_sub2_sub4_sub6_1.anIntArray1628[l2] && class33_3.anInt605 != 0)
                                 {
                                     class33.anInt602 += class33_3.anInt602;

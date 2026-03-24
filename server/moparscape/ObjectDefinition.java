@@ -172,7 +172,7 @@ final class ObjectDefinition
         int i = -1;
         if(anInt774 != -1)
         {
-            Class37 class37 = Class37.aClass37Array646[anInt774];
+            VarBitDefinition class37 = VarBitDefinition.aClass37Array646[anInt774];
             int j = class37.anInt648;
             int k = class37.anInt649;
             int l = class37.anInt650;
@@ -266,7 +266,7 @@ final class ObjectDefinition
             flag2 = true;
         else
             flag2 = false;
-        Model class30_sub2_sub4_sub6_3 = new Model(9, anIntArray784 == null, Class36.method532(k, false), l == 0 && k == -1 && !flag && !flag2, class30_sub2_sub4_sub6);
+        Model class30_sub2_sub4_sub6_3 = new Model(9, anIntArray784 == null, AnimationFrame.method532(k, false), l == 0 && k == -1 && !flag && !flag2, class30_sub2_sub4_sub6);
         if(k != -1)
         {
             class30_sub2_sub4_sub6_3.method469((byte)-71);

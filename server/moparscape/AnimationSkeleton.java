@@ -4,10 +4,10 @@
 
 import sign.SignLink;
 
-public class Class18
+public class AnimationSkeleton
 {
 
-    public Class18(int i, PacketBuffer class30_sub2_sub2)
+    public AnimationSkeleton(int i, PacketBuffer class30_sub2_sub2)
     {
         anInt340 = -588;
         anInt341 = class30_sub2_sub2.method408();

@@ -5,7 +5,7 @@
 import java.io.PrintStream;
 import sign.SignLink;
 
-public class Class23
+public class SpotAnimationDefinition
 {
 
     public static void method264(int i, Archive class44)
@@ -15,11 +15,11 @@ public class Class23
             aBoolean401 = !aBoolean401;
         anInt402 = class30_sub2_sub2.method410();
         if(aClass23Array403 == null)
-            aClass23Array403 = new Class23[anInt402];
+            aClass23Array403 = new SpotAnimationDefinition[anInt402];
         for(int j = 0; j < anInt402; j++)
         {
             if(aClass23Array403[j] == null)
-                aClass23Array403[j] = new Class23();
+                aClass23Array403[j] = new SpotAnimationDefinition();
             aClass23Array403[j].anInt404 = j;
             aClass23Array403[j].method265(true, class30_sub2_sub2);
         }
@@ -85,7 +85,7 @@ public class Class23
         return class30_sub2_sub4_sub6;
     }
 
-    public Class23()
+    public SpotAnimationDefinition()
     {
         anInt400 = 9;
         anInt406 = -1;
@@ -98,7 +98,7 @@ public class Class23
     private int anInt400;
     private static boolean aBoolean401 = true;
     public static int anInt402;
-    public static Class23 aClass23Array403[];
+    public static SpotAnimationDefinition aClass23Array403[];
     public int anInt404;
     public int anInt405;
     public int anInt406;

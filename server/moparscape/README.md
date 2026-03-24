@@ -73,6 +73,16 @@ The following high-impact renames are already completed:
   - `Class3` -> `GroundItemPile`
   - `Class47` -> `Occluder`
 
+- Definitions and animation metadata:
+  - `Class23` -> `SpotAnimationDefinition`
+  - `Class36` -> `AnimationFrame`
+  - `Class18` -> `AnimationSkeleton`
+  - `Class21` -> `ModelHeader`
+  - `Class37` -> `VarBitDefinition`
+  - `Class41` -> `VarpDefinition`
+  - `Class38` -> `IdentityKitDefinition`
+  - `Class33` -> `VertexNormal`
+
 ## Notes
 
 - Remaining obfuscated class names are intentionally being renamed in small batches.
