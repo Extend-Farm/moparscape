@@ -7604,24 +7604,11 @@ class GameClientCore extends GameShell
         if(aBoolean1255)
         {
             aBoolean1255 = false;
-            aClass15_903.method238(4, 23680, super.aGraphics12, 0);
-            aClass15_904.method238(357, 23680, super.aGraphics12, 0);
-            aClass15_905.method238(4, 23680, super.aGraphics12, 722);
-            aClass15_906.method238(205, 23680, super.aGraphics12, 743);
-            aClass15_907.method238(0, 23680, super.aGraphics12, 0);
-            aClass15_908.method238(4, 23680, super.aGraphics12, 516);
-            aClass15_909.method238(205, 23680, super.aGraphics12, 516);
-            aClass15_910.method238(357, 23680, super.aGraphics12, 496);
-            aClass15_911.method238(338, 23680, super.aGraphics12, 0);
-            aBoolean1153 = true;
-            aBoolean1223 = true;
-            aBoolean1103 = true;
-            aBoolean1233 = true;
-            if(anInt1023 != 2)
-            {
-                aClass15_1165.method238(4, 23680, super.aGraphics12, 4);
-                aClass15_1164.method238(4, 23680, super.aGraphics12, 550);
-            }
+            boolean redrawFlags[] = GameFrameHandler.applyFullFrameRedrawPrelude(true, aClass15_903, aClass15_904, aClass15_905, aClass15_906, aClass15_907, aClass15_908, aClass15_909, aClass15_910, aClass15_911, aClass15_1165, aClass15_1164, super.aGraphics12, anInt1023);
+            aBoolean1153 = redrawFlags[0];
+            aBoolean1223 = redrawFlags[1];
+            aBoolean1103 = redrawFlags[2];
+            aBoolean1233 = redrawFlags[3];
         }
         if(anInt1023 == 2)
             method146((byte)1);
