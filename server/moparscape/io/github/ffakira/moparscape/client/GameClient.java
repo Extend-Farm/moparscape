@@ -300,13 +300,19 @@ public final class GameClient extends GameShell
         }
     }
 
-    public final Socket method19(int i)
+    public final Socket openGameSocket(int port)
         throws IOException
     {
         if(SignLink.mainapp != null)
-            return SignLink.opensocket(i);
+            return SignLink.opensocket(port);
         else
-            return new Socket(InetAddress.getByName(getCodeBase().getHost()), i);
+            return new Socket(InetAddress.getByName(getCodeBase().getHost()), port);
+    }
+
+    public final Socket method19(int i)
+        throws IOException
+    {
+        return openGameSocket(i);
     }
 
     public final void method20(int i)
@@ -5824,7 +5830,7 @@ public final class GameClient extends GameShell
                 aString1267 = "Connecting to server...";
                 method135(true, false);
             }
-            aClass24_1168 = new BufferedConnection(this, -978, method19(4444 + anInt958));
+            aClass24_1168 = new BufferedConnection(this, -978, openGameSocket(4444 + anInt958));
             long l = TextUtils.method583(s);
             int i = (int)(l >> 16 & 31L);
             aClass30_Sub2_Sub2_1192.anInt1406 = 0;
@@ -6390,7 +6396,7 @@ public final class GameClient extends GameShell
             int k = anIntArray894[j];
             Npc class30_sub2_sub4_sub1_sub1 = aClass30_Sub2_Sub4_Sub1_Sub1Array835[k];
             int l = class30_sub2_sub2.method408();
-            if((l & 0x10) != 0)
+            if((l & EntityUpdateMasks.Npc.ANIMATION) != 0)
             {
                 int i1 = class30_sub2_sub2.method434((byte)108);
                 if(i1 == 65535)
@@ -6419,7 +6425,7 @@ public final class GameClient extends GameShell
                     class30_sub2_sub4_sub1_sub1.anInt1542 = ((Actor) (class30_sub2_sub4_sub1_sub1)).anInt1525;
                 }
             }
-            if((l & 8) != 0)
+            if((l & EntityUpdateMasks.Npc.HIT_PRIMARY) != 0)
             {
                 int j1 = class30_sub2_sub2.method426(0);
                 int j2 = class30_sub2_sub2.method427(false);
@@ -6428,7 +6434,7 @@ public final class GameClient extends GameShell
                 class30_sub2_sub4_sub1_sub1.anInt1533 = class30_sub2_sub2.method426(0);
                 class30_sub2_sub4_sub1_sub1.anInt1534 = class30_sub2_sub2.method408();
             }
-            if((l & 0x80) != 0)
+            if((l & EntityUpdateMasks.Npc.GRAPHIC) != 0)
             {
                 class30_sub2_sub4_sub1_sub1.anInt1520 = class30_sub2_sub2.method410();
                 int k1 = class30_sub2_sub2.method413();
@@ -6441,18 +6447,18 @@ public final class GameClient extends GameShell
                 if(((Actor) (class30_sub2_sub4_sub1_sub1)).anInt1520 == 65535)
                     class30_sub2_sub4_sub1_sub1.anInt1520 = -1;
             }
-            if((l & 0x20) != 0)
+            if((l & EntityUpdateMasks.Npc.INTERACTING_ENTITY) != 0)
             {
                 class30_sub2_sub4_sub1_sub1.anInt1502 = class30_sub2_sub2.method410();
                 if(((Actor) (class30_sub2_sub4_sub1_sub1)).anInt1502 == 65535)
                     class30_sub2_sub4_sub1_sub1.anInt1502 = -1;
             }
-            if((l & 1) != 0)
+            if((l & EntityUpdateMasks.Npc.FORCED_CHAT) != 0)
             {
                 class30_sub2_sub4_sub1_sub1.aString1506 = class30_sub2_sub2.method415();
                 class30_sub2_sub4_sub1_sub1.anInt1535 = 100;
             }
-            if((l & 0x40) != 0)
+            if((l & EntityUpdateMasks.Npc.HIT_SECONDARY) != 0)
             {
                 int l1 = class30_sub2_sub2.method427(false);
                 int k2 = class30_sub2_sub2.method428(2);
@@ -6461,7 +6467,7 @@ public final class GameClient extends GameShell
                 class30_sub2_sub4_sub1_sub1.anInt1533 = class30_sub2_sub2.method428(2);
                 class30_sub2_sub4_sub1_sub1.anInt1534 = class30_sub2_sub2.method427(false);
             }
-            if((l & 2) != 0)
+            if((l & EntityUpdateMasks.Npc.TRANSFORM) != 0)
             {
                 class30_sub2_sub4_sub1_sub1.aClass5_1696 = NpcDefinition.method159(class30_sub2_sub2.method436((byte)-74));
                 class30_sub2_sub4_sub1_sub1.anInt1540 = class30_sub2_sub4_sub1_sub1.aClass5_1696.aByte68;
@@ -6472,7 +6478,7 @@ public final class GameClient extends GameShell
                 class30_sub2_sub4_sub1_sub1.anInt1557 = class30_sub2_sub4_sub1_sub1.aClass5_1696.anInt55;
                 class30_sub2_sub4_sub1_sub1.anInt1511 = class30_sub2_sub4_sub1_sub1.aClass5_1696.anInt77;
             }
-            if((l & 4) != 0)
+            if((l & EntityUpdateMasks.Npc.FACE_COORDINATES) != 0)
             {
                 class30_sub2_sub4_sub1_sub1.anInt1538 = class30_sub2_sub2.method434((byte)108);
                 class30_sub2_sub4_sub1_sub1.anInt1539 = class30_sub2_sub2.method434((byte)108);
@@ -8306,7 +8312,7 @@ public final class GameClient extends GameShell
     {
         if(byte0 != 25)
             aClass19ArrayArrayArray827 = null;
-        if((i & 0x400) != 0)
+        if((i & EntityUpdateMasks.Player.FORCE_MOVEMENT) != 0)
         {
             class30_sub2_sub4_sub1_sub2.anInt1543 = class30_sub2_sub2.method428(2);
             class30_sub2_sub4_sub1_sub2.anInt1545 = class30_sub2_sub2.method428(2);
@@ -8317,7 +8323,7 @@ public final class GameClient extends GameShell
             class30_sub2_sub4_sub1_sub2.anInt1549 = class30_sub2_sub2.method428(2);
             class30_sub2_sub4_sub1_sub2.method446(true);
         }
-        if((i & 0x100) != 0)
+        if((i & EntityUpdateMasks.Player.GRAPHIC) != 0)
         {
             class30_sub2_sub4_sub1_sub2.anInt1520 = class30_sub2_sub2.method434((byte)108);
             int k = class30_sub2_sub2.method413();
@@ -8330,7 +8336,7 @@ public final class GameClient extends GameShell
             if(((Actor) (class30_sub2_sub4_sub1_sub2)).anInt1520 == 65535)
                 class30_sub2_sub4_sub1_sub2.anInt1520 = -1;
         }
-        if((i & 8) != 0)
+        if((i & EntityUpdateMasks.Player.ANIMATION) != 0)
         {
             int l = class30_sub2_sub2.method434((byte)108);
             if(l == 65535)
@@ -8359,7 +8365,7 @@ public final class GameClient extends GameShell
                 class30_sub2_sub4_sub1_sub2.anInt1542 = ((Actor) (class30_sub2_sub4_sub1_sub2)).anInt1525;
             }
         }
-        if((i & 4) != 0)
+        if((i & EntityUpdateMasks.Player.FORCED_CHAT) != 0)
         {
             class30_sub2_sub4_sub1_sub2.aString1506 = class30_sub2_sub2.method415();
             if(((Actor) (class30_sub2_sub4_sub1_sub2)).aString1506.charAt(0) == '~')
@@ -8373,7 +8379,7 @@ public final class GameClient extends GameShell
             class30_sub2_sub4_sub1_sub2.anInt1531 = 0;
             class30_sub2_sub4_sub1_sub2.anInt1535 = 150;
         }
-        if((i & 0x80) != 0)
+        if((i & EntityUpdateMasks.Player.PUBLIC_CHAT) != 0)
         {
             int i1 = class30_sub2_sub2.method434((byte)108);
             int j2 = class30_sub2_sub2.method408();
@@ -8421,13 +8427,13 @@ public final class GameClient extends GameShell
             }
             class30_sub2_sub2.anInt1406 = k3 + j3;
         }
-        if((i & 1) != 0)
+        if((i & EntityUpdateMasks.Player.INTERACTING_ENTITY) != 0)
         {
             class30_sub2_sub4_sub1_sub2.anInt1502 = class30_sub2_sub2.method434((byte)108);
             if(((Actor) (class30_sub2_sub4_sub1_sub2)).anInt1502 == 65535)
                 class30_sub2_sub4_sub1_sub2.anInt1502 = -1;
         }
-        if((i & 0x10) != 0)
+        if((i & EntityUpdateMasks.Player.APPEARANCE) != 0)
         {
             int j1 = class30_sub2_sub2.method427(false);
             byte abyte0[] = new byte[j1];
@@ -8436,12 +8442,12 @@ public final class GameClient extends GameShell
             aClass30_Sub2_Sub2Array895[j] = class30_sub2_sub2_1;
             class30_sub2_sub4_sub1_sub2.method451(0, class30_sub2_sub2_1);
         }
-        if((i & 2) != 0)
+        if((i & EntityUpdateMasks.Player.FACE_COORDINATES) != 0)
         {
             class30_sub2_sub4_sub1_sub2.anInt1538 = class30_sub2_sub2.method436((byte)-74);
             class30_sub2_sub4_sub1_sub2.anInt1539 = class30_sub2_sub2.method434((byte)108);
         }
-        if((i & 0x20) != 0)
+        if((i & EntityUpdateMasks.Player.HIT_PRIMARY) != 0)
         {
             int k1 = class30_sub2_sub2.method408();
             int k2 = class30_sub2_sub2.method426(0);
@@ -8450,7 +8456,7 @@ public final class GameClient extends GameShell
             class30_sub2_sub4_sub1_sub2.anInt1533 = class30_sub2_sub2.method427(false);
             class30_sub2_sub4_sub1_sub2.anInt1534 = class30_sub2_sub2.method408();
         }
-        if((i & 0x200) != 0)
+        if((i & EntityUpdateMasks.Player.HIT_SECONDARY) != 0)
         {
             int l1 = class30_sub2_sub2.method408();
             int l2 = class30_sub2_sub2.method428(2);
@@ -9580,7 +9586,7 @@ public final class GameClient extends GameShell
             catch(Exception _ex) { }
             aSocket832 = null;
         }
-        aSocket832 = method19(43595);
+        aSocket832 = openGameSocket(43595);
         aSocket832.setSoTimeout(10000);
         java.io.InputStream inputstream = aSocket832.getInputStream();
         OutputStream outputstream = aSocket832.getOutputStream();

@@ -251,7 +251,7 @@ public class OnDemandFetcher extends ResourceProvider
                 if(l - aLong1335 < 4000L)
                     return;
                 aLong1335 = l;
-                aSocket1363 = aClient1343.method19(4444 + GameClient.anInt958);
+                aSocket1363 = aClient1343.openGameSocket(4444 + GameClient.anInt958);
                 anInputStream1362 = aSocket1363.getInputStream();
                 anOutputStream1354 = aSocket1363.getOutputStream();
                 anOutputStream1354.write(15);
