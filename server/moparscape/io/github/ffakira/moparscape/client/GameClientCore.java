@@ -6364,45 +6364,10 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
             if(aClass14Array970[0] != null)
                 BootstrapDemandLoader.requestStartupMaps(this, aClass42_Sub1_1068);
             int k = aClass42_Sub1_1068.method555(79, 0);
-            for(int k2 = 0; k2 < k; k2++)
-            {
-                int l2 = aClass42_Sub1_1068.method559(k2, -203);
-                byte byte0 = 0;
-                if((l2 & 8) != 0)
-                    byte0 = 10;
-                else
-                if((l2 & 0x20) != 0)
-                    byte0 = 9;
-                else
-                if((l2 & 0x10) != 0)
-                    byte0 = 8;
-                else
-                if((l2 & 0x40) != 0)
-                    byte0 = 7;
-                else
-                if((l2 & 0x80) != 0)
-                    byte0 = 6;
-                else
-                if((l2 & 2) != 0)
-                    byte0 = 5;
-                else
-                if((l2 & 4) != 0)
-                    byte0 = 4;
-                if((l2 & 1) != 0)
-                    byte0 = 3;
-                if(byte0 != 0)
-                    aClass42_Sub1_1068.method563(byte0, 0, k2, (byte)8);
-            }
-
+            BootstrapDemandLoader.queuePriorityModelRequests(aClass42_Sub1_1068);
             aClass42_Sub1_1068.method554(aBoolean959, 0);
             if(!aBoolean960)
-            {
-                int l = aClass42_Sub1_1068.method555(79, 2);
-                for(int i3 = 1; i3 < l; i3++)
-                    if(aClass42_Sub1_1068.method569(i3, 5))
-                        aClass42_Sub1_1068.method563((byte)1, 2, i3, (byte)8);
-
-            }
+                BootstrapDemandLoader.queueMemberSongs(aClass42_Sub1_1068);
             method13(80, (byte)4, "Unpacking media");
             aClass30_Sub2_Sub1_Sub2_1196 = new IndexedSprite(class44_2, "invback", 0);
             aClass30_Sub2_Sub1_Sub2_1198 = new IndexedSprite(class44_2, "chatback", 0);
@@ -6505,17 +6470,7 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
             class30_sub2_sub1_sub1 = new Sprite(class44_2, "backhmid2", 0);
             aClass15_911 = new ProducingGraphicsBuffer(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
             class30_sub2_sub1_sub1.method346(0, 0, -32357);
-            int i5 = (int)(Math.random() * 21D) - 10;
-            int j5 = (int)(Math.random() * 21D) - 10;
-            int k5 = (int)(Math.random() * 21D) - 10;
-            int l5 = (int)(Math.random() * 41D) - 20;
-            for(int i6 = 0; i6 < 100; i6++)
-            {
-                if(aClass30_Sub2_Sub1_Sub1Array1033[i6] != null)
-                    aClass30_Sub2_Sub1_Sub1Array1033[i6].method344(i5 + l5, j5 + l5, k5 + l5, 0);
-                if(aClass30_Sub2_Sub1_Sub2Array1060[i6] != null)
-                    aClass30_Sub2_Sub1_Sub2Array1060[i6].method360(i5 + l5, j5 + l5, k5 + l5, 0);
-            }
+            BootstrapDemandLoader.applyRandomMapSpriteTint(aClass30_Sub2_Sub1_Sub1Array1033, aClass30_Sub2_Sub1_Sub2Array1060);
 
             method13(83, (byte)4, "Unpacking textures");
             Rasterizer3D.method368(class44_3, 0);
