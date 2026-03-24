@@ -1,7 +1,8 @@
-// Decompiled by Jad v1.5.8f. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.kpdus.com/jad.html
-// Decompiler options: packimports(3) 
+package io.github.ffakira.moparscape.client;
 
+import io.github.ffakira.moparscape.cache.*;
+import io.github.ffakira.moparscape.net.*;
+import io.github.ffakira.moparscape.sign.SignLink;
 import java.applet.Applet;
 import java.applet.AppletContext;
 import java.awt.*;
@@ -9,7 +10,10 @@ import java.io.*;
 import java.math.BigInteger;
 import java.net.*;
 import java.util.zip.CRC32;
-import sign.SignLink;
+
+// Decompiled by Jad v1.5.8f. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) 
 
 public final class GameClient extends GameShell
 {
@@ -12252,7 +12256,7 @@ public final class GameClient extends GameShell
     private long aLongArray955[];
     private int anInt956;
     private static int anInt957 = 10;
-    static int anInt958;
+    public static int anInt958;
     private static boolean aBoolean959 = true;
     private static boolean aBoolean960;
     private int anInt961;
@@ -12266,7 +12270,7 @@ public final class GameClient extends GameShell
     private IndexedSprite aClass30_Sub2_Sub1_Sub2_967;
     private int anIntArray968[];
     private int anIntArray969[];
-    CacheFileStore aClass14Array970[];
+    public CacheFileStore aClass14Array970[];
     public int anIntArray971[];
     private boolean aBoolean972;
     private byte aByte973;

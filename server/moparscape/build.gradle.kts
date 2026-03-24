@@ -16,7 +16,7 @@ sourceSets {
 }
 
 application {
-  mainClass.set("GameClient")
+  mainClass.set("io.github.ffakira.moparscape.client.GameClient")
 }
 
 tasks.named<JavaExec>("run") {
@@ -25,6 +25,6 @@ tasks.named<JavaExec>("run") {
 
 tasks.named<Jar>("jar") {
   manifest {
-    attributes["Main-Class"] = "GameClient"
+    attributes["Main-Class"] = "io.github.ffakira.moparscape.client.GameClient"
   }
 }

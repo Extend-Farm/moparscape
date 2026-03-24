@@ -1,12 +1,16 @@
-// Decompiled by Jad v1.5.8f. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.kpdus.com/jad.html
-// Decompiler options: packimports(3) 
+package io.github.ffakira.moparscape.net;
 
+import io.github.ffakira.moparscape.cache.*;
+import io.github.ffakira.moparscape.client.*;
+import io.github.ffakira.moparscape.sign.SignLink;
 import java.io.*;
 import java.net.Socket;
 import java.util.zip.CRC32;
 import java.util.zip.GZIPInputStream;
-import sign.SignLink;
+
+// Decompiled by Jad v1.5.8f. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) 
 
 public class OnDemandFetcher extends ResourceProvider
     implements Runnable

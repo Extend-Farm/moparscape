@@ -1,3 +1,9 @@
+package io.github.ffakira.moparscape.client;
+
+import io.github.ffakira.moparscape.cache.*;
+import io.github.ffakira.moparscape.net.*;
+import io.github.ffakira.moparscape.sign.SignLink;
+
 // Reconstructed from MapRegion.class in moparclient.jar (CFR 0.152); adjusted for javac (casts, buffer types).
 final class MapRegion {
     private static int anInt123 = (int)(Math.random() * 17.0) - 8;

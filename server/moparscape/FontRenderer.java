@@ -1,9 +1,13 @@
+package io.github.ffakira.moparscape.client;
+
+import io.github.ffakira.moparscape.cache.*;
+import io.github.ffakira.moparscape.net.*;
+import io.github.ffakira.moparscape.sign.SignLink;
+import java.util.Random;
+
 // Decompiled by Jad v1.5.8f. Copyright 2001 Pavel Kouznetsov.
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
-
-import java.util.Random;
-import sign.SignLink;
 
 public final class FontRenderer extends Rasterizer2D
 {

@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Created-By: 1.5.0_04 (Sun Microsystems Inc.)
-Main-Class: client
+Main-Class: io.github.ffakira.moparscape.client.GameClient
 
 Name: sign/signlink.class
 SHA1-Digest: /A+qCLTpXKrhxYUwXl3dMCtpQgk=

@@ -1,13 +1,13 @@
-// Decompiled by Jad v1.5.8f. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.kpdus.com/jad.html
-// Decompiler options: packimports(3) 
-// Source File Name:   SignLink.java
-
-package sign;
+package io.github.ffakira.moparscape.sign;
 
 import java.applet.Applet;
 import java.io.*;
 import java.net.*;
+
+// Decompiled by Jad v1.5.8f. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) 
+// Source File Name:   SignLink.java
 
 public final class SignLink
     implements Runnable

@@ -1,12 +1,16 @@
-// Decompiled by Jad v1.5.8f. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.kpdus.com/jad.html
-// Decompiler options: packimports(3) 
+package io.github.ffakira.moparscape.client;
 
+import io.github.ffakira.moparscape.cache.*;
+import io.github.ffakira.moparscape.net.*;
+import io.github.ffakira.moparscape.sign.SignLink;
 import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.PrintStream;
-import sign.SignLink;
+
+// Decompiled by Jad v1.5.8f. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) 
 
 public class GameShell extends Applet
     implements Runnable, MouseListener, MouseMotionListener, KeyListener, FocusListener, WindowListener
