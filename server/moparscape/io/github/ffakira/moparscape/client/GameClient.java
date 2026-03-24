@@ -1098,7 +1098,7 @@ public final class GameClient extends GameShell
             anInt877 = aClass17_1000.method246();
         method139(class30_sub2_sub2, -45, i);
         method46(i, class30_sub2_sub2, (byte)2);
-        method86(i, class30_sub2_sub2, true);
+        applyNpcUpdateMasks(i, class30_sub2_sub2, true);
         for(int k = 0; k < anInt839; k++)
         {
             int l = anIntArray840[k];
@@ -2206,7 +2206,7 @@ public final class GameClient extends GameShell
             int l = class30_sub2_sub2.method408();
             if((l & 0x40) != 0)
                 l += class30_sub2_sub2.method408() << 8;
-            method107(l, k, class30_sub2_sub2, aByte923, class30_sub2_sub4_sub1_sub2);
+            applyPlayerUpdateMasks(l, k, class30_sub2_sub2, aByte923, class30_sub2_sub4_sub1_sub2);
         }
 
     }
@@ -6484,32 +6484,37 @@ public final class GameClient extends GameShell
         npc.anInt1539 = packetBuffer.method434((byte)108);
     }
 
-    private final void method86(int i, PacketBuffer class30_sub2_sub2, boolean flag)
+    private void applyNpcUpdateMasks(int packetLength, PacketBuffer packetBuffer, boolean preserveConnectionFlag)
     {
         for(int j = 0; j < anInt893; j++)
         {
             int k = anIntArray894[j];
             Npc class30_sub2_sub4_sub1_sub1 = aClass30_Sub2_Sub4_Sub1_Sub1Array835[k];
-            int l = class30_sub2_sub2.method408();
+            int l = packetBuffer.method408();
             if((l & EntityUpdateMasks.Npc.ANIMATION) != 0)
-                applyActorAnimationUpdate(class30_sub2_sub4_sub1_sub1, class30_sub2_sub2);
+                applyActorAnimationUpdate(class30_sub2_sub4_sub1_sub1, packetBuffer);
             if((l & EntityUpdateMasks.Npc.HIT_PRIMARY) != 0)
-                applyNpcHitPrimaryUpdate(class30_sub2_sub4_sub1_sub1, class30_sub2_sub2);
+                applyNpcHitPrimaryUpdate(class30_sub2_sub4_sub1_sub1, packetBuffer);
             if((l & EntityUpdateMasks.Npc.GRAPHIC) != 0)
-                applyNpcGraphicUpdate(class30_sub2_sub4_sub1_sub1, class30_sub2_sub2);
+                applyNpcGraphicUpdate(class30_sub2_sub4_sub1_sub1, packetBuffer);
             if((l & EntityUpdateMasks.Npc.INTERACTING_ENTITY) != 0)
-                applyNpcInteractingEntityUpdate(class30_sub2_sub4_sub1_sub1, class30_sub2_sub2);
+                applyNpcInteractingEntityUpdate(class30_sub2_sub4_sub1_sub1, packetBuffer);
             if((l & EntityUpdateMasks.Npc.FORCED_CHAT) != 0)
-                applyNpcForcedChatUpdate(class30_sub2_sub4_sub1_sub1, class30_sub2_sub2);
+                applyNpcForcedChatUpdate(class30_sub2_sub4_sub1_sub1, packetBuffer);
             if((l & EntityUpdateMasks.Npc.HIT_SECONDARY) != 0)
-                applyNpcHitSecondaryUpdate(class30_sub2_sub4_sub1_sub1, class30_sub2_sub2);
+                applyNpcHitSecondaryUpdate(class30_sub2_sub4_sub1_sub1, packetBuffer);
             if((l & EntityUpdateMasks.Npc.TRANSFORM) != 0)
-                applyNpcTransformUpdate(class30_sub2_sub4_sub1_sub1, class30_sub2_sub2);
+                applyNpcTransformUpdate(class30_sub2_sub4_sub1_sub1, packetBuffer);
             if((l & EntityUpdateMasks.Npc.FACE_COORDINATES) != 0)
-                applyNpcFaceCoordinatesUpdate(class30_sub2_sub4_sub1_sub1, class30_sub2_sub2);
+                applyNpcFaceCoordinatesUpdate(class30_sub2_sub4_sub1_sub1, packetBuffer);
         }
 
-        aBoolean1157 &= flag;
+        aBoolean1157 &= preserveConnectionFlag;
+    }
+
+    private final void method86(int i, PacketBuffer class30_sub2_sub2, boolean flag)
+    {
+        applyNpcUpdateMasks(i, class30_sub2_sub2, flag);
     }
 
     public final void method87(NpcDefinition class5, int i, boolean flag, int j, int k)
@@ -8416,27 +8421,27 @@ public final class GameClient extends GameShell
         player.anInt1534 = packetBuffer.method427(false);
     }
 
-    private final void method107(int i, int j, PacketBuffer class30_sub2_sub2, byte byte0, Player class30_sub2_sub4_sub1_sub2)
+    private void applyPlayerUpdateMasks(int updateMask, int playerIndex, PacketBuffer packetBuffer, byte stateGuard, Player player)
     {
-        if(byte0 != 25)
+        if(stateGuard != 25)
             aClass19ArrayArrayArray827 = null;
-        if((i & EntityUpdateMasks.Player.FORCE_MOVEMENT) != 0)
-            applyPlayerForceMovementUpdate(class30_sub2_sub4_sub1_sub2, class30_sub2_sub2);
-        if((i & EntityUpdateMasks.Player.GRAPHIC) != 0)
-            applyPlayerGraphicUpdate(class30_sub2_sub4_sub1_sub2, class30_sub2_sub2);
-        if((i & EntityUpdateMasks.Player.ANIMATION) != 0)
-            applyActorAnimationUpdate(class30_sub2_sub4_sub1_sub2, class30_sub2_sub2);
-        if((i & EntityUpdateMasks.Player.FORCED_CHAT) != 0)
-            applyPlayerForcedChatUpdate(class30_sub2_sub4_sub1_sub2, class30_sub2_sub2);
-        if((i & EntityUpdateMasks.Player.PUBLIC_CHAT) != 0)
+        if((updateMask & EntityUpdateMasks.Player.FORCE_MOVEMENT) != 0)
+            applyPlayerForceMovementUpdate(player, packetBuffer);
+        if((updateMask & EntityUpdateMasks.Player.GRAPHIC) != 0)
+            applyPlayerGraphicUpdate(player, packetBuffer);
+        if((updateMask & EntityUpdateMasks.Player.ANIMATION) != 0)
+            applyActorAnimationUpdate(player, packetBuffer);
+        if((updateMask & EntityUpdateMasks.Player.FORCED_CHAT) != 0)
+            applyPlayerForcedChatUpdate(player, packetBuffer);
+        if((updateMask & EntityUpdateMasks.Player.PUBLIC_CHAT) != 0)
         {
-            int i1 = class30_sub2_sub2.method434((byte)108);
-            int j2 = class30_sub2_sub2.method408();
-            int j3 = class30_sub2_sub2.method427(false);
-            int k3 = class30_sub2_sub2.anInt1406;
-            if(class30_sub2_sub4_sub1_sub2.aString1703 != null && class30_sub2_sub4_sub1_sub2.aBoolean1710)
+            int i1 = packetBuffer.method434((byte)108);
+            int j2 = packetBuffer.method408();
+            int j3 = packetBuffer.method427(false);
+            int k3 = packetBuffer.anInt1406;
+            if(player.aString1703 != null && player.aBoolean1710)
             {
-                long l3 = TextUtils.method583(class30_sub2_sub4_sub1_sub2.aString1703);
+                long l3 = TextUtils.method583(player.aString1703);
                 boolean flag = false;
                 if(j2 <= 1)
                 {
@@ -8453,39 +8458,44 @@ public final class GameClient extends GameShell
                     try
                     {
                         aClass30_Sub2_Sub2_834.anInt1406 = 0;
-                        class30_sub2_sub2.method442(j3, 0, true, aClass30_Sub2_Sub2_834.aByteArray1405);
+                        packetBuffer.method442(j3, 0, true, aClass30_Sub2_Sub2_834.aByteArray1405);
                         aClass30_Sub2_Sub2_834.anInt1406 = 0;
                         String s = ChatMessageCodec.method525(j3, true, aClass30_Sub2_Sub2_834);
                         s = ChatCensor.method497(s, 0);
-                        class30_sub2_sub4_sub1_sub2.aString1506 = s;
-                        class30_sub2_sub4_sub1_sub2.anInt1513 = i1 >> 8;
-                        class30_sub2_sub4_sub1_sub2.anInt1531 = i1 & 0xff;
-                        class30_sub2_sub4_sub1_sub2.anInt1535 = 150;
+                        player.aString1506 = s;
+                        player.anInt1513 = i1 >> 8;
+                        player.anInt1531 = i1 & 0xff;
+                        player.anInt1535 = 150;
                         if(j2 == 2 || j2 == 3)
-                            method77(s, 1, "@cr2@" + class30_sub2_sub4_sub1_sub2.aString1703, aBoolean991);
+                            method77(s, 1, "@cr2@" + player.aString1703, aBoolean991);
                         else
                         if(j2 == 1)
-                            method77(s, 1, "@cr1@" + class30_sub2_sub4_sub1_sub2.aString1703, aBoolean991);
+                            method77(s, 1, "@cr1@" + player.aString1703, aBoolean991);
                         else
-                            method77(s, 2, class30_sub2_sub4_sub1_sub2.aString1703, aBoolean991);
+                            method77(s, 2, player.aString1703, aBoolean991);
                     }
                     catch(Exception exception)
                     {
                         SignLink.reporterror("cde2");
                     }
             }
-            class30_sub2_sub2.anInt1406 = k3 + j3;
+            packetBuffer.anInt1406 = k3 + j3;
         }
-        if((i & EntityUpdateMasks.Player.INTERACTING_ENTITY) != 0)
-            applyPlayerInteractingEntityUpdate(class30_sub2_sub4_sub1_sub2, class30_sub2_sub2);
-        if((i & EntityUpdateMasks.Player.APPEARANCE) != 0)
-            applyPlayerAppearanceUpdate(j, class30_sub2_sub4_sub1_sub2, class30_sub2_sub2);
-        if((i & EntityUpdateMasks.Player.FACE_COORDINATES) != 0)
-            applyPlayerFaceCoordinatesUpdate(class30_sub2_sub4_sub1_sub2, class30_sub2_sub2);
-        if((i & EntityUpdateMasks.Player.HIT_PRIMARY) != 0)
-            applyPlayerHitPrimaryUpdate(class30_sub2_sub4_sub1_sub2, class30_sub2_sub2);
-        if((i & EntityUpdateMasks.Player.HIT_SECONDARY) != 0)
-            applyPlayerHitSecondaryUpdate(class30_sub2_sub4_sub1_sub2, class30_sub2_sub2);
+        if((updateMask & EntityUpdateMasks.Player.INTERACTING_ENTITY) != 0)
+            applyPlayerInteractingEntityUpdate(player, packetBuffer);
+        if((updateMask & EntityUpdateMasks.Player.APPEARANCE) != 0)
+            applyPlayerAppearanceUpdate(playerIndex, player, packetBuffer);
+        if((updateMask & EntityUpdateMasks.Player.FACE_COORDINATES) != 0)
+            applyPlayerFaceCoordinatesUpdate(player, packetBuffer);
+        if((updateMask & EntityUpdateMasks.Player.HIT_PRIMARY) != 0)
+            applyPlayerHitPrimaryUpdate(player, packetBuffer);
+        if((updateMask & EntityUpdateMasks.Player.HIT_SECONDARY) != 0)
+            applyPlayerHitSecondaryUpdate(player, packetBuffer);
+    }
+
+    private final void method107(int i, int j, PacketBuffer class30_sub2_sub2, byte byte0, Player class30_sub2_sub4_sub1_sub2)
+    {
+        applyPlayerUpdateMasks(i, j, class30_sub2_sub2, byte0, class30_sub2_sub4_sub1_sub2);
     }
 
     public final void method108(int i)
