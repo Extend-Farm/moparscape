@@ -7847,17 +7847,9 @@ class GameClientCore extends GameShell
             Widget class9_1 = Widget.aClass9Array210[class9.anIntArray240[j2]];
             k2 += class9_1.anInt263;
             l2 += class9_1.anInt265;
-            if(class9_1.anInt214 > 0)
-                method75(950, class9_1);
             if(class9_1.anInt262 == 0)
             {
-                if(class9_1.anInt224 > class9_1.anInt261 - class9_1.anInt267)
-                    class9_1.anInt224 = class9_1.anInt261 - class9_1.anInt267;
-                if(class9_1.anInt224 < 0)
-                    class9_1.anInt224 = 0;
-                method105(8, class9_1.anInt224, k2, class9_1, l2);
-                if(class9_1.anInt261 > class9_1.anInt267)
-                    method30(519, class9_1.anInt267, class9_1.anInt224, l2, k2 + class9_1.anInt220, class9_1.anInt261);
+                WidgetContainerHandler.renderType0Container(this, class9_1, k2, l2);
             } else
             if(class9_1.anInt262 != 1)
                 if(class9_1.anInt262 == 2)
