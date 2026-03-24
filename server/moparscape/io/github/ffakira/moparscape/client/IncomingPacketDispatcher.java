@@ -169,4 +169,36 @@ final class IncomingPacketDispatcher {
     {
         return packetBuffer.method410();
     }
+
+    // Exact extraction of legacy opcode 85 map-position read.
+    static int[] readSceneBasePosition(PacketBuffer packetBuffer)
+    {
+        int baseX = packetBuffer.method427(false);
+        int baseY = packetBuffer.method427(false);
+        return new int[] {
+            baseX, baseY
+        };
+    }
+
+    // Exact extraction of legacy opcode 110 setting read.
+    static int readChatboxStatus(PacketBuffer packetBuffer)
+    {
+        return packetBuffer.method408();
+    }
+
+    // Exact extraction of legacy opcode 79 widget scroll read and clamp.
+    static void applyWidgetScrollClamp(PacketBuffer packetBuffer)
+    {
+        int widgetId = packetBuffer.method434((byte)108);
+        int scrollPosition = packetBuffer.method435(true);
+        Widget widget = Widget.aClass9Array210[widgetId];
+        if(widget != null && widget.anInt262 == 0)
+        {
+            if(scrollPosition < 0)
+                scrollPosition = 0;
+            if(scrollPosition > widget.anInt261 - widget.anInt267)
+                scrollPosition = widget.anInt261 - widget.anInt267;
+            widget.anInt224 = scrollPosition;
+        }
+    }
 }

@@ -7841,21 +7841,7 @@ class GameClientCore extends GameShell
 
     public final void method104(boolean flag)
     {
-        GraphicsObject class30_sub2_sub4_sub3 = (GraphicsObject)aClass19_1056.last();
-        aBoolean1157 &= flag;
-        for(; class30_sub2_sub4_sub3 != null; class30_sub2_sub4_sub3 = (GraphicsObject)aClass19_1056.previous(false))
-            if(class30_sub2_sub4_sub3.anInt1560 != anInt918 || class30_sub2_sub4_sub3.aBoolean1567)
-                class30_sub2_sub4_sub3.unlink();
-            else
-            if(anInt1161 >= class30_sub2_sub4_sub3.anInt1564)
-            {
-                class30_sub2_sub4_sub3.method454(anInt945, true);
-                if(class30_sub2_sub4_sub3.aBoolean1567)
-                    class30_sub2_sub4_sub3.unlink();
-                else
-                    aClass25_946.method285(class30_sub2_sub4_sub3.anInt1560, 0, (byte)6, class30_sub2_sub4_sub3.anInt1563, -1, class30_sub2_sub4_sub3.anInt1562, 60, class30_sub2_sub4_sub3.anInt1561, class30_sub2_sub4_sub3, false);
-            }
-
+        aBoolean1157 = SceneEffectHandler.updateGraphicsObjects(aClass19_1056, anInt918, anInt1161, anInt945, aClass25_946, flag, aBoolean1157);
     }
 
     public final void method105(int i, int j, int k, Widget class9, int l)
@@ -10886,7 +10872,7 @@ class GameClientCore extends GameShell
             {
                 if(anInt1221 == 12)
                     aBoolean1153 = true;
-                anInt1148 = aClass30_Sub2_Sub2_1083.method408();
+                anInt1148 = IncomingPacketDispatcher.readChatboxStatus(aClass30_Sub2_Sub2_1083);
                 anInt1008 = -1;
                 return true;
             }
@@ -10956,17 +10942,7 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 79)
             {
-                int j5 = aClass30_Sub2_Sub2_1083.method434((byte)108);
-                int l12 = aClass30_Sub2_Sub2_1083.method435(true);
-                Widget class9_3 = Widget.aClass9Array210[j5];
-                if(class9_3 != null && class9_3.anInt262 == 0)
-                {
-                    if(l12 < 0)
-                        l12 = 0;
-                    if(l12 > class9_3.anInt261 - class9_3.anInt267)
-                        l12 = class9_3.anInt261 - class9_3.anInt267;
-                    class9_3.anInt224 = l12;
-                }
+                IncomingPacketDispatcher.applyWidgetScrollClamp(aClass30_Sub2_Sub2_1083);
                 anInt1008 = -1;
                 return true;
             }
@@ -10991,8 +10967,9 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 85)
             {
-                anInt1269 = aClass30_Sub2_Sub2_1083.method427(false);
-                anInt1268 = aClass30_Sub2_Sub2_1083.method427(false);
+                int sceneBasePosition[] = IncomingPacketDispatcher.readSceneBasePosition(aClass30_Sub2_Sub2_1083);
+                anInt1269 = sceneBasePosition[0];
+                anInt1268 = sceneBasePosition[1];
                 anInt1008 = -1;
                 return true;
             }
