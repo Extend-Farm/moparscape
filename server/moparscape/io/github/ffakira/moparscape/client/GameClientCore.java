@@ -6151,76 +6151,11 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
                 method79(1);
                 return;
             }
-            if(k == 3)
+            String loginError[] = LoginProtocolHandler.resolveLoginError(k);
+            if(loginError != null)
             {
-                aString1266 = "";
-                aString1267 = "Invalid username or password.";
-                return;
-            }
-            if(k == 4)
-            {
-                aString1266 = "Your account has been disabled.";
-                aString1267 = "Please check your message-centre for details.";
-                return;
-            }
-            if(k == 5)
-            {
-                aString1266 = "Your account is already logged in.";
-                aString1267 = "Try again in 60 secs...";
-                return;
-            }
-            if(k == 6)
-            {
-                aString1266 = "MoparScape has been updated!";
-                aString1267 = "Please reload this page.";
-                return;
-            }
-            if(k == 7)
-            {
-                aString1266 = "This world is full.";
-                aString1267 = "Please use a different world.";
-                return;
-            }
-            if(k == 8)
-            {
-                aString1266 = "Unable to connect.";
-                aString1267 = "Login server offline.";
-                return;
-            }
-            if(k == 9)
-            {
-                aString1266 = "Login limit exceeded.";
-                aString1267 = "Too many connections from your address.";
-                return;
-            }
-            if(k == 10)
-            {
-                aString1266 = "Unable to connect.";
-                aString1267 = "Bad session id.";
-                return;
-            }
-            if(k == 11)
-            {
-                aString1267 = "Login server rejected session.";
-                aString1267 = "Please try again.";
-                return;
-            }
-            if(k == 12)
-            {
-                aString1266 = "You need a members account to login to this world.";
-                aString1267 = "Please subscribe, or use a different world.";
-                return;
-            }
-            if(k == 13)
-            {
-                aString1266 = "Could not complete login.";
-                aString1267 = "Please try using a different world.";
-                return;
-            }
-            if(k == 14)
-            {
-                aString1266 = "The server is being updated.";
-                aString1267 = "Please wait 1 minute and try again.";
+                aString1266 = loginError[0];
+                aString1267 = loginError[1];
                 return;
             }
             if(k == 15)
@@ -6238,24 +6173,6 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
                 anInt1133 = 0;
                 aBoolean885 = false;
                 aLong824 = System.currentTimeMillis();
-                return;
-            }
-            if(k == 16)
-            {
-                aString1266 = "Login attempts exceeded.";
-                aString1267 = "Please wait 1 minute and try again.";
-                return;
-            }
-            if(k == 17)
-            {
-                aString1266 = "You are standing in a members-only area.";
-                aString1267 = "To play on this world move to a free area first";
-                return;
-            }
-            if(k == 20)
-            {
-                aString1266 = "Invalid loginserver requested";
-                aString1267 = "Please try using a different world.";
                 return;
             }
             if(k == 21)
@@ -6836,12 +6753,9 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
         aBoolean993 = true;
         boolean flag = true;
         String s = resolveServerHost();
-        if(SignLink.cache_dat != null)
-        {
-            for(int i = 0; i < 5; i++)
-                aClass14Array970[i] = new CacheFileStore(0x7a120, SignLink.cache_dat, SignLink.cache_idx[i], i + 1, true);
-
-        }
+        CacheFileStore cacheStores[] = ClientBootstrapLoader.createCacheStores();
+        if(cacheStores != null)
+            aClass14Array970 = cacheStores;
         try
         {
             method16(533);
