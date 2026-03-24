@@ -10466,9 +10466,7 @@ class GameClientCore extends GameShell
             if(anInt1008 == 107)
             {
                 aBoolean1160 = false;
-                for(int l = 0; l < 5; l++)
-                    aBooleanArray876[l] = false;
-
+                IncomingPacketDispatcher.resetCameraEffects(aBooleanArray876);
                 anInt1008 = -1;
                 return true;
             }
@@ -10862,15 +10860,7 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 35)
             {
-                int l3 = aClass30_Sub2_Sub2_1083.method408();
-                int k11 = aClass30_Sub2_Sub2_1083.method408();
-                int j17 = aClass30_Sub2_Sub2_1083.method408();
-                int k21 = aClass30_Sub2_Sub2_1083.method408();
-                aBooleanArray876[l3] = true;
-                anIntArray873[l3] = k11;
-                anIntArray1203[l3] = j17;
-                anIntArray928[l3] = k21;
-                anIntArray1030[l3] = 0;
+                IncomingPacketDispatcher.applyCameraEffectUpdate(aClass30_Sub2_Sub2_1083, aBooleanArray876, anIntArray873, anIntArray1203, anIntArray928, anIntArray1030);
                 anInt1008 = -1;
                 return true;
             }
