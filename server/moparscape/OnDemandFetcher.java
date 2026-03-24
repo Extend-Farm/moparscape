@@ -687,29 +687,29 @@ public class OnDemandFetcher extends ResourceProvider
 
     public OnDemandFetcher()
     {
-        aClass19_1331 = new Class19(169);
+        aClass19_1331 = new Deque(169);
         aString1333 = "";
         aBoolean1336 = true;
         aCRC32_1338 = new CRC32();
         aByteArray1339 = new byte[500];
         anInt1340 = 923;
         aByteArrayArray1342 = new byte[4][];
-        aClass19_1344 = new Class19(169);
+        aClass19_1344 = new Deque(169);
         anInt1352 = 13603;
         aBoolean1353 = true;
         aBoolean1355 = false;
         aBoolean1357 = false;
-        aClass19_1358 = new Class19(169);
+        aClass19_1358 = new Deque(169);
         aByteArray1359 = new byte[65000];
-        aClass2_1361 = new Class2(anInt1345);
+        aClass2_1361 = new CacheableNodeDeque(anInt1345);
         anIntArrayArray1364 = new int[4][];
         anIntArrayArray1365 = new int[4][];
-        aClass19_1368 = new Class19(169);
-        aClass19_1370 = new Class19(169);
+        aClass19_1368 = new Deque(169);
+        aClass19_1370 = new Deque(169);
     }
 
     private int anInt1330;
-    private Class19 aClass19_1331;
+    private Deque aClass19_1331;
     private int anInt1332;
     public String aString1333;
     private int anInt1334;
@@ -722,7 +722,7 @@ public class OnDemandFetcher extends ResourceProvider
     public int anInt1341;
     private byte aByteArrayArray1342[][];
     private GameClient aClient1343;
-    private Class19 aClass19_1344;
+    private Deque aClass19_1344;
     private static int anInt1345;
     private int anInt1346;
     private int anInt1347;
@@ -736,19 +736,19 @@ public class OnDemandFetcher extends ResourceProvider
     private boolean aBoolean1355;
     private int anIntArray1356[];
     private boolean aBoolean1357;
-    private Class19 aClass19_1358;
+    private Deque aClass19_1358;
     private byte aByteArray1359[];
     private int anIntArray1360[];
-    private Class2 aClass2_1361;
+    private CacheableNodeDeque aClass2_1361;
     private InputStream anInputStream1362;
     private Socket aSocket1363;
     private int anIntArrayArray1364[][];
     private int anIntArrayArray1365[][];
     private int anInt1366;
     private int anInt1367;
-    private Class19 aClass19_1368;
+    private Deque aClass19_1368;
     private OnDemandRequest aClass30_Sub2_Sub3_1369;
-    private Class19 aClass19_1370;
+    private Deque aClass19_1370;
     private int anIntArray1371[];
     private byte aByteArray1372[];
     private int anInt1373;

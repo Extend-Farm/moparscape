@@ -3,7 +3,7 @@
 // Decompiler options: packimports(3) 
 
 
-public class Class30
+public class Node
 {
 
     public void method329()
@@ -21,14 +21,14 @@ public class Class30
         }
     }
 
-    public Class30()
+    public Node()
     {
         aBoolean547 = true;
     }
 
     private boolean aBoolean547;
     public long aLong548;
-    public Class30 aClass30_549;
-    Class30 aClass30_550;
+    public Node aClass30_549;
+    Node aClass30_550;
     public static boolean aBoolean551;
 }

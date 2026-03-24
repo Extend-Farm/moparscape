@@ -3,7 +3,7 @@
 // Decompiler options: packimports(3) 
 
 
-public class Class30_Sub2 extends Class30
+public class CacheableNode extends Node
 {
 
     public void method330()
@@ -21,11 +21,11 @@ public class Class30_Sub2 extends Class30
         }
     }
 
-    public Class30_Sub2()
+    public CacheableNode()
     {
     }
 
-    public Class30_Sub2 aClass30_Sub2_1303;
-    Class30_Sub2 aClass30_Sub2_1304;
+    public CacheableNode aClass30_Sub2_1303;
+    CacheableNode aClass30_Sub2_1304;
     public static int anInt1305;
 }

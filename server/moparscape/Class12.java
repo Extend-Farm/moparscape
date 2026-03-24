@@ -11,8 +11,8 @@ public final class Class12
     {
         aBoolean295 = false;
         aBoolean297 = false;
-        aClass30_Sub2_300 = new Class30_Sub2();
-        aClass2_304 = new Class2(anInt296);
+        aClass30_Sub2_300 = new CacheableNode();
+        aClass2_304 = new CacheableNodeDeque(anInt296);
         anInt301 = i;
         anInt302 = i;
         aClass1_303 = new Class1(-877, 1024);
@@ -20,9 +20,9 @@ public final class Class12
             anInt296 = -225;
     }
 
-    public Class30_Sub2 method222(long l)
+    public CacheableNode method222(long l)
     {
-        Class30_Sub2 class30_sub2 = (Class30_Sub2)aClass1_303.method148(l);
+        CacheableNode class30_sub2 = (CacheableNode)aClass1_303.method148(l);
         if(class30_sub2 != null)
         {
             aClass2_304.method150(class30_sub2);
@@ -34,7 +34,7 @@ public final class Class12
         return class30_sub2;
     }
 
-    public void method223(Class30_Sub2 class30_sub2, long l, byte byte0)
+    public void method223(CacheableNode class30_sub2, long l, byte byte0)
     {
         try
         {
@@ -42,12 +42,12 @@ public final class Class12
                 aBoolean297 = !aBoolean297;
             if(anInt302 == 0)
             {
-                Class30_Sub2 class30_sub2_1 = aClass2_304.method151();
+                CacheableNode class30_sub2_1 = aClass2_304.method151();
                 class30_sub2_1.method329();
                 class30_sub2_1.method330();
                 if(class30_sub2_1 == aClass30_Sub2_300)
                 {
-                    Class30_Sub2 class30_sub2_2 = aClass2_304.method151();
+                    CacheableNode class30_sub2_2 = aClass2_304.method151();
                     class30_sub2_2.method329();
                     class30_sub2_2.method330();
                 }
@@ -70,7 +70,7 @@ public final class Class12
     {
         do
         {
-            Class30_Sub2 class30_sub2 = aClass2_304.method151();
+            CacheableNode class30_sub2 = aClass2_304.method151();
             if(class30_sub2 != null)
             {
                 class30_sub2.method329();
@@ -88,9 +88,9 @@ public final class Class12
     private boolean aBoolean297;
     private int anInt298;
     private int anInt299;
-    private Class30_Sub2 aClass30_Sub2_300;
+    private CacheableNode aClass30_Sub2_300;
     private int anInt301;
     private int anInt302;
     private Class1 aClass1_303;
-    private Class2 aClass2_304;
+    private CacheableNodeDeque aClass2_304;
 }

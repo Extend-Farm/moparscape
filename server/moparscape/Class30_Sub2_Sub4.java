@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-public class Class30_Sub2_Sub4 extends Class30_Sub2
+public class Class30_Sub2_Sub4 extends CacheableNode
 {
 
     public void method443(int i, int j, int k, int l, int i1, int j1, int k1, 

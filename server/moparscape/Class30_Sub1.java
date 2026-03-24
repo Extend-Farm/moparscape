@@ -3,7 +3,7 @@
 // Decompiler options: packimports(3) 
 
 
-final class Class30_Sub1 extends Class30
+final class Class30_Sub1 extends Node
 {
 
     Class30_Sub1()

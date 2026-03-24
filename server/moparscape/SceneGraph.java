@@ -2336,7 +2336,7 @@ label0:
     static Class47 aClass47ArrayArray474[][];
     public static int anInt475;
     static Class47 aClass47Array476[] = new Class47[500];
-    static Class19 aClass19_477 = new Class19(169);
+    static Deque aClass19_477 = new Deque(169);
     static final int anIntArray478[] = {
         19, 55, 38, 155, 255, 110, 137, 205, 76
     };

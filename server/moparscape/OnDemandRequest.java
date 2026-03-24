@@ -3,7 +3,7 @@
 // Decompiler options: packimports(3) 
 
 
-public class OnDemandRequest extends Class30_Sub2
+public class OnDemandRequest extends CacheableNode
 {
 
     public OnDemandRequest()

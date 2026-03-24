@@ -761,7 +761,7 @@ public final class GameClient extends GameShell
 
     public final void method25(int i, int j)
     {
-        Class19 class19 = aClass19ArrayArrayArray827[anInt918][i][j];
+        Deque class19 = aClass19ArrayArrayArray827[anInt918][i][j];
         if(class19 == null)
         {
             aClass25_946.method295(anInt918, i, j);
@@ -782,7 +782,7 @@ public final class GameClient extends GameShell
             }
         }
 
-        class19.method250(-493, ((Class30) (obj)));
+        class19.method250(-493, ((Node) (obj)));
         Object obj1 = null;
         Object obj2 = null;
         for(Class30_Sub2_Sub4_Sub2 class30_sub2_sub4_sub2_1 = (Class30_Sub2_Sub4_Sub2)class19.method252(); class30_sub2_sub4_sub2_1 != null; class30_sub2_sub4_sub2_1 = (Class30_Sub2_Sub4_Sub2)class19.method254(false))
@@ -4574,7 +4574,7 @@ public final class GameClient extends GameShell
             }
             if(k1 == 3)
             {
-                Class19 class19 = aClass19ArrayArrayArray827[anInt918][i1][j1];
+                Deque class19 = aClass19ArrayArrayArray827[anInt918][i1][j1];
                 if(class19 != null)
                 {
                     for(Class30_Sub2_Sub4_Sub2 class30_sub2_sub4_sub2 = (Class30_Sub2_Sub4_Sub2)class19.method253(5); class30_sub2_sub4_sub2 != null; class30_sub2_sub4_sub2 = (Class30_Sub2_Sub4_Sub2)class19.method255(8))
@@ -5985,7 +5985,7 @@ public final class GameClient extends GameShell
 
                 }
 
-                aClass19_1179 = new Class19(169);
+                aClass19_1179 = new Deque(169);
                 anInt900 = 0;
                 anInt899 = 0;
                 anInt1042 = -1;
@@ -9345,7 +9345,7 @@ public final class GameClient extends GameShell
         {
             for(int l5 = 0; l5 < 104; l5++)
             {
-                Class19 class19 = aClass19ArrayArrayArray827[anInt918][k5][l5];
+                Deque class19 = aClass19ArrayArrayArray827[anInt918][k5][l5];
                 if(class19 != null)
                 {
                     int l = (k5 * 4 + 2) - ((Class30_Sub2_Sub4_Sub1) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anInt1550 / 32;
@@ -9945,7 +9945,7 @@ public final class GameClient extends GameShell
             int l13 = class30_sub2_sub2.method410();
             if(j3 >= 0 && i6 >= 0 && j3 < 104 && i6 < 104)
             {
-                Class19 class19_1 = aClass19ArrayArrayArray827[anInt918][j3][i6];
+                Deque class19_1 = aClass19ArrayArrayArray827[anInt918][j3][i6];
                 if(class19_1 != null)
                 {
                     for(Class30_Sub2_Sub4_Sub2 class30_sub2_sub4_sub2_3 = (Class30_Sub2_Sub4_Sub2)class19_1.method252(); class30_sub2_sub4_sub2_3 != null; class30_sub2_sub4_sub2_3 = (Class30_Sub2_Sub4_Sub2)class19_1.method254(false))
@@ -9992,7 +9992,7 @@ public final class GameClient extends GameShell
                 class30_sub2_sub4_sub2_2.anInt1558 = i1;
                 class30_sub2_sub4_sub2_2.anInt1559 = j14;
                 if(aClass19ArrayArrayArray827[anInt918][k6][j9] == null)
-                    aClass19ArrayArrayArray827[anInt918][k6][j9] = new Class19(169);
+                    aClass19ArrayArrayArray827[anInt918][k6][j9] = new Deque(169);
                 aClass19ArrayArrayArray827[anInt918][k6][j9].method249(class30_sub2_sub4_sub2_2);
                 method25(k6, j9);
             }
@@ -10006,7 +10006,7 @@ public final class GameClient extends GameShell
             int k9 = class30_sub2_sub2.method410();
             if(i4 >= 0 && l6 >= 0 && i4 < 104 && l6 < 104)
             {
-                Class19 class19 = aClass19ArrayArrayArray827[anInt918][i4][l6];
+                Deque class19 = aClass19ArrayArrayArray827[anInt918][i4][l6];
                 if(class19 != null)
                 {
                     for(Class30_Sub2_Sub4_Sub2 class30_sub2_sub4_sub2 = (Class30_Sub2_Sub4_Sub2)class19.method252(); class30_sub2_sub4_sub2 != null; class30_sub2_sub4_sub2 = (Class30_Sub2_Sub4_Sub2)class19.method254(false))
@@ -10188,7 +10188,7 @@ public final class GameClient extends GameShell
                 class30_sub2_sub4_sub2_1.anInt1558 = k2;
                 class30_sub2_sub4_sub2_1.anInt1559 = j5;
                 if(aClass19ArrayArrayArray827[anInt918][l10][i13] == null)
-                    aClass19ArrayArrayArray827[anInt918][l10][i13] = new Class19(169);
+                    aClass19ArrayArrayArray827[anInt918][l10][i13] = new Deque(169);
                 aClass19ArrayArrayArray827[anInt918][l10][i13].method249(class30_sub2_sub4_sub2_1);
                 method25(l10, i13);
             }
@@ -11937,7 +11937,7 @@ public final class GameClient extends GameShell
     {
         anIntArrayArray825 = new int[104][104];
         anIntArray826 = new int[200];
-        aClass19ArrayArrayArray827 = new Class19[4][104][104];
+        aClass19ArrayArrayArray827 = new Deque[4][104][104];
         aBoolean830 = true;
         aBoolean831 = false;
         aClass30_Sub2_Sub2_834 = new PacketBuffer(new byte[5000], 891);
@@ -12016,7 +12016,7 @@ public final class GameClient extends GameShell
         anInt1002 = 0x23201b;
         aString1004 = "";
         aByte1012 = 24;
-        aClass19_1013 = new Class19(169);
+        aClass19_1013 = new Deque(169);
         aBoolean1017 = false;
         anInt1018 = -1;
         anIntArray1030 = new int[5];
@@ -12030,7 +12030,7 @@ public final class GameClient extends GameShell
         anInt1050 = 111;
         anIntArray1052 = new int[151];
         anInt1054 = -1;
-        aClass19_1056 = new Class19(169);
+        aClass19_1056 = new Deque(169);
         anIntArray1057 = new int[33];
         anInt1058 = 24869;
         aClass9_1059 = new Class9();
@@ -12077,7 +12077,7 @@ public final class GameClient extends GameShell
         server = "";
         aBoolean1176 = false;
         anInt1178 = -1;
-        aClass19_1179 = new Class19(169);
+        aClass19_1179 = new Deque(169);
         anInt1184 = 128;
         anInt1189 = -1;
         aClass30_Sub2_Sub2_1192 = PacketBuffer.method396(1, 9);
@@ -12121,7 +12121,7 @@ public final class GameClient extends GameShell
     private long aLong824;
     private int anIntArrayArray825[][];
     private int anIntArray826[];
-    private Class19 aClass19ArrayArrayArray827[][][];
+    private Deque aClass19ArrayArrayArray827[][][];
     private int anIntArray828[];
     private int anIntArray829[];
     private boolean aBoolean830;
@@ -12324,7 +12324,7 @@ public final class GameClient extends GameShell
     private int anInt1010;
     private int anInt1011;
     private byte aByte1012;
-    private Class19 aClass19_1013;
+    private Deque aClass19_1013;
     private int anInt1014;
     private int anInt1015;
     private int anInt1016;
@@ -12367,7 +12367,7 @@ public final class GameClient extends GameShell
     private Archive aClass44_1053;
     private int anInt1054;
     private int anInt1055;
-    private Class19 aClass19_1056;
+    private Deque aClass19_1056;
     private int anIntArray1057[];
     private int anInt1058;
     private Class9 aClass9_1059;
@@ -12498,7 +12498,7 @@ public final class GameClient extends GameShell
         2, 2, 3
     };
     private int anInt1178;
-    private Class19 aClass19_1179;
+    private Deque aClass19_1179;
     private int anIntArray1180[];
     private int anIntArray1181[];
     private int anIntArray1182[];

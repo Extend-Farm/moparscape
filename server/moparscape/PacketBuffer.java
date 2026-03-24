@@ -5,7 +5,7 @@
 import java.math.BigInteger;
 import sign.SignLink;
 
-public final class PacketBuffer extends Class30_Sub2
+public final class PacketBuffer extends CacheableNode
 {
 
     public static PacketBuffer method396(int i, int j)
@@ -554,9 +554,9 @@ public final class PacketBuffer extends Class30_Sub2
     private static int anInt1411;
     private static int anInt1412;
     private static int anInt1413;
-    private static Class19 aClass19_1414 = new Class19(169);
-    private static Class19 aClass19_1415 = new Class19(169);
-    private static Class19 aClass19_1416 = new Class19(169);
+    private static Deque aClass19_1414 = new Deque(169);
+    private static Deque aClass19_1415 = new Deque(169);
+    private static Deque aClass19_1416 = new Deque(169);
     private static char aCharArray1417[] = {
         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 
         'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 
