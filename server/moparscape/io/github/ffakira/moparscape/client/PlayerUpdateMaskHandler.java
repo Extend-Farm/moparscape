@@ -54,6 +54,31 @@ final class PlayerUpdateMaskHandler {
         packetBuffer.anInt1406 = payloadStartOffset + encodedChatLength;
     }
 
+    static void applyPlayerForcedChatUpdate(GameClient gameClient, Player player, PacketBuffer packetBuffer, Player localPlayer, boolean messageFilterFlag)
+    {
+        player.aString1506 = packetBuffer.method415();
+        if(player.aString1506.charAt(0) == '~')
+        {
+            player.aString1506 = player.aString1506.substring(1);
+            gameClient.method77(player.aString1506, 2, player.aString1703, messageFilterFlag);
+        } else
+        if(player == localPlayer)
+            gameClient.method77(player.aString1506, 2, player.aString1703, messageFilterFlag);
+        player.anInt1513 = 0;
+        player.anInt1531 = 0;
+        player.anInt1535 = 150;
+    }
+
+    static void applyPlayerAppearanceUpdate(int playerIndex, Player player, PacketBuffer packetBuffer, byte decodeByte, PacketBuffer[] playerAppearanceBuffers)
+    {
+        int appearanceLength = packetBuffer.method427(false);
+        byte appearanceData[] = new byte[appearanceLength];
+        PacketBuffer appearanceBuffer = new PacketBuffer(appearanceData, 891);
+        packetBuffer.method417(appearanceLength, decodeByte, 0, appearanceData);
+        playerAppearanceBuffers[playerIndex] = appearanceBuffer;
+        player.method451(0, appearanceBuffer);
+    }
+
     private static boolean isIgnoredChatSender(long senderNameHash, int chatRank, int ignoreCount, long[] ignoredNameHashes)
     {
         if(chatRank > 1)

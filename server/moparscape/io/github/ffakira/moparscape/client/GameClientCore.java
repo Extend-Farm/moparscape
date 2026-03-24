@@ -8275,36 +8275,11 @@ class GameClientCore extends GameShell
             player.anInt1520 = -1;
     }
 
-    private void applyPlayerForcedChatUpdate(Player player, PacketBuffer packetBuffer)
-    {
-        player.aString1506 = packetBuffer.method415();
-        if(player.aString1506.charAt(0) == '~')
-        {
-            player.aString1506 = player.aString1506.substring(1);
-            method77(player.aString1506, 2, player.aString1703, aBoolean991);
-        } else
-        if(player == aClass30_Sub2_Sub4_Sub1_Sub2_1126)
-            method77(player.aString1506, 2, player.aString1703, aBoolean991);
-        player.anInt1513 = 0;
-        player.anInt1531 = 0;
-        player.anInt1535 = 150;
-    }
-
     private void applyPlayerInteractingEntityUpdate(Player player, PacketBuffer packetBuffer)
     {
         player.anInt1502 = packetBuffer.method434((byte)108);
         if(player.anInt1502 == 65535)
             player.anInt1502 = -1;
-    }
-
-    private void applyPlayerAppearanceUpdate(int playerIndex, Player player, PacketBuffer packetBuffer)
-    {
-        int appearanceLength = packetBuffer.method427(false);
-        byte appearanceData[] = new byte[appearanceLength];
-        PacketBuffer appearanceBuffer = new PacketBuffer(appearanceData, 891);
-        packetBuffer.method417(appearanceLength, aByte920, 0, appearanceData);
-        aClass30_Sub2_Sub2Array895[playerIndex] = appearanceBuffer;
-        player.method451(0, appearanceBuffer);
     }
 
     private void applyPlayerFaceCoordinatesUpdate(Player player, PacketBuffer packetBuffer)
@@ -8354,13 +8329,13 @@ class GameClientCore extends GameShell
         if((updateMask & EntityUpdateMasks.Player.ANIMATION) != 0)
             applyActorAnimationUpdate(player, packetBuffer);
         if((updateMask & EntityUpdateMasks.Player.FORCED_CHAT) != 0)
-            applyPlayerForcedChatUpdate(player, packetBuffer);
+            PlayerUpdateMaskHandler.applyPlayerForcedChatUpdate((GameClient)this, player, packetBuffer, aClass30_Sub2_Sub4_Sub1_Sub2_1126, aBoolean991);
         if((updateMask & EntityUpdateMasks.Player.PUBLIC_CHAT) != 0)
             applyPlayerPublicChatUpdate(player, packetBuffer);
         if((updateMask & EntityUpdateMasks.Player.INTERACTING_ENTITY) != 0)
             applyPlayerInteractingEntityUpdate(player, packetBuffer);
         if((updateMask & EntityUpdateMasks.Player.APPEARANCE) != 0)
-            applyPlayerAppearanceUpdate(playerIndex, player, packetBuffer);
+            PlayerUpdateMaskHandler.applyPlayerAppearanceUpdate(playerIndex, player, packetBuffer, aByte920, aClass30_Sub2_Sub2Array895);
         if((updateMask & EntityUpdateMasks.Player.FACE_COORDINATES) != 0)
             applyPlayerFaceCoordinatesUpdate(player, packetBuffer);
         if((updateMask & EntityUpdateMasks.Player.HIT_PRIMARY) != 0)
