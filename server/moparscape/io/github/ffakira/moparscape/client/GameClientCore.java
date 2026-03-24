@@ -10472,14 +10472,7 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 72)
             {
-                int i1 = aClass30_Sub2_Sub2_1083.method434((byte)108);
-                Widget class9 = Widget.aClass9Array210[i1];
-                for(int k15 = 0; k15 < class9.anIntArray253.length; k15++)
-                {
-                    class9.anIntArray253[k15] = -1;
-                    class9.anIntArray253[k15] = 0;
-                }
-
+                IncomingPacketDispatcher.clearWidgetItemContainer(aClass30_Sub2_Sub2_1083);
                 anInt1008 = -1;
                 return true;
             }
@@ -10571,12 +10564,7 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 70)
             {
-                int k2 = aClass30_Sub2_Sub2_1083.method411();
-                int l10 = aClass30_Sub2_Sub2_1083.method437(-665);
-                int i16 = aClass30_Sub2_Sub2_1083.method434((byte)108);
-                Widget class9_5 = Widget.aClass9Array210[i16];
-                class9_5.anInt263 = k2;
-                class9_5.anInt265 = l10;
+                IncomingPacketDispatcher.applyWidgetScrollPosition(aClass30_Sub2_Sub2_1083);
                 anInt1008 = -1;
                 return true;
             }
@@ -10827,22 +10815,19 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 99)
             {
-                anInt1021 = aClass30_Sub2_Sub2_1083.method408();
+                anInt1021 = IncomingPacketDispatcher.readMinimapState(aClass30_Sub2_Sub2_1083);
                 anInt1008 = -1;
                 return true;
             }
             if(anInt1008 == 75)
             {
-                int j3 = aClass30_Sub2_Sub2_1083.method436((byte)-74);
-                int j11 = aClass30_Sub2_Sub2_1083.method436((byte)-74);
-                Widget.aClass9Array210[j11].anInt233 = 2;
-                Widget.aClass9Array210[j11].anInt234 = j3;
+                IncomingPacketDispatcher.applyWidgetModelId(aClass30_Sub2_Sub2_1083);
                 anInt1008 = -1;
                 return true;
             }
             if(anInt1008 == 114)
             {
-                anInt1104 = aClass30_Sub2_Sub2_1083.method434((byte)108) * 30;
+                anInt1104 = IncomingPacketDispatcher.readSystemUpdateTimer(aClass30_Sub2_Sub2_1083);
                 anInt1008 = -1;
                 return true;
             }

@@ -33,4 +33,43 @@ final class IncomingPacketDispatcher {
         effectFrequencies[effectSlot] = effectFrequency;
         effectPhases[effectSlot] = 0;
     }
+
+    static void clearWidgetItemContainer(PacketBuffer packetBuffer)
+    {
+        int widgetId = packetBuffer.method434((byte)108);
+        Widget widget = Widget.aClass9Array210[widgetId];
+        for(int slot = 0; slot < widget.anIntArray253.length; slot++)
+        {
+            widget.anIntArray253[slot] = -1;
+            widget.anIntArray253[slot] = 0;
+        }
+    }
+
+    static void applyWidgetScrollPosition(PacketBuffer packetBuffer)
+    {
+        int scrollX = packetBuffer.method411();
+        int scrollY = packetBuffer.method437(-665);
+        int widgetId = packetBuffer.method434((byte)108);
+        Widget widget = Widget.aClass9Array210[widgetId];
+        widget.anInt263 = scrollX;
+        widget.anInt265 = scrollY;
+    }
+
+    static void applyWidgetModelId(PacketBuffer packetBuffer)
+    {
+        int modelId = packetBuffer.method436((byte)-74);
+        int widgetId = packetBuffer.method436((byte)-74);
+        Widget.aClass9Array210[widgetId].anInt233 = 2;
+        Widget.aClass9Array210[widgetId].anInt234 = modelId;
+    }
+
+    static int readMinimapState(PacketBuffer packetBuffer)
+    {
+        return packetBuffer.method408();
+    }
+
+    static int readSystemUpdateTimer(PacketBuffer packetBuffer)
+    {
+        return packetBuffer.method434((byte)108) * 30;
+    }
 }
