@@ -6381,34 +6381,10 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
             aClass30_Sub2_Sub1_Sub1_1122 = new Sprite(class44_2, "compass", 0);
             aClass30_Sub2_Sub1_Sub1_1001 = new Sprite(class44_2, "mapedge", 0);
             aClass30_Sub2_Sub1_Sub1_1001.method345(5059);
-            try
-            {
-                for(int k3 = 0; k3 < 100; k3++)
-                    aClass30_Sub2_Sub1_Sub2Array1060[k3] = new IndexedSprite(class44_2, "mapscene", k3);
-
-            }
-            catch(Exception _ex) { }
-            try
-            {
-                for(int l3 = 0; l3 < 100; l3++)
-                    aClass30_Sub2_Sub1_Sub1Array1033[l3] = new Sprite(class44_2, "mapfunction", l3);
-
-            }
-            catch(Exception _ex) { }
-            try
-            {
-                for(int i4 = 0; i4 < 20; i4++)
-                    aClass30_Sub2_Sub1_Sub1Array987[i4] = new Sprite(class44_2, "hitmarks", i4);
-
-            }
-            catch(Exception _ex) { }
-            try
-            {
-                for(int j4 = 0; j4 < 20; j4++)
-                    aClass30_Sub2_Sub1_Sub1Array1095[j4] = new Sprite(class44_2, "headicons", j4);
-
-            }
-            catch(Exception _ex) { }
+            BootstrapMediaLoader.loadMapSceneSprites(class44_2, aClass30_Sub2_Sub1_Sub2Array1060);
+            BootstrapMediaLoader.loadMapFunctionSprites(class44_2, aClass30_Sub2_Sub1_Sub1Array1033);
+            BootstrapMediaLoader.loadHitmarkSprites(class44_2, aClass30_Sub2_Sub1_Sub1Array987);
+            BootstrapMediaLoader.loadHeadIconSprites(class44_2, aClass30_Sub2_Sub1_Sub1Array1095);
             aClass30_Sub2_Sub1_Sub1_870 = new Sprite(class44_2, "mapmarker", 0);
             aClass30_Sub2_Sub1_Sub1_871 = new Sprite(class44_2, "mapmarker", 1);
             for(int k4 = 0; k4 < 8; k4++)
