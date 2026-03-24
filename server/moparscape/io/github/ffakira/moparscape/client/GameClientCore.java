@@ -10875,55 +10875,10 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 50)
             {
-                long l4 = aClass30_Sub2_Sub2_1083.method414(-35089);
-                int i18 = aClass30_Sub2_Sub2_1083.method408();
-                String s7 = TextUtils.method587(-45804, TextUtils.method584(l4, (byte)-99));
-                for(int k24 = 0; k24 < anInt899; k24++)
-                {
-                    if(l4 != aLongArray955[k24])
-                        continue;
-                    if(anIntArray826[k24] != i18)
-                    {
-                        anIntArray826[k24] = i18;
-                        aBoolean1153 = true;
-                        if(i18 > 0)
-                            method77(s7 + " has logged in.", 5, "", aBoolean991);
-                        if(i18 == 0)
-                            method77(s7 + " has logged out.", 5, "", aBoolean991);
-                    }
-                    s7 = null;
-                    break;
-                }
-
-                if(s7 != null && anInt899 < 200)
-                {
-                    aLongArray955[anInt899] = l4;
-                    aStringArray1082[anInt899] = s7;
-                    anIntArray826[anInt899] = i18;
-                    anInt899++;
+                int friendStatusUpdate[] = SocialPacketHandler.handleFriendStatusUpdate((GameClient)this, aClass30_Sub2_Sub2_1083, anInt899, anInt957, aLongArray955, aStringArray1082, anIntArray826, aBoolean991);
+                anInt899 = friendStatusUpdate[0];
+                if(friendStatusUpdate[1] == 1)
                     aBoolean1153 = true;
-                }
-                for(boolean flag6 = false; !flag6;)
-                {
-                    flag6 = true;
-                    for(int k29 = 0; k29 < anInt899 - 1; k29++)
-                        if(anIntArray826[k29] != anInt957 && anIntArray826[k29 + 1] == anInt957 || anIntArray826[k29] == 0 && anIntArray826[k29 + 1] != 0)
-                        {
-                            int j31 = anIntArray826[k29];
-                            anIntArray826[k29] = anIntArray826[k29 + 1];
-                            anIntArray826[k29 + 1] = j31;
-                            String s10 = aStringArray1082[k29];
-                            aStringArray1082[k29] = aStringArray1082[k29 + 1];
-                            aStringArray1082[k29 + 1] = s10;
-                            long l32 = aLongArray955[k29];
-                            aLongArray955[k29] = aLongArray955[k29 + 1];
-                            aLongArray955[k29 + 1] = l32;
-                            aBoolean1153 = true;
-                            flag6 = false;
-                        }
-
-                }
-
                 anInt1008 = -1;
                 return true;
             }
