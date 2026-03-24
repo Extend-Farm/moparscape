@@ -6303,73 +6303,17 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
             aClass14Array970 = cacheStores;
         try
         {
-            method16(533);
-            aClass44_1053 = method67(1, "title screen", "title", anIntArray1090[1], (byte)-41, 25);
-            aClass30_Sub2_Sub1_Sub4_1270 = new FontRenderer(false, "p11_full", 0, aClass44_1053);
-            aClass30_Sub2_Sub1_Sub4_1271 = new FontRenderer(false, "p12_full", 0, aClass44_1053);
-            aClass30_Sub2_Sub1_Sub4_1272 = new FontRenderer(false, "b12_full", 0, aClass44_1053);
-            aClass30_Sub2_Sub1_Sub4_1273 = new FontRenderer(true, "q8_full", 0, aClass44_1053);
-            method56(0);
-            method51(215);
-            Archive class44 = method67(2, "config", "config", anIntArray1090[2], (byte)-41, 30);
-            Archive class44_1 = method67(3, "interface", "interface", anIntArray1090[3], (byte)-41, 35);
-            Archive class44_2 = method67(4, "2d graphics", "media", anIntArray1090[4], (byte)-41, 40);
-            Archive class44_3 = method67(6, "textures", "textures", anIntArray1090[6], (byte)-41, 45);
-            Archive class44_4 = method67(7, "chat system", "wordenc", anIntArray1090[7], (byte)-41, 50);
-            Archive class44_5 = method67(8, "sound effects", "sounds", anIntArray1090[8], (byte)-41, 55);
-            aByteArrayArrayArray1258 = new byte[4][104][104];
-            anIntArrayArrayArray1214 = new int[4][105][105];
-            aClass25_946 = new SceneGraph(104, (byte)43, 104, anIntArrayArrayArray1214, 4);
-            for(int j = 0; j < 4; j++)
-                aClass11Array1230[j] = new CollisionMap(104, 104, true);
-
-            aClass30_Sub2_Sub1_Sub1_1263 = new Sprite(512, 512);
-            Archive class44_6 = method67(5, "update list", "versionlist", anIntArray1090[5], (byte)-41, 60);
-            method13(60, (byte)4, "Connecting to update server");
-            aClass42_Sub1_1068 = new OnDemandFetcher();
-            aClass42_Sub1_1068.method551(class44_6, (GameClient)this);
-            AnimationFrame.method528(aClass42_Sub1_1068.method557(0));
-            Model.method459(aClass42_Sub1_1068.method555(79, 0), aClass42_Sub1_1068);
-            if(!aBoolean960)
-            {
-                anInt1227 = 0;
-                try
-                {
-                    anInt1227 = Integer.parseInt(getParameter("music"));
-                }
-                catch(Exception _ex) { }
-                aBoolean1228 = true;
-                aClass42_Sub1_1068.method558(2, anInt1227);
-                while(aClass42_Sub1_1068.method552() > 0) 
-                {
-                    method57(false);
-                    try
-                    {
-                        Thread.sleep(100L);
-                    }
-                    catch(Exception _ex) { }
-                    if(aClass42_Sub1_1068.anInt1349 > 3)
-                    {
-                        method28("ondemand");
-                        return;
-                    }
-                }
-            }
-            if(!BootstrapDemandLoader.requestAnimations(this, aClass42_Sub1_1068))
+            bootstrapLoadTitleResources();
+            BootstrapArchives archives = bootstrapLoadArchivesAndScene();
+            bootstrapConnectUpdateServer(archives.updateListArchive);
+            if(!bootstrapPrimeOnDemand())
             {
                 method28("ondemand");
                 return;
             }
-            BootstrapDemandLoader.requestModels(this, aClass42_Sub1_1068);
-            if(aClass14Array970[0] != null)
-                BootstrapDemandLoader.requestStartupMaps(this, aClass42_Sub1_1068);
-            int k = aClass42_Sub1_1068.method555(79, 0);
-            BootstrapDemandLoader.queuePriorityModelRequests(aClass42_Sub1_1068);
-            aClass42_Sub1_1068.method554(aBoolean959, 0);
-            if(!aBoolean960)
-                BootstrapDemandLoader.queueMemberSongs(aClass42_Sub1_1068);
+            bootstrapLoadDemandQueues();
             method13(80, (byte)4, "Unpacking media");
-            BootstrapMediaLoader.CoreMediaState coreMedia = BootstrapMediaLoader.loadCoreMedia(class44_2);
+            BootstrapMediaLoader.CoreMediaState coreMedia = BootstrapMediaLoader.loadCoreMedia(archives.mediaArchive);
             aClass30_Sub2_Sub1_Sub2_1196 = coreMedia.invBack;
             aClass30_Sub2_Sub1_Sub2_1198 = coreMedia.chatBack;
             aClass30_Sub2_Sub1_Sub2_1197 = coreMedia.mapBack;
@@ -6379,11 +6323,11 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
             aClass30_Sub2_Sub1_Sub2Array947 = coreMedia.sideIcons;
             aClass30_Sub2_Sub1_Sub1_1122 = coreMedia.compass;
             aClass30_Sub2_Sub1_Sub1_1001 = coreMedia.mapEdge;
-            BootstrapMediaLoader.loadMapSceneSprites(class44_2, aClass30_Sub2_Sub1_Sub2Array1060);
-            BootstrapMediaLoader.loadMapFunctionSprites(class44_2, aClass30_Sub2_Sub1_Sub1Array1033);
-            BootstrapMediaLoader.loadHitmarkSprites(class44_2, aClass30_Sub2_Sub1_Sub1Array987);
-            BootstrapMediaLoader.loadHeadIconSprites(class44_2, aClass30_Sub2_Sub1_Sub1Array1095);
-            BootstrapMediaLayoutLoader.State mediaLayout = BootstrapMediaLayoutLoader.load(class44_2);
+            BootstrapMediaLoader.loadMapSceneSprites(archives.mediaArchive, aClass30_Sub2_Sub1_Sub2Array1060);
+            BootstrapMediaLoader.loadMapFunctionSprites(archives.mediaArchive, aClass30_Sub2_Sub1_Sub1Array1033);
+            BootstrapMediaLoader.loadHitmarkSprites(archives.mediaArchive, aClass30_Sub2_Sub1_Sub1Array987);
+            BootstrapMediaLoader.loadHeadIconSprites(archives.mediaArchive, aClass30_Sub2_Sub1_Sub1Array1095);
+            BootstrapMediaLayoutLoader.State mediaLayout = BootstrapMediaLayoutLoader.load(archives.mediaArchive);
             aClass30_Sub2_Sub1_Sub1_870 = mediaLayout.mapMarker0;
             aClass30_Sub2_Sub1_Sub1_871 = mediaLayout.mapMarker1;
             aClass30_Sub2_Sub1_Sub1Array1150 = mediaLayout.crossSprites;
@@ -6406,7 +6350,7 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
             aClass30_Sub2_Sub1_Sub2_869 = mediaLayout.redstone2BothTransforms;
             aClass30_Sub2_Sub1_Sub2Array1219 = mediaLayout.modIcons;
 
-            ProducingGraphicsBuffer[] backBuffers = BootstrapBackBufferLoader.createBackBuffers(class44_2, method11(0));
+            ProducingGraphicsBuffer[] backBuffers = BootstrapBackBufferLoader.createBackBuffers(archives.mediaArchive, method11(0));
             aClass15_903 = backBuffers[0];
             aClass15_904 = backBuffers[1];
             aClass15_905 = backBuffers[2];
@@ -6417,19 +6361,19 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
             aClass15_910 = backBuffers[7];
             aClass15_911 = backBuffers[8];
             BootstrapDemandLoader.applyRandomMapSpriteTint(aClass30_Sub2_Sub1_Sub1Array1033, aClass30_Sub2_Sub1_Sub2Array1060);
-            BootstrapConfigLoader.loadTexturesAndConfig(this, class44_3, class44, aByte1200, aBoolean959);
-            BootstrapConfigLoader.loadSoundsIfNeeded(this, aBoolean960, class44_5);
+            BootstrapConfigLoader.loadTexturesAndConfig(this, archives.texturesArchive, archives.configArchive, aByte1200, aBoolean959);
+            BootstrapConfigLoader.loadSoundsIfNeeded(this, aBoolean960, archives.soundsArchive);
             FontRenderer aclass30_sub2_sub1_sub4[] = {
                 aClass30_Sub2_Sub1_Sub4_1270, aClass30_Sub2_Sub1_Sub4_1271, aClass30_Sub2_Sub1_Sub4_1272, aClass30_Sub2_Sub1_Sub4_1273
             };
-            BootstrapConfigLoader.loadInterfaces(this, class44_1, class44_2, aclass30_sub2_sub1_sub4);
+            BootstrapConfigLoader.loadInterfaces(this, archives.interfaceArchive, archives.mediaArchive, aclass30_sub2_sub1_sub4);
             method13(100, (byte)4, "Preparing game engine");
             BootstrapGraphicsSetup.prepareMapbackClipMasks(aClass30_Sub2_Sub1_Sub2_1197, anIntArray968, anIntArray1057, anIntArray1052, anIntArray1229);
             BootstrapGraphicsSetup.State graphicsState = BootstrapGraphicsSetup.initializeRasterizerAndSceneVisibility(aBoolean1231);
             anIntArray1180 = graphicsState.viewportScanlineOffsets;
             anIntArray1181 = graphicsState.chatboxScanlineOffsets;
             anIntArray1182 = graphicsState.fullScreenScanlineOffsets;
-            aClass48_879 = BootstrapEngineFinalizer.finalizeStartup(this, class44_4, (GameClient)this, anInt1096);
+            aClass48_879 = BootstrapEngineFinalizer.finalizeStartup(this, archives.wordEncArchive, (GameClient)this, anInt1096);
             return;
         }
         catch(Exception exception)
@@ -6437,6 +6381,94 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
             SignLink.reporterror("loaderror " + aString1049 + " " + anInt1079);
         }
         aBoolean926 = true;
+    }
+
+    private void bootstrapLoadTitleResources()
+    {
+        method16(533);
+        aClass44_1053 = method67(1, "title screen", "title", anIntArray1090[1], (byte)-41, 25);
+        aClass30_Sub2_Sub1_Sub4_1270 = new FontRenderer(false, "p11_full", 0, aClass44_1053);
+        aClass30_Sub2_Sub1_Sub4_1271 = new FontRenderer(false, "p12_full", 0, aClass44_1053);
+        aClass30_Sub2_Sub1_Sub4_1272 = new FontRenderer(false, "b12_full", 0, aClass44_1053);
+        aClass30_Sub2_Sub1_Sub4_1273 = new FontRenderer(true, "q8_full", 0, aClass44_1053);
+        method56(0);
+        method51(215);
+    }
+
+    private BootstrapArchives bootstrapLoadArchivesAndScene()
+    {
+        BootstrapArchives archives = new BootstrapArchives();
+        archives.configArchive = method67(2, "config", "config", anIntArray1090[2], (byte)-41, 30);
+        archives.interfaceArchive = method67(3, "interface", "interface", anIntArray1090[3], (byte)-41, 35);
+        archives.mediaArchive = method67(4, "2d graphics", "media", anIntArray1090[4], (byte)-41, 40);
+        archives.texturesArchive = method67(6, "textures", "textures", anIntArray1090[6], (byte)-41, 45);
+        archives.wordEncArchive = method67(7, "chat system", "wordenc", anIntArray1090[7], (byte)-41, 50);
+        archives.soundsArchive = method67(8, "sound effects", "sounds", anIntArray1090[8], (byte)-41, 55);
+        aByteArrayArrayArray1258 = new byte[4][104][104];
+        anIntArrayArrayArray1214 = new int[4][105][105];
+        aClass25_946 = new SceneGraph(104, (byte)43, 104, anIntArrayArrayArray1214, 4);
+        for(int index = 0; index < 4; index++)
+            aClass11Array1230[index] = new CollisionMap(104, 104, true);
+        aClass30_Sub2_Sub1_Sub1_1263 = new Sprite(512, 512);
+        archives.updateListArchive = method67(5, "update list", "versionlist", anIntArray1090[5], (byte)-41, 60);
+        return archives;
+    }
+
+    private void bootstrapConnectUpdateServer(Archive updateListArchive)
+    {
+        method13(60, (byte)4, "Connecting to update server");
+        aClass42_Sub1_1068 = new OnDemandFetcher();
+        aClass42_Sub1_1068.method551(updateListArchive, (GameClient)this);
+        AnimationFrame.method528(aClass42_Sub1_1068.method557(0));
+        Model.method459(aClass42_Sub1_1068.method555(79, 0), aClass42_Sub1_1068);
+    }
+
+    private boolean bootstrapPrimeOnDemand()
+    {
+        if(!aBoolean960)
+        {
+            anInt1227 = 0;
+            try
+            {
+                anInt1227 = Integer.parseInt(getParameter("music"));
+            }
+            catch(Exception _ex) { }
+            aBoolean1228 = true;
+            aClass42_Sub1_1068.method558(2, anInt1227);
+            while(aClass42_Sub1_1068.method552() > 0)
+            {
+                method57(false);
+                try
+                {
+                    Thread.sleep(100L);
+                }
+                catch(Exception _ex) { }
+                if(aClass42_Sub1_1068.anInt1349 > 3)
+                    return false;
+            }
+        }
+        return BootstrapDemandLoader.requestAnimations(this, aClass42_Sub1_1068);
+    }
+
+    private void bootstrapLoadDemandQueues()
+    {
+        BootstrapDemandLoader.requestModels(this, aClass42_Sub1_1068);
+        if(aClass14Array970[0] != null)
+            BootstrapDemandLoader.requestStartupMaps(this, aClass42_Sub1_1068);
+        BootstrapDemandLoader.queuePriorityModelRequests(aClass42_Sub1_1068);
+        aClass42_Sub1_1068.method554(aBoolean959, 0);
+        if(!aBoolean960)
+            BootstrapDemandLoader.queueMemberSongs(aClass42_Sub1_1068);
+    }
+
+    private static final class BootstrapArchives {
+        Archive configArchive;
+        Archive interfaceArchive;
+        Archive mediaArchive;
+        Archive texturesArchive;
+        Archive wordEncArchive;
+        Archive soundsArchive;
+        Archive updateListArchive;
     }
 
     private final void method91(PacketBuffer class30_sub2_sub2, int i, byte byte0)
