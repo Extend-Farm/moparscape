@@ -6500,66 +6500,11 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
             };
             Widget.method205(class44_1, aclass30_sub2_sub1_sub4, (byte)-84, class44_2);
             method13(100, (byte)4, "Preparing game engine");
-            for(int j6 = 0; j6 < 33; j6++)
-            {
-                int k6 = 999;
-                int i7 = 0;
-                for(int k7 = 0; k7 < 34; k7++)
-                {
-                    if(aClass30_Sub2_Sub1_Sub2_1197.aByteArray1450[k7 + j6 * aClass30_Sub2_Sub1_Sub2_1197.anInt1452] == 0)
-                    {
-                        if(k6 == 999)
-                            k6 = k7;
-                        continue;
-                    }
-                    if(k6 == 999)
-                        continue;
-                    i7 = k7;
-                    break;
-                }
-
-                anIntArray968[j6] = k6;
-                anIntArray1057[j6] = i7 - k6;
-            }
-
-            for(int l6 = 5; l6 < 156; l6++)
-            {
-                int j7 = 999;
-                int l7 = 0;
-                for(int j8 = 25; j8 < 172; j8++)
-                {
-                    if(aClass30_Sub2_Sub1_Sub2_1197.aByteArray1450[j8 + l6 * aClass30_Sub2_Sub1_Sub2_1197.anInt1452] == 0 && (j8 > 34 || l6 > 34))
-                    {
-                        if(j7 == 999)
-                            j7 = j8;
-                        continue;
-                    }
-                    if(j7 == 999)
-                        continue;
-                    l7 = j8;
-                    break;
-                }
-
-                anIntArray1052[l6 - 5] = j7 - 25;
-                anIntArray1229[l6 - 5] = l7 - j7;
-            }
-
-            Rasterizer3D.method365(-950, 479, 96);
-            anIntArray1180 = Rasterizer3D.anIntArray1472;
-            Rasterizer3D.method365(-950, 190, 261);
-            anIntArray1181 = Rasterizer3D.anIntArray1472;
-            Rasterizer3D.method365(-950, 512, 334);
-            anIntArray1182 = Rasterizer3D.anIntArray1472;
-            int ai[] = new int[9];
-            for(int i8 = 0; i8 < 9; i8++)
-            {
-                int k8 = 128 + i8 * 32 + 15;
-                int l8 = 600 + k8 * 3;
-                int i9 = Rasterizer3D.anIntArray1470[k8];
-                ai[i8] = l8 * i9 >> 16;
-            }
-
-            SceneGraph.method310(500, 800, 512, 334, ai, aBoolean1231);
+            BootstrapGraphicsSetup.prepareMapbackClipMasks(aClass30_Sub2_Sub1_Sub2_1197, anIntArray968, anIntArray1057, anIntArray1052, anIntArray1229);
+            BootstrapGraphicsSetup.State graphicsState = BootstrapGraphicsSetup.initializeRasterizerAndSceneVisibility(aBoolean1231);
+            anIntArray1180 = graphicsState.viewportScanlineOffsets;
+            anIntArray1181 = graphicsState.chatboxScanlineOffsets;
+            anIntArray1182 = graphicsState.fullScreenScanlineOffsets;
             ChatCensor.method487(class44_4);
             aClass48_879 = new MouseRecorder((GameClient)this, anInt1096);
             method12(aClass48_879, 10);
