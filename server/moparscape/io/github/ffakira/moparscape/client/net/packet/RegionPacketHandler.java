@@ -1,11 +1,11 @@
-package io.github.ffakira.moparscape.client;
+package io.github.ffakira.moparscape.client.net.packet;
 
-final class RegionPacketHandler {
+public final class RegionPacketHandler {
 
     private RegionPacketHandler() {
     }
 
-    static int collectDynamicRegionIds(int[][][] chunkTemplates, int[] regionIdsOut)
+    public static int collectDynamicRegionIds(int[][][] chunkTemplates, int[] regionIdsOut)
     {
         int uniqueCount = 0;
         for(int plane = 0; plane < 4; plane++)

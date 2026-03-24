@@ -1,13 +1,13 @@
-package io.github.ffakira.moparscape.client;
+package io.github.ffakira.moparscape.client.net.packet;
 
 import io.github.ffakira.moparscape.net.PacketBuffer;
 
-final class CameraPacketHandler {
+public final class CameraPacketHandler {
 
     private CameraPacketHandler() {
     }
 
-    static int[] readCameraLock(PacketBuffer packetBuffer)
+    public static int[] readCameraLock(PacketBuffer packetBuffer)
     {
         int tileX = packetBuffer.method408();
         int tileY = packetBuffer.method408();
@@ -19,7 +19,7 @@ final class CameraPacketHandler {
         };
     }
 
-    static int[] readCameraAngle(PacketBuffer packetBuffer)
+    public static int[] readCameraAngle(PacketBuffer packetBuffer)
     {
         int tileX = packetBuffer.method408();
         int tileY = packetBuffer.method408();
@@ -31,7 +31,7 @@ final class CameraPacketHandler {
         };
     }
 
-    static int[] computeCameraAngles(int cameraX, int cameraY, int cameraZ, int targetX, int targetY, int targetZ)
+    public static int[] computeCameraAngles(int cameraX, int cameraY, int cameraZ, int targetX, int targetY, int targetZ)
     {
         int dx = targetX - cameraX;
         int dy = targetY - cameraY;

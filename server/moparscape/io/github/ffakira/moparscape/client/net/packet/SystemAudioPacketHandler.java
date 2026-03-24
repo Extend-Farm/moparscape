@@ -1,23 +1,23 @@
-package io.github.ffakira.moparscape.client;
+package io.github.ffakira.moparscape.client.net.packet;
 
 import io.github.ffakira.moparscape.net.PacketBuffer;
 
-final class SystemAudioPacketHandler {
+public final class SystemAudioPacketHandler {
 
     private SystemAudioPacketHandler() {
     }
 
-    static boolean shouldQueueSong(int songId, int currentSongId, boolean musicEnabled, boolean muted, int currentSongDelay)
+    public static boolean shouldQueueSong(int songId, int currentSongId, boolean musicEnabled, boolean muted, int currentSongDelay)
     {
         return songId != currentSongId && musicEnabled && !muted && currentSongDelay == 0;
     }
 
-    static boolean shouldQueueDelayedSong(boolean musicEnabled, boolean muted)
+    public static boolean shouldQueueDelayedSong(boolean musicEnabled, boolean muted)
     {
         return musicEnabled && !muted;
     }
 
-    static int[] readAreaSoundEffect(PacketBuffer packetBuffer)
+    public static int[] readAreaSoundEffect(PacketBuffer packetBuffer)
     {
         int effectId = packetBuffer.method410();
         int effectLoops = packetBuffer.method408();
