@@ -8470,10 +8470,15 @@ public final class GameClient extends GameShell
         packetBuffer.anInt1406 = payloadStartOffset + encodedChatLength;
     }
 
-    private void applyPlayerUpdateMasks(int updateMask, int playerIndex, PacketBuffer packetBuffer, byte stateGuard, Player player)
+    private void applyPlayerMaskStateGuard(byte stateGuard)
     {
         if(stateGuard != 25)
             aClass19ArrayArrayArray827 = null;
+    }
+
+    private void applyPlayerUpdateMasks(int updateMask, int playerIndex, PacketBuffer packetBuffer, byte stateGuard, Player player)
+    {
+        applyPlayerMaskStateGuard(stateGuard);
         if((updateMask & EntityUpdateMasks.Player.FORCE_MOVEMENT) != 0)
             applyPlayerForceMovementUpdate(player, packetBuffer);
         if((updateMask & EntityUpdateMasks.Player.GRAPHIC) != 0)
