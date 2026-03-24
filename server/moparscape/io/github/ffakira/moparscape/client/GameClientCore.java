@@ -6271,66 +6271,17 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
     {
         if(flag)
             anInt1008 = -1;
-        for(int i = 0; i < anInt1062; i++)
-            if(anIntArray1250[i] <= 0)
-            {
-                boolean flag1 = false;
-                try
-                {
-                    if(anIntArray1207[i] == anInt874 && anIntArray1241[i] == anInt1289)
-                    {
-                        if(!method27(11456))
-                            flag1 = true;
-                    } else
-                    {
-                        PacketBuffer class30_sub2_sub2 = SoundEffect.method241(anIntArray1241[i], anIntArray1207[i], false);
-                        if(System.currentTimeMillis() + (long)(class30_sub2_sub2.anInt1406 / 22) > aLong1172 + (long)(anInt1257 / 22))
-                        {
-                            anInt1257 = class30_sub2_sub2.anInt1406;
-                            aLong1172 = System.currentTimeMillis();
-                            if(method59(class30_sub2_sub2.aByteArray1405, (byte)116, class30_sub2_sub2.anInt1406))
-                            {
-                                anInt874 = anIntArray1207[i];
-                                anInt1289 = anIntArray1241[i];
-                            } else
-                            {
-                                flag1 = true;
-                            }
-                        }
-                    }
-                }
-                catch(Exception exception) { }
-                if(!flag1 || anIntArray1250[i] == -5)
-                {
-                    anInt1062--;
-                    for(int j = i; j < anInt1062; j++)
-                    {
-                        anIntArray1207[j] = anIntArray1207[j + 1];
-                        anIntArray1241[j] = anIntArray1241[j + 1];
-                        anIntArray1250[j] = anIntArray1250[j + 1];
-                    }
-
-                    i--;
-                } else
-                {
-                    anIntArray1250[i] = -5;
-                }
-            } else
-            {
-                anIntArray1250[i]--;
-            }
-
-        if(anInt1259 > 0)
+        AudioQueueProcessor.State audioState = AudioQueueProcessor.process(this, anInt1062, anIntArray1207, anIntArray1241, anIntArray1250, anInt874, anInt1289, aLong1172, anInt1257, anInt1259, aBoolean1151, aBoolean960, anInt956, aClass42_Sub1_1068);
+        anInt1062 = audioState.queueCount;
+        anInt874 = audioState.currentTrackArchive;
+        anInt1289 = audioState.currentTrackFile;
+        aLong1172 = audioState.bufferedSoundTimestamp;
+        anInt1257 = audioState.bufferedSoundLength;
+        anInt1259 = audioState.musicCooldown;
+        if(audioState.pendingSongRequest)
         {
-            anInt1259 -= 20;
-            if(anInt1259 < 0)
-                anInt1259 = 0;
-            if(anInt1259 == 0 && aBoolean1151 && !aBoolean960)
-            {
-                anInt1227 = anInt956;
-                aBoolean1228 = true;
-                aClass42_Sub1_1068.method558(2, anInt1227);
-            }
+            anInt1227 = audioState.requestedSongId;
+            aBoolean1228 = true;
         }
     }
 
