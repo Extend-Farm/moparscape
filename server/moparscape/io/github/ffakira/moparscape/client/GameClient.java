@@ -5120,18 +5120,7 @@ public final class GameClient extends GameShell
             int k1 = (70 - l * 14) + anInt1089 + 4;
             if(k1 < -20)
                 break;
-            String s = aStringArray943[i1];
-            boolean flag = false;
-            if(s != null && s.startsWith("@cr1@"))
-            {
-                s = s.substring(5);
-                boolean flag1 = true;
-            }
-            if(s != null && s.startsWith("@cr2@"))
-            {
-                s = s.substring(5);
-                byte byte0 = 2;
-            }
+            String s = ChatNameTagParser.parse(aStringArray943[i1]).name;
             if(j1 == 0)
                 l++;
             if((j1 == 1 || j1 == 2) && (j1 == 1 || anInt1287 == 0 || anInt1287 == 1 && method109(false, s)))
@@ -5521,18 +5510,9 @@ public final class GameClient extends GameShell
             if(aStringArray944[j] != null)
             {
                 int k = anIntArray942[j];
-                String s = aStringArray943[j];
-                byte byte1 = 0;
-                if(s != null && s.startsWith("@cr1@"))
-                {
-                    s = s.substring(5);
-                    byte1 = 1;
-                }
-                if(s != null && s.startsWith("@cr2@"))
-                {
-                    s = s.substring(5);
-                    byte1 = 2;
-                }
+                ChatNameTagParser.ParsedChatName parsedName = ChatNameTagParser.parse(aStringArray943[j]);
+                String s = parsedName.name;
+                byte byte1 = (byte)parsedName.crownIcon;
                 if((k == 3 || k == 7) && (k == 7 || anInt845 == 0 || anInt845 == 1 && method109(false, s)))
                 {
                     int l = 329 - i * 13;
@@ -5720,9 +5700,8 @@ public final class GameClient extends GameShell
         aBoolean1255 = true;
     }
 
-    public final String method80(boolean flag)
+    public final String resolveServerHost()
     {
-        aBoolean1157 &= flag;
         if(SignLink.mainapp != null)
             return SignLink.mainapp.getDocumentBase().getHost().toLowerCase();
         if(super.aFrame_Sub1_15 != null)
@@ -6787,7 +6766,7 @@ public final class GameClient extends GameShell
         }
         aBoolean993 = true;
         boolean flag = true;
-        String s = method80(true);
+        String s = resolveServerHost();
         if(SignLink.cache_dat != null)
         {
             for(int i = 0; i < 5; i++)
@@ -9488,18 +9467,7 @@ public final class GameClient extends GameShell
             if(aStringArray944[j] != null)
             {
                 int k = anIntArray942[j];
-                String s = aStringArray943[j];
-                boolean flag1 = false;
-                if(s != null && s.startsWith("@cr1@"))
-                {
-                    s = s.substring(5);
-                    boolean flag2 = true;
-                }
-                if(s != null && s.startsWith("@cr2@"))
-                {
-                    s = s.substring(5);
-                    byte byte0 = 2;
-                }
+                String s = ChatNameTagParser.parse(aStringArray943[j]).name;
                 if((k == 3 || k == 7) && (k == 7 || anInt845 == 0 || anInt845 == 1 && method109(false, s)))
                 {
                     int l = 329 - i * 13;
