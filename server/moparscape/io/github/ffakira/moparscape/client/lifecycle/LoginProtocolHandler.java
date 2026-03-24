@@ -1,16 +1,16 @@
-package io.github.ffakira.moparscape.client;
+package io.github.ffakira.moparscape.client.lifecycle;
 
-final class LoginProtocolHandler {
+public final class LoginProtocolHandler {
 
     private LoginProtocolHandler() {
     }
 
-    static boolean shouldShowConnectingUi(boolean reconnecting)
+    public static boolean shouldShowConnectingUi(boolean reconnecting)
     {
         return !reconnecting;
     }
 
-    static String[] resolveLoginError(int responseCode)
+    public static String[] resolveLoginError(int responseCode)
     {
         if(responseCode == 3)
             return new String[] {
@@ -75,12 +75,12 @@ final class LoginProtocolHandler {
         return null;
     }
 
-    static String resolveTransferCountdownMessage(int seconds)
+    public static String resolveTransferCountdownMessage(int seconds)
     {
         return "Your profile will be transferred in: " + seconds + " seconds";
     }
 
-    static void sleepSilently(long millis)
+    public static void sleepSilently(long millis)
     {
         try
         {
@@ -89,12 +89,12 @@ final class LoginProtocolHandler {
         catch(Exception _ex) { }
     }
 
-    static boolean shouldRetryAfterNoResponse(int initialResponseCode, int retryCount)
+    public static boolean shouldRetryAfterNoResponse(int initialResponseCode, int retryCount)
     {
         return initialResponseCode == 0 && retryCount < 2;
     }
 
-    static String[] resolveNoResponseError(int initialResponseCode)
+    public static String[] resolveNoResponseError(int initialResponseCode)
     {
         if(initialResponseCode == 0)
             return new String[] {

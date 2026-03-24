@@ -1,6 +1,8 @@
 package io.github.ffakira.moparscape.client;
 
 import io.github.ffakira.moparscape.cache.*;
+import io.github.ffakira.moparscape.client.lifecycle.ClientBootstrapLoader;
+import io.github.ffakira.moparscape.client.lifecycle.LoginProtocolHandler;
 import io.github.ffakira.moparscape.net.*;
 import io.github.ffakira.moparscape.sign.SignLink;
 import java.applet.Applet;

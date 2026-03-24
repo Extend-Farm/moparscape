@@ -1,19 +1,19 @@
-package io.github.ffakira.moparscape.client;
+package io.github.ffakira.moparscape.client.lifecycle;
 
 import io.github.ffakira.moparscape.cache.CacheFileStore;
 import io.github.ffakira.moparscape.sign.SignLink;
 
-final class ClientBootstrapLoader {
+public final class ClientBootstrapLoader {
 
     private ClientBootstrapLoader() {
     }
 
-    static boolean shouldUseSunJavaLoopTuning()
+    public static boolean shouldUseSunJavaLoopTuning()
     {
         return SignLink.sunjava;
     }
 
-    static CacheFileStore[] createCacheStores()
+    public static CacheFileStore[] createCacheStores()
     {
         if(SignLink.cache_dat == null)
             return null;
