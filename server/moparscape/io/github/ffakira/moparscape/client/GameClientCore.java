@@ -10856,61 +10856,7 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 253)
             {
-                String s = aClass30_Sub2_Sub2_1083.method415();
-                if(s.endsWith(":tradereq:"))
-                {
-                    String s3 = s.substring(0, s.indexOf(":"));
-                    long l17 = TextUtils.method583(s3);
-                    boolean flag2 = false;
-                    for(int j27 = 0; j27 < anInt822; j27++)
-                    {
-                        if(aLongArray925[j27] != l17)
-                            continue;
-                        flag2 = true;
-                        break;
-                    }
-
-                    if(!flag2 && anInt1251 == 0)
-                        method77("wishes to trade with you.", 4, s3, aBoolean991);
-                } else
-                if(s.endsWith(":duelreq:"))
-                {
-                    String s4 = s.substring(0, s.indexOf(":"));
-                    long l18 = TextUtils.method583(s4);
-                    boolean flag3 = false;
-                    for(int k27 = 0; k27 < anInt822; k27++)
-                    {
-                        if(aLongArray925[k27] != l18)
-                            continue;
-                        flag3 = true;
-                        break;
-                    }
-
-                    if(!flag3 && anInt1251 == 0)
-                        method77("wishes to duel with you.", 8, s4, aBoolean991);
-                } else
-                if(s.endsWith(":chalreq:"))
-                {
-                    String s5 = s.substring(0, s.indexOf(":"));
-                    long l19 = TextUtils.method583(s5);
-                    boolean flag4 = false;
-                    for(int l27 = 0; l27 < anInt822; l27++)
-                    {
-                        if(aLongArray925[l27] != l19)
-                            continue;
-                        flag4 = true;
-                        break;
-                    }
-
-                    if(!flag4 && anInt1251 == 0)
-                    {
-                        String s8 = s.substring(s.indexOf(":") + 1, s.length() - 9);
-                        method77(s8, 8, s5, aBoolean991);
-                    }
-                } else
-                {
-                    method77(s, 0, "", aBoolean991);
-                }
+                SocialPacketHandler.handleSocialRequestMessage((GameClient)this, aClass30_Sub2_Sub2_1083, anInt822, aLongArray925, anInt1251, aBoolean991);
                 anInt1008 = -1;
                 return true;
             }
