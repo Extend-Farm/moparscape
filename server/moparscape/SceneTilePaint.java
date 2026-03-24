@@ -3,10 +3,10 @@
 // Decompiler options: packimports(3) 
 
 
-final class Class43
+final class SceneTilePaint
 {
 
-    public Class43(int i, int j, int k, int l, int i1, int j1, boolean flag)
+    public SceneTilePaint(int i, int j, int k, int l, int i1, int j1, boolean flag)
     {
         aBoolean721 = true;
         anInt716 = i;

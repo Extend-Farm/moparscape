@@ -4769,7 +4769,7 @@ public final class GameClient extends GameShell
         Class38.aClass38Array656 = null;
         Class9.aClass9Array210 = null;
         Class27.aClass27Array507 = null;
-        Class20.aClass20Array351 = null;
+        SequenceDefinition.aClass20Array351 = null;
         Class23.aClass23Array403 = null;
         Class23.aClass12_415 = null;
         Class41.aClass41Array701 = null;
@@ -5357,7 +5357,7 @@ public final class GameClient extends GameShell
                     }
 
                 class30_sub2_sub4_sub6.method469((byte)-71);
-                class30_sub2_sub4_sub6.method470(Class20.aClass20Array351[((Class30_Sub2_Sub4_Sub1) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anInt1511].anIntArray353[0], 40542);
+                class30_sub2_sub4_sub6.method470(SequenceDefinition.aClass20Array351[((Class30_Sub2_Sub4_Sub1) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anInt1511].anIntArray353[0], 40542);
                 class30_sub2_sub4_sub6.method479(64, 850, -30, -50, -30, true);
                 class9.anInt233 = 5;
                 class9.anInt234 = 0;
@@ -6430,7 +6430,7 @@ public final class GameClient extends GameShell
                 int i2 = class30_sub2_sub2.method408();
                 if(i1 == ((Class30_Sub2_Sub4_Sub1) (class30_sub2_sub4_sub1_sub1)).anInt1526 && i1 != -1)
                 {
-                    int l2 = Class20.aClass20Array351[i1].anInt365;
+                    int l2 = SequenceDefinition.aClass20Array351[i1].anInt365;
                     if(l2 == 1)
                     {
                         class30_sub2_sub4_sub1_sub1.anInt1527 = 0;
@@ -6441,7 +6441,7 @@ public final class GameClient extends GameShell
                     if(l2 == 2)
                         class30_sub2_sub4_sub1_sub1.anInt1530 = 0;
                 } else
-                if(i1 == -1 || ((Class30_Sub2_Sub4_Sub1) (class30_sub2_sub4_sub1_sub1)).anInt1526 == -1 || Class20.aClass20Array351[i1].anInt359 >= Class20.aClass20Array351[((Class30_Sub2_Sub4_Sub1) (class30_sub2_sub4_sub1_sub1)).anInt1526].anInt359)
+                if(i1 == -1 || ((Class30_Sub2_Sub4_Sub1) (class30_sub2_sub4_sub1_sub1)).anInt1526 == -1 || SequenceDefinition.aClass20Array351[i1].anInt359 >= SequenceDefinition.aClass20Array351[((Class30_Sub2_Sub4_Sub1) (class30_sub2_sub4_sub1_sub1)).anInt1526].anInt359)
                 {
                     class30_sub2_sub4_sub1_sub1.anInt1526 = i1;
                     class30_sub2_sub4_sub1_sub1.anInt1527 = 0;
@@ -7091,7 +7091,7 @@ public final class GameClient extends GameShell
             Rasterizer3D.method372(0.80000000000000004D, aByte1200);
             Rasterizer3D.method367(20, true);
             method13(86, (byte)4, "Unpacking config");
-            Class20.method257(0, class44);
+            SequenceDefinition.method257(0, class44);
             ObjectDefinition.method576(class44);
             FloorDefinition.method260(0, class44);
             Class8.method193(class44);
@@ -7442,7 +7442,7 @@ public final class GameClient extends GameShell
 
     public final void method98(Class30_Sub2_Sub4_Sub1 class30_sub2_sub4_sub1, byte byte0)
     {
-        if(class30_sub2_sub4_sub1.anInt1548 == anInt1161 || class30_sub2_sub4_sub1.anInt1526 == -1 || class30_sub2_sub4_sub1.anInt1529 != 0 || class30_sub2_sub4_sub1.anInt1528 + 1 > Class20.aClass20Array351[class30_sub2_sub4_sub1.anInt1526].method258(class30_sub2_sub4_sub1.anInt1527, (byte)-39))
+        if(class30_sub2_sub4_sub1.anInt1548 == anInt1161 || class30_sub2_sub4_sub1.anInt1526 == -1 || class30_sub2_sub4_sub1.anInt1529 != 0 || class30_sub2_sub4_sub1.anInt1528 + 1 > SequenceDefinition.aClass20Array351[class30_sub2_sub4_sub1.anInt1526].method258(class30_sub2_sub4_sub1.anInt1527, (byte)-39))
         {
             int i = class30_sub2_sub4_sub1.anInt1548 - class30_sub2_sub4_sub1.anInt1547;
             int j = anInt1161 - class30_sub2_sub4_sub1.anInt1547;
@@ -7477,7 +7477,7 @@ public final class GameClient extends GameShell
         }
         if(class30_sub2_sub4_sub1.anInt1526 != -1 && class30_sub2_sub4_sub1.anInt1529 == 0)
         {
-            Class20 class20 = Class20.aClass20Array351[class30_sub2_sub4_sub1.anInt1526];
+            SequenceDefinition class20 = SequenceDefinition.aClass20Array351[class30_sub2_sub4_sub1.anInt1526];
             if(class30_sub2_sub4_sub1.anInt1542 > 0 && class20.anInt363 == 0)
             {
                 class30_sub2_sub4_sub1.anInt1503++;
@@ -7658,7 +7658,7 @@ public final class GameClient extends GameShell
         class30_sub2_sub4_sub1.aBoolean1541 = false;
         if(class30_sub2_sub4_sub1.anInt1517 != -1)
         {
-            Class20 class20 = Class20.aClass20Array351[class30_sub2_sub4_sub1.anInt1517];
+            SequenceDefinition class20 = SequenceDefinition.aClass20Array351[class30_sub2_sub4_sub1.anInt1517];
             class30_sub2_sub4_sub1.anInt1519++;
             if(class30_sub2_sub4_sub1.anInt1518 < class20.anInt352 && class30_sub2_sub4_sub1.anInt1519 > class20.method258(class30_sub2_sub4_sub1.anInt1518, (byte)-39))
             {
@@ -7675,7 +7675,7 @@ public final class GameClient extends GameShell
         {
             if(class30_sub2_sub4_sub1.anInt1521 < 0)
                 class30_sub2_sub4_sub1.anInt1521 = 0;
-            Class20 class20_1 = Class23.aClass23Array403[class30_sub2_sub4_sub1.anInt1520].aClass20_407;
+            SequenceDefinition class20_1 = Class23.aClass23Array403[class30_sub2_sub4_sub1.anInt1520].aClass20_407;
             for(class30_sub2_sub4_sub1.anInt1522++; class30_sub2_sub4_sub1.anInt1521 < class20_1.anInt352 && class30_sub2_sub4_sub1.anInt1522 > class20_1.method258(class30_sub2_sub4_sub1.anInt1521, (byte)-39); class30_sub2_sub4_sub1.anInt1521++)
                 class30_sub2_sub4_sub1.anInt1522 -= class20_1.method258(class30_sub2_sub4_sub1.anInt1521, (byte)-39);
 
@@ -7684,7 +7684,7 @@ public final class GameClient extends GameShell
         }
         if(class30_sub2_sub4_sub1.anInt1526 != -1 && class30_sub2_sub4_sub1.anInt1529 <= 1)
         {
-            Class20 class20_2 = Class20.aClass20Array351[class30_sub2_sub4_sub1.anInt1526];
+            SequenceDefinition class20_2 = SequenceDefinition.aClass20Array351[class30_sub2_sub4_sub1.anInt1526];
             if(class20_2.anInt363 == 1 && class30_sub2_sub4_sub1.anInt1542 > 0 && class30_sub2_sub4_sub1.anInt1547 <= anInt1161 && class30_sub2_sub4_sub1.anInt1548 < anInt1161)
             {
                 class30_sub2_sub4_sub1.anInt1529 = 1;
@@ -7693,7 +7693,7 @@ public final class GameClient extends GameShell
         }
         if(class30_sub2_sub4_sub1.anInt1526 != -1 && class30_sub2_sub4_sub1.anInt1529 == 0)
         {
-            Class20 class20_3 = Class20.aClass20Array351[class30_sub2_sub4_sub1.anInt1526];
+            SequenceDefinition class20_3 = SequenceDefinition.aClass20Array351[class30_sub2_sub4_sub1.anInt1526];
             for(class30_sub2_sub4_sub1.anInt1528++; class30_sub2_sub4_sub1.anInt1527 < class20_3.anInt352 && class30_sub2_sub4_sub1.anInt1528 > class20_3.method258(class30_sub2_sub4_sub1.anInt1527, (byte)-39); class30_sub2_sub4_sub1.anInt1527++)
                 class30_sub2_sub4_sub1.anInt1528 -= class20_3.method258(class30_sub2_sub4_sub1.anInt1527, (byte)-39);
 
@@ -8244,7 +8244,7 @@ public final class GameClient extends GameShell
                         class30_sub2_sub4_sub6 = class9_1.method209(0, -1, -1, flag2);
                     } else
                     {
-                        Class20 class20 = Class20.aClass20Array351[i7];
+                        SequenceDefinition class20 = SequenceDefinition.aClass20Array351[i7];
                         class30_sub2_sub4_sub6 = class9_1.method209(0, class20.anIntArray354[class9_1.anInt246], class20.anIntArray353[class9_1.anInt246], flag2);
                     }
                     if(class30_sub2_sub4_sub6 != null)
@@ -8370,7 +8370,7 @@ public final class GameClient extends GameShell
             int i2 = class30_sub2_sub2.method427(false);
             if(l == ((Class30_Sub2_Sub4_Sub1) (class30_sub2_sub4_sub1_sub2)).anInt1526 && l != -1)
             {
-                int i3 = Class20.aClass20Array351[l].anInt365;
+                int i3 = SequenceDefinition.aClass20Array351[l].anInt365;
                 if(i3 == 1)
                 {
                     class30_sub2_sub4_sub1_sub2.anInt1527 = 0;
@@ -8381,7 +8381,7 @@ public final class GameClient extends GameShell
                 if(i3 == 2)
                     class30_sub2_sub4_sub1_sub2.anInt1530 = 0;
             } else
-            if(l == -1 || ((Class30_Sub2_Sub4_Sub1) (class30_sub2_sub4_sub1_sub2)).anInt1526 == -1 || Class20.aClass20Array351[l].anInt359 >= Class20.aClass20Array351[((Class30_Sub2_Sub4_Sub1) (class30_sub2_sub4_sub1_sub2)).anInt1526].anInt359)
+            if(l == -1 || ((Class30_Sub2_Sub4_Sub1) (class30_sub2_sub4_sub1_sub2)).anInt1526 == -1 || SequenceDefinition.aClass20Array351[l].anInt359 >= SequenceDefinition.aClass20Array351[((Class30_Sub2_Sub4_Sub1) (class30_sub2_sub4_sub1_sub2)).anInt1526].anInt359)
             {
                 class30_sub2_sub4_sub1_sub2.anInt1526 = l;
                 class30_sub2_sub4_sub1_sub2.anInt1527 = 0;
@@ -9005,7 +9005,7 @@ public final class GameClient extends GameShell
                     l = class9_1.anInt257;
                 if(l != -1)
                 {
-                    Class20 class20 = Class20.aClass20Array351[l];
+                    SequenceDefinition class20 = SequenceDefinition.aClass20Array351[l];
                     for(class9_1.anInt208 += i; class9_1.anInt208 > class20.method258(class9_1.anInt246, (byte)-39);)
                     {
                         class9_1.anInt208 -= class20.method258(class9_1.anInt246, (byte)-39) + 1;
@@ -10042,7 +10042,7 @@ public final class GameClient extends GameShell
                 int k20 = anIntArrayArrayArray1214[anInt918][j4][i7 + 1];
                 if(j16 == 0)
                 {
-                    Class10 class10 = aClass25_946.method296(anInt918, j4, i7, false);
+                    WallObject class10 = aClass25_946.method296(anInt918, j4, i7, false);
                     if(class10 != null)
                     {
                         int k21 = class10.anInt280 >> 14 & 0x7fff;
@@ -10058,13 +10058,13 @@ public final class GameClient extends GameShell
                 }
                 if(j16 == 1)
                 {
-                    Class26 class26 = aClass25_946.method297(j4, 866, i7, anInt918);
+                    WallDecoration class26 = aClass25_946.method297(j4, 866, i7, anInt918);
                     if(class26 != null)
                         class26.aClass30_Sub2_Sub4_504 = new DynamicObject(class26.anInt505 >> 14 & 0x7fff, 0, 4, i19, (byte)7, l19, j18, k20, j17, false);
                 }
                 if(j16 == 2)
                 {
-                    Class28 class28 = aClass25_946.method298(j4, i7, (byte)4, anInt918);
+                    InteractiveObject class28 = aClass25_946.method298(j4, i7, (byte)4, anInt918);
                     if(j12 == 11)
                         j12 = 10;
                     if(class28 != null)
@@ -10072,7 +10072,7 @@ public final class GameClient extends GameShell
                 }
                 if(j16 == 3)
                 {
-                    Class49 class49 = aClass25_946.method299(i7, j4, anInt918, 0);
+                    GroundDecoration class49 = aClass25_946.method299(i7, j4, anInt918, 0);
                     if(class49 != null)
                         class49.aClass30_Sub2_Sub4_814 = new DynamicObject(class49.anInt815 >> 14 & 0x7fff, k14, 22, i19, (byte)7, l19, j18, k20, j17, false);
                 }

@@ -5,7 +5,7 @@
 import java.io.PrintStream;
 import sign.SignLink;
 
-public class Class20
+public class SequenceDefinition
 {
 
     public static void method257(int i, Archive class44)
@@ -13,11 +13,11 @@ public class Class20
         PacketBuffer class30_sub2_sub2 = new PacketBuffer(class44.method571("seq.dat", null), 891);
         anInt350 = class30_sub2_sub2.method410();
         if(aClass20Array351 == null)
-            aClass20Array351 = new Class20[anInt350];
+            aClass20Array351 = new SequenceDefinition[anInt350];
         for(int j = 0; j < anInt350; j++)
         {
             if(aClass20Array351[j] == null)
-                aClass20Array351[j] = new Class20();
+                aClass20Array351[j] = new SequenceDefinition();
             aClass20Array351[j].method259(true, class30_sub2_sub2);
         }
 
@@ -137,7 +137,7 @@ public class Class20
         }
     }
 
-    public Class20()
+    public SequenceDefinition()
     {
         anInt348 = 9;
         aBoolean349 = false;
@@ -155,7 +155,7 @@ public class Class20
     private int anInt348;
     private boolean aBoolean349;
     public static int anInt350;
-    public static Class20 aClass20Array351[];
+    public static SequenceDefinition aClass20Array351[];
     public int anInt352;
     public int anIntArray353[];
     public int anIntArray354[];

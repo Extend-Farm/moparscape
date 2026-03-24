@@ -89,7 +89,7 @@ public class DynamicObject extends Class30_Sub2_Sub4
         anInt1606 = k1;
         if(l1 != -1)
         {
-            aClass20_1607 = Class20.aClass20Array351[l1];
+            aClass20_1607 = SequenceDefinition.aClass20Array351[l1];
             anInt1599 = 0;
             anInt1608 = GameClient.anInt1161;
             if(flag && aClass20_1607.anInt356 != -1)
@@ -113,7 +113,7 @@ public class DynamicObject extends Class30_Sub2_Sub4
     private int anInt1604;
     private int anInt1605;
     private int anInt1606;
-    private Class20 aClass20_1607;
+    private SequenceDefinition aClass20_1607;
     private int anInt1608;
     public static GameClient aClient1609;
     private int anInt1610;

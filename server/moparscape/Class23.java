@@ -41,8 +41,8 @@ public class Class23
             if(i == 2)
             {
                 anInt406 = class30_sub2_sub2.method410();
-                if(Class20.aClass20Array351 != null)
-                    aClass20_407 = Class20.aClass20Array351[anInt406];
+                if(SequenceDefinition.aClass20Array351 != null)
+                    aClass20_407 = SequenceDefinition.aClass20Array351[anInt406];
             } else
             if(i == 4)
                 anInt410 = class30_sub2_sub2.method410();
@@ -102,7 +102,7 @@ public class Class23
     public int anInt404;
     public int anInt405;
     public int anInt406;
-    public Class20 aClass20_407;
+    public SequenceDefinition aClass20_407;
     public int anIntArray408[];
     public int anIntArray409[];
     public int anInt410;

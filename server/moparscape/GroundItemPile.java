@@ -3,10 +3,10 @@
 // Decompiler options: packimports(3) 
 
 
-final class Class3
+final class GroundItemPile
 {
 
-    Class3()
+    GroundItemPile()
     {
     }
 

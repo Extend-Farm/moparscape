@@ -3,10 +3,10 @@
 // Decompiler options: packimports(3) 
 
 
-public final class Class49
+public final class GroundDecoration
 {
 
-    public Class49()
+    public GroundDecoration()
     {
     }
 

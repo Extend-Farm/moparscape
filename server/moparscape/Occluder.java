@@ -3,10 +3,10 @@
 // Decompiler options: packimports(3) 
 
 
-final class Class47
+final class Occluder
 {
 
-    Class47()
+    Occluder()
     {
     }
 

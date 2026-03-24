@@ -61,6 +61,18 @@ The following high-impact renames are already completed:
   - `Class30_Sub2_Sub1_Sub3` -> `Rasterizer3D`
   - `Class30_Sub2_Sub1_Sub4` -> `FontRenderer`
 
+- Scene internals and animation defs:
+  - `Class20` -> `SequenceDefinition`
+  - `Class30_Sub3` -> `SceneTile`
+  - `Class43` -> `SceneTilePaint`
+  - `Class40` -> `SceneTileModel`
+  - `Class28` -> `InteractiveObject`
+  - `Class10` -> `WallObject`
+  - `Class26` -> `WallDecoration`
+  - `Class49` -> `GroundDecoration`
+  - `Class3` -> `GroundItemPile`
+  - `Class47` -> `Occluder`
+
 ## Notes
 
 - Remaining obfuscated class names are intentionally being renamed in small batches.

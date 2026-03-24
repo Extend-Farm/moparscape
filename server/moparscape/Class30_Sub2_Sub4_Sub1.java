@@ -9,7 +9,7 @@ class Class30_Sub2_Sub4_Sub1 extends Class30_Sub2_Sub4
 
     public final void method445(int i, int j, boolean flag, boolean flag1)
     {
-        if(anInt1526 != -1 && Class20.aClass20Array351[anInt1526].anInt364 == 1)
+        if(anInt1526 != -1 && SequenceDefinition.aClass20Array351[anInt1526].anInt364 == 1)
             anInt1526 = -1;
         if(!flag)
         {
@@ -100,7 +100,7 @@ class Class30_Sub2_Sub4_Sub1 extends Class30_Sub2_Sub4
             j++;
             k--;
         }
-        if(anInt1526 != -1 && Class20.aClass20Array351[anInt1526].anInt364 == 1)
+        if(anInt1526 != -1 && SequenceDefinition.aClass20Array351[anInt1526].anInt364 == 1)
             anInt1526 = -1;
         if(anInt1525 < 9)
             anInt1525++;

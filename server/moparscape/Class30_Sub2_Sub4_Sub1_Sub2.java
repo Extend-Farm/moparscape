@@ -180,10 +180,10 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
         {
             int j = -1;
             if(super.anInt1526 >= 0 && super.anInt1529 == 0)
-                j = Class20.aClass20Array351[super.anInt1526].anIntArray353[super.anInt1527];
+                j = SequenceDefinition.aClass20Array351[super.anInt1526].anIntArray353[super.anInt1527];
             else
             if(super.anInt1517 >= 0)
-                j = Class20.aClass20Array351[super.anInt1517].anIntArray353[super.anInt1518];
+                j = SequenceDefinition.aClass20Array351[super.anInt1517].anIntArray353[super.anInt1518];
             Model class30_sub2_sub4_sub6 = aClass5_1698.method164(0, -1, j, null);
             return class30_sub2_sub4_sub6;
         }
@@ -194,10 +194,10 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
         int k1 = -1;
         if(super.anInt1526 >= 0 && super.anInt1529 == 0)
         {
-            Class20 class20 = Class20.aClass20Array351[super.anInt1526];
+            SequenceDefinition class20 = SequenceDefinition.aClass20Array351[super.anInt1526];
             k = class20.anIntArray353[super.anInt1527];
             if(super.anInt1517 >= 0 && super.anInt1517 != super.anInt1511)
-                i1 = Class20.aClass20Array351[super.anInt1517].anIntArray353[super.anInt1518];
+                i1 = SequenceDefinition.aClass20Array351[super.anInt1517].anIntArray353[super.anInt1518];
             if(class20.anInt360 >= 0)
             {
                 j1 = class20.anInt360;
@@ -210,7 +210,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
             }
         } else
         if(super.anInt1517 >= 0)
-            k = Class20.aClass20Array351[super.anInt1517].anIntArray353[super.anInt1518];
+            k = SequenceDefinition.aClass20Array351[super.anInt1517].anIntArray353[super.anInt1518];
         Model class30_sub2_sub4_sub6_1 = (Model)aClass12_1704.method222(l);
         if(i != 0)
         {
@@ -284,7 +284,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
         Model class30_sub2_sub4_sub6_2 = Model.aClass30_Sub2_Sub4_Sub6_1621;
         class30_sub2_sub4_sub6_2.method464(7, class30_sub2_sub4_sub6_1, Class36.method532(k, false) & Class36.method532(i1, false));
         if(k != -1 && i1 != -1)
-            class30_sub2_sub4_sub6_2.method471(-20491, Class20.aClass20Array351[super.anInt1526].anIntArray357, i1, k);
+            class30_sub2_sub4_sub6_2.method471(-20491, SequenceDefinition.aClass20Array351[super.anInt1526].anIntArray357, i1, k);
         else
         if(k != -1)
             class30_sub2_sub4_sub6_2.method470(k, 40542);
