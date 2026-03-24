@@ -7612,18 +7612,13 @@ class GameClientCore extends GameShell
         }
         if(anInt1023 == 2)
             method146((byte)1);
-        if(aBoolean885 && anInt948 == 1)
-            aBoolean1153 = true;
         if(anInt1189 != -1)
         {
             boolean flag1 = method119(anInt945, false, anInt1189);
             if(flag1)
                 aBoolean1153 = true;
         }
-        if(anInt1246 == 2)
-            aBoolean1153 = true;
-        if(anInt1086 == 2)
-            aBoolean1153 = true;
+        aBoolean1153 = GameFrameHandler.applyMainViewportRedrawTriggers(anInt1023, aBoolean885, anInt948, anInt1189, anInt945, anInt1246, anInt1086, aBoolean1153);
         if(aBoolean1153)
         {
             method36((byte)-81);

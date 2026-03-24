@@ -53,4 +53,29 @@ final class GameFrameHandler {
             redrawInterface, redrawChatbox, redrawSidebar, redrawTabArea
         };
     }
+
+    // Exact extraction of the legacy method102 redraw trigger update block.
+    static boolean applyMainViewportRedrawTriggers(
+        int gameState,
+        boolean isDragActive,
+        int dragMode,
+        int activeInterfaceId,
+        int animationStep,
+        int selectedMenuAction,
+        int itemDragState,
+        boolean currentRedrawInterface
+    ) {
+        boolean redrawInterface = currentRedrawInterface;
+        if(gameState == 2)
+            redrawInterface = true;
+        if(isDragActive && dragMode == 1)
+            redrawInterface = true;
+        if(activeInterfaceId != -1)
+            redrawInterface = true;
+        if(selectedMenuAction == 2)
+            redrawInterface = true;
+        if(itemDragState == 2)
+            redrawInterface = true;
+        return redrawInterface;
+    }
 }
