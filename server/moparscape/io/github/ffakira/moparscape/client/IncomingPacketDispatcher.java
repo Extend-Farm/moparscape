@@ -114,4 +114,27 @@ final class IncomingPacketDispatcher {
             songId, songDelay
         };
     }
+
+    static int[] readMapFlagUpdate(PacketBuffer packetBuffer)
+    {
+        int mapFlagX = packetBuffer.method408();
+        int mapFlagY = packetBuffer.method427(false);
+        return new int[] {
+            mapFlagX, mapFlagY
+        };
+    }
+
+    static int[] readRegionPacketCoordinates(int packetOpcode, PacketBuffer packetBuffer, int fallbackRegionX, int fallbackRegionY)
+    {
+        int regionX = fallbackRegionX;
+        int regionY = fallbackRegionY;
+        if(packetOpcode == 73)
+        {
+            regionX = packetBuffer.method435(true);
+            regionY = packetBuffer.method410();
+        }
+        return new int[] {
+            regionX, regionY
+        };
+    }
 }

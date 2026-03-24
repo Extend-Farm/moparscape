@@ -10559,14 +10559,11 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 73 || anInt1008 == 241)
             {
-                int l2 = anInt1069;
-                int i11 = anInt1070;
+                int regionPacketCoordinates[] = IncomingPacketDispatcher.readRegionPacketCoordinates(anInt1008, aClass30_Sub2_Sub2_1083, anInt1069, anInt1070);
+                int l2 = regionPacketCoordinates[0];
+                int i11 = regionPacketCoordinates[1];
                 if(anInt1008 == 73)
-                {
-                    l2 = aClass30_Sub2_Sub2_1083.method435(true);
-                    i11 = aClass30_Sub2_Sub2_1083.method410();
                     aBoolean1159 = false;
-                }
                 if(anInt1008 == 241)
                 {
                     i11 = aClass30_Sub2_Sub2_1083.method435(true);
@@ -10822,8 +10819,9 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 60)
             {
-                anInt1269 = aClass30_Sub2_Sub2_1083.method408();
-                anInt1268 = aClass30_Sub2_Sub2_1083.method427(false);
+                int mapFlagUpdate[] = IncomingPacketDispatcher.readMapFlagUpdate(aClass30_Sub2_Sub2_1083);
+                anInt1269 = mapFlagUpdate[0];
+                anInt1268 = mapFlagUpdate[1];
                 while(aClass30_Sub2_Sub2_1083.anInt1406 < anInt1007) 
                 {
                     int k3 = aClass30_Sub2_Sub2_1083.method408();
