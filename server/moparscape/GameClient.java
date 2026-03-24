@@ -449,8 +449,8 @@ public final class GameClient extends GameShell
         try
         {
             anInt985 = -1;
-            aClass19_1056.method256();
-            aClass19_1013.method256();
+            aClass19_1056.clear();
+            aClass19_1013.clear();
             Rasterizer3D.method366(anInt846);
             method23(false);
             aClass25_946.method274(619);
@@ -769,7 +769,7 @@ public final class GameClient extends GameShell
         }
         int k = 0xfa0a1f01;
         Object obj = null;
-        for(GroundItem class30_sub2_sub4_sub2 = (GroundItem)class19.method252(); class30_sub2_sub4_sub2 != null; class30_sub2_sub4_sub2 = (GroundItem)class19.method254(false))
+        for(GroundItem class30_sub2_sub4_sub2 = (GroundItem)class19.last(); class30_sub2_sub4_sub2 != null; class30_sub2_sub4_sub2 = (GroundItem)class19.previous(false))
         {
             ItemDefinition class8 = ItemDefinition.method198(class30_sub2_sub4_sub2.anInt1558);
             int l = class8.anInt155;
@@ -782,10 +782,10 @@ public final class GameClient extends GameShell
             }
         }
 
-        class19.method250(-493, ((Node) (obj)));
+        class19.addLast(-493, ((Node) (obj)));
         Object obj1 = null;
         Object obj2 = null;
-        for(GroundItem class30_sub2_sub4_sub2_1 = (GroundItem)class19.method252(); class30_sub2_sub4_sub2_1 != null; class30_sub2_sub4_sub2_1 = (GroundItem)class19.method254(false))
+        for(GroundItem class30_sub2_sub4_sub2_1 = (GroundItem)class19.last(); class30_sub2_sub4_sub2_1 != null; class30_sub2_sub4_sub2_1 = (GroundItem)class19.previous(false))
         {
             if(class30_sub2_sub4_sub2_1.anInt1558 != ((GroundItem) (obj)).anInt1558 && obj1 == null)
                 obj1 = class30_sub2_sub4_sub2_1;
@@ -2576,9 +2576,9 @@ public final class GameClient extends GameShell
     {
         while(i >= 0) 
             method6();
-        for(Projectile class30_sub2_sub4_sub4 = (Projectile)aClass19_1013.method252(); class30_sub2_sub4_sub4 != null; class30_sub2_sub4_sub4 = (Projectile)aClass19_1013.method254(false))
+        for(Projectile class30_sub2_sub4_sub4 = (Projectile)aClass19_1013.last(); class30_sub2_sub4_sub4 != null; class30_sub2_sub4_sub4 = (Projectile)aClass19_1013.previous(false))
             if(class30_sub2_sub4_sub4.anInt1597 != anInt918 || anInt1161 > class30_sub2_sub4_sub4.anInt1572)
-                class30_sub2_sub4_sub4.method329();
+                class30_sub2_sub4_sub4.unlink();
             else
             if(anInt1161 >= class30_sub2_sub4_sub4.anInt1571)
             {
@@ -3190,19 +3190,19 @@ public final class GameClient extends GameShell
 
     private final void method63(int i)
     {
-        SceneObjectSpawnRequest class30_sub1 = (SceneObjectSpawnRequest)aClass19_1179.method252();
+        SceneObjectSpawnRequest class30_sub1 = (SceneObjectSpawnRequest)aClass19_1179.last();
         while(i >= 0) 
         {
             for(int j = 1; j > 0; j++);
         }
-        for(; class30_sub1 != null; class30_sub1 = (SceneObjectSpawnRequest)aClass19_1179.method254(false))
+        for(; class30_sub1 != null; class30_sub1 = (SceneObjectSpawnRequest)aClass19_1179.previous(false))
             if(class30_sub1.anInt1294 == -1)
             {
                 class30_sub1.anInt1302 = 0;
                 method89(false, class30_sub1);
             } else
             {
-                class30_sub1.method329();
+                class30_sub1.unlink();
             }
 
     }
@@ -4577,7 +4577,7 @@ public final class GameClient extends GameShell
                 Deque class19 = aClass19ArrayArrayArray827[anInt918][i1][j1];
                 if(class19 != null)
                 {
-                    for(GroundItem class30_sub2_sub4_sub2 = (GroundItem)class19.method253(5); class30_sub2_sub4_sub2 != null; class30_sub2_sub4_sub2 = (GroundItem)class19.method255(8))
+                    for(GroundItem class30_sub2_sub4_sub2 = (GroundItem)class19.first(5); class30_sub2_sub4_sub2 != null; class30_sub2_sub4_sub2 = (GroundItem)class19.next(8))
                     {
                         ItemDefinition class8 = ItemDefinition.method198(class30_sub2_sub4_sub2.anInt1558);
                         if(anInt1282 == 1)
@@ -5972,8 +5972,8 @@ public final class GameClient extends GameShell
                     aClass30_Sub2_Sub4_Sub1_Sub1Array835[k2] = null;
 
                 aClass30_Sub2_Sub4_Sub1_Sub2_1126 = aClass30_Sub2_Sub4_Sub1_Sub2Array890[anInt889] = new Player();
-                aClass19_1013.method256();
-                aClass19_1056.method256();
+                aClass19_1013.clear();
+                aClass19_1056.clear();
                 for(int l2 = 0; l2 < 4; l2++)
                 {
                     for(int i3 = 0; i3 < 104; i3++)
@@ -7956,17 +7956,17 @@ public final class GameClient extends GameShell
 
     public final void method104(boolean flag)
     {
-        GraphicsObject class30_sub2_sub4_sub3 = (GraphicsObject)aClass19_1056.method252();
+        GraphicsObject class30_sub2_sub4_sub3 = (GraphicsObject)aClass19_1056.last();
         aBoolean1157 &= flag;
-        for(; class30_sub2_sub4_sub3 != null; class30_sub2_sub4_sub3 = (GraphicsObject)aClass19_1056.method254(false))
+        for(; class30_sub2_sub4_sub3 != null; class30_sub2_sub4_sub3 = (GraphicsObject)aClass19_1056.previous(false))
             if(class30_sub2_sub4_sub3.anInt1560 != anInt918 || class30_sub2_sub4_sub3.aBoolean1567)
-                class30_sub2_sub4_sub3.method329();
+                class30_sub2_sub4_sub3.unlink();
             else
             if(anInt1161 >= class30_sub2_sub4_sub3.anInt1564)
             {
                 class30_sub2_sub4_sub3.method454(anInt945, true);
                 if(class30_sub2_sub4_sub3.aBoolean1567)
-                    class30_sub2_sub4_sub3.method329();
+                    class30_sub2_sub4_sub3.unlink();
                 else
                     aClass25_946.method285(class30_sub2_sub4_sub3.anInt1560, 0, (byte)6, class30_sub2_sub4_sub3.anInt1563, -1, class30_sub2_sub4_sub3.anInt1562, 60, class30_sub2_sub4_sub3.anInt1561, class30_sub2_sub4_sub3, false);
             }
@@ -8797,7 +8797,7 @@ public final class GameClient extends GameShell
             aClass30_Sub2_Sub2_1192.method398(101);
         if(anInt1023 == 2)
         {
-            for(SceneObjectSpawnRequest class30_sub1 = (SceneObjectSpawnRequest)aClass19_1179.method252(); class30_sub1 != null; class30_sub1 = (SceneObjectSpawnRequest)aClass19_1179.method254(false))
+            for(SceneObjectSpawnRequest class30_sub1 = (SceneObjectSpawnRequest)aClass19_1179.last(); class30_sub1 != null; class30_sub1 = (SceneObjectSpawnRequest)aClass19_1179.previous(false))
             {
                 if(class30_sub1.anInt1294 > 0)
                     class30_sub1.anInt1294--;
@@ -8806,7 +8806,7 @@ public final class GameClient extends GameShell
                     if(class30_sub1.anInt1299 < 0 || MapRegion.method178(class30_sub1.anInt1299, class30_sub1.anInt1301, 8))
                     {
                         method142(class30_sub1.anInt1298, class30_sub1.anInt1295, class30_sub1.anInt1300, class30_sub1.anInt1301, class30_sub1.anInt1297, class30_sub1.anInt1296, class30_sub1.anInt1299, 4);
-                        class30_sub1.method329();
+                        class30_sub1.unlink();
                     }
                 } else
                 {
@@ -8817,10 +8817,10 @@ public final class GameClient extends GameShell
                         method142(class30_sub1.anInt1298, class30_sub1.anInt1295, class30_sub1.anInt1292, class30_sub1.anInt1293, class30_sub1.anInt1297, class30_sub1.anInt1296, class30_sub1.anInt1291, 4);
                         class30_sub1.anInt1302 = -1;
                         if(class30_sub1.anInt1291 == class30_sub1.anInt1299 && class30_sub1.anInt1299 == -1)
-                            class30_sub1.method329();
+                            class30_sub1.unlink();
                         else
                         if(class30_sub1.anInt1291 == class30_sub1.anInt1299 && class30_sub1.anInt1292 == class30_sub1.anInt1300 && class30_sub1.anInt1293 == class30_sub1.anInt1301)
-                            class30_sub1.method329();
+                            class30_sub1.unlink();
                     }
                 }
             }
@@ -9548,7 +9548,7 @@ public final class GameClient extends GameShell
             int l1, int i2, int j2)
     {
         SceneObjectSpawnRequest class30_sub1 = null;
-        for(SceneObjectSpawnRequest class30_sub1_1 = (SceneObjectSpawnRequest)aClass19_1179.method252(); class30_sub1_1 != null; class30_sub1_1 = (SceneObjectSpawnRequest)aClass19_1179.method254(false))
+        for(SceneObjectSpawnRequest class30_sub1_1 = (SceneObjectSpawnRequest)aClass19_1179.last(); class30_sub1_1 != null; class30_sub1_1 = (SceneObjectSpawnRequest)aClass19_1179.previous(false))
         {
             if(class30_sub1_1.anInt1295 != l1 || class30_sub1_1.anInt1297 != i2 || class30_sub1_1.anInt1298 != j1 || class30_sub1_1.anInt1296 != i1)
                 continue;
@@ -9564,7 +9564,7 @@ public final class GameClient extends GameShell
             class30_sub1.anInt1297 = i2;
             class30_sub1.anInt1298 = j1;
             method89(false, class30_sub1);
-            aClass19_1179.method249(class30_sub1);
+            aClass19_1179.addFirst(class30_sub1);
         }
         class30_sub1.anInt1291 = k;
         class30_sub1.anInt1293 = k1;
@@ -9948,7 +9948,7 @@ public final class GameClient extends GameShell
                 Deque class19_1 = aClass19ArrayArrayArray827[anInt918][j3][i6];
                 if(class19_1 != null)
                 {
-                    for(GroundItem class30_sub2_sub4_sub2_3 = (GroundItem)class19_1.method252(); class30_sub2_sub4_sub2_3 != null; class30_sub2_sub4_sub2_3 = (GroundItem)class19_1.method254(false))
+                    for(GroundItem class30_sub2_sub4_sub2_3 = (GroundItem)class19_1.last(); class30_sub2_sub4_sub2_3 != null; class30_sub2_sub4_sub2_3 = (GroundItem)class19_1.previous(false))
                     {
                         if(class30_sub2_sub4_sub2_3.anInt1558 != (l8 & 0x7fff) || class30_sub2_sub4_sub2_3.anInt1559 != k11)
                             continue;
@@ -9993,7 +9993,7 @@ public final class GameClient extends GameShell
                 class30_sub2_sub4_sub2_2.anInt1559 = j14;
                 if(aClass19ArrayArrayArray827[anInt918][k6][j9] == null)
                     aClass19ArrayArrayArray827[anInt918][k6][j9] = new Deque(169);
-                aClass19ArrayArrayArray827[anInt918][k6][j9].method249(class30_sub2_sub4_sub2_2);
+                aClass19ArrayArrayArray827[anInt918][k6][j9].addFirst(class30_sub2_sub4_sub2_2);
                 method25(k6, j9);
             }
             return;
@@ -10009,15 +10009,15 @@ public final class GameClient extends GameShell
                 Deque class19 = aClass19ArrayArrayArray827[anInt918][i4][l6];
                 if(class19 != null)
                 {
-                    for(GroundItem class30_sub2_sub4_sub2 = (GroundItem)class19.method252(); class30_sub2_sub4_sub2 != null; class30_sub2_sub4_sub2 = (GroundItem)class19.method254(false))
+                    for(GroundItem class30_sub2_sub4_sub2 = (GroundItem)class19.last(); class30_sub2_sub4_sub2 != null; class30_sub2_sub4_sub2 = (GroundItem)class19.previous(false))
                     {
                         if(class30_sub2_sub4_sub2.anInt1558 != (k9 & 0x7fff))
                             continue;
-                        class30_sub2_sub4_sub2.method329();
+                        class30_sub2_sub4_sub2.unlink();
                         break;
                     }
 
-                    if(class19.method252() == null)
+                    if(class19.last() == null)
                         aClass19ArrayArrayArray827[anInt918][i4][l6] = null;
                     method25(i4, l6);
                 }
@@ -10171,7 +10171,7 @@ public final class GameClient extends GameShell
                 i5 = i5 * 128 + 64;
                 l7 = l7 * 128 + 64;
                 GraphicsObject class30_sub2_sub4_sub3 = new GraphicsObject(anInt918, anInt1161, 6, j15, k10, method42(anInt918, l7, true, i5) - l12, l7, i5);
-                aClass19_1056.method249(class30_sub2_sub4_sub3);
+                aClass19_1056.addFirst(class30_sub2_sub4_sub3);
             }
             return;
         }
@@ -10189,7 +10189,7 @@ public final class GameClient extends GameShell
                 class30_sub2_sub4_sub2_1.anInt1559 = j5;
                 if(aClass19ArrayArrayArray827[anInt918][l10][i13] == null)
                     aClass19ArrayArrayArray827[anInt918][l10][i13] = new Deque(169);
-                aClass19ArrayArrayArray827[anInt918][l10][i13].method249(class30_sub2_sub4_sub2_1);
+                aClass19ArrayArrayArray827[anInt918][l10][i13].addFirst(class30_sub2_sub4_sub2_1);
                 method25(l10, i13);
             }
             return;
@@ -10230,7 +10230,7 @@ public final class GameClient extends GameShell
                 k13 = k13 * 128 + 64;
                 Projectile class30_sub2_sub4_sub4 = new Projectile(i21, l18, 46883, k19 + anInt1161, j20 + anInt1161, j21, anInt918, method42(anInt918, k8, true, l5) - i18, k8, l5, l15, i17);
                 class30_sub2_sub4_sub4.method455(k19 + anInt1161, k13, method42(anInt918, k13, true, j11) - l18, j11, (byte)-83);
-                aClass19_1013.method249(class30_sub2_sub4_sub4);
+                aClass19_1013.addFirst(class30_sub2_sub4_sub4);
             }
         }
     }
@@ -10689,7 +10689,7 @@ public final class GameClient extends GameShell
 
                 }
 
-                for(SceneObjectSpawnRequest class30_sub1 = (SceneObjectSpawnRequest)aClass19_1179.method252(); class30_sub1 != null; class30_sub1 = (SceneObjectSpawnRequest)aClass19_1179.method254(false))
+                for(SceneObjectSpawnRequest class30_sub1 = (SceneObjectSpawnRequest)aClass19_1179.last(); class30_sub1 != null; class30_sub1 = (SceneObjectSpawnRequest)aClass19_1179.previous(false))
                     if(class30_sub1.anInt1297 >= anInt1268 && class30_sub1.anInt1297 < anInt1268 + 8 && class30_sub1.anInt1298 >= anInt1269 && class30_sub1.anInt1298 < anInt1269 + 8 && class30_sub1.anInt1295 == anInt918)
                         class30_sub1.anInt1294 = 0;
 
@@ -11048,12 +11048,12 @@ public final class GameClient extends GameShell
 
                 }
 
-                for(SceneObjectSpawnRequest class30_sub1_1 = (SceneObjectSpawnRequest)aClass19_1179.method252(); class30_sub1_1 != null; class30_sub1_1 = (SceneObjectSpawnRequest)aClass19_1179.method254(false))
+                for(SceneObjectSpawnRequest class30_sub1_1 = (SceneObjectSpawnRequest)aClass19_1179.last(); class30_sub1_1 != null; class30_sub1_1 = (SceneObjectSpawnRequest)aClass19_1179.previous(false))
                 {
                     class30_sub1_1.anInt1297 -= i17;
                     class30_sub1_1.anInt1298 -= j21;
                     if(class30_sub1_1.anInt1297 < 0 || class30_sub1_1.anInt1298 < 0 || class30_sub1_1.anInt1297 >= 104 || class30_sub1_1.anInt1298 >= 104)
-                        class30_sub1_1.method329();
+                        class30_sub1_1.unlink();
                 }
 
                 if(anInt1261 != 0)

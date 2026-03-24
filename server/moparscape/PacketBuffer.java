@@ -16,17 +16,17 @@ public final class PacketBuffer extends CacheableNode
             if(i == 0 && anInt1411 > 0)
             {
                 anInt1411--;
-                class30_sub2_sub2_2 = (PacketBuffer)aClass19_1414.method251();
+                class30_sub2_sub2_2 = (PacketBuffer)aClass19_1414.removeLast();
             } else
             if(i == 1 && anInt1412 > 0)
             {
                 anInt1412--;
-                class30_sub2_sub2_2 = (PacketBuffer)aClass19_1415.method251();
+                class30_sub2_sub2_2 = (PacketBuffer)aClass19_1415.removeLast();
             } else
             if(i == 2 && anInt1413 > 0)
             {
                 anInt1413--;
-                class30_sub2_sub2_2 = (PacketBuffer)aClass19_1416.method251();
+                class30_sub2_sub2_2 = (PacketBuffer)aClass19_1416.removeLast();
             }
             if(class30_sub2_sub2_2 != null)
             {

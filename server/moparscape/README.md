@@ -108,6 +108,12 @@ The following high-impact renames are already completed:
   - `Class30_Sub2_Sub4_Sub2` -> `GroundItem`
   - `Class27` -> `UnusedClientFlagsCandidate` (intentional low-confidence placeholder)
 
+- Core container API cleanup:
+  - `Node`: `unlink`, `key`, `prev`, `next`
+  - `CacheableNode`: `unlinkDual`, `previousDual`, `nextDual`
+  - `Deque`: `addFirst`, `addLast`, `removeLast`, `last`, `first`, `previous`, `next`, `clear`
+  - `NodeHashTable`: `get`, `put`, and clarified bucket field names
+
 ## Notes
 
 - Remaining obfuscated class names are intentionally being renamed in small batches.

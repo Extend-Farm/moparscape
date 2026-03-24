@@ -11,124 +11,124 @@ public final class Deque
     {
         aBoolean344 = false;
         anInt345 = -77;
-        aClass30_346 = new Node();
+        sentinel = new Node();
         if(i <= 0)
             aBoolean344 = !aBoolean344;
-        aClass30_346.aClass30_549 = aClass30_346;
-        aClass30_346.aClass30_550 = aClass30_346;
+        sentinel.prev = sentinel;
+        sentinel.next = sentinel;
     }
 
-    public void method249(Node class30)
+    public void addFirst(Node class30)
     {
-        if(class30.aClass30_550 != null)
-            class30.method329();
-        class30.aClass30_550 = aClass30_346.aClass30_550;
-        class30.aClass30_549 = aClass30_346;
-        class30.aClass30_550.aClass30_549 = class30;
-        class30.aClass30_549.aClass30_550 = class30;
+        if(class30.next != null)
+            class30.unlink();
+        class30.next = sentinel.next;
+        class30.prev = sentinel;
+        class30.next.prev = class30;
+        class30.prev.next = class30;
     }
 
-    public void method250(int i, Node class30)
+    public void addLast(int i, Node class30)
     {
-        if(class30.aClass30_550 != null)
-            class30.method329();
-        class30.aClass30_550 = aClass30_346;
-        class30.aClass30_549 = aClass30_346.aClass30_549;
+        if(class30.next != null)
+            class30.unlink();
+        class30.next = sentinel;
+        class30.prev = sentinel.prev;
         while(i >= 0) 
             aBoolean344 = !aBoolean344;
-        class30.aClass30_550.aClass30_549 = class30;
-        class30.aClass30_549.aClass30_550 = class30;
+        class30.next.prev = class30;
+        class30.prev.next = class30;
     }
 
-    public Node method251()
+    public Node removeLast()
     {
-        Node class30 = aClass30_346.aClass30_549;
-        if(class30 == aClass30_346)
+        Node class30 = sentinel.prev;
+        if(class30 == sentinel)
         {
             return null;
         } else
         {
-            class30.method329();
+            class30.unlink();
             return class30;
         }
     }
 
-    public Node method252()
+    public Node last()
     {
-        Node class30 = aClass30_346.aClass30_549;
-        if(class30 == aClass30_346)
+        Node class30 = sentinel.prev;
+        if(class30 == sentinel)
         {
-            aClass30_347 = null;
+            current = null;
             return null;
         } else
         {
-            aClass30_347 = class30.aClass30_549;
+            current = class30.prev;
             return class30;
         }
     }
 
-    public Node method253(int i)
+    public Node first(int i)
     {
         if(i < 5 || i > 5)
             throw new NullPointerException();
-        Node class30 = aClass30_346.aClass30_550;
-        if(class30 == aClass30_346)
+        Node class30 = sentinel.next;
+        if(class30 == sentinel)
         {
-            aClass30_347 = null;
+            current = null;
             return null;
         } else
         {
-            aClass30_347 = class30.aClass30_550;
+            current = class30.next;
             return class30;
         }
     }
 
-    public Node method254(boolean flag)
+    public Node previous(boolean flag)
     {
-        Node class30 = aClass30_347;
+        Node class30 = current;
         if(flag)
             anInt345 = 48;
-        if(class30 == aClass30_346)
+        if(class30 == sentinel)
         {
-            aClass30_347 = null;
+            current = null;
             return null;
         } else
         {
-            aClass30_347 = class30.aClass30_549;
+            current = class30.prev;
             return class30;
         }
     }
 
-    public Node method255(int i)
+    public Node next(int i)
     {
-        Node class30 = aClass30_347;
-        if(class30 == aClass30_346)
+        Node class30 = current;
+        if(class30 == sentinel)
         {
-            aClass30_347 = null;
+            current = null;
             return null;
         }
-        aClass30_347 = class30.aClass30_550;
+        current = class30.next;
         if(i != 8)
             throw new NullPointerException();
         else
             return class30;
     }
 
-    public void method256()
+    public void clear()
     {
-        if(aClass30_346.aClass30_549 == aClass30_346)
+        if(sentinel.prev == sentinel)
             return;
         do
         {
-            Node class30 = aClass30_346.aClass30_549;
-            if(class30 == aClass30_346)
+            Node class30 = sentinel.prev;
+            if(class30 == sentinel)
                 return;
-            class30.method329();
+            class30.unlink();
         } while(true);
     }
 
     private boolean aBoolean344;
     private int anInt345;
-    public Node aClass30_346;
-    private Node aClass30_347;
+    public Node sentinel;
+    private Node current;
 }

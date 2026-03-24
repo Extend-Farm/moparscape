@@ -6,17 +6,17 @@
 public class Node
 {
 
-    public void method329()
+    public void unlink()
     {
-        if(aClass30_550 == null)
+        if(next == null)
         {
             return;
         } else
         {
-            aClass30_550.aClass30_549 = aClass30_549;
-            aClass30_549.aClass30_550 = aClass30_550;
-            aClass30_549 = null;
-            aClass30_550 = null;
+            next.prev = prev;
+            prev.next = next;
+            prev = null;
+            next = null;
             return;
         }
     }
@@ -27,8 +27,8 @@ public class Node
     }
 
     private boolean aBoolean547;
-    public long aLong548;
-    public Node aClass30_549;
-    Node aClass30_550;
+    public long key;
+    public Node prev;
+    Node next;
     public static boolean aBoolean551;
 }

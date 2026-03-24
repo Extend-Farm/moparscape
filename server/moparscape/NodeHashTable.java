@@ -13,44 +13,44 @@ public final class NodeHashTable
         anInt38 = -373;
         if(i >= 0)
             throw new NullPointerException();
-        anInt39 = j;
-        aClass30Array40 = new Node[j];
+        bucketCount = j;
+        buckets = new Node[j];
         for(int k = 0; k < j; k++)
         {
-            Node class30 = aClass30Array40[k] = new Node();
-            class30.aClass30_549 = class30;
-            class30.aClass30_550 = class30;
+            Node class30 = buckets[k] = new Node();
+            class30.prev = class30;
+            class30.next = class30;
         }
 
     }
 
-    public Node method148(long l)
+    public Node get(long l)
     {
-        Node class30 = aClass30Array40[(int)(l & (long)(anInt39 - 1))];
-        for(Node class30_1 = class30.aClass30_549; class30_1 != class30; class30_1 = class30_1.aClass30_549)
-            if(class30_1.aLong548 == l)
+        Node class30 = buckets[(int)(l & (long)(bucketCount - 1))];
+        for(Node class30_1 = class30.prev; class30_1 != class30; class30_1 = class30_1.prev)
+            if(class30_1.key == l)
                 return class30_1;
 
         return null;
     }
 
-    public void method149(Node class30, long l, byte byte0)
+    public void put(Node class30, long l, byte byte0)
     {
         try
         {
-            if(class30.aClass30_550 != null)
-                class30.method329();
-            Node class30_1 = aClass30Array40[(int)(l & (long)(anInt39 - 1))];
+            if(class30.next != null)
+                class30.unlink();
+            Node class30_1 = buckets[(int)(l & (long)(bucketCount - 1))];
             if(byte0 != 7)
             {
                 return;
             } else
             {
-                class30.aClass30_550 = class30_1.aClass30_550;
-                class30.aClass30_549 = class30_1;
-                class30.aClass30_550.aClass30_549 = class30;
-                class30.aClass30_549.aClass30_550 = class30;
-                class30.aLong548 = l;
+                class30.next = class30_1.next;
+                class30.prev = class30_1;
+                class30.next.prev = class30;
+                class30.prev.next = class30;
+                class30.key = l;
                 return;
             }
         }
@@ -63,6 +63,6 @@ public final class NodeHashTable
 
     private boolean aBoolean37;
     private int anInt38;
-    private int anInt39;
-    private Node aClass30Array40[];
+    private int bucketCount;
+    private Node buckets[];
 }

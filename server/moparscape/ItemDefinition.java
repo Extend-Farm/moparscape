@@ -261,7 +261,7 @@ final class ItemDefinition
             Sprite class30_sub2_sub1_sub1 = (Sprite)aClass12_158.method222(i);
             if(class30_sub2_sub1_sub1 != null && class30_sub2_sub1_sub1.anInt1445 != j && class30_sub2_sub1_sub1.anInt1445 != -1)
             {
-                class30_sub2_sub1_sub1.method329();
+                class30_sub2_sub1_sub1.unlink();
                 class30_sub2_sub1_sub1 = null;
             }
             if(class30_sub2_sub1_sub1 != null)

@@ -125,6 +125,15 @@ This project is now a Gradle multi-module build.
 - `Class30_Sub2_Sub4_Sub2` -> `GroundItem`
 - `Class27` -> `UnusedClientFlagsCandidate` (low-confidence placeholder by design)
 
+### Phase 10 (core container API cleanup)
+
+Refined high-traffic intrusive list/hash APIs for readability:
+
+- `Node`: `method329` -> `unlink`, fields `aLong548/aClass30_549/aClass30_550` -> `key/prev/next`
+- `CacheableNode`: `method330` -> `unlinkDual`, dual-link fields renamed to `previousDual/nextDual`
+- `Deque`: renamed `method249..method256` to `addFirst/addLast/removeLast/last/first/previous/next/clear`
+- `NodeHashTable`: `method148/method149` -> `get/put`, buckets metadata names clarified
+
 ## Next steps
 
 - Continue phased renaming of remaining `Class1`..`Class50` files.

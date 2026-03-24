@@ -6,17 +6,17 @@
 public class CacheableNode extends Node
 {
 
-    public void method330()
+    public void unlinkDual()
     {
-        if(aClass30_Sub2_1304 == null)
+        if(nextDual == null)
         {
             return;
         } else
         {
-            aClass30_Sub2_1304.aClass30_Sub2_1303 = aClass30_Sub2_1303;
-            aClass30_Sub2_1303.aClass30_Sub2_1304 = aClass30_Sub2_1304;
-            aClass30_Sub2_1303 = null;
-            aClass30_Sub2_1304 = null;
+            nextDual.previousDual = previousDual;
+            previousDual.nextDual = nextDual;
+            previousDual = null;
+            nextDual = null;
             return;
         }
     }
@@ -25,7 +25,7 @@ public class CacheableNode extends Node
     {
     }
 
-    public CacheableNode aClass30_Sub2_1303;
-    CacheableNode aClass30_Sub2_1304;
+    public CacheableNode previousDual;
+    CacheableNode nextDual;
     public static int anInt1305;
 }

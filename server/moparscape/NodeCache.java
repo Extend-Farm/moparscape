@@ -22,7 +22,7 @@ public final class NodeCache
 
     public CacheableNode method222(long l)
     {
-        CacheableNode class30_sub2 = (CacheableNode)aClass1_303.method148(l);
+        CacheableNode class30_sub2 = (CacheableNode)aClass1_303.get(l);
         if(class30_sub2 != null)
         {
             aClass2_304.method150(class30_sub2);
@@ -43,19 +43,19 @@ public final class NodeCache
             if(anInt302 == 0)
             {
                 CacheableNode class30_sub2_1 = aClass2_304.method151();
-                class30_sub2_1.method329();
-                class30_sub2_1.method330();
+                class30_sub2_1.unlink();
+                class30_sub2_1.unlinkDual();
                 if(class30_sub2_1 == aClass30_Sub2_300)
                 {
                     CacheableNode class30_sub2_2 = aClass2_304.method151();
-                    class30_sub2_2.method329();
-                    class30_sub2_2.method330();
+                    class30_sub2_2.unlink();
+                    class30_sub2_2.unlinkDual();
                 }
             } else
             {
                 anInt302--;
             }
-            aClass1_303.method149(class30_sub2, l, (byte)7);
+            aClass1_303.put(class30_sub2, l, (byte)7);
             aClass2_304.method150(class30_sub2);
             return;
         }
@@ -73,8 +73,8 @@ public final class NodeCache
             CacheableNode class30_sub2 = aClass2_304.method151();
             if(class30_sub2 != null)
             {
-                class30_sub2.method329();
-                class30_sub2.method330();
+                class30_sub2.unlink();
+                class30_sub2.unlinkDual();
             } else
             {
                 anInt302 = anInt301;

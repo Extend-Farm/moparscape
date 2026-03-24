@@ -44,7 +44,7 @@ public class OnDemandFetcher extends ResourceProvider
                 int l1 = ((aByteArray1339[3] & 0xff) << 8) + (aByteArray1339[4] & 0xff);
                 int i2 = aByteArray1339[5] & 0xff;
                 aClass30_Sub2_Sub3_1369 = null;
-                for(OnDemandRequest class30_sub2_sub3 = (OnDemandRequest)aClass19_1331.method252(); class30_sub2_sub3 != null; class30_sub2_sub3 = (OnDemandRequest)aClass19_1331.method254(false))
+                for(OnDemandRequest class30_sub2_sub3 = (OnDemandRequest)aClass19_1331.last(); class30_sub2_sub3 != null; class30_sub2_sub3 = (OnDemandRequest)aClass19_1331.previous(false))
                 {
                     if(class30_sub2_sub3.anInt1419 == l && class30_sub2_sub3.anInt1421 == j1)
                         aClass30_Sub2_Sub3_1369 = class30_sub2_sub3;
@@ -62,10 +62,10 @@ public class OnDemandFetcher extends ResourceProvider
                         if(aClass30_Sub2_Sub3_1369.aBoolean1422)
                             synchronized(aClass19_1358)
                             {
-                                aClass19_1358.method249(aClass30_Sub2_Sub3_1369);
+                                aClass19_1358.addFirst(aClass30_Sub2_Sub3_1369);
                             }
                         else
-                            aClass30_Sub2_Sub3_1369.method329();
+                            aClass30_Sub2_Sub3_1369.unlink();
                         aClass30_Sub2_Sub3_1369 = null;
                     } else
                     {
@@ -103,10 +103,10 @@ public class OnDemandFetcher extends ResourceProvider
                     if(aClass30_Sub2_Sub3_1369.aBoolean1422)
                         synchronized(aClass19_1358)
                         {
-                            aClass19_1358.method249(aClass30_Sub2_Sub3_1369);
+                            aClass19_1358.addFirst(aClass30_Sub2_Sub3_1369);
                         }
                     else
-                        aClass30_Sub2_Sub3_1369.method329();
+                        aClass30_Sub2_Sub3_1369.unlink();
                 }
                 anInt1347 = 0;
                 return;
@@ -309,7 +309,7 @@ public class OnDemandFetcher extends ResourceProvider
             class30_sub2_sub3_1.aBoolean1422 = true;
             synchronized(aClass19_1370)
             {
-                aClass19_1370.method249(class30_sub2_sub3_1);
+                aClass19_1370.addFirst(class30_sub2_sub3_1);
             }
             aClass2_1361.method150(class30_sub2_sub3_1);
         }
@@ -353,7 +353,7 @@ public class OnDemandFetcher extends ResourceProvider
                 }
 
                 boolean flag = false;
-                for(OnDemandRequest class30_sub2_sub3 = (OnDemandRequest)aClass19_1331.method252(); class30_sub2_sub3 != null; class30_sub2_sub3 = (OnDemandRequest)aClass19_1331.method254(false))
+                for(OnDemandRequest class30_sub2_sub3 = (OnDemandRequest)aClass19_1331.last(); class30_sub2_sub3 != null; class30_sub2_sub3 = (OnDemandRequest)aClass19_1331.previous(false))
                     if(class30_sub2_sub3.aBoolean1422)
                     {
                         flag = true;
@@ -367,7 +367,7 @@ public class OnDemandFetcher extends ResourceProvider
 
                 if(!flag)
                 {
-                    for(OnDemandRequest class30_sub2_sub3_1 = (OnDemandRequest)aClass19_1331.method252(); class30_sub2_sub3_1 != null; class30_sub2_sub3_1 = (OnDemandRequest)aClass19_1331.method254(false))
+                    for(OnDemandRequest class30_sub2_sub3_1 = (OnDemandRequest)aClass19_1331.last(); class30_sub2_sub3_1 != null; class30_sub2_sub3_1 = (OnDemandRequest)aClass19_1331.previous(false))
                     {
                         flag = true;
                         class30_sub2_sub3_1.anInt1423++;
@@ -446,7 +446,7 @@ public class OnDemandFetcher extends ResourceProvider
         class30_sub2_sub3.aBoolean1422 = false;
         synchronized(aClass19_1344)
         {
-            aClass19_1344.method249(class30_sub2_sub3);
+            aClass19_1344.addFirst(class30_sub2_sub3);
         }
     }
 
@@ -455,13 +455,13 @@ public class OnDemandFetcher extends ResourceProvider
         OnDemandRequest class30_sub2_sub3;
         synchronized(aClass19_1358)
         {
-            class30_sub2_sub3 = (OnDemandRequest)aClass19_1358.method251();
+            class30_sub2_sub3 = (OnDemandRequest)aClass19_1358.removeLast();
         }
         if(class30_sub2_sub3 == null)
             return null;
         synchronized(aClass2_1361)
         {
-            class30_sub2_sub3.method330();
+            class30_sub2_sub3.unlinkDual();
         }
         if(class30_sub2_sub3.aByteArray1420 == null)
             return class30_sub2_sub3;
@@ -546,7 +546,7 @@ public class OnDemandFetcher extends ResourceProvider
         if(flag)
             return;
         anInt1367 = 0;
-        for(OnDemandRequest class30_sub2_sub3 = (OnDemandRequest)aClass19_1331.method252(); class30_sub2_sub3 != null; class30_sub2_sub3 = (OnDemandRequest)aClass19_1331.method254(false))
+        for(OnDemandRequest class30_sub2_sub3 = (OnDemandRequest)aClass19_1331.last(); class30_sub2_sub3 != null; class30_sub2_sub3 = (OnDemandRequest)aClass19_1331.previous(false))
             if(class30_sub2_sub3.aBoolean1422)
                 anInt1366++;
             else
@@ -554,13 +554,13 @@ public class OnDemandFetcher extends ResourceProvider
 
         while(anInt1366 < 10) 
         {
-            OnDemandRequest class30_sub2_sub3_1 = (OnDemandRequest)aClass19_1368.method251();
+            OnDemandRequest class30_sub2_sub3_1 = (OnDemandRequest)aClass19_1368.removeLast();
             if(class30_sub2_sub3_1 == null)
                 break;
             if(aByteArrayArray1342[class30_sub2_sub3_1.anInt1419][class30_sub2_sub3_1.anInt1421] != 0)
                 anInt1351++;
             aByteArrayArray1342[class30_sub2_sub3_1.anInt1419][class30_sub2_sub3_1.anInt1421] = 0;
-            aClass19_1331.method249(class30_sub2_sub3_1);
+            aClass19_1331.addFirst(class30_sub2_sub3_1);
             anInt1366++;
             method556(8, class30_sub2_sub3_1);
             aBoolean1357 = true;
@@ -575,7 +575,7 @@ public class OnDemandFetcher extends ResourceProvider
         }
         synchronized(aClass19_1344)
         {
-            aClass19_1344.method256();
+            aClass19_1344.clear();
         }
     }
 
@@ -586,7 +586,7 @@ public class OnDemandFetcher extends ResourceProvider
         OnDemandRequest class30_sub2_sub3;
         synchronized(aClass19_1370)
         {
-            class30_sub2_sub3 = (OnDemandRequest)aClass19_1370.method251();
+            class30_sub2_sub3 = (OnDemandRequest)aClass19_1370.removeLast();
         }
         while(class30_sub2_sub3 != null) 
         {
@@ -600,16 +600,16 @@ public class OnDemandFetcher extends ResourceProvider
             {
                 if(abyte0 == null)
                 {
-                    aClass19_1368.method249(class30_sub2_sub3);
+                    aClass19_1368.addFirst(class30_sub2_sub3);
                 } else
                 {
                     class30_sub2_sub3.aByteArray1420 = abyte0;
                     synchronized(aClass19_1358)
                     {
-                        aClass19_1358.method249(class30_sub2_sub3);
+                        aClass19_1358.addFirst(class30_sub2_sub3);
                     }
                 }
-                class30_sub2_sub3 = (OnDemandRequest)aClass19_1370.method251();
+                class30_sub2_sub3 = (OnDemandRequest)aClass19_1370.removeLast();
             }
         }
     }
@@ -627,14 +627,14 @@ public class OnDemandFetcher extends ResourceProvider
             OnDemandRequest class30_sub2_sub3;
             synchronized(aClass19_1344)
             {
-                class30_sub2_sub3 = (OnDemandRequest)aClass19_1344.method251();
+                class30_sub2_sub3 = (OnDemandRequest)aClass19_1344.removeLast();
             }
             while(class30_sub2_sub3 != null) 
             {
                 if(aByteArrayArray1342[class30_sub2_sub3.anInt1419][class30_sub2_sub3.anInt1421] != 0)
                 {
                     aByteArrayArray1342[class30_sub2_sub3.anInt1419][class30_sub2_sub3.anInt1421] = 0;
-                    aClass19_1331.method249(class30_sub2_sub3);
+                    aClass19_1331.addFirst(class30_sub2_sub3);
                     method556(8, class30_sub2_sub3);
                     aBoolean1357 = true;
                     if(anInt1351 < anInt1330)
@@ -646,7 +646,7 @@ public class OnDemandFetcher extends ResourceProvider
                 }
                 synchronized(aClass19_1344)
                 {
-                    class30_sub2_sub3 = (OnDemandRequest)aClass19_1344.method251();
+                    class30_sub2_sub3 = (OnDemandRequest)aClass19_1344.removeLast();
                 }
             }
             for(int j = 0; j < 4; j++)
@@ -661,7 +661,7 @@ public class OnDemandFetcher extends ResourceProvider
                         class30_sub2_sub3_1.anInt1419 = j;
                         class30_sub2_sub3_1.anInt1421 = l;
                         class30_sub2_sub3_1.aBoolean1422 = false;
-                        aClass19_1331.method249(class30_sub2_sub3_1);
+                        aClass19_1331.addFirst(class30_sub2_sub3_1);
                         method556(8, class30_sub2_sub3_1);
                         aBoolean1357 = true;
                         if(anInt1351 < anInt1330)
