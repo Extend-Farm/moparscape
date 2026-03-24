@@ -72,4 +72,129 @@ final class WidgetRenderHandler {
         Rasterizer3D.anInt1466 = previousCenterX;
         Rasterizer3D.anInt1467 = previousCenterY;
     }
+
+    // Exact extraction of legacy method105 branch for widget type 3 rectangle fills.
+    static void renderType3Rectangle(Widget widget, int drawX, int drawY, boolean isFocusedWidget, boolean isWidgetActive)
+    {
+        int color;
+        if(isWidgetActive)
+        {
+            color = widget.anInt219;
+            if(isFocusedWidget && widget.anInt239 != 0)
+                color = widget.anInt239;
+        } else
+        {
+            color = widget.anInt232;
+            if(isFocusedWidget && widget.anInt216 != 0)
+                color = widget.anInt216;
+        }
+        if(widget.aByte254 == 0)
+        {
+            if(widget.aBoolean227)
+                Rasterizer2D.method336(widget.anInt267, drawY, drawX, color, widget.anInt220, 0);
+            else
+                Rasterizer2D.method337(drawX, widget.anInt220, widget.anInt267, color, drawY, true);
+        } else
+        if(widget.aBoolean227)
+            Rasterizer2D.method335(color, drawY, widget.anInt220, widget.anInt267, 256 - (widget.aByte254 & 0xff), 0, drawX);
+        else
+            Rasterizer2D.method338(drawY, widget.anInt267, 256 - (widget.aByte254 & 0xff), color, widget.anInt220, drawX, -17319);
+    }
+
+    // Exact extraction of legacy method105 branch for widget type 4 text rendering.
+    static void renderType4Text(
+        GameClientCore gameClient,
+        Widget widget,
+        int drawX,
+        int drawY,
+        int textColorSeed,
+        boolean isFocusedWidget,
+        boolean isWidgetActive,
+        boolean isDialogueOpen
+    ) {
+        FontRenderer fontRenderer = widget.aClass30_Sub2_Sub1_Sub4_243;
+        String text = widget.aString248;
+        int color;
+        if(isWidgetActive)
+        {
+            color = widget.anInt219;
+            if(isFocusedWidget && widget.anInt239 != 0)
+                color = widget.anInt239;
+            if(widget.aString228.length() > 0)
+                text = widget.aString228;
+        } else
+        {
+            color = widget.anInt232;
+            if(isFocusedWidget && widget.anInt216 != 0)
+                color = widget.anInt216;
+        }
+        if(widget.anInt217 == 6 && isDialogueOpen)
+        {
+            text = "Please wait...";
+            color = widget.anInt232;
+        }
+        if(Rasterizer2D.anInt1379 == 479)
+        {
+            if(color == 0xffff00)
+                color = 255;
+            if(color == 49152)
+                color = 0xffffff;
+        }
+        for(int lineY = drawY + fontRenderer.anInt1497; text.length() > 0; lineY += fontRenderer.anInt1497)
+        {
+            if(text.indexOf("%") != -1)
+            {
+                do
+                {
+                    int token = text.indexOf("%1");
+                    if(token == -1)
+                        break;
+                    text = text.substring(0, token) + gameClient.method93(369, gameClient.method124(341, widget, 0)) + text.substring(token + 2);
+                } while(true);
+                do
+                {
+                    int token = text.indexOf("%2");
+                    if(token == -1)
+                        break;
+                    text = text.substring(0, token) + gameClient.method93(369, gameClient.method124(341, widget, 1)) + text.substring(token + 2);
+                } while(true);
+                do
+                {
+                    int token = text.indexOf("%3");
+                    if(token == -1)
+                        break;
+                    text = text.substring(0, token) + gameClient.method93(369, gameClient.method124(341, widget, 2)) + text.substring(token + 2);
+                } while(true);
+                do
+                {
+                    int token = text.indexOf("%4");
+                    if(token == -1)
+                        break;
+                    text = text.substring(0, token) + gameClient.method93(369, gameClient.method124(341, widget, 3)) + text.substring(token + 2);
+                } while(true);
+                do
+                {
+                    int token = text.indexOf("%5");
+                    if(token == -1)
+                        break;
+                    text = text.substring(0, token) + gameClient.method93(369, gameClient.method124(341, widget, 4)) + text.substring(token + 2);
+                } while(true);
+            }
+            int newlineToken = text.indexOf("\\n");
+            String lineText;
+            if(newlineToken != -1)
+            {
+                lineText = text.substring(0, newlineToken);
+                text = text.substring(newlineToken + 2);
+            } else
+            {
+                lineText = text;
+                text = "";
+            }
+            if(widget.aBoolean223)
+                fontRenderer.method382(color, drawX + widget.anInt220 / 2, textColorSeed, lineText, lineY, widget.aBoolean268);
+            else
+                fontRenderer.method389(false, widget.aBoolean268, drawX, color, lineText, lineY);
+        }
+    }
 }

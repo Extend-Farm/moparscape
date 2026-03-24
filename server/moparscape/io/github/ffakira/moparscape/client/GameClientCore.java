@@ -7949,123 +7949,17 @@ class GameClientCore extends GameShell
                 } else
                 if(class9_1.anInt262 == 3)
                 {
-                    boolean flag = false;
+                    boolean isFocusedWidget = false;
                     if(anInt1039 == class9_1.anInt250 || anInt1048 == class9_1.anInt250 || anInt1026 == class9_1.anInt250)
-                        flag = true;
-                    int j3;
-                    if(method131(class9_1, false))
-                    {
-                        j3 = class9_1.anInt219;
-                        if(flag && class9_1.anInt239 != 0)
-                            j3 = class9_1.anInt239;
-                    } else
-                    {
-                        j3 = class9_1.anInt232;
-                        if(flag && class9_1.anInt216 != 0)
-                            j3 = class9_1.anInt216;
-                    }
-                    if(class9_1.aByte254 == 0)
-                    {
-                        if(class9_1.aBoolean227)
-                            Rasterizer2D.method336(class9_1.anInt267, l2, k2, j3, class9_1.anInt220, 0);
-                        else
-                            Rasterizer2D.method337(k2, class9_1.anInt220, class9_1.anInt267, j3, l2, true);
-                    } else
-                    if(class9_1.aBoolean227)
-                        Rasterizer2D.method335(j3, l2, class9_1.anInt220, class9_1.anInt267, 256 - (class9_1.aByte254 & 0xff), 0, k2);
-                    else
-                        Rasterizer2D.method338(l2, class9_1.anInt267, 256 - (class9_1.aByte254 & 0xff), j3, class9_1.anInt220, k2, -17319);
+                        isFocusedWidget = true;
+                    WidgetRenderHandler.renderType3Rectangle(class9_1, k2, l2, isFocusedWidget, method131(class9_1, false));
                 } else
                 if(class9_1.anInt262 == 4)
                 {
-                    FontRenderer class30_sub2_sub1_sub4 = class9_1.aClass30_Sub2_Sub1_Sub4_243;
-                    String s = class9_1.aString248;
-                    boolean flag1 = false;
+                    boolean isFocusedWidget = false;
                     if(anInt1039 == class9_1.anInt250 || anInt1048 == class9_1.anInt250 || anInt1026 == class9_1.anInt250)
-                        flag1 = true;
-                    int i4;
-                    if(method131(class9_1, false))
-                    {
-                        i4 = class9_1.anInt219;
-                        if(flag1 && class9_1.anInt239 != 0)
-                            i4 = class9_1.anInt239;
-                        if(class9_1.aString228.length() > 0)
-                            s = class9_1.aString228;
-                    } else
-                    {
-                        i4 = class9_1.anInt232;
-                        if(flag1 && class9_1.anInt216 != 0)
-                            i4 = class9_1.anInt216;
-                    }
-                    if(class9_1.anInt217 == 6 && aBoolean1149)
-                    {
-                        s = "Please wait...";
-                        i4 = class9_1.anInt232;
-                    }
-                    if(Rasterizer2D.anInt1379 == 479)
-                    {
-                        if(i4 == 0xffff00)
-                            i4 = 255;
-                        if(i4 == 49152)
-                            i4 = 0xffffff;
-                    }
-                    for(int l6 = l2 + class30_sub2_sub1_sub4.anInt1497; s.length() > 0; l6 += class30_sub2_sub1_sub4.anInt1497)
-                    {
-                        if(s.indexOf("%") != -1)
-                        {
-                            do
-                            {
-                                int k7 = s.indexOf("%1");
-                                if(k7 == -1)
-                                    break;
-                                s = s.substring(0, k7) + method93(369, method124(341, class9_1, 0)) + s.substring(k7 + 2);
-                            } while(true);
-                            do
-                            {
-                                int l7 = s.indexOf("%2");
-                                if(l7 == -1)
-                                    break;
-                                s = s.substring(0, l7) + method93(369, method124(341, class9_1, 1)) + s.substring(l7 + 2);
-                            } while(true);
-                            do
-                            {
-                                int i8 = s.indexOf("%3");
-                                if(i8 == -1)
-                                    break;
-                                s = s.substring(0, i8) + method93(369, method124(341, class9_1, 2)) + s.substring(i8 + 2);
-                            } while(true);
-                            do
-                            {
-                                int j8 = s.indexOf("%4");
-                                if(j8 == -1)
-                                    break;
-                                s = s.substring(0, j8) + method93(369, method124(341, class9_1, 3)) + s.substring(j8 + 2);
-                            } while(true);
-                            do
-                            {
-                                int k8 = s.indexOf("%5");
-                                if(k8 == -1)
-                                    break;
-                                s = s.substring(0, k8) + method93(369, method124(341, class9_1, 4)) + s.substring(k8 + 2);
-                            } while(true);
-                        }
-                        int l8 = s.indexOf("\\n");
-                        String s1;
-                        if(l8 != -1)
-                        {
-                            s1 = s.substring(0, l8);
-                            s = s.substring(l8 + 2);
-                        } else
-                        {
-                            s1 = s;
-                            s = "";
-                        }
-                        if(class9_1.aBoolean223)
-                            class30_sub2_sub1_sub4.method382(i4, k2 + class9_1.anInt220 / 2, anInt939, s1, l6, class9_1.aBoolean268);
-                        else
-                            class30_sub2_sub1_sub4.method389(false, class9_1.aBoolean268, k2, i4, s1, l6);
-                    }
-
+                        isFocusedWidget = true;
+                    WidgetRenderHandler.renderType4Text(this, class9_1, k2, l2, anInt939, isFocusedWidget, method131(class9_1, false), aBoolean1149);
                 } else
                 if(class9_1.anInt262 == 5)
                 {
