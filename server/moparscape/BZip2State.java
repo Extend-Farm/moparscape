@@ -3,10 +3,10 @@
 // Decompiler options: packimports(3) 
 
 
-class Class32
+class BZip2State
 {
 
-    Class32()
+    BZip2State()
     {
         anIntArray583 = new int[256];
         anIntArray585 = new int[257];

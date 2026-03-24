@@ -4,10 +4,10 @@
 
 import sign.SignLink;
 
-public final class Class1
+public final class NodeHashTable
 {
 
-    public Class1(int i, int j)
+    public NodeHashTable(int i, int j)
     {
         aBoolean37 = false;
         anInt38 = -373;

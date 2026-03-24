@@ -148,7 +148,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
         super.anInt1505 = class30_sub2_sub2.method410();
         if(super.anInt1505 == 65535)
             super.anInt1505 = -1;
-        aString1703 = Class50.method587(-45804, Class50.method584(class30_sub2_sub2.method414(-35089), (byte)-99));
+        aString1703 = TextUtils.method587(-45804, TextUtils.method584(class30_sub2_sub2.method414(-35089), (byte)-99));
         anInt1705 = class30_sub2_sub2.method408();
         anInt1723 = class30_sub2_sub2.method410();
         aBoolean1710 = true;
@@ -370,7 +370,7 @@ final class Class30_Sub2_Sub4_Sub1_Sub2 extends Class30_Sub2_Sub4_Sub1
     int anInt1701;
     int anInt1702;
     String aString1703;
-    static Class12 aClass12_1704 = new Class12(false, 260);
+    static NodeCache aClass12_1704 = new NodeCache(false, 260);
     int anInt1705;
     int anInt1706;
     int anInt1707;

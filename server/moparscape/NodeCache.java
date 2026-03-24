@@ -4,10 +4,10 @@
 
 import sign.SignLink;
 
-public final class Class12
+public final class NodeCache
 {
 
-    public Class12(boolean flag, int i)
+    public NodeCache(boolean flag, int i)
     {
         aBoolean295 = false;
         aBoolean297 = false;
@@ -15,7 +15,7 @@ public final class Class12
         aClass2_304 = new CacheableNodeDeque(anInt296);
         anInt301 = i;
         anInt302 = i;
-        aClass1_303 = new Class1(-877, 1024);
+        aClass1_303 = new NodeHashTable(-877, 1024);
         if(flag)
             anInt296 = -225;
     }
@@ -91,6 +91,6 @@ public final class Class12
     private CacheableNode aClass30_Sub2_300;
     private int anInt301;
     private int anInt302;
-    private Class1 aClass1_303;
+    private NodeHashTable aClass1_303;
     private CacheableNodeDeque aClass2_304;
 }

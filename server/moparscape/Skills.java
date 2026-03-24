@@ -3,7 +3,7 @@
 // Decompiler options: packimports(3) 
 
 
-public class Class45
+public class Skills
 {
 
     public static int anInt733 = 25;

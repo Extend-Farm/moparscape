@@ -270,7 +270,7 @@ public final class GameClient extends GameShell
             if(aClass30_Sub2_Sub4_Sub1_Sub2_1126 != null && aClass30_Sub2_Sub4_Sub1_Sub2_1126.aString1703 != null)
                 s = aClass30_Sub2_Sub4_Sub1_Sub2_1126.aString1703;
             else
-                s = Class50.method587(-45804, aString1173);
+                s = TextUtils.method587(-45804, aString1173);
             class30_sub2_sub1_sub4.method385(0, s + ":", 90, 822, 4);
             class30_sub2_sub1_sub4.method385(255, aString887 + "*", 90, 822, 6 + class30_sub2_sub1_sub4.method383(anInt1116, s + ": "));
             Class30_Sub2_Sub1.method339(77, 0, 479, 0, (byte)4);
@@ -1861,7 +1861,7 @@ public final class GameClient extends GameShell
                 method77("Your friendlist is full. Max of 100 for free users, and 200 for members", 0, "", aBoolean991);
                 return;
             }
-            String s = Class50.method587(-45804, Class50.method584(l, (byte)-99));
+            String s = TextUtils.method587(-45804, TextUtils.method584(l, (byte)-99));
             for(int i = 0; i < anInt899; i++)
                 if(aLongArray955[i] == l)
                 {
@@ -2190,7 +2190,7 @@ public final class GameClient extends GameShell
             if(aString881.length() > 0)
             {
                 aClass30_Sub2_Sub2_1192.method397((byte)6, 218);
-                aClass30_Sub2_Sub2_1192.method404(5, Class50.method583(aString881));
+                aClass30_Sub2_Sub2_1192.method404(5, TextUtils.method583(aString881));
                 aClass30_Sub2_Sub2_1192.method398(j - 601);
                 aClass30_Sub2_Sub2_1192.method398(aBoolean1158 ? 1 : 0);
             }
@@ -3529,7 +3529,7 @@ public final class GameClient extends GameShell
         aClass15_1165.method238(4, 23680, super.aGraphics12, 4);
         anInt1021 = 0;
         anInt1261 = 0;
-        Class24 class24 = aClass24_1168;
+        BufferedConnection class24 = aClass24_1168;
         aBoolean1157 = false;
         anInt1038 = 0;
         method84(aString1173, aString1174, true);
@@ -3741,7 +3741,7 @@ public final class GameClient extends GameShell
             int k1 = s.indexOf("@whi@");
             if(k1 != -1)
             {
-                long l3 = Class50.method583(s.substring(k1 + 5).trim());
+                long l3 = TextUtils.method583(s.substring(k1 + 5).trim());
                 if(l == 337)
                     method41((byte)68, l3);
                 if(l == 42)
@@ -3789,7 +3789,7 @@ public final class GameClient extends GameShell
             if(l1 != -1)
             {
                 s1 = s1.substring(l1 + 5).trim();
-                String s7 = Class50.method587(-45804, Class50.method584(Class50.method583(s1), (byte)-99));
+                String s7 = TextUtils.method587(-45804, TextUtils.method584(TextUtils.method583(s1), (byte)-99));
                 boolean flag9 = false;
                 for(int j3 = 0; j3 < anInt891; j3++)
                 {
@@ -4252,7 +4252,7 @@ public final class GameClient extends GameShell
             int k2 = s3.indexOf("@whi@");
             if(k2 != -1)
             {
-                long l4 = Class50.method583(s3.substring(k2 + 5).trim());
+                long l4 = TextUtils.method583(s3.substring(k2 + 5).trim());
                 int k3 = -1;
                 for(int i4 = 0; i4 < anInt899; i4++)
                 {
@@ -4845,12 +4845,12 @@ public final class GameClient extends GameShell
                     aBoolean1223 = true;
                     if(anInt1064 == 1)
                     {
-                        long l = Class50.method583(aString1212);
+                        long l = TextUtils.method583(aString1212);
                         method41((byte)68, l);
                     }
                     if(anInt1064 == 2 && anInt899 > 0)
                     {
-                        long l1 = Class50.method583(aString1212);
+                        long l1 = TextUtils.method583(aString1212);
                         method35(false, l1);
                     }
                     if(anInt1064 == 3 && aString1212.length() > 0)
@@ -4863,7 +4863,7 @@ public final class GameClient extends GameShell
                         aClass30_Sub2_Sub2_1192.method407(aClass30_Sub2_Sub2_1192.anInt1406 - k, (byte)0);
                         aString1212 = Class35.method527(aString1212, 0);
                         aString1212 = Class34.method497(aString1212, 0);
-                        method77(aString1212, 6, Class50.method587(-45804, Class50.method584(aLong953, (byte)-99)), aBoolean991);
+                        method77(aString1212, 6, TextUtils.method587(-45804, TextUtils.method584(aLong953, (byte)-99)), aBoolean991);
                         if(anInt845 == 2)
                         {
                             anInt845 = 1;
@@ -4876,12 +4876,12 @@ public final class GameClient extends GameShell
                     }
                     if(anInt1064 == 4 && anInt822 < 100)
                     {
-                        long l2 = Class50.method583(aString1212);
+                        long l2 = TextUtils.method583(aString1212);
                         method113(l2, 4);
                     }
                     if(anInt1064 == 5 && anInt822 > 0)
                     {
-                        long l3 = Class50.method583(aString1212);
+                        long l3 = TextUtils.method583(aString1212);
                         method122(3, l3);
                     }
                 }
@@ -4932,7 +4932,7 @@ public final class GameClient extends GameShell
                     if(aString1004.length() > 0)
                     {
                         aClass30_Sub2_Sub2_1192.method397((byte)6, 60);
-                        aClass30_Sub2_Sub2_1192.method404(5, Class50.method583(aString1004));
+                        aClass30_Sub2_Sub2_1192.method404(5, TextUtils.method583(aString1004));
                     }
                     anInt1225 = 0;
                     aBoolean1223 = true;
@@ -5312,7 +5312,7 @@ public final class GameClient extends GameShell
                 return;
             } else
             {
-                class9.aString248 = Class50.method587(-45804, Class50.method584(aLongArray925[j], (byte)-99));
+                class9.aString248 = TextUtils.method587(-45804, TextUtils.method584(aLongArray925[j], (byte)-99));
                 class9.anInt217 = 1;
                 return;
             }
@@ -5856,8 +5856,8 @@ public final class GameClient extends GameShell
                 aString1267 = "Connecting to server...";
                 method135(true, false);
             }
-            aClass24_1168 = new Class24(this, -978, method19(4444 + anInt958));
-            long l = Class50.method583(s);
+            aClass24_1168 = new BufferedConnection(this, -978, method19(4444 + anInt958));
+            long l = TextUtils.method583(s);
             int i = (int)(l >> 16 & 31L);
             aClass30_Sub2_Sub2_1192.anInt1406 = 0;
             aClass30_Sub2_Sub2_1192.method398(14);
@@ -8413,7 +8413,7 @@ public final class GameClient extends GameShell
             int k3 = class30_sub2_sub2.anInt1406;
             if(class30_sub2_sub4_sub1_sub2.aString1703 != null && class30_sub2_sub4_sub1_sub2.aBoolean1710)
             {
-                long l3 = Class50.method583(class30_sub2_sub4_sub1_sub2.aString1703);
+                long l3 = TextUtils.method583(class30_sub2_sub4_sub1_sub2.aString1703);
                 boolean flag = false;
                 if(j2 <= 1)
                 {
@@ -8741,7 +8741,7 @@ public final class GameClient extends GameShell
                 method77("Your ignore list is full. Max of 100 hit", 0, "", aBoolean991);
                 return;
             }
-            String s = Class50.method587(-45804, Class50.method584(l, (byte)-99));
+            String s = TextUtils.method587(-45804, TextUtils.method584(l, (byte)-99));
             for(int j = 0; j < anInt822; j++)
                 if(aLongArray925[j] == l)
                 {
@@ -9214,8 +9214,8 @@ public final class GameClient extends GameShell
                     k1 = aClass30_Sub2_Sub4_Sub1_Sub2_1126.anInt1705;
                 if(j1 == 9)
                 {
-                    for(int l1 = 0; l1 < Class45.anInt733; l1++)
-                        if(Class45.aBooleanArray735[l1])
+                    for(int l1 = 0; l1 < Skills.anInt733; l1++)
+                        if(Skills.aBooleanArray735[l1])
                             k1 += anIntArray1044[l1];
 
                 }
@@ -9381,7 +9381,7 @@ public final class GameClient extends GameShell
                 int j1 = ((Class30_Sub2_Sub4_Sub1) (class30_sub2_sub4_sub1_sub2)).anInt1550 / 32 - ((Class30_Sub2_Sub4_Sub1) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anInt1550 / 32;
                 int l3 = ((Class30_Sub2_Sub4_Sub1) (class30_sub2_sub4_sub1_sub2)).anInt1551 / 32 - ((Class30_Sub2_Sub4_Sub1) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anInt1551 / 32;
                 boolean flag1 = false;
-                long l6 = Class50.method583(class30_sub2_sub4_sub1_sub2.aString1703);
+                long l6 = TextUtils.method583(class30_sub2_sub4_sub1_sub2.aString1703);
                 for(int k6 = 0; k6 < anInt899; k6++)
                 {
                     if(l6 != aLongArray955[k6] || anIntArray826[k6] == 0)
@@ -9833,7 +9833,7 @@ public final class GameClient extends GameShell
             }
             aClass30_Sub2_Sub1_Sub4_1272.method389(false, true, c / 2 - 90, 0xffffff, "Username: " + aString1173 + ((anInt1216 == 0) & (anInt1161 % 40 < 20) ? "@yel@|" : ""), j);
             j += 15;
-            aClass30_Sub2_Sub1_Sub4_1272.method389(false, true, c / 2 - 88, 0xffffff, "Password: " + Class50.method588(aString1174, 0) + ((anInt1216 == 1) & (anInt1105 % 40 < 20) ? "@yel@|" : ""), j);
+            aClass30_Sub2_Sub1_Sub4_1272.method389(false, true, c / 2 - 88, 0xffffff, "Password: " + TextUtils.method588(aString1174, 0) + ((anInt1216 == 1) & (anInt1105 % 40 < 20) ? "@yel@|" : ""), j);
             j += 15;
             aClass30_Sub2_Sub1_Sub4_1272.method389(false, true, c / 2 - 90, 0xffffff, "Server IP: " + server + ((anInt1216 == 2) & (anInt1105 % 40 < 20) ? "@yel@|" : ""), j);
             j += 15;
@@ -10655,7 +10655,7 @@ public final class GameClient extends GameShell
                 anInt1006 = aClass30_Sub2_Sub2_1083.method410();
                 if(anInt1193 != 0 && anInt857 == -1)
                 {
-                    SignLink.dnslookup(Class50.method586(anInt1193, true));
+                    SignLink.dnslookup(TextUtils.method586(anInt1193, true));
                     method147(537);
                     char c = '\u028A';
                     if(anInt1167 != 201 || anInt1120 == 1)
@@ -11163,7 +11163,7 @@ public final class GameClient extends GameShell
                 if(s.endsWith(":tradereq:"))
                 {
                     String s3 = s.substring(0, s.indexOf(":"));
-                    long l17 = Class50.method583(s3);
+                    long l17 = TextUtils.method583(s3);
                     boolean flag2 = false;
                     for(int j27 = 0; j27 < anInt822; j27++)
                     {
@@ -11179,7 +11179,7 @@ public final class GameClient extends GameShell
                 if(s.endsWith(":duelreq:"))
                 {
                     String s4 = s.substring(0, s.indexOf(":"));
-                    long l18 = Class50.method583(s4);
+                    long l18 = TextUtils.method583(s4);
                     boolean flag3 = false;
                     for(int k27 = 0; k27 < anInt822; k27++)
                     {
@@ -11195,7 +11195,7 @@ public final class GameClient extends GameShell
                 if(s.endsWith(":chalreq:"))
                 {
                     String s5 = s.substring(0, s.indexOf(":"));
-                    long l19 = Class50.method583(s5);
+                    long l19 = TextUtils.method583(s5);
                     boolean flag4 = false;
                     for(int l27 = 0; l27 < anInt822; l27++)
                     {
@@ -11234,7 +11234,7 @@ public final class GameClient extends GameShell
             {
                 long l4 = aClass30_Sub2_Sub2_1083.method414(-35089);
                 int i18 = aClass30_Sub2_Sub2_1083.method408();
-                String s7 = Class50.method587(-45804, Class50.method584(l4, (byte)-99));
+                String s7 = TextUtils.method587(-45804, TextUtils.method584(l4, (byte)-99));
                 for(int k24 = 0; k24 < anInt899; k24++)
                 {
                     if(l4 != aLongArray955[k24])
@@ -11419,12 +11419,12 @@ public final class GameClient extends GameShell
                         if(l21 != 3)
                             s9 = Class34.method497(s9, 0);
                         if(l21 == 2 || l21 == 3)
-                            method77(s9, 7, "@cr2@" + Class50.method587(-45804, Class50.method584(l5, (byte)-99)), aBoolean991);
+                            method77(s9, 7, "@cr2@" + TextUtils.method587(-45804, TextUtils.method584(l5, (byte)-99)), aBoolean991);
                         else
                         if(l21 == 1)
-                            method77(s9, 7, "@cr1@" + Class50.method587(-45804, Class50.method584(l5, (byte)-99)), aBoolean991);
+                            method77(s9, 7, "@cr1@" + TextUtils.method587(-45804, TextUtils.method584(l5, (byte)-99)), aBoolean991);
                         else
-                            method77(s9, 3, Class50.method587(-45804, Class50.method584(l5, (byte)-99)), aBoolean991);
+                            method77(s9, 3, TextUtils.method587(-45804, TextUtils.method584(l5, (byte)-99)), aBoolean991);
                     }
                     catch(Exception exception1)
                     {
@@ -11948,7 +11948,7 @@ public final class GameClient extends GameShell
         aClass30_Sub2_Sub2_847 = PacketBuffer.method396(1, 9);
         aBoolean848 = true;
         anInt857 = -1;
-        anIntArray864 = new int[Class45.anInt733];
+        anIntArray864 = new int[Skills.anInt733];
         aBoolean872 = false;
         anIntArray873 = new int[5];
         anInt874 = -1;
@@ -11974,7 +11974,7 @@ public final class GameClient extends GameShell
         aByteArray912 = new byte[16384];
         aByte920 = 14;
         anInt921 = 732;
-        anIntArray922 = new int[Class45.anInt733];
+        anIntArray922 = new int[Skills.anInt733];
         aByte923 = 25;
         aLongArray925 = new long[100];
         aBoolean926 = false;
@@ -12024,7 +12024,7 @@ public final class GameClient extends GameShell
         aClass30_Sub2_Sub1_Sub1Array1033 = new Class30_Sub2_Sub1_Sub1[100];
         anInt1042 = -1;
         aBoolean1043 = false;
-        anIntArray1044 = new int[Class45.anInt733];
+        anIntArray1044 = new int[Skills.anInt733];
         anIntArray1045 = new int[2000];
         aBoolean1047 = true;
         anInt1050 = 111;
@@ -12482,7 +12482,7 @@ public final class GameClient extends GameShell
     private ProducingGraphicsBuffer aClass15_1165;
     private ProducingGraphicsBuffer aClass15_1166;
     private int anInt1167;
-    private Class24 aClass24_1168;
+    private BufferedConnection aClass24_1168;
     private int anInt1169;
     private int anInt1170;
     private int anInt1171;

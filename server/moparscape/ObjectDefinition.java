@@ -544,12 +544,12 @@ label0:
     public byte aByteArray777[];
     public boolean aBoolean778;
     public boolean aBoolean779;
-    public static Class12 aClass12_780 = new Class12(false, 30);
+    public static NodeCache aClass12_780 = new NodeCache(false, 30);
     public int anInt781;
     private static ObjectDefinition aClass46Array782[];
     private int anInt783;
     private int anIntArray784[];
-    public static Class12 aClass12_785 = new Class12(false, 500);
+    public static NodeCache aClass12_785 = new NodeCache(false, 500);
     public String aStringArray786[];
 
 }

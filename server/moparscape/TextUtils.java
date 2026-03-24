@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-public final class Class50
+public final class TextUtils
 {
 
     public static long method583(String s)

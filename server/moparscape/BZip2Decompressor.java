@@ -4,7 +4,7 @@
 
 import java.io.PrintStream;
 
-public final class Class13
+public final class BZip2Decompressor
 {
 
     public static int method225(byte abyte0[], int i, byte abyte1[], int j, int k)
@@ -31,13 +31,13 @@ public final class Class13
         }
     }
 
-    private static void method226(Class32 class32)
+    private static void method226(BZip2State class32)
     {
         byte byte4 = class32.aByte573;
         int i = class32.anInt574;
         int j = class32.anInt584;
         int k = class32.anInt582;
-        int ai[] = Class32.anIntArray587;
+        int ai[] = BZip2State.anIntArray587;
         int l = class32.anInt581;
         byte abyte0[] = class32.aByteArray568;
         int i1 = class32.anInt569;
@@ -151,14 +151,14 @@ label0:
         class32.anInt574 = i;
         class32.anInt584 = j;
         class32.anInt582 = k;
-        Class32.anIntArray587 = ai;
+        BZip2State.anIntArray587 = ai;
         class32.anInt581 = l;
         class32.aByteArray568 = abyte0;
         class32.anInt569 = i1;
         class32.anInt570 = j1;
     }
 
-    private static void method227(Class32 class32)
+    private static void method227(BZip2State class32)
     {
         boolean flag = false;
         boolean flag1 = false;
@@ -184,8 +184,8 @@ label0:
         int ai1[] = null;
         int ai2[] = null;
         class32.anInt578 = 1;
-        if(Class32.anIntArray587 == null)
-            Class32.anIntArray587 = new int[class32.anInt578 * 0x186a0];
+        if(BZip2State.anIntArray587 == null)
+            BZip2State.anIntArray587 = new int[class32.anInt578 * 0x186a0];
         boolean flag19 = true;
         while(flag19) 
         {
@@ -389,7 +389,7 @@ label0:
                     class32.anIntArray583[byte5 & 0xff] += j6;
                     for(; j6 > 0; j6--)
                     {
-                        Class32.anIntArray587[i6] = byte5 & 0xff;
+                        BZip2State.anIntArray587[i6] = byte5 & 0xff;
                         i6++;
                     }
 
@@ -449,7 +449,7 @@ label0:
                         }
                     }
                     class32.anIntArray583[class32.aByteArray591[byte6 & 0xff] & 0xff]++;
-                    Class32.anIntArray587[i6] = class32.aByteArray591[byte6 & 0xff] & 0xff;
+                    BZip2State.anIntArray587[i6] = class32.aByteArray591[byte6 & 0xff] & 0xff;
                     i6++;
                     if(j5 == 0)
                     {
@@ -485,14 +485,14 @@ label0:
 
             for(int l2 = 0; l2 < i6; l2++)
             {
-                byte byte7 = (byte)(Class32.anIntArray587[l2] & 0xff);
-                Class32.anIntArray587[class32.anIntArray585[byte7 & 0xff]] |= l2 << 8;
+                byte byte7 = (byte)(BZip2State.anIntArray587[l2] & 0xff);
+                BZip2State.anIntArray587[class32.anIntArray585[byte7 & 0xff]] |= l2 << 8;
                 class32.anIntArray585[byte7 & 0xff]++;
             }
 
-            class32.anInt581 = Class32.anIntArray587[class32.anInt580] >> 8;
+            class32.anInt581 = BZip2State.anIntArray587[class32.anInt580] >> 8;
             class32.anInt584 = 0;
-            class32.anInt581 = Class32.anIntArray587[class32.anInt581];
+            class32.anInt581 = BZip2State.anIntArray587[class32.anInt581];
             class32.anInt582 = (byte)(class32.anInt581 & 0xff);
             class32.anInt581 >>= 8;
             class32.anInt584++;
@@ -505,17 +505,17 @@ label0:
         }
     }
 
-    private static byte method228(Class32 class32)
+    private static byte method228(BZip2State class32)
     {
         return (byte)method230(8, class32);
     }
 
-    private static byte method229(Class32 class32)
+    private static byte method229(BZip2State class32)
     {
         return (byte)method230(1, class32);
     }
 
-    private static int method230(int i, Class32 class32)
+    private static int method230(int i, BZip2State class32)
     {
         int j;
         do
@@ -538,7 +538,7 @@ label0:
         return j;
     }
 
-    private static void method231(Class32 class32)
+    private static void method231(BZip2State class32)
     {
         class32.anInt588 = 0;
         for(int i = 0; i < 256; i++)
@@ -589,6 +589,6 @@ label0:
 
     }
 
-    private static Class32 aClass32_305 = new Class32();
+    private static BZip2State aClass32_305 = new BZip2State();
 
 }

@@ -364,7 +364,7 @@ final class Class5
     private int anInt92;
     public boolean aBoolean93;
     private int anIntArray94[];
-    public static Class12 aClass12_95 = new Class12(false, 30);
+    public static NodeCache aClass12_95 = new NodeCache(false, 30);
     public int anInt96;
 
 }

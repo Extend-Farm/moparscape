@@ -6,11 +6,11 @@ import java.io.*;
 import java.net.Socket;
 import sign.SignLink;
 
-public final class Class24
+public final class BufferedConnection
     implements Runnable
 {
 
-    public Class24(GameShell applet_sub1, int i, Socket socket)
+    public BufferedConnection(GameShell applet_sub1, int i, Socket socket)
         throws IOException
     {
         anInt416 = -53;

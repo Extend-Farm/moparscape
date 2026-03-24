@@ -614,8 +614,8 @@ final class Class8
     public int anInt155;
     private int anIntArray156[];
     public int anInt157;
-    static Class12 aClass12_158 = new Class12(false, 100);
-    public static Class12 aClass12_159 = new Class12(false, 50);
+    static NodeCache aClass12_158 = new NodeCache(false, 100);
+    public static NodeCache aClass12_159 = new NodeCache(false, 50);
     private int anIntArray160[];
     public boolean aBoolean161;
     public int anInt162;

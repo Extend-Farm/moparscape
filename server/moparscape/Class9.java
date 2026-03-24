@@ -23,7 +23,7 @@ public class Class9
 
     public static void method205(Archive class44, Class30_Sub2_Sub1_Sub4 aclass30_sub2_sub1_sub4[], byte byte0, Archive class44_1)
     {
-        aClass12_238 = new Class12(false, 50000);
+        aClass12_238 = new NodeCache(false, 50000);
         PacketBuffer class30_sub2_sub2 = new PacketBuffer(class44.method571("data", null), 891);
         int i = -1;
         int j = class30_sub2_sub2.method410();
@@ -271,7 +271,7 @@ public class Class9
 
     private static Class30_Sub2_Sub1_Sub1 method207(int i, boolean flag, Archive class44, String s)
     {
-        long l = (Class50.method585((byte)1, s) << 8) + (long)i;
+        long l = (TextUtils.method585((byte)1, s) << 8) + (long)i;
         if(flag)
             throw new NullPointerException();
         Class30_Sub2_Sub1_Sub1 class30_sub2_sub1_sub1 = (Class30_Sub2_Sub1_Sub1)aClass12_238.method222(l);
@@ -360,7 +360,7 @@ public class Class9
     public boolean aBoolean235;
     public int anInt236;
     public int anInt237;
-    private static Class12 aClass12_238;
+    private static NodeCache aClass12_238;
     public int anInt239;
     public int anIntArray240[];
     public int anIntArray241[];
@@ -386,7 +386,7 @@ public class Class9
     public int anInt261;
     public int anInt262;
     public int anInt263;
-    static Class12 aClass12_264 = new Class12(false, 30);
+    static NodeCache aClass12_264 = new NodeCache(false, 30);
     public int anInt265;
     public boolean aBoolean266;
     public int anInt267;

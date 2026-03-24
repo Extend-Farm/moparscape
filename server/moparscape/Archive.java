@@ -30,7 +30,7 @@ public final class Archive
         if(j != i)
         {
             byte abyte1[] = new byte[i];
-            Class13.method225(abyte1, i, abyte0, j, 6);
+            BZip2Decompressor.method225(abyte1, i, abyte0, j, 6);
             aByteArray726 = abyte1;
             class30_sub2_sub2 = new PacketBuffer(aByteArray726, 891);
             aBoolean732 = true;
@@ -72,7 +72,7 @@ public final class Archive
                     abyte0 = new byte[anIntArray729[k]];
                 if(!aBoolean732)
                 {
-                    Class13.method225(abyte0, anIntArray729[k], aByteArray726, anIntArray730[k], anIntArray731[k]);
+                    BZip2Decompressor.method225(abyte0, anIntArray729[k], aByteArray726, anIntArray730[k], anIntArray731[k]);
                 } else
                 {
                     for(int l = 0; l < anIntArray729[k]; l++)

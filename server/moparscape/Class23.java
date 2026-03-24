@@ -110,6 +110,6 @@ public class Class23
     public int anInt412;
     public int anInt413;
     public int anInt414;
-    public static Class12 aClass12_415 = new Class12(false, 30);
+    public static NodeCache aClass12_415 = new NodeCache(false, 30);
 
 }
