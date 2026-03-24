@@ -91,4 +91,52 @@ final class MenuActionExecutor {
         core.beginPrivateMessagePrompt(targetNameHash);
         return true;
     }
+
+    static int handlePlayerNameAction(GameClientCore core, int actionOpcode, String actionText, int actionValue, Player[] players, int[] trackedPlayerIndexes, int trackedPlayerCount, PacketBuffer outboundBuffer, int antiSpamCounter, boolean feedbackEnabled)
+    {
+        String targetName = extractTargetName(actionText);
+        if(targetName == null)
+            return antiSpamCounter;
+        boolean found = false;
+        for(int index = 0; index < trackedPlayerCount; index++)
+        {
+            int trackedIndex = trackedPlayerIndexes[index];
+            Player targetPlayer = players[trackedIndex];
+            if(targetPlayer == null || targetPlayer.aString1703 == null || !targetPlayer.aString1703.equalsIgnoreCase(targetName))
+                continue;
+            core.routeToActor(targetPlayer);
+            core.markMenuInteractionCursor();
+            if(actionOpcode == 484)
+            {
+                outboundBuffer.method397((byte)6, 139);
+                outboundBuffer.method431(true, trackedIndex);
+            }
+            if(actionOpcode == 6)
+            {
+                antiSpamCounter += actionValue;
+                if(antiSpamCounter >= 90)
+                {
+                    outboundBuffer.method397((byte)6, 136);
+                    antiSpamCounter = 0;
+                }
+                outboundBuffer.method397((byte)6, 128);
+                outboundBuffer.method399(trackedIndex);
+            }
+            found = true;
+            break;
+        }
+
+        if(!found)
+            core.method77("Unable to find " + targetName, 0, "", feedbackEnabled);
+        return antiSpamCounter;
+    }
+
+    private static String extractTargetName(String actionText)
+    {
+        int nameStart = actionText.indexOf("@whi@");
+        if(nameStart == -1)
+            return null;
+        String rawName = actionText.substring(nameStart + 5).trim();
+        return TextUtils.method587(-45804, TextUtils.method584(TextUtils.method583(rawName), (byte)-99));
+    }
 }

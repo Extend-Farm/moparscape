@@ -3623,44 +3623,7 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
             MenuActionExecutor.applyDragSelection(this, k, j);
         }
         if(l == 484 || l == 6)
-        {
-            String s1 = aStringArray1199[i];
-            int l1 = s1.indexOf("@whi@");
-            if(l1 != -1)
-            {
-                s1 = s1.substring(l1 + 5).trim();
-                String s7 = TextUtils.method587(-45804, TextUtils.method584(TextUtils.method583(s1), (byte)-99));
-                boolean flag9 = false;
-                for(int j3 = 0; j3 < anInt891; j3++)
-                {
-                    Player class30_sub2_sub4_sub1_sub2_7 = aClass30_Sub2_Sub4_Sub1_Sub2Array890[anIntArray892[j3]];
-                    if(class30_sub2_sub4_sub1_sub2_7 == null || class30_sub2_sub4_sub1_sub2_7.aString1703 == null || !class30_sub2_sub4_sub1_sub2_7.aString1703.equalsIgnoreCase(s7))
-                        continue;
-                    method85(2, 0, 1, -11308, 0, ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1501[0], 1, 0, ((Actor) (class30_sub2_sub4_sub1_sub2_7)).anIntArray1501[0], ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1500[0], false, ((Actor) (class30_sub2_sub4_sub1_sub2_7)).anIntArray1500[0]);
-                    if(l == 484)
-                    {
-                        aClass30_Sub2_Sub2_1192.method397((byte)6, 139);
-                        aClass30_Sub2_Sub2_1192.method431(true, anIntArray892[j3]);
-                    }
-                    if(l == 6)
-                    {
-                        anInt1188 += i1;
-                        if(anInt1188 >= 90)
-                        {
-                            aClass30_Sub2_Sub2_1192.method397((byte)6, 136);
-                            anInt1188 = 0;
-                        }
-                        aClass30_Sub2_Sub2_1192.method397((byte)6, 128);
-                        aClass30_Sub2_Sub2_1192.method399(anIntArray892[j3]);
-                    }
-                    flag9 = true;
-                    break;
-                }
-
-                if(!flag9)
-                    method77("Unable to find " + s7, 0, "", aBoolean991);
-            }
-        }
+            anInt1188 = MenuActionExecutor.handlePlayerNameAction(this, l, aStringArray1199[i], i1, aClass30_Sub2_Sub4_Sub1_Sub2Array890, anIntArray892, anInt891, aClass30_Sub2_Sub2_1192, anInt1188, aBoolean991);
         if(l == 870)
         {
             aClass30_Sub2_Sub2_1192.method397((byte)6, 53);
@@ -9468,11 +9431,12 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
             if(anInt1008 == 166)
             {
                 aBoolean1160 = true;
-                anInt1098 = aClass30_Sub2_Sub2_1083.method408();
-                anInt1099 = aClass30_Sub2_Sub2_1083.method408();
-                anInt1100 = aClass30_Sub2_Sub2_1083.method410();
-                anInt1101 = aClass30_Sub2_Sub2_1083.method408();
-                anInt1102 = aClass30_Sub2_Sub2_1083.method408();
+                int cameraLock[] = CameraPacketHandler.readCameraLock(aClass30_Sub2_Sub2_1083);
+                anInt1098 = cameraLock[0];
+                anInt1099 = cameraLock[1];
+                anInt1100 = cameraLock[2];
+                anInt1101 = cameraLock[3];
+                anInt1102 = cameraLock[4];
                 if(anInt1102 >= 100)
                 {
                     anInt858 = anInt1098 * 128 + 64;
@@ -9503,7 +9467,7 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
             if(anInt1008 == 74)
             {
                 int songId = IncomingPacketDispatcher.readSongId(aClass30_Sub2_Sub2_1083);
-                if(songId != anInt956 && aBoolean1151 && !aBoolean960 && anInt1259 == 0)
+                if(SystemAudioPacketHandler.shouldQueueSong(songId, anInt956, aBoolean1151, aBoolean960, anInt1259))
                 {
                     anInt1227 = songId;
                     aBoolean1228 = true;
@@ -9518,7 +9482,7 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
                 int songDelayUpdate[] = IncomingPacketDispatcher.readSongDelayUpdate(aClass30_Sub2_Sub2_1083);
                 int songId = songDelayUpdate[0];
                 int songDelay = songDelayUpdate[1];
-                if(aBoolean1151 && !aBoolean960)
+                if(SystemAudioPacketHandler.shouldQueueDelayedSong(aBoolean1151, aBoolean960))
                 {
                     anInt1227 = songId;
                     aBoolean1228 = false;
@@ -9617,37 +9581,8 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
                 }
                 if(anInt1008 == 241)
                 {
-                    int l16 = 0;
                     int ai[] = new int[676];
-                    for(int i24 = 0; i24 < 4; i24++)
-                    {
-                        for(int k26 = 0; k26 < 13; k26++)
-                        {
-                            for(int l28 = 0; l28 < 13; l28++)
-                            {
-                                int k30 = anIntArrayArrayArray1129[i24][k26][l28];
-                                if(k30 != -1)
-                                {
-                                    int k31 = k30 >> 14 & 0x3ff;
-                                    int i32 = k30 >> 3 & 0x7ff;
-                                    int k32 = (k31 / 8 << 8) + i32 / 8;
-                                    for(int j33 = 0; j33 < l16; j33++)
-                                    {
-                                        if(ai[j33] != k32)
-                                            continue;
-                                        k32 = -1;
-                                        break;
-                                    }
-
-                                    if(k32 != -1)
-                                        ai[l16++] = k32;
-                                }
-                            }
-
-                        }
-
-                    }
-
+                    int l16 = RegionPacketHandler.collectDynamicRegionIds(anIntArrayArrayArray1129, ai);
                     aByteArrayArray1183 = new byte[l16][];
                     aByteArrayArray1247 = new byte[l16][];
                     anIntArray1234 = new int[l16];
