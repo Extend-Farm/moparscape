@@ -3,10 +3,10 @@
 // Decompiler options: packimports(3) 
 
 
-final class Class30_Sub1 extends Node
+final class SceneObjectSpawnRequest extends Node
 {
 
-    Class30_Sub1()
+    SceneObjectSpawnRequest()
     {
         anInt1294 = -1;
     }

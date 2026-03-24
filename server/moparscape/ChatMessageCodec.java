@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-public final class Class35
+public final class ChatMessageCodec
 {
 
     public static String method525(int i, boolean flag, PacketBuffer class30_sub2_sub2)

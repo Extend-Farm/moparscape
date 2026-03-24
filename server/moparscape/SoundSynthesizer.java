@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-public class Class6
+public class SoundSynthesizer
 {
 
     public static final void method166()
@@ -141,12 +141,12 @@ public class Class6
                     l7 = i - i5;
                 for(; j7 < l7; j7++)
                 {
-                    int j8 = (int)((long)anIntArray115[j7 + i5] * (long)Class39.anInt672 >> 16);
+                    int j8 = (int)((long)anIntArray115[j7 + i5] * (long)SoundFilter.anInt672 >> 16);
                     for(int k8 = 0; k8 < i5; k8++)
-                        j8 += (int)((long)anIntArray115[(j7 + i5) - 1 - k8] * (long)Class39.anIntArrayArray670[0][k8] >> 16);
+                        j8 += (int)((long)anIntArray115[(j7 + i5) - 1 - k8] * (long)SoundFilter.anIntArrayArray670[0][k8] >> 16);
 
                     for(int j9 = 0; j9 < j7; j9++)
-                        j8 -= (int)((long)anIntArray115[j7 - 1 - j9] * (long)Class39.anIntArrayArray670[1][j9] >> 16);
+                        j8 -= (int)((long)anIntArray115[j7 - 1 - j9] * (long)SoundFilter.anIntArrayArray670[1][j9] >> 16);
 
                     anIntArray115[j7] = j8;
                     k3 = aClass29_112.method328(true, i + 1);
@@ -160,12 +160,12 @@ public class Class6
                         l7 = i - i5;
                     for(; j7 < l7; j7++)
                     {
-                        int l8 = (int)((long)anIntArray115[j7 + i5] * (long)Class39.anInt672 >> 16);
+                        int l8 = (int)((long)anIntArray115[j7 + i5] * (long)SoundFilter.anInt672 >> 16);
                         for(int k9 = 0; k9 < i5; k9++)
-                            l8 += (int)((long)anIntArray115[(j7 + i5) - 1 - k9] * (long)Class39.anIntArrayArray670[0][k9] >> 16);
+                            l8 += (int)((long)anIntArray115[(j7 + i5) - 1 - k9] * (long)SoundFilter.anIntArrayArray670[0][k9] >> 16);
 
                         for(int i10 = 0; i10 < i6; i10++)
-                            l8 -= (int)((long)anIntArray115[j7 - 1 - i10] * (long)Class39.anIntArrayArray670[1][i10] >> 16);
+                            l8 -= (int)((long)anIntArray115[j7 - 1 - i10] * (long)SoundFilter.anIntArrayArray670[1][i10] >> 16);
 
                         anIntArray115[j7] = l8;
                         k3 = aClass29_112.method328(true, i + 1);
@@ -181,10 +181,10 @@ public class Class6
                 {
                     int i9 = 0;
                     for(int l9 = (j7 + i5) - i; l9 < i5; l9++)
-                        i9 += (int)((long)anIntArray115[(j7 + i5) - 1 - l9] * (long)Class39.anIntArrayArray670[0][l9] >> 16);
+                        i9 += (int)((long)anIntArray115[(j7 + i5) - 1 - l9] * (long)SoundFilter.anIntArrayArray670[0][l9] >> 16);
 
                     for(int j10 = 0; j10 < i6; j10++)
-                        i9 -= (int)((long)anIntArray115[j7 - 1 - j10] * (long)Class39.anIntArrayArray670[1][j10] >> 16);
+                        i9 -= (int)((long)anIntArray115[j7 - 1 - j10] * (long)SoundFilter.anIntArrayArray670[1][j10] >> 16);
 
                     anIntArray115[j7] = i9;
                     int l3 = aClass29_112.method328(true, i + 1);
@@ -224,9 +224,9 @@ public class Class6
 
     public final void method169(boolean flag, PacketBuffer class30_sub2_sub2)
     {
-        aClass29_98 = new Class29();
+        aClass29_98 = new SoundEnvelope();
         aClass29_98.method325(true, class30_sub2_sub2);
-        aClass29_99 = new Class29();
+        aClass29_99 = new SoundEnvelope();
         if(!flag)
             throw new NullPointerException();
         aClass29_99.method325(true, class30_sub2_sub2);
@@ -234,27 +234,27 @@ public class Class6
         if(i != 0)
         {
             class30_sub2_sub2.anInt1406--;
-            aClass29_100 = new Class29();
+            aClass29_100 = new SoundEnvelope();
             aClass29_100.method325(true, class30_sub2_sub2);
-            aClass29_101 = new Class29();
+            aClass29_101 = new SoundEnvelope();
             aClass29_101.method325(true, class30_sub2_sub2);
         }
         i = class30_sub2_sub2.method408();
         if(i != 0)
         {
             class30_sub2_sub2.anInt1406--;
-            aClass29_102 = new Class29();
+            aClass29_102 = new SoundEnvelope();
             aClass29_102.method325(true, class30_sub2_sub2);
-            aClass29_103 = new Class29();
+            aClass29_103 = new SoundEnvelope();
             aClass29_103.method325(true, class30_sub2_sub2);
         }
         i = class30_sub2_sub2.method408();
         if(i != 0)
         {
             class30_sub2_sub2.anInt1406--;
-            aClass29_104 = new Class29();
+            aClass29_104 = new SoundEnvelope();
             aClass29_104.method325(true, class30_sub2_sub2);
-            aClass29_105 = new Class29();
+            aClass29_105 = new SoundEnvelope();
             aClass29_105.method325(true, class30_sub2_sub2);
         }
         for(int j = 0; j < 10; j++)
@@ -271,12 +271,12 @@ public class Class6
         anInt110 = class30_sub2_sub2.method422();
         anInt113 = class30_sub2_sub2.method410();
         anInt114 = class30_sub2_sub2.method410();
-        aClass39_111 = new Class39();
-        aClass29_112 = new Class29();
+        aClass39_111 = new SoundFilter();
+        aClass29_112 = new SoundEnvelope();
         aClass39_111.method545(class30_sub2_sub2, false, aClass29_112);
     }
 
-    public Class6()
+    public SoundSynthesizer()
     {
         aBoolean97 = true;
         anIntArray106 = new int[5];
@@ -287,21 +287,21 @@ public class Class6
     }
 
     private boolean aBoolean97;
-    private Class29 aClass29_98;
-    private Class29 aClass29_99;
-    private Class29 aClass29_100;
-    private Class29 aClass29_101;
-    private Class29 aClass29_102;
-    private Class29 aClass29_103;
-    private Class29 aClass29_104;
-    private Class29 aClass29_105;
+    private SoundEnvelope aClass29_98;
+    private SoundEnvelope aClass29_99;
+    private SoundEnvelope aClass29_100;
+    private SoundEnvelope aClass29_101;
+    private SoundEnvelope aClass29_102;
+    private SoundEnvelope aClass29_103;
+    private SoundEnvelope aClass29_104;
+    private SoundEnvelope aClass29_105;
     private int anIntArray106[];
     private int anIntArray107[];
     private int anIntArray108[];
     private int anInt109;
     private int anInt110;
-    private Class39 aClass39_111;
-    private Class29 aClass29_112;
+    private SoundFilter aClass39_111;
+    private SoundEnvelope aClass29_112;
     int anInt113;
     int anInt114;
     private static int anIntArray115[];

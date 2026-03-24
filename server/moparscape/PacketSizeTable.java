@@ -3,7 +3,7 @@
 // Decompiler options: packimports(3) 
 
 
-public class Class31
+public class PacketSizeTable
 {
 
     public static final int anIntArray552[] = {

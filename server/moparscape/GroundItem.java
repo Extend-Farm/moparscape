@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-final class Class30_Sub2_Sub4_Sub2 extends Renderable
+final class GroundItem extends Renderable
 {
 
     public final Model method444(int i)
@@ -16,7 +16,7 @@ final class Class30_Sub2_Sub4_Sub2 extends Renderable
             return class8.method201(anInt1559);
     }
 
-    Class30_Sub2_Sub4_Sub2()
+    GroundItem()
     {
     }
 

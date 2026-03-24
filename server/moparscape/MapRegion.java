@@ -898,7 +898,7 @@ final class MapRegion {
                 int n14 = 0;
                 while (n14 < 64) {
                     if (n12 == n && n13 >= n5 && n13 < n5 + 8 && n14 >= n6 && n14 < n6 + 8) {
-                        this.method181(n8 + Class4.method156((int)(n14 & 7), (int)n2, (int)-383, (int)(n13 & 7)), 0, class30_Sub2_Sub2, n4 + Class4.method155((int)n2, (int)(n14 & 7), (int)(n13 & 7), (boolean)false), n7, n2, 942, 0);
+                        this.method181(n8 + TileRotationUtils.method156((int)(n14 & 7), (int)n2, (int)-383, (int)(n13 & 7)), 0, class30_Sub2_Sub2, n4 + TileRotationUtils.method155((int)n2, (int)(n14 & 7), (int)(n13 & 7), (boolean)false), n7, n2, 942, 0);
                     } else {
                         this.method181(-1, 0, class30_Sub2_Sub2, -1, 0, 0, 942, 0);
                     }
@@ -1031,8 +1031,8 @@ final class MapRegion {
                 int n17 = n15 & 3;
                 if (n14 != n || n13 < n5 || n13 >= n5 + 8 || n12 < n3 || n12 >= n3 + 8) continue;
                 ObjectDefinition class46 = ObjectDefinition.method572((int)n9);
-                int n18 = n2 + Class4.method157((int)n6, (int)class46.anInt761, (int)(n13 & 7), (byte)113, (int)(n12 & 7), (int)class46.anInt744);
-                int n19 = n7 + Class4.method158((int)-433, (int)(n12 & 7), (int)class46.anInt761, (int)n6, (int)class46.anInt744, (int)(n13 & 7));
+                int n18 = n2 + TileRotationUtils.method157((int)n6, (int)class46.anInt761, (int)(n13 & 7), (byte)113, (int)(n12 & 7), (int)class46.anInt744);
+                int n19 = n7 + TileRotationUtils.method158((int)-433, (int)(n12 & 7), (int)class46.anInt761, (int)n6, (int)class46.anInt744, (int)(n13 & 7));
                 if (n18 <= 0 || n19 <= 0 || n18 >= 103 || n19 >= 103) continue;
                 int n20 = n14;
                 if ((this.aByteArrayArrayArray149[1][n18][n19] & 2) == 2) {

@@ -3,10 +3,10 @@
 // Decompiler options: packimports(3) 
 
 
-public class Class27
+public class UnusedClientFlagsCandidate
 {
 
-    public Class27()
+    public UnusedClientFlagsCandidate()
     {
         anInt509 = 1;
         aBoolean510 = true;
@@ -18,7 +18,7 @@ public class Class27
         aBoolean516 = false;
     }
 
-    public static Class27 aClass27Array507[];
+    public static UnusedClientFlagsCandidate aClass27Array507[];
     public static int anInt508 = -1;
     public int anInt509;
     public boolean aBoolean510;

@@ -111,6 +111,20 @@ This project is now a Gradle multi-module build.
 - `Class9` -> `Widget`
 - `Class48` -> `MouseRecorder`
 
+### Phase 9 (remaining classes and candidate naming)
+
+- `Class4` -> `TileRotationUtils`
+- `Class6` -> `SoundSynthesizer`
+- `Class16` -> `SoundEffect`
+- `Class29` -> `SoundEnvelope`
+- `Class31` -> `PacketSizeTable`
+- `Class34` -> `ChatCensor`
+- `Class35` -> `ChatMessageCodec`
+- `Class39` -> `SoundFilter`
+- `Class30_Sub1` -> `SceneObjectSpawnRequest`
+- `Class30_Sub2_Sub4_Sub2` -> `GroundItem`
+- `Class27` -> `UnusedClientFlagsCandidate` (low-confidence placeholder by design)
+
 ## Next steps
 
 - Continue phased renaming of remaining `Class1`..`Class50` files.

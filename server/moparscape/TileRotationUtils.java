@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-public class Class4
+public class TileRotationUtils
 {
 
     public static int method155(int i, int j, int k, boolean flag)

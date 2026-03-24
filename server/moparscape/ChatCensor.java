@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-public final class Class34
+public final class ChatCensor
 {
 
     public static final void method487(Archive class44)

@@ -4,13 +4,13 @@
 
 import sign.SignLink;
 
-public class Class16
+public class SoundEffect
 {
 
-    private Class16(int i)
+    private SoundEffect(int i)
     {
         aBoolean321 = true;
-        aClass6Array329 = new Class6[10];
+        aClass6Array329 = new SoundSynthesizer[10];
         if(i < 8 || i > 8)
             anInt324 = 477;
     }
@@ -21,13 +21,13 @@ public class Class16
         aClass30_Sub2_Sub2_328 = new PacketBuffer(aByteArray327, 891);
         if(i != 0)
             aBoolean322 = !aBoolean322;
-        Class6.method166();
+        SoundSynthesizer.method166();
         do
         {
             int j = class30_sub2_sub2.method410();
             if(j == 65535)
                 return;
-            aClass16Array325[j] = new Class16(8);
+            aClass16Array325[j] = new SoundEffect(8);
             aClass16Array325[j].method242(true, class30_sub2_sub2);
             anIntArray326[j] = aClass16Array325[j].method243(0);
         } while(true);
@@ -39,7 +39,7 @@ public class Class16
             aBoolean323 = !aBoolean323;
         if(aClass16Array325[j] != null)
         {
-            Class16 class16 = aClass16Array325[j];
+            SoundEffect class16 = aClass16Array325[j];
             return class16.method244(i, 6);
         } else
         {
@@ -55,7 +55,7 @@ public class Class16
             if(j != 0)
             {
                 class30_sub2_sub2.anInt1406--;
-                aClass6Array329[i] = new Class6();
+                aClass6Array329[i] = new SoundSynthesizer();
                 aClass6Array329[i].method169(true, class30_sub2_sub2);
             }
         }
@@ -171,11 +171,11 @@ public class Class16
     private static boolean aBoolean322;
     private static boolean aBoolean323 = true;
     private int anInt324;
-    private static Class16 aClass16Array325[] = new Class16[5000];
+    private static SoundEffect aClass16Array325[] = new SoundEffect[5000];
     public static int anIntArray326[] = new int[5000];
     private static byte aByteArray327[];
     private static PacketBuffer aClass30_Sub2_Sub2_328;
-    private Class6 aClass6Array329[];
+    private SoundSynthesizer aClass6Array329[];
     private int anInt330;
     private int anInt331;
 

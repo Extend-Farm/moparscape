@@ -95,6 +95,19 @@ The following high-impact renames are already completed:
   - `Class9` -> `Widget`
   - `Class48` -> `MouseRecorder`
 
+- Remaining classes and candidate naming:
+  - `Class4` -> `TileRotationUtils`
+  - `Class6` -> `SoundSynthesizer`
+  - `Class16` -> `SoundEffect`
+  - `Class29` -> `SoundEnvelope`
+  - `Class31` -> `PacketSizeTable`
+  - `Class34` -> `ChatCensor`
+  - `Class35` -> `ChatMessageCodec`
+  - `Class39` -> `SoundFilter`
+  - `Class30_Sub1` -> `SceneObjectSpawnRequest`
+  - `Class30_Sub2_Sub4_Sub2` -> `GroundItem`
+  - `Class27` -> `UnusedClientFlagsCandidate` (intentional low-confidence placeholder)
+
 ## Notes
 
 - Remaining obfuscated class names are intentionally being renamed in small batches.

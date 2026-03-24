@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-public class Class39
+public class SoundFilter
 {
 
     private float method541(int i, int j, float f, boolean flag)
@@ -82,7 +82,7 @@ public class Class39
         return anIntArray665[i] * 2;
     }
 
-    public final void method545(PacketBuffer class30_sub2_sub2, boolean flag, Class29 class29)
+    public final void method545(PacketBuffer class30_sub2_sub2, boolean flag, SoundEnvelope class29)
     {
         int i = class30_sub2_sub2.method408();
         anIntArray665[0] = i >> 4;
@@ -129,7 +129,7 @@ public class Class39
         }
     }
 
-    public Class39()
+    public SoundFilter()
     {
         anInt663 = 748;
         anInt664 = 201;

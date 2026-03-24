@@ -4,7 +4,7 @@
 
 import sign.SignLink;
 
-public class Class29
+public class SoundEnvelope
 {
 
     public final void method325(boolean flag, PacketBuffer class30_sub2_sub2)
@@ -68,7 +68,7 @@ public class Class29
         return anInt544 - anInt543 >> 15;
     }
 
-    public Class29()
+    public SoundEnvelope()
     {
         aBoolean531 = false;
         aByte532 = -112;

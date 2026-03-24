@@ -769,7 +769,7 @@ public final class GameClient extends GameShell
         }
         int k = 0xfa0a1f01;
         Object obj = null;
-        for(Class30_Sub2_Sub4_Sub2 class30_sub2_sub4_sub2 = (Class30_Sub2_Sub4_Sub2)class19.method252(); class30_sub2_sub4_sub2 != null; class30_sub2_sub4_sub2 = (Class30_Sub2_Sub4_Sub2)class19.method254(false))
+        for(GroundItem class30_sub2_sub4_sub2 = (GroundItem)class19.method252(); class30_sub2_sub4_sub2 != null; class30_sub2_sub4_sub2 = (GroundItem)class19.method254(false))
         {
             ItemDefinition class8 = ItemDefinition.method198(class30_sub2_sub4_sub2.anInt1558);
             int l = class8.anInt155;
@@ -785,11 +785,11 @@ public final class GameClient extends GameShell
         class19.method250(-493, ((Node) (obj)));
         Object obj1 = null;
         Object obj2 = null;
-        for(Class30_Sub2_Sub4_Sub2 class30_sub2_sub4_sub2_1 = (Class30_Sub2_Sub4_Sub2)class19.method252(); class30_sub2_sub4_sub2_1 != null; class30_sub2_sub4_sub2_1 = (Class30_Sub2_Sub4_Sub2)class19.method254(false))
+        for(GroundItem class30_sub2_sub4_sub2_1 = (GroundItem)class19.method252(); class30_sub2_sub4_sub2_1 != null; class30_sub2_sub4_sub2_1 = (GroundItem)class19.method254(false))
         {
-            if(class30_sub2_sub4_sub2_1.anInt1558 != ((Class30_Sub2_Sub4_Sub2) (obj)).anInt1558 && obj1 == null)
+            if(class30_sub2_sub4_sub2_1.anInt1558 != ((GroundItem) (obj)).anInt1558 && obj1 == null)
                 obj1 = class30_sub2_sub4_sub2_1;
-            if(class30_sub2_sub4_sub2_1.anInt1558 != ((Class30_Sub2_Sub4_Sub2) (obj)).anInt1558 && class30_sub2_sub4_sub2_1.anInt1558 != ((Class30_Sub2_Sub4_Sub2) (obj1)).anInt1558 && obj2 == null)
+            if(class30_sub2_sub4_sub2_1.anInt1558 != ((GroundItem) (obj)).anInt1558 && class30_sub2_sub4_sub2_1.anInt1558 != ((GroundItem) (obj1)).anInt1558 && obj2 == null)
                 obj2 = class30_sub2_sub4_sub2_1;
         }
 
@@ -3190,12 +3190,12 @@ public final class GameClient extends GameShell
 
     private final void method63(int i)
     {
-        Class30_Sub1 class30_sub1 = (Class30_Sub1)aClass19_1179.method252();
+        SceneObjectSpawnRequest class30_sub1 = (SceneObjectSpawnRequest)aClass19_1179.method252();
         while(i >= 0) 
         {
             for(int j = 1; j > 0; j++);
         }
-        for(; class30_sub1 != null; class30_sub1 = (Class30_Sub1)aClass19_1179.method254(false))
+        for(; class30_sub1 != null; class30_sub1 = (SceneObjectSpawnRequest)aClass19_1179.method254(false))
             if(class30_sub1.anInt1294 == -1)
             {
                 class30_sub1.anInt1302 = 0;
@@ -4577,7 +4577,7 @@ public final class GameClient extends GameShell
                 Deque class19 = aClass19ArrayArrayArray827[anInt918][i1][j1];
                 if(class19 != null)
                 {
-                    for(Class30_Sub2_Sub4_Sub2 class30_sub2_sub4_sub2 = (Class30_Sub2_Sub4_Sub2)class19.method253(5); class30_sub2_sub4_sub2 != null; class30_sub2_sub4_sub2 = (Class30_Sub2_Sub4_Sub2)class19.method255(8))
+                    for(GroundItem class30_sub2_sub4_sub2 = (GroundItem)class19.method253(5); class30_sub2_sub4_sub2 != null; class30_sub2_sub4_sub2 = (GroundItem)class19.method255(8))
                     {
                         ItemDefinition class8 = ItemDefinition.method198(class30_sub2_sub4_sub2.anInt1558);
                         if(anInt1282 == 1)
@@ -4768,7 +4768,7 @@ public final class GameClient extends GameShell
         FloorDefinition.aClass22Array388 = null;
         IdentityKitDefinition.aClass38Array656 = null;
         Widget.aClass9Array210 = null;
-        Class27.aClass27Array507 = null;
+        UnusedClientFlagsCandidate.aClass27Array507 = null;
         SequenceDefinition.aClass20Array351 = null;
         SpotAnimationDefinition.aClass23Array403 = null;
         SpotAnimationDefinition.aClass12_415 = null;
@@ -4859,10 +4859,10 @@ public final class GameClient extends GameShell
                         aClass30_Sub2_Sub2_1192.method398(0);
                         int k = aClass30_Sub2_Sub2_1192.anInt1406;
                         aClass30_Sub2_Sub2_1192.method404(5, aLong953);
-                        Class35.method526(aString1212, aBoolean1277, aClass30_Sub2_Sub2_1192);
+                        ChatMessageCodec.method526(aString1212, aBoolean1277, aClass30_Sub2_Sub2_1192);
                         aClass30_Sub2_Sub2_1192.method407(aClass30_Sub2_Sub2_1192.anInt1406 - k, (byte)0);
-                        aString1212 = Class35.method527(aString1212, 0);
-                        aString1212 = Class34.method497(aString1212, 0);
+                        aString1212 = ChatMessageCodec.method527(aString1212, 0);
+                        aString1212 = ChatCensor.method497(aString1212, 0);
                         method77(aString1212, 6, TextUtils.method587(-45804, TextUtils.method584(aLong953, (byte)-99)), aBoolean991);
                         if(anInt845 == 2)
                         {
@@ -5085,11 +5085,11 @@ public final class GameClient extends GameShell
                         aClass30_Sub2_Sub2_1192.method425(301, i3);
                         aClass30_Sub2_Sub2_1192.method425(301, j2);
                         aClass30_Sub2_Sub2_834.anInt1406 = 0;
-                        Class35.method526(aString887, aBoolean1277, aClass30_Sub2_Sub2_834);
+                        ChatMessageCodec.method526(aString887, aBoolean1277, aClass30_Sub2_Sub2_834);
                         aClass30_Sub2_Sub2_1192.method441(0, aByte1217, aClass30_Sub2_Sub2_834.aByteArray1405, aClass30_Sub2_Sub2_834.anInt1406);
                         aClass30_Sub2_Sub2_1192.method407(aClass30_Sub2_Sub2_1192.anInt1406 - j3, (byte)0);
-                        aString887 = Class35.method527(aString887, 0);
-                        aString887 = Class34.method497(aString887, 0);
+                        aString887 = ChatMessageCodec.method527(aString887, 0);
+                        aString887 = ChatCensor.method497(aString887, 0);
                         aClass30_Sub2_Sub4_Sub1_Sub2_1126.aString1506 = aString887;
                         aClass30_Sub2_Sub4_Sub1_Sub2_1126.anInt1513 = j2;
                         aClass30_Sub2_Sub4_Sub1_Sub2_1126.anInt1531 = i3;
@@ -6689,7 +6689,7 @@ public final class GameClient extends GameShell
 
     }
 
-    private final void method89(boolean flag, Class30_Sub1 class30_sub1)
+    private final void method89(boolean flag, SceneObjectSpawnRequest class30_sub1)
     {
         int i = 0;
         int j = -1;
@@ -6735,7 +6735,7 @@ public final class GameClient extends GameShell
                             flag1 = true;
                     } else
                     {
-                        PacketBuffer class30_sub2_sub2 = Class16.method241(anIntArray1241[i], anIntArray1207[i], false);
+                        PacketBuffer class30_sub2_sub2 = SoundEffect.method241(anIntArray1241[i], anIntArray1207[i], false);
                         if(System.currentTimeMillis() + (long)(class30_sub2_sub2.anInt1406 / 22) > aLong1172 + (long)(anInt1257 / 22))
                         {
                             anInt1257 = class30_sub2_sub2.anInt1406;
@@ -7106,7 +7106,7 @@ public final class GameClient extends GameShell
                 method13(90, (byte)4, "Unpacking sounds");
                 byte abyte0[] = class44_5.method571("sounds.dat", null);
                 PacketBuffer class30_sub2_sub2 = new PacketBuffer(abyte0, 891);
-                Class16.method240(0, class30_sub2_sub2);
+                SoundEffect.method240(0, class30_sub2_sub2);
             }
             method13(95, (byte)4, "Unpacking interfaces");
             FontRenderer aclass30_sub2_sub1_sub4[] = {
@@ -7174,7 +7174,7 @@ public final class GameClient extends GameShell
             }
 
             SceneGraph.method310(500, 800, 512, 334, ai, aBoolean1231);
-            Class34.method487(class44_4);
+            ChatCensor.method487(class44_4);
             aClass48_879 = new MouseRecorder(this, anInt1096);
             method12(aClass48_879, 10);
             DynamicObject.aClient1609 = this;
@@ -8432,8 +8432,8 @@ public final class GameClient extends GameShell
                         aClass30_Sub2_Sub2_834.anInt1406 = 0;
                         class30_sub2_sub2.method442(j3, 0, true, aClass30_Sub2_Sub2_834.aByteArray1405);
                         aClass30_Sub2_Sub2_834.anInt1406 = 0;
-                        String s = Class35.method525(j3, true, aClass30_Sub2_Sub2_834);
-                        s = Class34.method497(s, 0);
+                        String s = ChatMessageCodec.method525(j3, true, aClass30_Sub2_Sub2_834);
+                        s = ChatCensor.method497(s, 0);
                         class30_sub2_sub4_sub1_sub2.aString1506 = s;
                         class30_sub2_sub4_sub1_sub2.anInt1513 = i1 >> 8;
                         class30_sub2_sub4_sub1_sub2.anInt1531 = i1 & 0xff;
@@ -8797,7 +8797,7 @@ public final class GameClient extends GameShell
             aClass30_Sub2_Sub2_1192.method398(101);
         if(anInt1023 == 2)
         {
-            for(Class30_Sub1 class30_sub1 = (Class30_Sub1)aClass19_1179.method252(); class30_sub1 != null; class30_sub1 = (Class30_Sub1)aClass19_1179.method254(false))
+            for(SceneObjectSpawnRequest class30_sub1 = (SceneObjectSpawnRequest)aClass19_1179.method252(); class30_sub1 != null; class30_sub1 = (SceneObjectSpawnRequest)aClass19_1179.method254(false))
             {
                 if(class30_sub1.anInt1294 > 0)
                     class30_sub1.anInt1294--;
@@ -9547,8 +9547,8 @@ public final class GameClient extends GameShell
     private final void method130(int i, int j, int k, int l, int i1, int j1, int k1, 
             int l1, int i2, int j2)
     {
-        Class30_Sub1 class30_sub1 = null;
-        for(Class30_Sub1 class30_sub1_1 = (Class30_Sub1)aClass19_1179.method252(); class30_sub1_1 != null; class30_sub1_1 = (Class30_Sub1)aClass19_1179.method254(false))
+        SceneObjectSpawnRequest class30_sub1 = null;
+        for(SceneObjectSpawnRequest class30_sub1_1 = (SceneObjectSpawnRequest)aClass19_1179.method252(); class30_sub1_1 != null; class30_sub1_1 = (SceneObjectSpawnRequest)aClass19_1179.method254(false))
         {
             if(class30_sub1_1.anInt1295 != l1 || class30_sub1_1.anInt1297 != i2 || class30_sub1_1.anInt1298 != j1 || class30_sub1_1.anInt1296 != i1)
                 continue;
@@ -9558,7 +9558,7 @@ public final class GameClient extends GameShell
 
         if(class30_sub1 == null)
         {
-            class30_sub1 = new Class30_Sub1();
+            class30_sub1 = new SceneObjectSpawnRequest();
             class30_sub1.anInt1295 = l1;
             class30_sub1.anInt1296 = i1;
             class30_sub1.anInt1297 = i2;
@@ -9948,7 +9948,7 @@ public final class GameClient extends GameShell
                 Deque class19_1 = aClass19ArrayArrayArray827[anInt918][j3][i6];
                 if(class19_1 != null)
                 {
-                    for(Class30_Sub2_Sub4_Sub2 class30_sub2_sub4_sub2_3 = (Class30_Sub2_Sub4_Sub2)class19_1.method252(); class30_sub2_sub4_sub2_3 != null; class30_sub2_sub4_sub2_3 = (Class30_Sub2_Sub4_Sub2)class19_1.method254(false))
+                    for(GroundItem class30_sub2_sub4_sub2_3 = (GroundItem)class19_1.method252(); class30_sub2_sub4_sub2_3 != null; class30_sub2_sub4_sub2_3 = (GroundItem)class19_1.method254(false))
                     {
                         if(class30_sub2_sub4_sub2_3.anInt1558 != (l8 & 0x7fff) || class30_sub2_sub4_sub2_3.anInt1559 != k11)
                             continue;
@@ -9974,7 +9974,7 @@ public final class GameClient extends GameShell
             {
                 anIntArray1207[anInt1062] = i9;
                 anIntArray1241[anInt1062] = i16;
-                anIntArray1250[anInt1062] = Class16.anIntArray326[i9];
+                anIntArray1250[anInt1062] = SoundEffect.anIntArray326[i9];
                 anInt1062++;
             }
         }
@@ -9988,7 +9988,7 @@ public final class GameClient extends GameShell
             int j14 = class30_sub2_sub2.method410();
             if(k6 >= 0 && j9 >= 0 && k6 < 104 && j9 < 104 && i12 != anInt884)
             {
-                Class30_Sub2_Sub4_Sub2 class30_sub2_sub4_sub2_2 = new Class30_Sub2_Sub4_Sub2();
+                GroundItem class30_sub2_sub4_sub2_2 = new GroundItem();
                 class30_sub2_sub4_sub2_2.anInt1558 = i1;
                 class30_sub2_sub4_sub2_2.anInt1559 = j14;
                 if(aClass19ArrayArrayArray827[anInt918][k6][j9] == null)
@@ -10009,7 +10009,7 @@ public final class GameClient extends GameShell
                 Deque class19 = aClass19ArrayArrayArray827[anInt918][i4][l6];
                 if(class19 != null)
                 {
-                    for(Class30_Sub2_Sub4_Sub2 class30_sub2_sub4_sub2 = (Class30_Sub2_Sub4_Sub2)class19.method252(); class30_sub2_sub4_sub2 != null; class30_sub2_sub4_sub2 = (Class30_Sub2_Sub4_Sub2)class19.method254(false))
+                    for(GroundItem class30_sub2_sub4_sub2 = (GroundItem)class19.method252(); class30_sub2_sub4_sub2 != null; class30_sub2_sub4_sub2 = (GroundItem)class19.method254(false))
                     {
                         if(class30_sub2_sub4_sub2.anInt1558 != (k9 & 0x7fff))
                             continue;
@@ -10184,7 +10184,7 @@ public final class GameClient extends GameShell
             int i13 = anInt1269 + (i8 & 7);
             if(l10 >= 0 && i13 >= 0 && l10 < 104 && i13 < 104)
             {
-                Class30_Sub2_Sub4_Sub2 class30_sub2_sub4_sub2_1 = new Class30_Sub2_Sub4_Sub2();
+                GroundItem class30_sub2_sub4_sub2_1 = new GroundItem();
                 class30_sub2_sub4_sub2_1.anInt1558 = k2;
                 class30_sub2_sub4_sub2_1.anInt1559 = j5;
                 if(aClass19ArrayArrayArray827[anInt918][l10][i13] == null)
@@ -10607,7 +10607,7 @@ public final class GameClient extends GameShell
                 anInt1008 = aClass30_Sub2_Sub2_1083.aByteArray1405[0] & 0xff;
                 if(aClass17_1000 != null)
                     anInt1008 = anInt1008 - aClass17_1000.method246() & 0xff;
-                anInt1007 = Class31.anIntArray553[anInt1008];
+                anInt1007 = PacketSizeTable.anIntArray553[anInt1008];
                 i--;
             }
             if(anInt1007 == -1)
@@ -10689,7 +10689,7 @@ public final class GameClient extends GameShell
 
                 }
 
-                for(Class30_Sub1 class30_sub1 = (Class30_Sub1)aClass19_1179.method252(); class30_sub1 != null; class30_sub1 = (Class30_Sub1)aClass19_1179.method254(false))
+                for(SceneObjectSpawnRequest class30_sub1 = (SceneObjectSpawnRequest)aClass19_1179.method252(); class30_sub1 != null; class30_sub1 = (SceneObjectSpawnRequest)aClass19_1179.method254(false))
                     if(class30_sub1.anInt1297 >= anInt1268 && class30_sub1.anInt1297 < anInt1268 + 8 && class30_sub1.anInt1298 >= anInt1269 && class30_sub1.anInt1298 < anInt1269 + 8 && class30_sub1.anInt1295 == anInt918)
                         class30_sub1.anInt1294 = 0;
 
@@ -11048,7 +11048,7 @@ public final class GameClient extends GameShell
 
                 }
 
-                for(Class30_Sub1 class30_sub1_1 = (Class30_Sub1)aClass19_1179.method252(); class30_sub1_1 != null; class30_sub1_1 = (Class30_Sub1)aClass19_1179.method254(false))
+                for(SceneObjectSpawnRequest class30_sub1_1 = (SceneObjectSpawnRequest)aClass19_1179.method252(); class30_sub1_1 != null; class30_sub1_1 = (SceneObjectSpawnRequest)aClass19_1179.method254(false))
                 {
                     class30_sub1_1.anInt1297 -= i17;
                     class30_sub1_1.anInt1298 -= j21;
@@ -11130,7 +11130,7 @@ public final class GameClient extends GameShell
                 {
                     anIntArray1207[anInt1062] = i4;
                     anIntArray1241[anInt1062] = l11;
-                    anIntArray1250[anInt1062] = k17 + Class16.anIntArray326[i4];
+                    anIntArray1250[anInt1062] = k17 + SoundEffect.anIntArray326[i4];
                     anInt1062++;
                 }
                 anInt1008 = -1;
@@ -11415,9 +11415,9 @@ public final class GameClient extends GameShell
                     {
                         anIntArray1240[anInt1169] = j18;
                         anInt1169 = (anInt1169 + 1) % 100;
-                        String s9 = Class35.method525(anInt1007 - 13, true, aClass30_Sub2_Sub2_1083);
+                        String s9 = ChatMessageCodec.method525(anInt1007 - 13, true, aClass30_Sub2_Sub2_1083);
                         if(l21 != 3)
-                            s9 = Class34.method497(s9, 0);
+                            s9 = ChatCensor.method497(s9, 0);
                         if(l21 == 2 || l21 == 3)
                             method77(s9, 7, "@cr2@" + TextUtils.method587(-45804, TextUtils.method584(l5, (byte)-99)), aBoolean991);
                         else
