@@ -4,7 +4,6 @@ import io.github.ffakira.moparscape.cache.*;
 import io.github.ffakira.moparscape.client.lifecycle.ClientBootstrapLoader;
 import io.github.ffakira.moparscape.client.lifecycle.LoginProtocolHandler;
 import io.github.ffakira.moparscape.client.net.packet.CameraPacketHandler;
-import io.github.ffakira.moparscape.client.net.packet.RegionPacketHandler;
 import io.github.ffakira.moparscape.client.net.packet.SystemAudioPacketHandler;
 import io.github.ffakira.moparscape.net.*;
 import io.github.ffakira.moparscape.sign.SignLink;
@@ -9540,147 +9539,33 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
                 aClass15_1165.method238(4, 23680, super.aGraphics12, 4);
                 if(anInt1008 == 73)
                 {
-                    int k16 = 0;
-                    for(int i21 = (anInt1069 - 6) / 8; i21 <= (anInt1069 + 6) / 8; i21++)
-                    {
-                        for(int k23 = (anInt1070 - 6) / 8; k23 <= (anInt1070 + 6) / 8; k23++)
-                            k16++;
-
-                    }
-
+                    int k16 = ((anInt1069 + 6) / 8 - (anInt1069 - 6) / 8 + 1) * ((anInt1070 + 6) / 8 - (anInt1070 - 6) / 8 + 1);
                     aByteArrayArray1183 = new byte[k16][];
                     aByteArrayArray1247 = new byte[k16][];
                     anIntArray1234 = new int[k16];
                     anIntArray1235 = new int[k16];
                     anIntArray1236 = new int[k16];
-                    k16 = 0;
-                    for(int l23 = (anInt1069 - 6) / 8; l23 <= (anInt1069 + 6) / 8; l23++)
-                    {
-                        for(int j26 = (anInt1070 - 6) / 8; j26 <= (anInt1070 + 6) / 8; j26++)
-                        {
-                            anIntArray1234[k16] = (l23 << 8) + j26;
-                            if(aBoolean1141 && (j26 == 49 || j26 == 149 || j26 == 147 || l23 == 50 || l23 == 49 && j26 == 47))
-                            {
-                                anIntArray1235[k16] = -1;
-                                anIntArray1236[k16] = -1;
-                                k16++;
-                            } else
-                            {
-                                int k28 = anIntArray1235[k16] = aClass42_Sub1_1068.method562(0, 0, j26, l23);
-                                if(k28 != -1)
-                                    aClass42_Sub1_1068.method558(3, k28);
-                                int j30 = anIntArray1236[k16] = aClass42_Sub1_1068.method562(1, 0, j26, l23);
-                                if(j30 != -1)
-                                    aClass42_Sub1_1068.method558(3, j30);
-                                k16++;
-                            }
-                        }
-
-                    }
-
+                    RegionTransitionHandler.buildStaticRegionRequests(anInt1069, anInt1070, aBoolean1141, aClass42_Sub1_1068, anIntArray1234, anIntArray1235, anIntArray1236);
                 }
                 if(anInt1008 == 241)
                 {
                     int ai[] = new int[676];
-                    int l16 = RegionPacketHandler.collectDynamicRegionIds(anIntArrayArrayArray1129, ai);
+                    int l16 = RegionTransitionHandler.collectDynamicRegionIds(anIntArrayArrayArray1129, ai);
                     aByteArrayArray1183 = new byte[l16][];
                     aByteArrayArray1247 = new byte[l16][];
                     anIntArray1234 = new int[l16];
                     anIntArray1235 = new int[l16];
                     anIntArray1236 = new int[l16];
                     for(int l26 = 0; l26 < l16; l26++)
-                    {
-                        int i29 = anIntArray1234[l26] = ai[l26];
-                        int l30 = i29 >> 8 & 0xff;
-                        int l31 = i29 & 0xff;
-                        int j32 = anIntArray1235[l26] = aClass42_Sub1_1068.method562(0, 0, l31, l30);
-                        if(j32 != -1)
-                            aClass42_Sub1_1068.method558(3, j32);
-                        int i33 = anIntArray1236[l26] = aClass42_Sub1_1068.method562(1, 0, l31, l30);
-                        if(i33 != -1)
-                            aClass42_Sub1_1068.method558(3, i33);
-                    }
-
+                        anIntArray1234[l26] = ai[l26];
+                    RegionTransitionHandler.buildDynamicRegionRequests(anIntArray1234, l16, aClass42_Sub1_1068, anIntArray1235, anIntArray1236);
                 }
                 int i17 = anInt1034 - anInt1036;
                 int j21 = anInt1035 - anInt1037;
                 anInt1036 = anInt1034;
                 anInt1037 = anInt1035;
-                for(int j24 = 0; j24 < 16384; j24++)
-                {
-                    Npc class30_sub2_sub4_sub1_sub1 = aClass30_Sub2_Sub4_Sub1_Sub1Array835[j24];
-                    if(class30_sub2_sub4_sub1_sub1 != null)
-                    {
-                        for(int j29 = 0; j29 < 10; j29++)
-                        {
-                            ((Actor) (class30_sub2_sub4_sub1_sub1)).anIntArray1500[j29] -= i17;
-                            ((Actor) (class30_sub2_sub4_sub1_sub1)).anIntArray1501[j29] -= j21;
-                        }
-
-                        class30_sub2_sub4_sub1_sub1.anInt1550 -= i17 * 128;
-                        class30_sub2_sub4_sub1_sub1.anInt1551 -= j21 * 128;
-                    }
-                }
-
-                for(int i27 = 0; i27 < anInt888; i27++)
-                {
-                    Player class30_sub2_sub4_sub1_sub2 = aClass30_Sub2_Sub4_Sub1_Sub2Array890[i27];
-                    if(class30_sub2_sub4_sub1_sub2 != null)
-                    {
-                        for(int i31 = 0; i31 < 10; i31++)
-                        {
-                            ((Actor) (class30_sub2_sub4_sub1_sub2)).anIntArray1500[i31] -= i17;
-                            ((Actor) (class30_sub2_sub4_sub1_sub2)).anIntArray1501[i31] -= j21;
-                        }
-
-                        class30_sub2_sub4_sub1_sub2.anInt1550 -= i17 * 128;
-                        class30_sub2_sub4_sub1_sub2.anInt1551 -= j21 * 128;
-                    }
-                }
-
                 aBoolean1080 = true;
-                byte byte1 = 0;
-                byte byte2 = 104;
-                byte byte3 = 1;
-                if(i17 < 0)
-                {
-                    byte1 = 103;
-                    byte2 = -1;
-                    byte3 = -1;
-                }
-                byte byte4 = 0;
-                byte byte5 = 104;
-                byte byte6 = 1;
-                if(j21 < 0)
-                {
-                    byte4 = 103;
-                    byte5 = -1;
-                    byte6 = -1;
-                }
-                for(int k33 = byte1; k33 != byte2; k33 += byte3)
-                {
-                    for(int l33 = byte4; l33 != byte5; l33 += byte6)
-                    {
-                        int i34 = k33 + i17;
-                        int j34 = l33 + j21;
-                        for(int k34 = 0; k34 < 4; k34++)
-                            if(i34 >= 0 && j34 >= 0 && i34 < 104 && j34 < 104)
-                                aClass19ArrayArrayArray827[k34][k33][l33] = aClass19ArrayArrayArray827[k34][i34][j34];
-                            else
-                                aClass19ArrayArrayArray827[k34][k33][l33] = null;
-
-                    }
-
-                }
-
-                for(SceneObjectSpawnRequest class30_sub1_1 = (SceneObjectSpawnRequest)aClass19_1179.last(); class30_sub1_1 != null; class30_sub1_1 = (SceneObjectSpawnRequest)aClass19_1179.previous(false))
-                {
-                    class30_sub1_1.anInt1297 -= i17;
-                    class30_sub1_1.anInt1298 -= j21;
-                    if(class30_sub1_1.anInt1297 < 0 || class30_sub1_1.anInt1298 < 0 || class30_sub1_1.anInt1297 >= 104 || class30_sub1_1.anInt1298 >= 104)
-                        class30_sub1_1.unlink();
-                }
-
+                RegionTransitionHandler.applyRegionShift(i17, j21, aClass30_Sub2_Sub4_Sub1_Sub1Array835, aClass30_Sub2_Sub4_Sub1_Sub2Array890, anInt888, aClass19ArrayArrayArray827, aClass19_1179);
                 if(anInt1261 != 0)
                 {
                     anInt1261 -= i17;
