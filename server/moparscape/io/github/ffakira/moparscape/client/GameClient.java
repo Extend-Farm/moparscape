@@ -8421,6 +8421,55 @@ public final class GameClient extends GameShell
         player.anInt1534 = packetBuffer.method427(false);
     }
 
+    private void applyPlayerPublicChatUpdate(Player player, PacketBuffer packetBuffer)
+    {
+        int chatEffects = packetBuffer.method434((byte)108);
+        int chatRank = packetBuffer.method408();
+        int encodedChatLength = packetBuffer.method427(false);
+        int payloadStartOffset = packetBuffer.anInt1406;
+        if(player.aString1703 != null && player.aBoolean1710)
+        {
+            long nameHash = TextUtils.method583(player.aString1703);
+            boolean isIgnored = false;
+            if(chatRank <= 1)
+            {
+                for(int ignoredIndex = 0; ignoredIndex < anInt822; ignoredIndex++)
+                {
+                    if(aLongArray925[ignoredIndex] != nameHash)
+                        continue;
+                    isIgnored = true;
+                    break;
+                }
+
+            }
+            if(!isIgnored && anInt1251 == 0)
+                try
+                {
+                    aClass30_Sub2_Sub2_834.anInt1406 = 0;
+                    packetBuffer.method442(encodedChatLength, 0, true, aClass30_Sub2_Sub2_834.aByteArray1405);
+                    aClass30_Sub2_Sub2_834.anInt1406 = 0;
+                    String chatText = ChatMessageCodec.method525(encodedChatLength, true, aClass30_Sub2_Sub2_834);
+                    chatText = ChatCensor.method497(chatText, 0);
+                    player.aString1506 = chatText;
+                    player.anInt1513 = chatEffects >> 8;
+                    player.anInt1531 = chatEffects & 0xff;
+                    player.anInt1535 = 150;
+                    if(chatRank == 2 || chatRank == 3)
+                        method77(chatText, 1, "@cr2@" + player.aString1703, aBoolean991);
+                    else
+                    if(chatRank == 1)
+                        method77(chatText, 1, "@cr1@" + player.aString1703, aBoolean991);
+                    else
+                        method77(chatText, 2, player.aString1703, aBoolean991);
+                }
+                catch(Exception exception)
+                {
+                    SignLink.reporterror("cde2");
+                }
+        }
+        packetBuffer.anInt1406 = payloadStartOffset + encodedChatLength;
+    }
+
     private void applyPlayerUpdateMasks(int updateMask, int playerIndex, PacketBuffer packetBuffer, byte stateGuard, Player player)
     {
         if(stateGuard != 25)
@@ -8434,53 +8483,7 @@ public final class GameClient extends GameShell
         if((updateMask & EntityUpdateMasks.Player.FORCED_CHAT) != 0)
             applyPlayerForcedChatUpdate(player, packetBuffer);
         if((updateMask & EntityUpdateMasks.Player.PUBLIC_CHAT) != 0)
-        {
-            int i1 = packetBuffer.method434((byte)108);
-            int j2 = packetBuffer.method408();
-            int j3 = packetBuffer.method427(false);
-            int k3 = packetBuffer.anInt1406;
-            if(player.aString1703 != null && player.aBoolean1710)
-            {
-                long l3 = TextUtils.method583(player.aString1703);
-                boolean flag = false;
-                if(j2 <= 1)
-                {
-                    for(int i4 = 0; i4 < anInt822; i4++)
-                    {
-                        if(aLongArray925[i4] != l3)
-                            continue;
-                        flag = true;
-                        break;
-                    }
-
-                }
-                if(!flag && anInt1251 == 0)
-                    try
-                    {
-                        aClass30_Sub2_Sub2_834.anInt1406 = 0;
-                        packetBuffer.method442(j3, 0, true, aClass30_Sub2_Sub2_834.aByteArray1405);
-                        aClass30_Sub2_Sub2_834.anInt1406 = 0;
-                        String s = ChatMessageCodec.method525(j3, true, aClass30_Sub2_Sub2_834);
-                        s = ChatCensor.method497(s, 0);
-                        player.aString1506 = s;
-                        player.anInt1513 = i1 >> 8;
-                        player.anInt1531 = i1 & 0xff;
-                        player.anInt1535 = 150;
-                        if(j2 == 2 || j2 == 3)
-                            method77(s, 1, "@cr2@" + player.aString1703, aBoolean991);
-                        else
-                        if(j2 == 1)
-                            method77(s, 1, "@cr1@" + player.aString1703, aBoolean991);
-                        else
-                            method77(s, 2, player.aString1703, aBoolean991);
-                    }
-                    catch(Exception exception)
-                    {
-                        SignLink.reporterror("cde2");
-                    }
-            }
-            packetBuffer.anInt1406 = k3 + j3;
-        }
+            applyPlayerPublicChatUpdate(player, packetBuffer);
         if((updateMask & EntityUpdateMasks.Player.INTERACTING_ENTITY) != 0)
             applyPlayerInteractingEntityUpdate(player, packetBuffer);
         if((updateMask & EntityUpdateMasks.Player.APPEARANCE) != 0)
