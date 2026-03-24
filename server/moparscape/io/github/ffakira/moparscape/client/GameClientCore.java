@@ -10487,10 +10487,7 @@ class GameClientCore extends GameShell
             }
             if(anInt1008 == 214)
             {
-                anInt822 = anInt1007 / 8;
-                for(int j1 = 0; j1 < anInt822; j1++)
-                    aLongArray925[j1] = aClass30_Sub2_Sub2_1083.method414(-35089);
-
+                anInt822 = IncomingPacketDispatcher.applyIgnoreListSnapshot(aClass30_Sub2_Sub2_1083, anInt1007, aLongArray925);
                 anInt1008 = -1;
                 return true;
             }
