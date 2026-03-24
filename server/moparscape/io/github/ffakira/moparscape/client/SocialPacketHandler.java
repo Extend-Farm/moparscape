@@ -9,7 +9,7 @@ final class SocialPacketHandler {
     }
 
     static void handleSocialRequestMessage(
-        GameClient gameClient,
+        SocialOutputPort socialOutputPort,
         PacketBuffer packetBuffer,
         int ignoreCount,
         long[] ignoredNameHashes,
@@ -22,7 +22,7 @@ final class SocialPacketHandler {
             String playerName = message.substring(0, message.indexOf(":"));
             long playerNameHash = TextUtils.method583(playerName);
             if(!isIgnored(playerNameHash, ignoreCount, ignoredNameHashes) && chatPrivacyMode == 0)
-                gameClient.method77("wishes to trade with you.", 4, playerName, messageFilterFlag);
+                socialOutputPort.addChatMessage("wishes to trade with you.", 4, playerName, messageFilterFlag);
             return;
         }
         if(message.endsWith(":duelreq:"))
@@ -30,7 +30,7 @@ final class SocialPacketHandler {
             String playerName = message.substring(0, message.indexOf(":"));
             long playerNameHash = TextUtils.method583(playerName);
             if(!isIgnored(playerNameHash, ignoreCount, ignoredNameHashes) && chatPrivacyMode == 0)
-                gameClient.method77("wishes to duel with you.", 8, playerName, messageFilterFlag);
+                socialOutputPort.addChatMessage("wishes to duel with you.", 8, playerName, messageFilterFlag);
             return;
         }
         if(message.endsWith(":chalreq:"))
@@ -40,15 +40,15 @@ final class SocialPacketHandler {
             if(!isIgnored(playerNameHash, ignoreCount, ignoredNameHashes) && chatPrivacyMode == 0)
             {
                 String challengeText = message.substring(message.indexOf(":") + 1, message.length() - 9);
-                gameClient.method77(challengeText, 8, playerName, messageFilterFlag);
+                socialOutputPort.addChatMessage(challengeText, 8, playerName, messageFilterFlag);
             }
             return;
         }
-        gameClient.method77(message, 0, "", messageFilterFlag);
+        socialOutputPort.addChatMessage(message, 0, "", messageFilterFlag);
     }
 
     static int[] handleFriendStatusUpdate(
-        GameClient gameClient,
+        SocialOutputPort socialOutputPort,
         PacketBuffer packetBuffer,
         int friendCount,
         int onlinePriorityStatus,
@@ -71,9 +71,9 @@ final class SocialPacketHandler {
                 friendWorlds[index] = friendWorld;
                 shouldRefreshFriends = true;
                 if(friendWorld > 0)
-                    gameClient.method77(friendName + " has logged in.", 5, "", messageFilterFlag);
+                    socialOutputPort.addChatMessage(friendName + " has logged in.", 5, "", messageFilterFlag);
                 if(friendWorld == 0)
-                    gameClient.method77(friendName + " has logged out.", 5, "", messageFilterFlag);
+                    socialOutputPort.addChatMessage(friendName + " has logged out.", 5, "", messageFilterFlag);
             }
             friendName = null;
             break;
@@ -114,7 +114,7 @@ final class SocialPacketHandler {
 
     // Exact extraction of legacy public-chat packet (opcode 196) logic.
     static int handlePublicChatPacket(
-        GameClient gameClient,
+        SocialOutputPort socialOutputPort,
         PacketBuffer packetBuffer,
         int packetSize,
         int[] recentChatIds,
@@ -156,12 +156,12 @@ final class SocialPacketHandler {
                 if(chatPrivilege != 3)
                     message = ChatCensor.method497(message, 0);
                 if(chatPrivilege == 2 || chatPrivilege == 3)
-                    gameClient.method77(message, 7, "@cr2@" + TextUtils.method587(-45804, TextUtils.method584(senderNameHash, (byte)-99)), messageFilterFlag);
+                    socialOutputPort.addChatMessage(message, 7, "@cr2@" + TextUtils.method587(-45804, TextUtils.method584(senderNameHash, (byte)-99)), messageFilterFlag);
                 else
                 if(chatPrivilege == 1)
-                    gameClient.method77(message, 7, "@cr1@" + TextUtils.method587(-45804, TextUtils.method584(senderNameHash, (byte)-99)), messageFilterFlag);
+                    socialOutputPort.addChatMessage(message, 7, "@cr1@" + TextUtils.method587(-45804, TextUtils.method584(senderNameHash, (byte)-99)), messageFilterFlag);
                 else
-                    gameClient.method77(message, 3, TextUtils.method587(-45804, TextUtils.method584(senderNameHash, (byte)-99)), messageFilterFlag);
+                    socialOutputPort.addChatMessage(message, 3, TextUtils.method587(-45804, TextUtils.method584(senderNameHash, (byte)-99)), messageFilterFlag);
             }
             catch(Exception exception)
             {

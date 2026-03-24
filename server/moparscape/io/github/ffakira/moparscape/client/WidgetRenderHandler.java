@@ -103,7 +103,7 @@ final class WidgetRenderHandler {
 
     // Exact extraction of legacy method105 branch for widget type 4 text rendering.
     static void renderType4Text(
-        GameClientCore gameClient,
+        WidgetConditionPort widgetConditionPort,
         Widget widget,
         int drawX,
         int drawY,
@@ -149,35 +149,35 @@ final class WidgetRenderHandler {
                     int token = text.indexOf("%1");
                     if(token == -1)
                         break;
-                    text = text.substring(0, token) + gameClient.method93(369, gameClient.method124(341, widget, 0)) + text.substring(token + 2);
+                    text = text.substring(0, token) + widgetConditionPort.formatWidgetValue(widget, 0) + text.substring(token + 2);
                 } while(true);
                 do
                 {
                     int token = text.indexOf("%2");
                     if(token == -1)
                         break;
-                    text = text.substring(0, token) + gameClient.method93(369, gameClient.method124(341, widget, 1)) + text.substring(token + 2);
+                    text = text.substring(0, token) + widgetConditionPort.formatWidgetValue(widget, 1) + text.substring(token + 2);
                 } while(true);
                 do
                 {
                     int token = text.indexOf("%3");
                     if(token == -1)
                         break;
-                    text = text.substring(0, token) + gameClient.method93(369, gameClient.method124(341, widget, 2)) + text.substring(token + 2);
+                    text = text.substring(0, token) + widgetConditionPort.formatWidgetValue(widget, 2) + text.substring(token + 2);
                 } while(true);
                 do
                 {
                     int token = text.indexOf("%4");
                     if(token == -1)
                         break;
-                    text = text.substring(0, token) + gameClient.method93(369, gameClient.method124(341, widget, 3)) + text.substring(token + 2);
+                    text = text.substring(0, token) + widgetConditionPort.formatWidgetValue(widget, 3) + text.substring(token + 2);
                 } while(true);
                 do
                 {
                     int token = text.indexOf("%5");
                     if(token == -1)
                         break;
-                    text = text.substring(0, token) + gameClient.method93(369, gameClient.method124(341, widget, 4)) + text.substring(token + 2);
+                    text = text.substring(0, token) + widgetConditionPort.formatWidgetValue(widget, 4) + text.substring(token + 2);
                 } while(true);
             }
             int newlineToken = text.indexOf("\\n");
@@ -196,5 +196,126 @@ final class WidgetRenderHandler {
             else
                 fontRenderer.method389(false, widget.aBoolean268, drawX, color, lineText, lineY);
         }
+    }
+
+    // Exact extraction of legacy method105 branch for widget type 2 inventory grids.
+    static int renderType2InventoryGrid(
+        Widget parentWidget,
+        Widget widget,
+        int drawX,
+        int drawY,
+        int gameTickDelta,
+        int dragState,
+        int dragSlot,
+        int dragWidgetId,
+        int dragStartMouseX,
+        int dragStartMouseY,
+        int dragThreshold,
+        boolean dragAlphaEnabled,
+        int selectedDragState,
+        int selectedDragSlot,
+        int selectedDragWidgetId,
+        int itemUseState,
+        int itemUseSlot,
+        int itemUseWidgetId,
+        int mouseX,
+        int mouseY,
+        int dragOffsetY,
+        FontRenderer itemAmountFont
+    ) {
+        int slot = 0;
+        for(int row = 0; row < widget.anInt267; row++)
+        {
+            for(int column = 0; column < widget.anInt220; column++)
+            {
+                int itemX = drawX + column * (32 + widget.anInt231);
+                int itemY = drawY + row * (32 + widget.anInt244);
+                if(slot < 20)
+                {
+                    itemX += widget.anIntArray215[slot];
+                    itemY += widget.anIntArray247[slot];
+                }
+                if(widget.anIntArray253[slot] > 0)
+                {
+                    int dragX = 0;
+                    int dragY = 0;
+                    int itemId = widget.anIntArray253[slot] - 1;
+                    if(itemX > Rasterizer2D.anInt1383 - 32 && itemX < Rasterizer2D.anInt1384 && itemY > Rasterizer2D.anInt1381 - 32 && itemY < Rasterizer2D.anInt1382 || dragState != 0 && dragSlot == slot)
+                    {
+                        int outlineColor = 0;
+                        if(itemUseState == 1 && itemUseSlot == slot && itemUseWidgetId == widget.anInt250)
+                            outlineColor = 0xffffff;
+                        Sprite itemSprite = ItemDefinition.method200(itemId, widget.anIntArray252[slot], outlineColor, 9);
+                        if(itemSprite != null)
+                        {
+                            if(dragState != 0 && dragSlot == slot && dragWidgetId == widget.anInt250)
+                            {
+                                dragX = mouseX - dragStartMouseX;
+                                dragY = mouseY - dragOffsetY;
+                                if(dragX < 5 && dragX > -5)
+                                    dragX = 0;
+                                if(dragY < 5 && dragY > -5)
+                                    dragY = 0;
+                                if(dragThreshold < 5)
+                                {
+                                    dragX = 0;
+                                    dragY = 0;
+                                }
+                                itemSprite.method350(itemX + dragX, itemY + dragY, 128, dragAlphaEnabled);
+                                if(itemY + dragY < Rasterizer2D.anInt1381 && parentWidget.anInt224 > 0)
+                                {
+                                    int scrollDelta = (gameTickDelta * (Rasterizer2D.anInt1381 - itemY - dragY)) / 3;
+                                    if(scrollDelta > gameTickDelta * 10)
+                                        scrollDelta = gameTickDelta * 10;
+                                    if(scrollDelta > parentWidget.anInt224)
+                                        scrollDelta = parentWidget.anInt224;
+                                    parentWidget.anInt224 -= scrollDelta;
+                                    dragOffsetY += scrollDelta;
+                                }
+                                if(itemY + dragY + 32 > Rasterizer2D.anInt1382 && parentWidget.anInt224 < parentWidget.anInt261 - parentWidget.anInt267)
+                                {
+                                    int scrollDelta = (gameTickDelta * ((itemY + dragY + 32) - Rasterizer2D.anInt1382)) / 3;
+                                    if(scrollDelta > gameTickDelta * 10)
+                                        scrollDelta = gameTickDelta * 10;
+                                    if(scrollDelta > parentWidget.anInt261 - parentWidget.anInt267 - parentWidget.anInt224)
+                                        scrollDelta = parentWidget.anInt261 - parentWidget.anInt267 - parentWidget.anInt224;
+                                    parentWidget.anInt224 += scrollDelta;
+                                    dragOffsetY -= scrollDelta;
+                                }
+                            } else
+                            if(selectedDragState != 0 && selectedDragSlot == slot && selectedDragWidgetId == widget.anInt250)
+                                itemSprite.method350(itemX, itemY, 128, dragAlphaEnabled);
+                            else
+                                itemSprite.method348(itemX, 16083, itemY);
+                            if(itemSprite.anInt1444 == 33 || widget.anIntArray252[slot] != 1)
+                            {
+                                int itemAmount = widget.anIntArray252[slot];
+                                itemAmountFont.method385(0, formatLegacyItemAmount(itemAmount), itemY + 10 + dragY, 822, itemX + 1 + dragX);
+                                itemAmountFont.method385(0xffff00, formatLegacyItemAmount(itemAmount), itemY + 9 + dragY, 822, itemX + dragX);
+                            }
+                        }
+                    }
+                } else
+                if(widget.aClass30_Sub2_Sub1_Sub1Array209 != null && slot < 20)
+                {
+                    Sprite fallbackSprite = widget.aClass30_Sub2_Sub1_Sub1Array209[slot];
+                    if(fallbackSprite != null)
+                        fallbackSprite.method348(itemX, 16083, itemY);
+                }
+                slot++;
+            }
+
+        }
+        return dragOffsetY;
+    }
+
+    private static String formatLegacyItemAmount(int amount)
+    {
+        if(amount < 0x186a0)
+            return String.valueOf(amount);
+        if(amount < 0x989680)
+            return amount / 1000 + "K";
+        else
+            return amount / 0xf4240 + "M";
     }
 }
