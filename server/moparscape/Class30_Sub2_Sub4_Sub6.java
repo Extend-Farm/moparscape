@@ -2,7 +2,7 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
 public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
 {
@@ -33,7 +33,7 @@ public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
         anIntArray1692 = null;
     }
 
-    public static void method459(int i, Class42 class42)
+    public static void method459(int i, ResourceProvider class42)
     {
         aClass21Array1661 = new Class21[i];
         aClass42_1662 = class42;
@@ -49,7 +49,7 @@ public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
             class21.anInt371 = 0;
             return;
         }
-        Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(abyte0, 891);
+        PacketBuffer class30_sub2_sub2 = new PacketBuffer(abyte0, 891);
         class30_sub2_sub2.anInt1406 = abyte0.length - 18;
         Class21 class21_1 = aClass21Array1661[j] = new Class21();
         class21_1.aByteArray368 = abyte0;
@@ -201,15 +201,15 @@ public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
         if(class21.anInt383 >= 0)
             anIntArray1656 = new int[anInt1630];
         anIntArray1640 = new int[anInt1630];
-        Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(class21.aByteArray368, 891);
+        PacketBuffer class30_sub2_sub2 = new PacketBuffer(class21.aByteArray368, 891);
         class30_sub2_sub2.anInt1406 = class21.anInt372;
-        Class30_Sub2_Sub2 class30_sub2_sub2_1 = new Class30_Sub2_Sub2(class21.aByteArray368, 891);
+        PacketBuffer class30_sub2_sub2_1 = new PacketBuffer(class21.aByteArray368, 891);
         class30_sub2_sub2_1.anInt1406 = class21.anInt373;
-        Class30_Sub2_Sub2 class30_sub2_sub2_2 = new Class30_Sub2_Sub2(class21.aByteArray368, 891);
+        PacketBuffer class30_sub2_sub2_2 = new PacketBuffer(class21.aByteArray368, 891);
         class30_sub2_sub2_2.anInt1406 = class21.anInt374;
-        Class30_Sub2_Sub2 class30_sub2_sub2_3 = new Class30_Sub2_Sub2(class21.aByteArray368, 891);
+        PacketBuffer class30_sub2_sub2_3 = new PacketBuffer(class21.aByteArray368, 891);
         class30_sub2_sub2_3.anInt1406 = class21.anInt375;
-        Class30_Sub2_Sub2 class30_sub2_sub2_4 = new Class30_Sub2_Sub2(class21.aByteArray368, 891);
+        PacketBuffer class30_sub2_sub2_4 = new PacketBuffer(class21.aByteArray368, 891);
         class30_sub2_sub2_4.anInt1406 = class21.anInt376;
         int k = 0;
         int l = 0;
@@ -2095,7 +2095,7 @@ public class Class30_Sub2_Sub4_Sub6 extends Class30_Sub2_Sub4
     public boolean aBoolean1659;
     Class33 aClass33Array1660[];
     static Class21 aClass21Array1661[];
-    static Class42 aClass42_1662;
+    static ResourceProvider aClass42_1662;
     static boolean aBooleanArray1663[] = new boolean[4096];
     static boolean aBooleanArray1664[] = new boolean[4096];
     static int anIntArray1665[] = new int[4096];

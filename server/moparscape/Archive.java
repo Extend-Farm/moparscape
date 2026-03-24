@@ -2,12 +2,12 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
-public final class Class44
+public final class Archive
 {
 
-    public Class44(int i, byte abyte0[])
+    public Archive(int i, byte abyte0[])
     {
         aByte723 = 0;
         anInt724 = 9;
@@ -24,7 +24,7 @@ public final class Class44
 
     private void method570(byte abyte0[], byte byte0)
     {
-        Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(abyte0, 891);
+        PacketBuffer class30_sub2_sub2 = new PacketBuffer(abyte0, 891);
         int i = class30_sub2_sub2.method412();
         int j = class30_sub2_sub2.method412();
         if(j != i)
@@ -32,7 +32,7 @@ public final class Class44
             byte abyte1[] = new byte[i];
             Class13.method225(abyte1, i, abyte0, j, 6);
             aByteArray726 = abyte1;
-            class30_sub2_sub2 = new Class30_Sub2_Sub2(aByteArray726, 891);
+            class30_sub2_sub2 = new PacketBuffer(aByteArray726, 891);
             aBoolean732 = true;
         } else
         {

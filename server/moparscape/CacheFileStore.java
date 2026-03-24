@@ -3,12 +3,12 @@
 // Decompiler options: packimports(3) 
 
 import java.io.*;
-import sign.signlink;
+import sign.SignLink;
 
-public final class Class14
+public final class CacheFileStore
 {
 
-    public Class14(int i, RandomAccessFile randomaccessfile, RandomAccessFile randomaccessfile1, int j, boolean flag)
+    public CacheFileStore(int i, RandomAccessFile randomaccessfile, RandomAccessFile randomaccessfile1, int j, boolean flag)
     {
         anInt306 = 923;
         aBoolean307 = true;

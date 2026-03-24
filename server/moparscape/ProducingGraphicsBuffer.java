@@ -5,13 +5,13 @@
 import java.awt.*;
 import java.awt.image.*;
 import java.io.PrintStream;
-import sign.signlink;
+import sign.SignLink;
 
-public final class Class15
+public final class ProducingGraphicsBuffer
     implements ImageProducer, ImageObserver
 {
 
-    public Class15(int i, int j, Component component, int k)
+    public ProducingGraphicsBuffer(int i, int j, Component component, int k)
     {
         aBoolean314 = true;
         anInt316 = i;

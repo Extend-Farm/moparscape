@@ -9,9 +9,9 @@ import java.io.*;
 import java.math.BigInteger;
 import java.net.*;
 import java.util.zip.CRC32;
-import sign.signlink;
+import sign.SignLink;
 
-public final class client extends Applet_Sub1
+public final class GameClient extends GameShell
 {
 	public static int cameratoggle;
 	public static int zoom;
@@ -35,8 +35,8 @@ public final class client extends Applet_Sub1
 
     public final void method15(int i)
     {
-        signlink.midifade = 0;
-        signlink.midi = "stop";
+        SignLink.midifade = 0;
+        SignLink.midi = "stop";
         if(i <= 0)
             aBoolean1206 = !aBoolean1206;
     }
@@ -55,7 +55,7 @@ public final class client extends Applet_Sub1
             try
             {
                 //DataInputStream datainputstream = method132("crc" + (int)(Math.random() * 99999999D) + "-" + 317);
-                //Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(new byte[40], 891);
+                //PacketBuffer class30_sub2_sub2 = new PacketBuffer(new byte[40], 891);
                 //datainputstream.readFully(class30_sub2_sub2.aByteArray1405, 0, 40);
                 //datainputstream.close();
                 //for(int i1 = 0; i1 < 9; i1++)
@@ -86,7 +86,7 @@ public final class client extends Applet_Sub1
             {
                 s = "logic problem";
                 anIntArray1090[8] = 0;
-                if(!signlink.reporterror)
+                if(!SignLink.reporterror)
                     return;
             }
             if(anIntArray1090[8] == 0)
@@ -292,7 +292,7 @@ public final class client extends Applet_Sub1
         method52(false);//highmem
       //aBoolean959 = false;//free
         aBoolean959 = true;//members
-      //signlink.storeid = 32;//not in init() originally
+      //SignLink.storeid = 32;//not in init() originally
         method2(503, false, 765);
     }
 
@@ -300,9 +300,9 @@ public final class client extends Applet_Sub1
     {
         if(i > 10)
             i = 10;
-        if(signlink.mainapp != null)
+        if(SignLink.mainapp != null)
         {
-            signlink.startthread(runnable, i);
+            SignLink.startthread(runnable, i);
             return;
         } else
         {
@@ -314,8 +314,8 @@ public final class client extends Applet_Sub1
     public final Socket method19(int i)
         throws IOException
     {
-        if(signlink.mainapp != null)
-            return signlink.opensocket(i);
+        if(SignLink.mainapp != null)
+            return SignLink.opensocket(i);
         else
             return new Socket(InetAddress.getByName(getCodeBase().getHost()), i);
     }
@@ -438,8 +438,8 @@ public final class client extends Applet_Sub1
 
     public final void method21(boolean flag, int i, byte abyte0[])
     {
-        signlink.midifade = flag ? 1 : 0;
-        signlink.midisave(abyte0, abyte0.length);
+        SignLink.midifade = flag ? 1 : 0;
+        SignLink.midisave(abyte0, abyte0.length);
         if(i != 0)
             anInt1008 = aClass30_Sub2_Sub2_1083.method408();
     }
@@ -621,7 +621,7 @@ public final class client extends Applet_Sub1
             aClass30_Sub2_Sub2_1192.method397((byte)6, 210);
             aClass30_Sub2_Sub2_1192.method402(0x3f008edd);
         }
-        if(aBoolean960 && signlink.cache_dat != null)
+        if(aBoolean960 && SignLink.cache_dat != null)
         {
             int j = aClass42_Sub1_1068.method555(79, 0);
             for(int i1 = 0; i1 < j; i1++)
@@ -828,7 +828,7 @@ public final class client extends Applet_Sub1
         if(i != 11456)
             throw new NullPointerException();
         else
-            return signlink.wavereplay();
+            return SignLink.wavereplay();
     }
 
     private final void method28(String s)
@@ -1095,7 +1095,7 @@ public final class client extends Applet_Sub1
         Class30_Sub2_Sub1.method339(l + 14 + l1 + k1, anInt927, 15, i1 + 1, (byte)4);
     }
 
-    private final void method31(Class30_Sub2_Sub2 class30_sub2_sub2, int i, int j)
+    private final void method31(PacketBuffer class30_sub2_sub2, int i, int j)
     {
         anInt839 = 0;
         anInt893 = 0;
@@ -1116,13 +1116,13 @@ public final class client extends Applet_Sub1
 
         if(class30_sub2_sub2.anInt1406 != i)
         {
-            signlink.reporterror(aString1173 + " size mismatch in getnpcpos - pos:" + class30_sub2_sub2.anInt1406 + " psize:" + i);
+            SignLink.reporterror(aString1173 + " size mismatch in getnpcpos - pos:" + class30_sub2_sub2.anInt1406 + " psize:" + i);
             throw new RuntimeException("eek");
         }
         for(int i1 = 0; i1 < anInt836; i1++)
             if(aClass30_Sub2_Sub4_Sub1_Sub1Array835[anIntArray837[i1]] == null)
             {
-                signlink.reporterror(aString1173 + " null entry in npc list - pos:" + i1 + " size:" + anInt836);
+                SignLink.reporterror(aString1173 + " null entry in npc list - pos:" + i1 + " size:" + anInt836);
                 throw new RuntimeException("eek");
             }
 
@@ -1579,7 +1579,7 @@ public final class client extends Applet_Sub1
         }
         catch(RuntimeException runtimeexception)
         {
-            signlink.reporterror("18622, " + flag + ", " + l + ", " + runtimeexception.toString());
+            SignLink.reporterror("18622, " + flag + ", " + l + ", " + runtimeexception.toString());
             throw new RuntimeException();
         }
     }
@@ -1895,7 +1895,7 @@ public final class client extends Applet_Sub1
         }
         catch(RuntimeException runtimeexception)
         {
-            signlink.reporterror("15283, " + byte0 + ", " + l + ", " + runtimeexception.toString());
+            SignLink.reporterror("15283, " + byte0 + ", " + l + ", " + runtimeexception.toString());
         }
         throw new RuntimeException();
     }
@@ -1976,7 +1976,7 @@ public final class client extends Applet_Sub1
 
     }
 
-    private final void method46(int i, Class30_Sub2_Sub2 class30_sub2_sub2, byte byte0)
+    private final void method46(int i, PacketBuffer class30_sub2_sub2, byte byte0)
     {
         if(byte0 != 2)
         {
@@ -2198,7 +2198,7 @@ public final class client extends Applet_Sub1
         return false;
     }
 
-    private final void method49(int i, byte byte0, Class30_Sub2_Sub2 class30_sub2_sub2)
+    private final void method49(int i, byte byte0, PacketBuffer class30_sub2_sub2)
     {
         if(byte0 == 2)
             byte0 = 0;
@@ -2475,10 +2475,10 @@ public final class client extends Applet_Sub1
     {
         try
         {
-            System.out.println("RS2 user client - release #" + 317);
+            System.out.println("RS2 user GameClient - release #" + 317);
             if(args.length > 0)
             {
-                System.out.println("do not send in parameters in this version of the client");
+                System.out.println("do not send in parameters in this version of the GameClient");
                 return;
             }
             anInt957 = 0;
@@ -2487,9 +2487,9 @@ public final class client extends Applet_Sub1
             method52(false);//highmem
        //     aBoolean959 = false;//free
             aBoolean959 = true;//members
-            signlink.storeid = 32;
-            signlink.startpriv(InetAddress.getLocalHost());
-            client client1 = new client();
+            SignLink.storeid = 32;
+            SignLink.startpriv(InetAddress.getLocalHost());
+            GameClient client1 = new GameClient();
             client1.method1(503, false, 765);
             return;
         }
@@ -2517,7 +2517,7 @@ public final class client extends Applet_Sub1
             int j = method54((byte)-95);
             if(j != 0 && System.currentTimeMillis() - aLong824 > 0x57e40L)
             {
-                signlink.reporterror(aString1173 + " glcfb " + aLong1215 + "," + j + "," + aBoolean960 + "," + aClass14Array970[0] + "," + aClass42_Sub1_1068.method552() + "," + anInt918 + "," + anInt1069 + "," + anInt1070);
+                SignLink.reporterror(aString1173 + " glcfb " + aLong1215 + "," + j + "," + aBoolean960 + "," + aClass14Array970[0] + "," + aClass42_Sub1_1068.method552() + "," + anInt918 + "," + anInt1069 + "," + anInt1070);
                 aLong824 = System.currentTimeMillis();
             }
         }
@@ -2607,8 +2607,8 @@ public final class client extends Applet_Sub1
 
     public final AppletContext getAppletContext()
     {
-        if(signlink.mainapp != null)
-            return signlink.mainapp.getAppletContext();
+        if(SignLink.mainapp != null)
+            return SignLink.mainapp.getAppletContext();
         else
             return super.getAppletContext();
     }
@@ -2686,7 +2686,7 @@ public final class client extends Applet_Sub1
             anInt883 = -72;
         do
         {
-            Class30_Sub2_Sub3 class30_sub2_sub3;
+            OnDemandRequest class30_sub2_sub3;
             do
             {
                 class30_sub2_sub3 = aClass42_Sub1_1068.method561();
@@ -2727,7 +2727,7 @@ public final class client extends Applet_Sub1
 
                 }
             } while(class30_sub2_sub3.anInt1419 != 93 || !aClass42_Sub1_1068.method564(class30_sub2_sub3.anInt1421, -520));
-            Class7.method173((byte)-107, new Class30_Sub2_Sub2(class30_sub2_sub3.aByteArray1420, 891), aClass42_Sub1_1068);
+            Class7.method173((byte)-107, new PacketBuffer(class30_sub2_sub3.aByteArray1420, 891), aClass42_Sub1_1068);
         } while(true);
     }
 
@@ -2806,7 +2806,7 @@ public final class client extends Applet_Sub1
         if(abyte0 == null)
             return true;
         else
-            return signlink.wavesave(abyte0, i);
+            return SignLink.wavesave(abyte0, i);
     }
 
     public final void method60(int i, byte byte0)
@@ -3219,25 +3219,25 @@ public final class client extends Applet_Sub1
         aClass15_1123 = null;
         aClass15_1124 = null;
         aClass15_1125 = null;
-        aClass15_1110 = new Class15(128, 265, method11(0), 0);
+        aClass15_1110 = new ProducingGraphicsBuffer(128, 265, method11(0), 0);
         Class30_Sub2_Sub1.method334(aBoolean1206);
-        aClass15_1111 = new Class15(128, 265, method11(0), 0);
+        aClass15_1111 = new ProducingGraphicsBuffer(128, 265, method11(0), 0);
         Class30_Sub2_Sub1.method334(aBoolean1206);
-        aClass15_1107 = new Class15(509, 171, method11(0), 0);
+        aClass15_1107 = new ProducingGraphicsBuffer(509, 171, method11(0), 0);
         Class30_Sub2_Sub1.method334(aBoolean1206);
-        aClass15_1108 = new Class15(360, 132, method11(0), 0);
+        aClass15_1108 = new ProducingGraphicsBuffer(360, 132, method11(0), 0);
         Class30_Sub2_Sub1.method334(aBoolean1206);
-        aClass15_1109 = new Class15(360, 200, method11(0), 0);
+        aClass15_1109 = new ProducingGraphicsBuffer(360, 200, method11(0), 0);
         Class30_Sub2_Sub1.method334(aBoolean1206);
-        aClass15_1112 = new Class15(202, 238, method11(0), 0);
+        aClass15_1112 = new ProducingGraphicsBuffer(202, 238, method11(0), 0);
         if(i < 0 || i > 0)
             aClass19ArrayArrayArray827 = null;
         Class30_Sub2_Sub1.method334(aBoolean1206);
-        aClass15_1113 = new Class15(203, 238, method11(0), 0);
+        aClass15_1113 = new ProducingGraphicsBuffer(203, 238, method11(0), 0);
         Class30_Sub2_Sub1.method334(aBoolean1206);
-        aClass15_1114 = new Class15(74, 94, method11(0), 0);
+        aClass15_1114 = new ProducingGraphicsBuffer(74, 94, method11(0), 0);
         Class30_Sub2_Sub1.method334(aBoolean1206);
-        aClass15_1115 = new Class15(75, 94, method11(0), 0);
+        aClass15_1115 = new ProducingGraphicsBuffer(75, 94, method11(0), 0);
         Class30_Sub2_Sub1.method334(aBoolean1206);
         if(aClass44_1053 != null)
         {
@@ -3370,7 +3370,7 @@ public final class client extends Applet_Sub1
         return true;
     }
 
-    public final Class44 method67(int i, String s, String s1, int j, byte byte0, int k)
+    public final Archive method67(int i, String s, String s1, int j, byte byte0, int k)
     {
         byte abyte0[] = null;
         int l = 5;
@@ -3390,7 +3390,7 @@ public final class client extends Applet_Sub1
         }
         if(abyte0 != null)
         {
-            Class44 class44 = new Class44(44820, abyte0);
+            Archive class44 = new Archive(44820, abyte0);
             return class44;
         }
         int j1 = 0;
@@ -3405,7 +3405,7 @@ public final class client extends Applet_Sub1
                 DataInputStream datainputstream = method132(s1 + j);
                 byte abyte1[] = new byte[6];
                 datainputstream.readFully(abyte1, 0, 6);
-                Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(abyte1, 891);
+                PacketBuffer class30_sub2_sub2 = new PacketBuffer(abyte1, 891);
                 class30_sub2_sub2.anInt1406 = 3;
                 int i2 = class30_sub2_sub2.method412() + 6;
                 int j2 = 6;
@@ -3463,21 +3463,21 @@ public final class client extends Applet_Sub1
             {
                 s2 = "Null error";
                 abyte0 = null;
-                if(!signlink.reporterror)
+                if(!SignLink.reporterror)
                     return null;
             }
             catch(ArrayIndexOutOfBoundsException _ex)
             {
                 s2 = "Bounds error";
                 abyte0 = null;
-                if(!signlink.reporterror)
+                if(!SignLink.reporterror)
                     return null;
             }
             catch(Exception _ex)
             {
                 s2 = "Unexpected error";
                 abyte0 = null;
-                if(!signlink.reporterror)
+                if(!SignLink.reporterror)
                     return null;
             }
             if(abyte0 == null)
@@ -3505,7 +3505,7 @@ public final class client extends Applet_Sub1
                 aBoolean872 = !aBoolean872;
             }
         }
-        Class44 class44_1 = new Class44(44820, abyte0);
+        Archive class44_1 = new Archive(44820, abyte0);
         if(byte0 != -41)
             throw new NullPointerException();
         else
@@ -4650,7 +4650,7 @@ public final class client extends Applet_Sub1
 
     public final void method8(int i)
     {
-        signlink.reporterror = false;
+        SignLink.reporterror = false;
         try
         {
             if(aClass24_1168 != null)
@@ -4804,8 +4804,8 @@ public final class client extends Applet_Sub1
     public final Component method11(int i)
     {
         anInt1007 += i;
-        if(signlink.mainapp != null)
-            return signlink.mainapp;
+        if(SignLink.mainapp != null)
+            return SignLink.mainapp;
         if(super.aFrame_Sub1_15 != null)
             return super.aFrame_Sub1_15;
         else
@@ -5439,7 +5439,7 @@ public final class client extends Applet_Sub1
                     s = "yesterday";
                 else
                     s = anInt1006 + " days ago";
-                class9.aString248 = "You last logged in " + s + " from: " + signlink.dns;
+                class9.aString248 = "You last logged in " + s + " from: " + SignLink.dns;
             } else
             {
                 class9.aString248 = "";
@@ -5716,26 +5716,26 @@ public final class client extends Applet_Sub1
         aClass15_1113 = null;
         aClass15_1114 = null;
         aClass15_1115 = null;
-        aClass15_1166 = new Class15(479, 96, method11(0), 0);
-        aClass15_1164 = new Class15(172, 156, method11(0), 0);
+        aClass15_1166 = new ProducingGraphicsBuffer(479, 96, method11(0), 0);
+        aClass15_1164 = new ProducingGraphicsBuffer(172, 156, method11(0), 0);
         Class30_Sub2_Sub1.method334(aBoolean1206);
         aClass30_Sub2_Sub1_Sub2_1197.method361(0, 16083, 0);
-        aClass15_1163 = new Class15(190, 261, method11(0), 0);
-        aClass15_1165 = new Class15(512, 334, method11(0), 0);
+        aClass15_1163 = new ProducingGraphicsBuffer(190, 261, method11(0), 0);
+        aClass15_1165 = new ProducingGraphicsBuffer(512, 334, method11(0), 0);
         Class30_Sub2_Sub1.method334(aBoolean1206);
-        aClass15_1123 = new Class15(496, 50, method11(0), 0);
+        aClass15_1123 = new ProducingGraphicsBuffer(496, 50, method11(0), 0);
         if(i != 1)
             method6();
-        aClass15_1124 = new Class15(269, 37, method11(0), 0);
-        aClass15_1125 = new Class15(249, 45, method11(0), 0);
+        aClass15_1124 = new ProducingGraphicsBuffer(269, 37, method11(0), 0);
+        aClass15_1125 = new ProducingGraphicsBuffer(249, 45, method11(0), 0);
         aBoolean1255 = true;
     }
 
     public final String method80(boolean flag)
     {
         aBoolean1157 &= flag;
-        if(signlink.mainapp != null)
-            return signlink.mainapp.getDocumentBase().getHost().toLowerCase();
+        if(SignLink.mainapp != null)
+            return SignLink.mainapp.getDocumentBase().getHost().toLowerCase();
         if(super.aFrame_Sub1_15 != null)
             return "MoparScape.com";
         else
@@ -5847,7 +5847,7 @@ public final class client extends Applet_Sub1
 
     public final void method84(String s, String s1, boolean flag)
     {
-        signlink.errorname = s;
+        SignLink.errorname = s;
         try
         {
             if(!flag)
@@ -5884,7 +5884,7 @@ public final class client extends Applet_Sub1
                 aClass30_Sub2_Sub2_1192.method402(ai[1]);
                 aClass30_Sub2_Sub2_1192.method402(ai[2]);
                 aClass30_Sub2_Sub2_1192.method402(ai[3]);
-                aClass30_Sub2_Sub2_1192.method402(signlink.uid);
+                aClass30_Sub2_Sub2_1192.method402(SignLink.uid);
                 aClass30_Sub2_Sub2_1192.method405(s);
                 aClass30_Sub2_Sub2_1192.method405(s1);
                 aClass30_Sub2_Sub2_1192.method423(aBigInteger1032, aBigInteger856, (byte)0);
@@ -5901,11 +5901,11 @@ public final class client extends Applet_Sub1
                     aClass30_Sub2_Sub2_847.method402(anIntArray1090[l1]);
 
                 aClass30_Sub2_Sub2_847.method406(aClass30_Sub2_Sub2_1192.aByteArray1405, aClass30_Sub2_Sub2_1192.anInt1406, true, 0);
-                aClass30_Sub2_Sub2_1192.aClass17_1410 = new Class17(-436, ai);
+                aClass30_Sub2_Sub2_1192.aClass17_1410 = new IsaacCipher(-436, ai);
                 for(int j2 = 0; j2 < 4; j2++)
                     ai[j2] += 50;
 
-                aClass17_1000 = new Class17(-436, ai);
+                aClass17_1000 = new IsaacCipher(-436, ai);
                 aClass24_1168.method271(aClass30_Sub2_Sub2_847.anInt1406, 0, aClass30_Sub2_Sub2_847.aByteArray1405, 0);
                 k = aClass24_1168.method268();
             }
@@ -6415,7 +6415,7 @@ public final class client extends Applet_Sub1
         return i != 1;
     }
 
-    private final void method86(int i, Class30_Sub2_Sub2 class30_sub2_sub2, boolean flag)
+    private final void method86(int i, PacketBuffer class30_sub2_sub2, boolean flag)
     {
         for(int j = 0; j < anInt893; j++)
         {
@@ -6735,7 +6735,7 @@ public final class client extends Applet_Sub1
                             flag1 = true;
                     } else
                     {
-                        Class30_Sub2_Sub2 class30_sub2_sub2 = Class16.method241(anIntArray1241[i], anIntArray1207[i], false);
+                        PacketBuffer class30_sub2_sub2 = Class16.method241(anIntArray1241[i], anIntArray1207[i], false);
                         if(System.currentTimeMillis() + (long)(class30_sub2_sub2.anInt1406 / 22) > aLong1172 + (long)(anInt1257 / 22))
                         {
                             anInt1257 = class30_sub2_sub2.anInt1406;
@@ -6789,7 +6789,7 @@ public final class client extends Applet_Sub1
     public final void method6()
     {
         method13(20, (byte)4, "Starting up");
-        if(signlink.sunjava)
+        if(SignLink.sunjava)
             super.anInt6 = 5;
         if(aBoolean993)
         {
@@ -6799,10 +6799,10 @@ public final class client extends Applet_Sub1
         aBoolean993 = true;
         boolean flag = true;
         String s = method80(true);
-        if(signlink.cache_dat != null)
+        if(SignLink.cache_dat != null)
         {
             for(int i = 0; i < 5; i++)
-                aClass14Array970[i] = new Class14(0x7a120, signlink.cache_dat, signlink.cache_idx[i], i + 1, true);
+                aClass14Array970[i] = new CacheFileStore(0x7a120, SignLink.cache_dat, SignLink.cache_idx[i], i + 1, true);
 
         }
         try
@@ -6815,12 +6815,12 @@ public final class client extends Applet_Sub1
             aClass30_Sub2_Sub1_Sub4_1273 = new Class30_Sub2_Sub1_Sub4(true, "q8_full", 0, aClass44_1053);
             method56(0);
             method51(215);
-            Class44 class44 = method67(2, "config", "config", anIntArray1090[2], (byte)-41, 30);
-            Class44 class44_1 = method67(3, "interface", "interface", anIntArray1090[3], (byte)-41, 35);
-            Class44 class44_2 = method67(4, "2d graphics", "media", anIntArray1090[4], (byte)-41, 40);
-            Class44 class44_3 = method67(6, "textures", "textures", anIntArray1090[6], (byte)-41, 45);
-            Class44 class44_4 = method67(7, "chat system", "wordenc", anIntArray1090[7], (byte)-41, 50);
-            Class44 class44_5 = method67(8, "sound effects", "sounds", anIntArray1090[8], (byte)-41, 55);
+            Archive class44 = method67(2, "config", "config", anIntArray1090[2], (byte)-41, 30);
+            Archive class44_1 = method67(3, "interface", "interface", anIntArray1090[3], (byte)-41, 35);
+            Archive class44_2 = method67(4, "2d graphics", "media", anIntArray1090[4], (byte)-41, 40);
+            Archive class44_3 = method67(6, "textures", "textures", anIntArray1090[6], (byte)-41, 45);
+            Archive class44_4 = method67(7, "chat system", "wordenc", anIntArray1090[7], (byte)-41, 50);
+            Archive class44_5 = method67(8, "sound effects", "sounds", anIntArray1090[8], (byte)-41, 55);
             aByteArrayArrayArray1258 = new byte[4][104][104];
             anIntArrayArrayArray1214 = new int[4][105][105];
             aClass25_946 = new Class25(104, (byte)43, 104, anIntArrayArrayArray1214, 4);
@@ -6828,9 +6828,9 @@ public final class client extends Applet_Sub1
                 aClass11Array1230[j] = new Class11(104, 104, true);
 
             aClass30_Sub2_Sub1_Sub1_1263 = new Class30_Sub2_Sub1_Sub1(512, 512);
-            Class44 class44_6 = method67(5, "update list", "versionlist", anIntArray1090[5], (byte)-41, 60);
+            Archive class44_6 = method67(5, "update list", "versionlist", anIntArray1090[5], (byte)-41, 60);
             method13(60, (byte)4, "Connecting to update server");
-            aClass42_Sub1_1068 = new Class42_Sub1();
+            aClass42_Sub1_1068 = new OnDemandFetcher();
             aClass42_Sub1_1068.method551(class44_6, this);
             Class36.method528(aClass42_Sub1_1068.method557(0));
             Class30_Sub2_Sub4_Sub6.method459(aClass42_Sub1_1068.method555(79, 0), aClass42_Sub1_1068);
@@ -7048,31 +7048,31 @@ public final class client extends Applet_Sub1
                 aClass30_Sub2_Sub1_Sub2Array1219[l4] = new Class30_Sub2_Sub1_Sub2(class44_2, "mod_icons", l4);
 
             Class30_Sub2_Sub1_Sub1 class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(class44_2, "backleft1", 0);
-            aClass15_903 = new Class15(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
+            aClass15_903 = new ProducingGraphicsBuffer(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
             class30_sub2_sub1_sub1.method346(0, 0, -32357);
             class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(class44_2, "backleft2", 0);
-            aClass15_904 = new Class15(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
+            aClass15_904 = new ProducingGraphicsBuffer(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
             class30_sub2_sub1_sub1.method346(0, 0, -32357);
             class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(class44_2, "backright1", 0);
-            aClass15_905 = new Class15(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
+            aClass15_905 = new ProducingGraphicsBuffer(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
             class30_sub2_sub1_sub1.method346(0, 0, -32357);
             class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(class44_2, "backright2", 0);
-            aClass15_906 = new Class15(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
+            aClass15_906 = new ProducingGraphicsBuffer(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
             class30_sub2_sub1_sub1.method346(0, 0, -32357);
             class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(class44_2, "backtop1", 0);
-            aClass15_907 = new Class15(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
+            aClass15_907 = new ProducingGraphicsBuffer(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
             class30_sub2_sub1_sub1.method346(0, 0, -32357);
             class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(class44_2, "backvmid1", 0);
-            aClass15_908 = new Class15(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
+            aClass15_908 = new ProducingGraphicsBuffer(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
             class30_sub2_sub1_sub1.method346(0, 0, -32357);
             class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(class44_2, "backvmid2", 0);
-            aClass15_909 = new Class15(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
+            aClass15_909 = new ProducingGraphicsBuffer(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
             class30_sub2_sub1_sub1.method346(0, 0, -32357);
             class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(class44_2, "backvmid3", 0);
-            aClass15_910 = new Class15(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
+            aClass15_910 = new ProducingGraphicsBuffer(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
             class30_sub2_sub1_sub1.method346(0, 0, -32357);
             class30_sub2_sub1_sub1 = new Class30_Sub2_Sub1_Sub1(class44_2, "backhmid2", 0);
-            aClass15_911 = new Class15(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
+            aClass15_911 = new ProducingGraphicsBuffer(class30_sub2_sub1_sub1.anInt1440, class30_sub2_sub1_sub1.anInt1441, method11(0), 0);
             class30_sub2_sub1_sub1.method346(0, 0, -32357);
             int i5 = (int)(Math.random() * 21D) - 10;
             int j5 = (int)(Math.random() * 21D) - 10;
@@ -7105,7 +7105,7 @@ public final class client extends Applet_Sub1
             {
                 method13(90, (byte)4, "Unpacking sounds");
                 byte abyte0[] = class44_5.method571("sounds.dat", null);
-                Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(abyte0, 891);
+                PacketBuffer class30_sub2_sub2 = new PacketBuffer(abyte0, 891);
                 Class16.method240(0, class30_sub2_sub2);
             }
             method13(95, (byte)4, "Unpacking interfaces");
@@ -7184,12 +7184,12 @@ public final class client extends Applet_Sub1
         }
         catch(Exception exception)
         {
-            signlink.reporterror("loaderror " + aString1049 + " " + anInt1079);
+            SignLink.reporterror("loaderror " + aString1049 + " " + anInt1079);
         }
         aBoolean926 = true;
     }
 
-    private final void method91(Class30_Sub2_Sub2 class30_sub2_sub2, int i, byte byte0)
+    private final void method91(PacketBuffer class30_sub2_sub2, int i, byte byte0)
     {
         if(byte0 == 8)
             byte0 = 0;
@@ -7360,8 +7360,8 @@ public final class client extends Applet_Sub1
 
     public final URL getCodeBase()
     {
-        if(signlink.mainapp != null)
-            return signlink.mainapp.getCodeBase();
+        if(SignLink.mainapp != null)
+            return SignLink.mainapp.getCodeBase();
         try
         {
             if(super.aFrame_Sub1_15 != null)
@@ -8334,7 +8334,7 @@ public final class client extends Applet_Sub1
         }
     }
 
-    private final void method107(int i, int j, Class30_Sub2_Sub2 class30_sub2_sub2, byte byte0, Class30_Sub2_Sub4_Sub1_Sub2 class30_sub2_sub4_sub1_sub2)
+    private final void method107(int i, int j, PacketBuffer class30_sub2_sub2, byte byte0, Class30_Sub2_Sub4_Sub1_Sub2 class30_sub2_sub4_sub1_sub2)
     {
         if(byte0 != 25)
             aClass19ArrayArrayArray827 = null;
@@ -8448,7 +8448,7 @@ public final class client extends Applet_Sub1
                     }
                     catch(Exception exception)
                     {
-                        signlink.reporterror("cde2");
+                        SignLink.reporterror("cde2");
                     }
             }
             class30_sub2_sub2.anInt1406 = k3 + j3;
@@ -8463,7 +8463,7 @@ public final class client extends Applet_Sub1
         {
             int j1 = class30_sub2_sub2.method427(false);
             byte abyte0[] = new byte[j1];
-            Class30_Sub2_Sub2 class30_sub2_sub2_1 = new Class30_Sub2_Sub2(abyte0, 891);
+            PacketBuffer class30_sub2_sub2_1 = new PacketBuffer(abyte0, 891);
             class30_sub2_sub2.method417(j1, aByte920, 0, abyte0);
             aClass30_Sub2_Sub2Array895[j] = class30_sub2_sub2_1;
             class30_sub2_sub4_sub1_sub2.method451(0, class30_sub2_sub2_1);
@@ -8589,7 +8589,7 @@ public final class client extends Applet_Sub1
         }
         catch(Exception _ex)
         {
-            signlink.reporterror("glfc_ex " + ((Class30_Sub2_Sub4_Sub1) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anInt1550 + "," + ((Class30_Sub2_Sub4_Sub1) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anInt1551 + "," + anInt1014 + "," + anInt1015 + "," + anInt1069 + "," + anInt1070 + "," + anInt1034 + "," + anInt1035);
+            SignLink.reporterror("glfc_ex " + ((Class30_Sub2_Sub4_Sub1) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anInt1550 + "," + ((Class30_Sub2_Sub4_Sub1) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anInt1551 + "," + anInt1014 + "," + anInt1015 + "," + anInt1069 + "," + anInt1070 + "," + anInt1034 + "," + anInt1035);
             throw new RuntimeException("eek");
         }
     }
@@ -8655,7 +8655,7 @@ public final class client extends Applet_Sub1
             byte0 = 0;
         else
             method6();
-        signlink.wavevol = i;
+        SignLink.wavevol = i;
     }
 
     public final void method112(int i)
@@ -8766,7 +8766,7 @@ public final class client extends Applet_Sub1
         }
         catch(RuntimeException runtimeexception)
         {
-            signlink.reporterror("45688, " + l + ", " + i + ", " + runtimeexception.toString());
+            SignLink.reporterror("45688, " + l + ", " + i + ", " + runtimeexception.toString());
         }
         throw new RuntimeException();
     }
@@ -8904,7 +8904,7 @@ public final class client extends Applet_Sub1
         }
     }
 
-    private final void method117(Class30_Sub2_Sub2 class30_sub2_sub2, int i, byte byte0)
+    private final void method117(PacketBuffer class30_sub2_sub2, int i, byte byte0)
     {
         class30_sub2_sub2.method418(anInt1118);
         if(byte0 == 5)
@@ -9144,15 +9144,15 @@ public final class client extends Applet_Sub1
         }
         catch(RuntimeException runtimeexception)
         {
-            signlink.reporterror("47229, " + i + ", " + l + ", " + runtimeexception.toString());
+            SignLink.reporterror("47229, " + i + ", " + l + ", " + runtimeexception.toString());
         }
         throw new RuntimeException();
     }
 
     public final String getParameter(String s)
     {
-        if(signlink.mainapp != null)
-            return signlink.mainapp.getParameter(s);
+        if(SignLink.mainapp != null)
+            return SignLink.mainapp.getParameter(s);
         else
             return super.getParameter(s);
     }
@@ -9163,9 +9163,9 @@ public final class client extends Applet_Sub1
             byte0 = 0;
         else
             aClass19ArrayArrayArray827 = null;
-        signlink.midivol = i;
+        SignLink.midivol = i;
         if(flag)
-            signlink.midi = "voladjust";
+            SignLink.midi = "voladjust";
     }
 
     public final int method124(int i, Class9 class9, int j)
@@ -9610,8 +9610,8 @@ public final class client extends Applet_Sub1
         throws IOException
     {
         //if(!aBoolean872)
-        //    if(signlink.mainapp != null)
-        //        return signlink.openurl(s);
+        //    if(SignLink.mainapp != null)
+        //        return SignLink.openurl(s);
         //    else
         //        return new DataInputStream((new URL(getCodeBase(), s)).openStream());
         if(aSocket832 != null)
@@ -9730,7 +9730,7 @@ public final class client extends Applet_Sub1
             anInt1008 = aClass30_Sub2_Sub2_1083.method408();
     }
 
-    private final void method134(byte byte0, int i, Class30_Sub2_Sub2 class30_sub2_sub2)
+    private final void method134(byte byte0, int i, PacketBuffer class30_sub2_sub2)
     {
         int j = class30_sub2_sub2.method419(8, 0);
         if(j < anInt891)
@@ -9741,7 +9741,7 @@ public final class client extends Applet_Sub1
         }
         if(j > anInt891)
         {
-            signlink.reporterror(aString1173 + " Too many players");
+            SignLink.reporterror(aString1173 + " Too many players");
             throw new RuntimeException("eek");
         }
         anInt891 = 0;
@@ -9931,7 +9931,7 @@ public final class client extends Applet_Sub1
         }
     }
 
-    public final void method137(int i, Class30_Sub2_Sub2 class30_sub2_sub2, int j)
+    public final void method137(int i, PacketBuffer class30_sub2_sub2, int j)
     {
         while(i >= 0) 
             j = -1;
@@ -10248,7 +10248,7 @@ public final class client extends Applet_Sub1
         Class46.aBoolean752 = true;
     }
 
-    private final void method139(Class30_Sub2_Sub2 class30_sub2_sub2, int i, int j)
+    private final void method139(PacketBuffer class30_sub2_sub2, int i, int j)
     {
         if(i >= 0)
             anInt1118 = -7;
@@ -10262,7 +10262,7 @@ public final class client extends Applet_Sub1
         }
         if(k > anInt836)
         {
-            signlink.reporterror(aString1173 + " Too many npcs");
+            SignLink.reporterror(aString1173 + " Too many npcs");
             throw new RuntimeException("eek");
         }
         anInt836 = 0;
@@ -10516,7 +10516,7 @@ public final class client extends Applet_Sub1
         }
     }
 
-    private final void method143(int i, Class30_Sub2_Sub2 class30_sub2_sub2, int j)
+    private final void method143(int i, PacketBuffer class30_sub2_sub2, int j)
     {
         anInt839 = 0;
         if(j != 9759)
@@ -10535,13 +10535,13 @@ public final class client extends Applet_Sub1
 
         if(class30_sub2_sub2.anInt1406 != i)
         {
-            signlink.reporterror("Error packet size mismatch in getplayer pos:" + class30_sub2_sub2.anInt1406 + " psize:" + i);
+            SignLink.reporterror("Error packet size mismatch in getplayer pos:" + class30_sub2_sub2.anInt1406 + " psize:" + i);
             throw new RuntimeException("eek");
         }
         for(int i1 = 0; i1 < anInt891; i1++)
             if(aClass30_Sub2_Sub4_Sub1_Sub2Array890[anIntArray892[i1]] == null)
             {
-                signlink.reporterror(aString1173 + " null entry in pl list - pos:" + i1 + " size:" + anInt891);
+                SignLink.reporterror(aString1173 + " null entry in pl list - pos:" + i1 + " size:" + anInt891);
                 throw new RuntimeException("eek");
             }
 
@@ -10655,7 +10655,7 @@ public final class client extends Applet_Sub1
                 anInt1006 = aClass30_Sub2_Sub2_1083.method410();
                 if(anInt1193 != 0 && anInt857 == -1)
                 {
-                    signlink.dnslookup(Class50.method586(anInt1193, true));
+                    SignLink.dnslookup(Class50.method586(anInt1193, true));
                     method147(537);
                     char c = '\u028A';
                     if(anInt1167 != 201 || anInt1120 == 1)
@@ -11428,7 +11428,7 @@ public final class client extends Applet_Sub1
                     }
                     catch(Exception exception1)
                     {
-                        signlink.reporterror("cde1");
+                        SignLink.reporterror("cde1");
                     }
                 anInt1008 = -1;
                 return true;
@@ -11815,7 +11815,7 @@ public final class client extends Applet_Sub1
                 anInt1008 = -1;
                 return true;
             }
-            signlink.reporterror("T1 - " + anInt1008 + "," + anInt1007 + " - " + anInt842 + "," + anInt843);
+            SignLink.reporterror("T1 - " + anInt1008 + "," + anInt1007 + " - " + anInt842 + "," + anInt843);
             method44(true);
         }
         catch(IOException _ex)
@@ -11828,7 +11828,7 @@ public final class client extends Applet_Sub1
             for(int j15 = 0; j15 < anInt1007 && j15 < 50; j15++)
                 s2 = s2 + aClass30_Sub2_Sub2_1083.aByteArray1405[j15] + ",";
 
-            signlink.reporterror(s2);
+            SignLink.reporterror(s2);
             method44(true);
         }
         return true;
@@ -11933,19 +11933,19 @@ public final class client extends Applet_Sub1
             aClass30_Sub2_Sub2_1192.method398(13);
     }
 
-    public client()
+    public GameClient()
     {
         anIntArrayArray825 = new int[104][104];
         anIntArray826 = new int[200];
         aClass19ArrayArrayArray827 = new Class19[4][104][104];
         aBoolean830 = true;
         aBoolean831 = false;
-        aClass30_Sub2_Sub2_834 = new Class30_Sub2_Sub2(new byte[5000], 891);
+        aClass30_Sub2_Sub2_834 = new PacketBuffer(new byte[5000], 891);
         aClass30_Sub2_Sub4_Sub1_Sub1Array835 = new Class30_Sub2_Sub4_Sub1_Sub1[16384];
         anIntArray837 = new int[16384];
         anInt838 = 9;
         anIntArray840 = new int[1000];
-        aClass30_Sub2_Sub2_847 = Class30_Sub2_Sub2.method396(1, 9);
+        aClass30_Sub2_Sub2_847 = PacketBuffer.method396(1, 9);
         aBoolean848 = true;
         anInt857 = -1;
         anIntArray864 = new int[Class45.anInt733];
@@ -11967,7 +11967,7 @@ public final class client extends Applet_Sub1
         aClass30_Sub2_Sub4_Sub1_Sub2Array890 = new Class30_Sub2_Sub4_Sub1_Sub2[anInt888];
         anIntArray892 = new int[anInt888];
         anIntArray894 = new int[anInt888];
-        aClass30_Sub2_Sub2Array895 = new Class30_Sub2_Sub2[anInt888];
+        aClass30_Sub2_Sub2Array895 = new PacketBuffer[anInt888];
         anInt897 = 1;
         anIntArrayArray901 = new int[104][104];
         anInt902 = 0x766654;
@@ -11995,7 +11995,7 @@ public final class client extends Applet_Sub1
         anInt964 = -1;
         anIntArray968 = new int[33];
         anIntArray969 = new int[256];
-        aClass14Array970 = new Class14[5];
+        aClass14Array970 = new CacheFileStore[5];
         anIntArray971 = new int[2000];
         aBoolean972 = false;
         aByte973 = -74;
@@ -12042,7 +12042,7 @@ public final class client extends Applet_Sub1
         aBoolean1080 = false;
         anInt1081 = -733;
         aStringArray1082 = new String[200];
-        aClass30_Sub2_Sub2_1083 = Class30_Sub2_Sub2.method396(1, 9);
+        aClass30_Sub2_Sub2_1083 = PacketBuffer.method396(1, 9);
         anIntArray1090 = new int[9];
         anIntArray1091 = new int[500];
         anIntArray1092 = new int[500];
@@ -12080,7 +12080,7 @@ public final class client extends Applet_Sub1
         aClass19_1179 = new Class19(169);
         anInt1184 = 128;
         anInt1189 = -1;
-        aClass30_Sub2_Sub2_1192 = Class30_Sub2_Sub2.method396(1, 9);
+        aClass30_Sub2_Sub2_1192 = PacketBuffer.method396(1, 9);
         aByte1194 = 5;
         aStringArray1199 = new String[500];
         anIntArray1203 = new int[5];
@@ -12128,7 +12128,7 @@ public final class client extends Applet_Sub1
     private volatile boolean aBoolean831;
     private Socket aSocket832;
     private int anInt833;
-    private Class30_Sub2_Sub2 aClass30_Sub2_Sub2_834;
+    private PacketBuffer aClass30_Sub2_Sub2_834;
     private Class30_Sub2_Sub4_Sub1_Sub1 aClass30_Sub2_Sub4_Sub1_Sub1Array835[];
     private int anInt836;
     int anIntArray837[];
@@ -12141,7 +12141,7 @@ public final class client extends Applet_Sub1
     private String aString844;
     private int anInt845;
     private static int anInt846;
-    private Class30_Sub2_Sub2 aClass30_Sub2_Sub2_847;
+    private PacketBuffer aClass30_Sub2_Sub2_847;
     private boolean aBoolean848;
     private static int anInt849;
     private int anIntArray850[];
@@ -12189,7 +12189,7 @@ public final class client extends Applet_Sub1
     int anIntArray892[];
     private int anInt893;
     private int anIntArray894[];
-    private Class30_Sub2_Sub2 aClass30_Sub2_Sub2Array895[];
+    private PacketBuffer aClass30_Sub2_Sub2Array895[];
     private int anInt896;
     private int anInt897;
     private int anInt898;
@@ -12197,15 +12197,15 @@ public final class client extends Applet_Sub1
     private int anInt900;
     private int anIntArrayArray901[][];
     private int anInt902;
-    private Class15 aClass15_903;
-    private Class15 aClass15_904;
-    private Class15 aClass15_905;
-    private Class15 aClass15_906;
-    private Class15 aClass15_907;
-    private Class15 aClass15_908;
-    private Class15 aClass15_909;
-    private Class15 aClass15_910;
-    private Class15 aClass15_911;
+    private ProducingGraphicsBuffer aClass15_903;
+    private ProducingGraphicsBuffer aClass15_904;
+    private ProducingGraphicsBuffer aClass15_905;
+    private ProducingGraphicsBuffer aClass15_906;
+    private ProducingGraphicsBuffer aClass15_907;
+    private ProducingGraphicsBuffer aClass15_908;
+    private ProducingGraphicsBuffer aClass15_909;
+    private ProducingGraphicsBuffer aClass15_910;
+    private ProducingGraphicsBuffer aClass15_911;
     private byte aByteArray912[];
     private int anInt913;
     private int anInt914;
@@ -12266,7 +12266,7 @@ public final class client extends Applet_Sub1
     private Class30_Sub2_Sub1_Sub2 aClass30_Sub2_Sub1_Sub2_967;
     private int anIntArray968[];
     private int anIntArray969[];
-    Class14 aClass14Array970[];
+    CacheFileStore aClass14Array970[];
     public int anIntArray971[];
     private boolean aBoolean972;
     private byte aByte973;
@@ -12296,7 +12296,7 @@ public final class client extends Applet_Sub1
     private int anInt997;
     private int anInt998;
     private int anInt999;
-    private Class17 aClass17_1000;
+    private IsaacCipher aClass17_1000;
     private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1_1001;
     private int anInt1002;
     static final int anIntArrayArray1003[][] = {
@@ -12364,7 +12364,7 @@ public final class client extends Applet_Sub1
     private int anInt1050;
     private static int anInt1051;
     private int anIntArray1052[];
-    private Class44 aClass44_1053;
+    private Archive aClass44_1053;
     private int anInt1054;
     private int anInt1055;
     private Class19 aClass19_1056;
@@ -12379,7 +12379,7 @@ public final class client extends Applet_Sub1
     private int anIntArray1065[];
     private int anInt1066;
     private int anInt1067;
-    private Class42_Sub1 aClass42_Sub1_1068;
+    private OnDemandFetcher aClass42_Sub1_1068;
     private int anInt1069;
     private int anInt1070;
     private int anInt1071;
@@ -12394,7 +12394,7 @@ public final class client extends Applet_Sub1
     private boolean aBoolean1080;
     private int anInt1081;
     private String aStringArray1082[];
-    private Class30_Sub2_Sub2 aClass30_Sub2_Sub2_1083;
+    private PacketBuffer aClass30_Sub2_Sub2_1083;
     private int anInt1084;
     private int anInt1085;
     private int anInt1086;
@@ -12418,15 +12418,15 @@ public final class client extends Applet_Sub1
     private int anInt1104;
     private int anInt1105;
     private boolean aBoolean1106;
-    private Class15 aClass15_1107;
-    private Class15 aClass15_1108;
-    private Class15 aClass15_1109;
-    private Class15 aClass15_1110;
-    private Class15 aClass15_1111;
-    private Class15 aClass15_1112;
-    private Class15 aClass15_1113;
-    private Class15 aClass15_1114;
-    private Class15 aClass15_1115;
+    private ProducingGraphicsBuffer aClass15_1107;
+    private ProducingGraphicsBuffer aClass15_1108;
+    private ProducingGraphicsBuffer aClass15_1109;
+    private ProducingGraphicsBuffer aClass15_1110;
+    private ProducingGraphicsBuffer aClass15_1111;
+    private ProducingGraphicsBuffer aClass15_1112;
+    private ProducingGraphicsBuffer aClass15_1113;
+    private ProducingGraphicsBuffer aClass15_1114;
+    private ProducingGraphicsBuffer aClass15_1115;
     private int anInt1116;
     private static int anInt1117;
     private int anInt1118;
@@ -12434,9 +12434,9 @@ public final class client extends Applet_Sub1
     private int anInt1120;
     private String aString1121;
     private Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1_1122;
-    private Class15 aClass15_1123;
-    private Class15 aClass15_1124;
-    private Class15 aClass15_1125;
+    private ProducingGraphicsBuffer aClass15_1123;
+    private ProducingGraphicsBuffer aClass15_1124;
+    private ProducingGraphicsBuffer aClass15_1125;
     static Class30_Sub2_Sub4_Sub1_Sub2 aClass30_Sub2_Sub4_Sub1_Sub2_1126;
     private String aStringArray1127[];
     private boolean aBooleanArray1128[];
@@ -12477,10 +12477,10 @@ public final class client extends Applet_Sub1
     private boolean aBoolean1160;
     static int anInt1161;
     private static String aString1162 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!\"\243$%^&*()-_=+[{]};:'@#~,<.>/?\\| ";
-    private Class15 aClass15_1163;
-    private Class15 aClass15_1164;
-    private Class15 aClass15_1165;
-    private Class15 aClass15_1166;
+    private ProducingGraphicsBuffer aClass15_1163;
+    private ProducingGraphicsBuffer aClass15_1164;
+    private ProducingGraphicsBuffer aClass15_1165;
+    private ProducingGraphicsBuffer aClass15_1166;
     private int anInt1167;
     private Class24 aClass24_1168;
     private int anInt1169;
@@ -12511,7 +12511,7 @@ public final class client extends Applet_Sub1
     private int anInt1189;
     private int anIntArray1190[];
     private int anIntArray1191[];
-    private Class30_Sub2_Sub2 aClass30_Sub2_Sub2_1192;
+    private PacketBuffer aClass30_Sub2_Sub2_1192;
     private int anInt1193;
     private byte aByte1194;
     private int anInt1195;

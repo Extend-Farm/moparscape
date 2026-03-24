@@ -2,7 +2,7 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
 public class Class30_Sub2_Sub4 extends Class30_Sub2
 {

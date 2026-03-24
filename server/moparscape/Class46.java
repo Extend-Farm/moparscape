@@ -2,7 +2,7 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
 final class Class46
 {
@@ -62,7 +62,7 @@ final class Class46
         anIntArray759 = null;
     }
 
-    public final void method574(Class42_Sub1 class42_sub1, int i)
+    public final void method574(OnDemandFetcher class42_sub1, int i)
     {
         if(anIntArray773 == null)
             return;
@@ -84,10 +84,10 @@ final class Class46
 
     }
 
-    public static final void method576(Class44 class44)
+    public static final void method576(Archive class44)
     {
-        aClass30_Sub2_Sub2_753 = new Class30_Sub2_Sub2(class44.method571("loc.dat", null), 891);
-        Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(class44.method571("loc.idx", null), 891);
+        aClass30_Sub2_Sub2_753 = new PacketBuffer(class44.method571("loc.dat", null), 891);
+        PacketBuffer class30_sub2_sub2 = new PacketBuffer(class44.method571("loc.idx", null), 891);
         anInt756 = class30_sub2_sub2.method410();
         anIntArray755 = new int[anInt756];
         int i = 2;
@@ -176,7 +176,7 @@ final class Class46
             int j = class37.anInt648;
             int k = class37.anInt649;
             int l = class37.anInt650;
-            int i1 = client.anIntArray1232[l - k];
+            int i1 = GameClient.anIntArray1232[l - k];
             i = aClient765.anIntArray971[j] >> k & i1;
         } else
         if(anInt749 != -1)
@@ -295,7 +295,7 @@ final class Class46
         return class30_sub2_sub4_sub6_3;
     }
 
-    private final void method582(boolean flag, Class30_Sub2_Sub2 class30_sub2_sub2)
+    private final void method582(boolean flag, PacketBuffer class30_sub2_sub2)
     {
         if(!flag)
             anInt750 = 217;
@@ -517,7 +517,7 @@ label0:
     private int anInt750;
     private boolean aBoolean751;
     public static boolean aBoolean752;
-    private static Class30_Sub2_Sub2 aClass30_Sub2_Sub2_753;
+    private static PacketBuffer aClass30_Sub2_Sub2_753;
     public int anInt754;
     private static int anIntArray755[];
     private static int anInt756;
@@ -529,7 +529,7 @@ label0:
     public boolean aBoolean762;
     private boolean aBoolean763;
     public boolean aBoolean764;
-    public static client aClient765;
+    public static GameClient aClient765;
     public boolean aBoolean766;
     public boolean aBoolean767;
     public int anInt768;

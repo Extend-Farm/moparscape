@@ -3,12 +3,12 @@
 // Decompiler options: packimports(3) 
 
 import java.awt.*;
-import sign.signlink;
+import sign.SignLink;
 
-public final class Frame_Sub1 extends Frame
+public final class GameFrame extends Frame
 {
 
-    public Frame_Sub1(Applet_Sub1 applet_sub1, int i, byte byte0, int j)
+    public GameFrame(GameShell applet_sub1, int i, byte byte0, int j)
     {
         aBoolean35 = true;
         anApplet_Sub1_36 = applet_sub1;
@@ -39,5 +39,5 @@ public final class Frame_Sub1 extends Frame
     }
 
     private boolean aBoolean35;
-    Applet_Sub1 anApplet_Sub1_36;
+    GameShell anApplet_Sub1_36;
 }

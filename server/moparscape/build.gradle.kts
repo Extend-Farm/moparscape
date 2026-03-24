@@ -16,7 +16,7 @@ sourceSets {
 }
 
 application {
-  mainClass.set("client")
+  mainClass.set("GameClient")
 }
 
 tasks.named<JavaExec>("run") {
@@ -25,6 +25,6 @@ tasks.named<JavaExec>("run") {
 
 tasks.named<Jar>("jar") {
   manifest {
-    attributes["Main-Class"] = "client"
+    attributes["Main-Class"] = "GameClient"
   }
 }

@@ -2,7 +2,7 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
 public class Class16
 {
@@ -15,10 +15,10 @@ public class Class16
             anInt324 = 477;
     }
 
-    public static final void method240(int i, Class30_Sub2_Sub2 class30_sub2_sub2)
+    public static final void method240(int i, PacketBuffer class30_sub2_sub2)
     {
         aByteArray327 = new byte[0x6baa8];
-        aClass30_Sub2_Sub2_328 = new Class30_Sub2_Sub2(aByteArray327, 891);
+        aClass30_Sub2_Sub2_328 = new PacketBuffer(aByteArray327, 891);
         if(i != 0)
             aBoolean322 = !aBoolean322;
         Class6.method166();
@@ -33,7 +33,7 @@ public class Class16
         } while(true);
     }
 
-    public static final Class30_Sub2_Sub2 method241(int i, int j, boolean flag)
+    public static final PacketBuffer method241(int i, int j, boolean flag)
     {
         if(flag)
             aBoolean323 = !aBoolean323;
@@ -47,7 +47,7 @@ public class Class16
         }
     }
 
-    private final void method242(boolean flag, Class30_Sub2_Sub2 class30_sub2_sub2)
+    private final void method242(boolean flag, PacketBuffer class30_sub2_sub2)
     {
         for(int i = 0; i < 10; i++)
         {
@@ -91,7 +91,7 @@ public class Class16
         return j;
     }
 
-    private final Class30_Sub2_Sub2 method244(int i, int j)
+    private final PacketBuffer method244(int i, int j)
     {
         int k = method245(i);
         aClass30_Sub2_Sub2_328.anInt1406 = 0;
@@ -174,7 +174,7 @@ public class Class16
     private static Class16 aClass16Array325[] = new Class16[5000];
     public static int anIntArray326[] = new int[5000];
     private static byte aByteArray327[];
-    private static Class30_Sub2_Sub2 aClass30_Sub2_Sub2_328;
+    private static PacketBuffer aClass30_Sub2_Sub2_328;
     private Class6 aClass6Array329[];
     private int anInt330;
     private int anInt331;

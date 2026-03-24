@@ -2,7 +2,7 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
 public class Class48
     implements Runnable
@@ -16,8 +16,8 @@ public class Class48
             {
                 if(anInt810 < 500)
                 {
-                    anIntArray809[anInt810] = ((Applet_Sub1) (aClient805)).anInt20;
-                    anIntArray807[anInt810] = ((Applet_Sub1) (aClient805)).anInt21;
+                    anIntArray809[anInt810] = ((GameShell) (aClient805)).anInt20;
+                    anIntArray807[anInt810] = ((GameShell) (aClient805)).anInt21;
                     anInt810++;
                 }
             }
@@ -29,7 +29,7 @@ public class Class48
         }
     }
 
-    public Class48(client client1, int i)
+    public Class48(GameClient client1, int i)
     {
         anObject806 = new Object();
         anIntArray807 = new int[500];
@@ -40,7 +40,7 @@ public class Class48
         aClient805 = client1;
     }
 
-    public client aClient805;
+    public GameClient aClient805;
     public Object anObject806;
     public int anIntArray807[];
     public boolean aBoolean808;

@@ -3,14 +3,14 @@
 // Decompiler options: packimports(3) 
 
 import java.io.PrintStream;
-import sign.signlink;
+import sign.SignLink;
 
 public class Class38
 {
 
-    public static void method535(int i, Class44 class44)
+    public static void method535(int i, Archive class44)
     {
-        Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(class44.method571("idk.dat", null), 891);
+        PacketBuffer class30_sub2_sub2 = new PacketBuffer(class44.method571("idk.dat", null), 891);
         anInt655 = class30_sub2_sub2.method410();
         if(aClass38Array656 == null)
             aClass38Array656 = new Class38[anInt655];
@@ -24,7 +24,7 @@ public class Class38
         if(i == 0);
     }
 
-    public void method536(boolean flag, Class30_Sub2_Sub2 class30_sub2_sub2)
+    public void method536(boolean flag, PacketBuffer class30_sub2_sub2)
     {
         if(!flag)
             throw new NullPointerException();

@@ -2,7 +2,7 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
 public class Class6
 {
@@ -222,7 +222,7 @@ public class Class6
             return 0;
     }
 
-    public final void method169(boolean flag, Class30_Sub2_Sub2 class30_sub2_sub2)
+    public final void method169(boolean flag, PacketBuffer class30_sub2_sub2)
     {
         aClass29_98 = new Class29();
         aClass29_98.method325(true, class30_sub2_sub2);

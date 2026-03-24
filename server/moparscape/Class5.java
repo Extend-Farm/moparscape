@@ -2,7 +2,7 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
 final class Class5
 {
@@ -71,7 +71,7 @@ final class Class5
             int k = class37.anInt648;
             int l = class37.anInt649;
             int i1 = class37.anInt650;
-            int j1 = client.anIntArray1232[i1 - l];
+            int j1 = GameClient.anIntArray1232[i1 - l];
             j = aClient82.anIntArray971[k] >> l & j1;
         } else
         if(anInt59 != -1)
@@ -82,10 +82,10 @@ final class Class5
             return method159(anIntArray88[j]);
     }
 
-    public static final void method162(Class44 class44)
+    public static final void method162(Archive class44)
     {
-        aClass30_Sub2_Sub2_60 = new Class30_Sub2_Sub2(class44.method571("npc.dat", null), 891);
-        Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(class44.method571("npc.idx", null), 891);
+        aClass30_Sub2_Sub2_60 = new PacketBuffer(class44.method571("npc.dat", null), 891);
+        PacketBuffer class30_sub2_sub2 = new PacketBuffer(class44.method571("npc.idx", null), 891);
         anInt62 = class30_sub2_sub2.method410();
         anIntArray72 = new int[anInt62];
         int i = 2;
@@ -170,7 +170,7 @@ final class Class5
         return class30_sub2_sub4_sub6_1;
     }
 
-    private final void method165(boolean flag, Class30_Sub2_Sub2 class30_sub2_sub2)
+    private final void method165(boolean flag, PacketBuffer class30_sub2_sub2)
     {
         if(!flag)
             throw new NullPointerException();
@@ -329,7 +329,7 @@ final class Class5
     public int anInt57;
     public int anInt58;
     public int anInt59;
-    private static Class30_Sub2_Sub2 aClass30_Sub2_Sub2_60;
+    private static PacketBuffer aClass30_Sub2_Sub2_60;
     public int anInt61;
     public static int anInt62;
     private int anInt63;
@@ -351,7 +351,7 @@ final class Class5
     public int anInt79;
     private static Class5 aClass5Array80[];
     private boolean aBoolean81;
-    public static client aClient82;
+    public static GameClient aClient82;
     public int anInt83;
     public boolean aBoolean84;
     private int anInt85;

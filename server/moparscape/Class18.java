@@ -2,12 +2,12 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
 public class Class18
 {
 
-    public Class18(int i, Class30_Sub2_Sub2 class30_sub2_sub2)
+    public Class18(int i, PacketBuffer class30_sub2_sub2)
     {
         anInt340 = -588;
         anInt341 = class30_sub2_sub2.method408();

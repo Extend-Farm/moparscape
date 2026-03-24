@@ -6,9 +6,9 @@ import java.io.*;
 import java.net.Socket;
 import java.util.zip.CRC32;
 import java.util.zip.GZIPInputStream;
-import sign.signlink;
+import sign.SignLink;
 
-public class Class42_Sub1 extends Class42
+public class OnDemandFetcher extends ResourceProvider
     implements Runnable
 {
 
@@ -44,7 +44,7 @@ public class Class42_Sub1 extends Class42
                 int l1 = ((aByteArray1339[3] & 0xff) << 8) + (aByteArray1339[4] & 0xff);
                 int i2 = aByteArray1339[5] & 0xff;
                 aClass30_Sub2_Sub3_1369 = null;
-                for(Class30_Sub2_Sub3 class30_sub2_sub3 = (Class30_Sub2_Sub3)aClass19_1331.method252(); class30_sub2_sub3 != null; class30_sub2_sub3 = (Class30_Sub2_Sub3)aClass19_1331.method254(false))
+                for(OnDemandRequest class30_sub2_sub3 = (OnDemandRequest)aClass19_1331.method252(); class30_sub2_sub3 != null; class30_sub2_sub3 = (OnDemandRequest)aClass19_1331.method254(false))
                 {
                     if(class30_sub2_sub3.anInt1419 == l && class30_sub2_sub3.anInt1421 == j1)
                         aClass30_Sub2_Sub3_1369 = class30_sub2_sub3;
@@ -57,7 +57,7 @@ public class Class42_Sub1 extends Class42
                     anInt1373 = 0;
                     if(l1 == 0)
                     {
-                        signlink.reporterror("Rej: " + l + "," + j1);
+                        SignLink.reporterror("Rej: " + l + "," + j1);
                         aClass30_Sub2_Sub3_1369.aByteArray1420 = null;
                         if(aClass30_Sub2_Sub3_1369.aBoolean1422)
                             synchronized(aClass19_1358)
@@ -126,7 +126,7 @@ public class Class42_Sub1 extends Class42
         }
     }
 
-    public final void method551(Class44 class44, client client1)
+    public final void method551(Archive class44, GameClient client1)
     {
         String as[] = {
             "model_version", "anim_version", "midi_version", "map_version"
@@ -135,7 +135,7 @@ public class Class42_Sub1 extends Class42
         {
             byte abyte0[] = class44.method571(as[i], null);
             int j = abyte0.length / 2;
-            Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(abyte0, 891);
+            PacketBuffer class30_sub2_sub2 = new PacketBuffer(abyte0, 891);
             anIntArrayArray1364[i] = new int[j];
             aByteArrayArray1342[i] = new byte[j];
             for(int l = 0; l < j; l++)
@@ -150,7 +150,7 @@ public class Class42_Sub1 extends Class42
         {
             byte abyte1[] = class44.method571(as1[k], null);
             int i1 = abyte1.length / 4;
-            Class30_Sub2_Sub2 class30_sub2_sub2_1 = new Class30_Sub2_Sub2(abyte1, 891);
+            PacketBuffer class30_sub2_sub2_1 = new PacketBuffer(abyte1, 891);
             anIntArrayArray1365[k] = new int[i1];
             for(int l1 = 0; l1 < i1; l1++)
                 anIntArrayArray1365[k][l1] = class30_sub2_sub2_1.method413();
@@ -167,7 +167,7 @@ public class Class42_Sub1 extends Class42
                 aByteArray1372[k1] = 0;
 
         abyte2 = class44.method571("map_index", null);
-        Class30_Sub2_Sub2 class30_sub2_sub2_2 = new Class30_Sub2_Sub2(abyte2, 891);
+        PacketBuffer class30_sub2_sub2_2 = new PacketBuffer(abyte2, 891);
         j1 = abyte2.length / 7;
         anIntArray1371 = new int[j1];
         anIntArray1350 = new int[j1];
@@ -182,14 +182,14 @@ public class Class42_Sub1 extends Class42
         }
 
         abyte2 = class44.method571("anim_index", null);
-        class30_sub2_sub2_2 = new Class30_Sub2_Sub2(abyte2, 891);
+        class30_sub2_sub2_2 = new PacketBuffer(abyte2, 891);
         j1 = abyte2.length / 2;
         anIntArray1360 = new int[j1];
         for(int j2 = 0; j2 < j1; j2++)
             anIntArray1360[j2] = class30_sub2_sub2_2.method410();
 
         abyte2 = class44.method571("midi_index", null);
-        class30_sub2_sub2_2 = new Class30_Sub2_Sub2(abyte2, 891);
+        class30_sub2_sub2_2 = new PacketBuffer(abyte2, 891);
         j1 = abyte2.length;
         anIntArray1348 = new int[j1];
         for(int k2 = 0; k2 < j1; k2++)
@@ -235,7 +235,7 @@ public class Class42_Sub1 extends Class42
         return anIntArrayArray1364[j].length;
     }
 
-    private final void method556(int i, Class30_Sub2_Sub3 class30_sub2_sub3)
+    private final void method556(int i, OnDemandRequest class30_sub2_sub3)
     {
         if(i < 8 || i > 8)
             anInt1352 = -339;
@@ -247,7 +247,7 @@ public class Class42_Sub1 extends Class42
                 if(l - aLong1335 < 4000L)
                     return;
                 aLong1335 = l;
-                aSocket1363 = aClient1343.method19(4444 + client.anInt958);
+                aSocket1363 = aClient1343.method19(4444 + GameClient.anInt958);
                 anInputStream1362 = aSocket1363.getInputStream();
                 anOutputStream1354 = aSocket1363.getOutputStream();
                 anOutputStream1354.write(15);
@@ -299,11 +299,11 @@ public class Class42_Sub1 extends Class42
             return;
         synchronized(aClass2_1361)
         {
-            for(Class30_Sub2_Sub3 class30_sub2_sub3 = (Class30_Sub2_Sub3)aClass2_1361.method152(); class30_sub2_sub3 != null; class30_sub2_sub3 = (Class30_Sub2_Sub3)aClass2_1361.method153(false))
+            for(OnDemandRequest class30_sub2_sub3 = (OnDemandRequest)aClass2_1361.method152(); class30_sub2_sub3 != null; class30_sub2_sub3 = (OnDemandRequest)aClass2_1361.method153(false))
                 if(class30_sub2_sub3.anInt1419 == i && class30_sub2_sub3.anInt1421 == j)
                     return;
 
-            Class30_Sub2_Sub3 class30_sub2_sub3_1 = new Class30_Sub2_Sub3();
+            OnDemandRequest class30_sub2_sub3_1 = new OnDemandRequest();
             class30_sub2_sub3_1.anInt1419 = i;
             class30_sub2_sub3_1.anInt1421 = j;
             class30_sub2_sub3_1.aBoolean1422 = true;
@@ -353,7 +353,7 @@ public class Class42_Sub1 extends Class42
                 }
 
                 boolean flag = false;
-                for(Class30_Sub2_Sub3 class30_sub2_sub3 = (Class30_Sub2_Sub3)aClass19_1331.method252(); class30_sub2_sub3 != null; class30_sub2_sub3 = (Class30_Sub2_Sub3)aClass19_1331.method254(false))
+                for(OnDemandRequest class30_sub2_sub3 = (OnDemandRequest)aClass19_1331.method252(); class30_sub2_sub3 != null; class30_sub2_sub3 = (OnDemandRequest)aClass19_1331.method254(false))
                     if(class30_sub2_sub3.aBoolean1422)
                     {
                         flag = true;
@@ -367,7 +367,7 @@ public class Class42_Sub1 extends Class42
 
                 if(!flag)
                 {
-                    for(Class30_Sub2_Sub3 class30_sub2_sub3_1 = (Class30_Sub2_Sub3)aClass19_1331.method252(); class30_sub2_sub3_1 != null; class30_sub2_sub3_1 = (Class30_Sub2_Sub3)aClass19_1331.method254(false))
+                    for(OnDemandRequest class30_sub2_sub3_1 = (OnDemandRequest)aClass19_1331.method252(); class30_sub2_sub3_1 != null; class30_sub2_sub3_1 = (OnDemandRequest)aClass19_1331.method254(false))
                     {
                         flag = true;
                         class30_sub2_sub3_1.anInt1423++;
@@ -424,7 +424,7 @@ public class Class42_Sub1 extends Class42
         }
         catch(Exception exception)
         {
-            signlink.reporterror("od_ex " + exception.getMessage());
+            SignLink.reporterror("od_ex " + exception.getMessage());
         }
     }
 
@@ -438,7 +438,7 @@ public class Class42_Sub1 extends Class42
             return;
         if(anInt1332 == 0)
             return;
-        Class30_Sub2_Sub3 class30_sub2_sub3 = new Class30_Sub2_Sub3();
+        OnDemandRequest class30_sub2_sub3 = new OnDemandRequest();
         class30_sub2_sub3.anInt1419 = j;
         class30_sub2_sub3.anInt1421 = i;
         if(flag)
@@ -450,12 +450,12 @@ public class Class42_Sub1 extends Class42
         }
     }
 
-    public final Class30_Sub2_Sub3 method561()
+    public final OnDemandRequest method561()
     {
-        Class30_Sub2_Sub3 class30_sub2_sub3;
+        OnDemandRequest class30_sub2_sub3;
         synchronized(aClass19_1358)
         {
-            class30_sub2_sub3 = (Class30_Sub2_Sub3)aClass19_1358.method251();
+            class30_sub2_sub3 = (OnDemandRequest)aClass19_1358.method251();
         }
         if(class30_sub2_sub3 == null)
             return null;
@@ -546,7 +546,7 @@ public class Class42_Sub1 extends Class42
         if(flag)
             return;
         anInt1367 = 0;
-        for(Class30_Sub2_Sub3 class30_sub2_sub3 = (Class30_Sub2_Sub3)aClass19_1331.method252(); class30_sub2_sub3 != null; class30_sub2_sub3 = (Class30_Sub2_Sub3)aClass19_1331.method254(false))
+        for(OnDemandRequest class30_sub2_sub3 = (OnDemandRequest)aClass19_1331.method252(); class30_sub2_sub3 != null; class30_sub2_sub3 = (OnDemandRequest)aClass19_1331.method254(false))
             if(class30_sub2_sub3.aBoolean1422)
                 anInt1366++;
             else
@@ -554,7 +554,7 @@ public class Class42_Sub1 extends Class42
 
         while(anInt1366 < 10) 
         {
-            Class30_Sub2_Sub3 class30_sub2_sub3_1 = (Class30_Sub2_Sub3)aClass19_1368.method251();
+            OnDemandRequest class30_sub2_sub3_1 = (OnDemandRequest)aClass19_1368.method251();
             if(class30_sub2_sub3_1 == null)
                 break;
             if(aByteArrayArray1342[class30_sub2_sub3_1.anInt1419][class30_sub2_sub3_1.anInt1421] != 0)
@@ -583,10 +583,10 @@ public class Class42_Sub1 extends Class42
     {
         if(!flag)
             return;
-        Class30_Sub2_Sub3 class30_sub2_sub3;
+        OnDemandRequest class30_sub2_sub3;
         synchronized(aClass19_1370)
         {
-            class30_sub2_sub3 = (Class30_Sub2_Sub3)aClass19_1370.method251();
+            class30_sub2_sub3 = (OnDemandRequest)aClass19_1370.method251();
         }
         while(class30_sub2_sub3 != null) 
         {
@@ -609,7 +609,7 @@ public class Class42_Sub1 extends Class42
                         aClass19_1358.method249(class30_sub2_sub3);
                     }
                 }
-                class30_sub2_sub3 = (Class30_Sub2_Sub3)aClass19_1370.method251();
+                class30_sub2_sub3 = (OnDemandRequest)aClass19_1370.method251();
             }
         }
     }
@@ -624,10 +624,10 @@ public class Class42_Sub1 extends Class42
         {
             if(anInt1332 == 0)
                 break;
-            Class30_Sub2_Sub3 class30_sub2_sub3;
+            OnDemandRequest class30_sub2_sub3;
             synchronized(aClass19_1344)
             {
-                class30_sub2_sub3 = (Class30_Sub2_Sub3)aClass19_1344.method251();
+                class30_sub2_sub3 = (OnDemandRequest)aClass19_1344.method251();
             }
             while(class30_sub2_sub3 != null) 
             {
@@ -646,7 +646,7 @@ public class Class42_Sub1 extends Class42
                 }
                 synchronized(aClass19_1344)
                 {
-                    class30_sub2_sub3 = (Class30_Sub2_Sub3)aClass19_1344.method251();
+                    class30_sub2_sub3 = (OnDemandRequest)aClass19_1344.method251();
                 }
             }
             for(int j = 0; j < 4; j++)
@@ -657,7 +657,7 @@ public class Class42_Sub1 extends Class42
                     if(abyte0[l] == anInt1332)
                     {
                         abyte0[l] = 0;
-                        Class30_Sub2_Sub3 class30_sub2_sub3_1 = new Class30_Sub2_Sub3();
+                        OnDemandRequest class30_sub2_sub3_1 = new OnDemandRequest();
                         class30_sub2_sub3_1.anInt1419 = j;
                         class30_sub2_sub3_1.anInt1421 = l;
                         class30_sub2_sub3_1.aBoolean1422 = false;
@@ -685,7 +685,7 @@ public class Class42_Sub1 extends Class42
         return anIntArray1348[i] == 1;
     }
 
-    public Class42_Sub1()
+    public OnDemandFetcher()
     {
         aClass19_1331 = new Class19(169);
         aString1333 = "";
@@ -721,7 +721,7 @@ public class Class42_Sub1 extends Class42
     private int anInt1340;
     public int anInt1341;
     private byte aByteArrayArray1342[][];
-    private client aClient1343;
+    private GameClient aClient1343;
     private Class19 aClass19_1344;
     private static int anInt1345;
     private int anInt1346;
@@ -747,7 +747,7 @@ public class Class42_Sub1 extends Class42
     private int anInt1366;
     private int anInt1367;
     private Class19 aClass19_1368;
-    private Class30_Sub2_Sub3 aClass30_Sub2_Sub3_1369;
+    private OnDemandRequest aClass30_Sub2_Sub3_1369;
     private Class19 aClass19_1370;
     private int anIntArray1371[];
     private byte aByteArray1372[];

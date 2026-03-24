@@ -2,18 +2,18 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
 public final class Class30_Sub2_Sub1_Sub2 extends Class30_Sub2_Sub1
 {
 
-    public Class30_Sub2_Sub1_Sub2(Class44 class44, String s, int i)
+    public Class30_Sub2_Sub1_Sub2(Archive class44, String s, int i)
     {
         aBoolean1447 = false;
         anInt1448 = 360;
         aByte1449 = 3;
-        Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(class44.method571(s + ".dat", null), 891);
-        Class30_Sub2_Sub2 class30_sub2_sub2_1 = new Class30_Sub2_Sub2(class44.method571("index.dat", null), 891);
+        PacketBuffer class30_sub2_sub2 = new PacketBuffer(class44.method571(s + ".dat", null), 891);
+        PacketBuffer class30_sub2_sub2_1 = new PacketBuffer(class44.method571("index.dat", null), 891);
         class30_sub2_sub2_1.anInt1406 = class30_sub2_sub2.method410();
         anInt1456 = class30_sub2_sub2_1.method410();
         anInt1457 = class30_sub2_sub2_1.method410();

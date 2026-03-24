@@ -3,14 +3,14 @@
 // Decompiler options: packimports(3) 
 
 import java.io.PrintStream;
-import sign.signlink;
+import sign.SignLink;
 
 public class Class41
 {
 
-    public static void method546(int i, Class44 class44)
+    public static void method546(int i, Archive class44)
     {
-        Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(class44.method571("varp.dat", null), 891);
+        PacketBuffer class30_sub2_sub2 = new PacketBuffer(class44.method571("varp.dat", null), 891);
         anInt702 = 0;
         anInt700 = class30_sub2_sub2.method410();
         if(aClass41Array701 == null)
@@ -30,7 +30,7 @@ public class Class41
             System.out.println("varptype load mismatch");
     }
 
-    public void method547(Class30_Sub2_Sub2 class30_sub2_sub2, boolean flag, int i)
+    public void method547(PacketBuffer class30_sub2_sub2, boolean flag, int i)
     {
         if(flag)
             anInt699 = -91;

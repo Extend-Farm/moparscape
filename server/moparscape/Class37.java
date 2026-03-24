@@ -3,16 +3,16 @@
 // Decompiler options: packimports(3) 
 
 import java.io.PrintStream;
-import sign.signlink;
+import sign.SignLink;
 
 public class Class37
 {
 
-    public static void method533(int i, Class44 class44)
+    public static void method533(int i, Archive class44)
     {
         if(i != 0)
             anInt644 = 91;
-        Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(class44.method571("varbit.dat", null), 891);
+        PacketBuffer class30_sub2_sub2 = new PacketBuffer(class44.method571("varbit.dat", null), 891);
         anInt645 = class30_sub2_sub2.method410();
         if(aClass37Array646 == null)
             aClass37Array646 = new Class37[anInt645];
@@ -29,7 +29,7 @@ public class Class37
             System.out.println("varbit load mismatch");
     }
 
-    public void method534(Class30_Sub2_Sub2 class30_sub2_sub2, boolean flag, int i)
+    public void method534(PacketBuffer class30_sub2_sub2, boolean flag, int i)
     {
         if(flag)
             return;

@@ -2,12 +2,12 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
 public class Class29
 {
 
-    public final void method325(boolean flag, Class30_Sub2_Sub2 class30_sub2_sub2)
+    public final void method325(boolean flag, PacketBuffer class30_sub2_sub2)
     {
         anInt540 = class30_sub2_sub2.method408();
         if(!flag)
@@ -22,7 +22,7 @@ public class Class29
         }
     }
 
-    public final void method326(byte byte0, Class30_Sub2_Sub2 class30_sub2_sub2)
+    public final void method326(byte byte0, PacketBuffer class30_sub2_sub2)
     {
         if(byte0 != aByte532)
             aBoolean533 = !aBoolean533;

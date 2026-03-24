@@ -3,14 +3,14 @@
 // Decompiler options: packimports(3) 
 
 
-public class Class42
+public class ResourceProvider
 {
 
     public void method548(int i)
     {
     }
 
-    public Class42()
+    public ResourceProvider()
     {
         aBoolean715 = true;
     }

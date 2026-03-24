@@ -2,12 +2,12 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
-public final class Class17
+public final class IsaacCipher
 {
 
-    public Class17(int i, int ai[])
+    public IsaacCipher(int i, int ai[])
     {
         anInt332 = -436;
         anInt333 = -431;

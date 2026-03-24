@@ -2,7 +2,7 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
 public class Class36
 {
@@ -18,26 +18,26 @@ public class Class36
 
     public static void method529(byte abyte0[], boolean flag)
     {
-        Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(abyte0, 891);
+        PacketBuffer class30_sub2_sub2 = new PacketBuffer(abyte0, 891);
         class30_sub2_sub2.anInt1406 = abyte0.length - 8;
         int i = class30_sub2_sub2.method410();
         int j = class30_sub2_sub2.method410();
         int k = class30_sub2_sub2.method410();
         int l = class30_sub2_sub2.method410();
         int i1 = 0;
-        Class30_Sub2_Sub2 class30_sub2_sub2_1 = new Class30_Sub2_Sub2(abyte0, 891);
+        PacketBuffer class30_sub2_sub2_1 = new PacketBuffer(abyte0, 891);
         class30_sub2_sub2_1.anInt1406 = i1;
         i1 += i + 2;
-        Class30_Sub2_Sub2 class30_sub2_sub2_2 = new Class30_Sub2_Sub2(abyte0, 891);
+        PacketBuffer class30_sub2_sub2_2 = new PacketBuffer(abyte0, 891);
         class30_sub2_sub2_2.anInt1406 = i1;
         i1 += j;
-        Class30_Sub2_Sub2 class30_sub2_sub2_3 = new Class30_Sub2_Sub2(abyte0, 891);
+        PacketBuffer class30_sub2_sub2_3 = new PacketBuffer(abyte0, 891);
         class30_sub2_sub2_3.anInt1406 = i1;
         i1 += k;
-        Class30_Sub2_Sub2 class30_sub2_sub2_4 = new Class30_Sub2_Sub2(abyte0, 891);
+        PacketBuffer class30_sub2_sub2_4 = new PacketBuffer(abyte0, 891);
         class30_sub2_sub2_4.anInt1406 = i1;
         i1 += l;
-        Class30_Sub2_Sub2 class30_sub2_sub2_5 = new Class30_Sub2_Sub2(abyte0, 891);
+        PacketBuffer class30_sub2_sub2_5 = new PacketBuffer(abyte0, 891);
         class30_sub2_sub2_5.anInt1406 = i1;
         if(flag)
         {

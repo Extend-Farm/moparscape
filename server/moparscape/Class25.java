@@ -3,7 +3,7 @@
 // Decompiler options: packimports(3) 
 
 import java.io.PrintStream;
-import sign.signlink;
+import sign.SignLink;
 
 public class Class25
 {

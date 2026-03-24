@@ -2,21 +2,21 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
 public final class Class34
 {
 
-    public static final void method487(Class44 class44)
+    public static final void method487(Archive class44)
     {
-        Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(class44.method571("fragmentsenc.txt", null), 891);
-        Class30_Sub2_Sub2 class30_sub2_sub2_1 = new Class30_Sub2_Sub2(class44.method571("badenc.txt", null), 891);
-        Class30_Sub2_Sub2 class30_sub2_sub2_2 = new Class30_Sub2_Sub2(class44.method571("domainenc.txt", null), 891);
-        Class30_Sub2_Sub2 class30_sub2_sub2_3 = new Class30_Sub2_Sub2(class44.method571("tldlist.txt", null), 891);
+        PacketBuffer class30_sub2_sub2 = new PacketBuffer(class44.method571("fragmentsenc.txt", null), 891);
+        PacketBuffer class30_sub2_sub2_1 = new PacketBuffer(class44.method571("badenc.txt", null), 891);
+        PacketBuffer class30_sub2_sub2_2 = new PacketBuffer(class44.method571("domainenc.txt", null), 891);
+        PacketBuffer class30_sub2_sub2_3 = new PacketBuffer(class44.method571("tldlist.txt", null), 891);
         method488(class30_sub2_sub2, class30_sub2_sub2_1, class30_sub2_sub2_2, class30_sub2_sub2_3);
     }
 
-    private static final void method488(Class30_Sub2_Sub2 class30_sub2_sub2, Class30_Sub2_Sub2 class30_sub2_sub2_1, Class30_Sub2_Sub2 class30_sub2_sub2_2, Class30_Sub2_Sub2 class30_sub2_sub2_3)
+    private static final void method488(PacketBuffer class30_sub2_sub2, PacketBuffer class30_sub2_sub2_1, PacketBuffer class30_sub2_sub2_2, PacketBuffer class30_sub2_sub2_3)
     {
         method490(9121, class30_sub2_sub2_1);
         method491(class30_sub2_sub2_2, (byte)-28);
@@ -24,7 +24,7 @@ public final class Class34
         method489((byte)2, class30_sub2_sub2_3);
     }
 
-    private static final void method489(byte byte0, Class30_Sub2_Sub2 class30_sub2_sub2)
+    private static final void method489(byte byte0, PacketBuffer class30_sub2_sub2)
     {
         int i = class30_sub2_sub2.method413();
         aCharArrayArray624 = new char[i][];
@@ -43,7 +43,7 @@ public final class Class34
 
     }
 
-    private static final void method490(int i, Class30_Sub2_Sub2 class30_sub2_sub2)
+    private static final void method490(int i, PacketBuffer class30_sub2_sub2)
     {
         if(i != 9121)
             aBoolean619 = !aBoolean619;
@@ -53,7 +53,7 @@ public final class Class34
         method493(class30_sub2_sub2, aCharArrayArray621, true, aByteArrayArrayArray622);
     }
 
-    private static final void method491(Class30_Sub2_Sub2 class30_sub2_sub2, byte byte0)
+    private static final void method491(PacketBuffer class30_sub2_sub2, byte byte0)
     {
         int i = class30_sub2_sub2.method413();
         aCharArrayArray623 = new char[i][];
@@ -67,7 +67,7 @@ public final class Class34
         }
     }
 
-    private static final void method492(Class30_Sub2_Sub2 class30_sub2_sub2, boolean flag)
+    private static final void method492(PacketBuffer class30_sub2_sub2, boolean flag)
     {
         anIntArray620 = new int[class30_sub2_sub2.method413()];
         for(int i = 0; i < anIntArray620.length; i++)
@@ -77,7 +77,7 @@ public final class Class34
             anInt609 = 167;
     }
 
-    private static final void method493(Class30_Sub2_Sub2 class30_sub2_sub2, char ac[][], boolean flag, byte abyte0[][][])
+    private static final void method493(PacketBuffer class30_sub2_sub2, char ac[][], boolean flag, byte abyte0[][][])
     {
         if(!flag)
         {
@@ -103,7 +103,7 @@ public final class Class34
 
     }
 
-    private static final void method494(char ac[][], Class30_Sub2_Sub2 class30_sub2_sub2, int i)
+    private static final void method494(char ac[][], PacketBuffer class30_sub2_sub2, int i)
     {
         if(i >= 0)
             return;

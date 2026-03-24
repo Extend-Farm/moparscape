@@ -2,12 +2,12 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
 public final class Class35
 {
 
-    public static String method525(int i, boolean flag, Class30_Sub2_Sub2 class30_sub2_sub2)
+    public static String method525(int i, boolean flag, PacketBuffer class30_sub2_sub2)
     {
         int j = 0;
         int k = -1;
@@ -58,7 +58,7 @@ public final class Class35
         return new String(aCharArray631, 0, j);
     }
 
-    public static void method526(String s, boolean flag, Class30_Sub2_Sub2 class30_sub2_sub2)
+    public static void method526(String s, boolean flag, PacketBuffer class30_sub2_sub2)
     {
         if(s.length() > 80)
             s = s.substring(0, 80);
@@ -118,7 +118,7 @@ public final class Class35
     private static boolean aBoolean629;
     private static boolean aBoolean630 = true;
     public static char aCharArray631[] = new char[100];
-    private static Class30_Sub2_Sub2 aClass30_Sub2_Sub2_632 = new Class30_Sub2_Sub2(new byte[100], 891);
+    private static PacketBuffer aClass30_Sub2_Sub2_632 = new PacketBuffer(new byte[100], 891);
     private static char aCharArray633[] = {
         ' ', 'e', 't', 'a', 'o', 'i', 'h', 'n', 's', 'r', 
         'd', 'l', 'u', 'm', 'w', 'c', 'y', 'f', 'g', 'p', 

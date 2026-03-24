@@ -2,7 +2,7 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
 public class Class39
 {
@@ -82,7 +82,7 @@ public class Class39
         return anIntArray665[i] * 2;
     }
 
-    public final void method545(Class30_Sub2_Sub2 class30_sub2_sub2, boolean flag, Class29 class29)
+    public final void method545(PacketBuffer class30_sub2_sub2, boolean flag, Class29 class29)
     {
         int i = class30_sub2_sub2.method408();
         anIntArray665[0] = i >> 4;

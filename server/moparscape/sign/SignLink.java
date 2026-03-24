@@ -1,7 +1,7 @@
 // Decompiled by Jad v1.5.8f. Copyright 2001 Pavel Kouznetsov.
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
-// Source File Name:   signlink.java
+// Source File Name:   SignLink.java
 
 package sign;
 
@@ -9,7 +9,7 @@ import java.applet.Applet;
 import java.io.*;
 import java.net.*;
 
-public final class signlink
+public final class SignLink
     implements Runnable
 {
 
@@ -31,7 +31,7 @@ public final class signlink
         savereq = null;
         urlreq = null;
         socketip = inetaddress;
-        Thread thread = new Thread(new signlink());
+        Thread thread = new Thread(new SignLink());
         thread.setDaemon(true);
         thread.start();
         while(!active) 
@@ -276,7 +276,7 @@ public final class signlink
         }
     }
 
-    public signlink()
+    public SignLink()
     {
     }
 

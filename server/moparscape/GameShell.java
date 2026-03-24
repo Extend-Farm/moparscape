@@ -6,9 +6,9 @@ import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.PrintStream;
-import sign.signlink;
+import sign.SignLink;
 
-public class Applet_Sub1 extends Applet
+public class GameShell extends Applet
     implements Runnable, MouseListener, MouseMotionListener, KeyListener, FocusListener, WindowListener
 {
 
@@ -21,9 +21,9 @@ public class Applet_Sub1 extends Applet
             return;
         } else
         {
-            aFrame_Sub1_15 = new Frame_Sub1(this, anInt10, (byte)5, anInt11);
+            aFrame_Sub1_15 = new GameFrame(this, anInt10, (byte)5, anInt11);
             aGraphics12 = method11(0).getGraphics();
-            aClass15_13 = new Class15(anInt10, anInt11, method11(0), 0);
+            aClass15_13 = new ProducingGraphicsBuffer(anInt10, anInt11, method11(0), 0);
             method12(this, 1);
             return;
         }
@@ -34,7 +34,7 @@ public class Applet_Sub1 extends Applet
         anInt10 = j;
         anInt11 = i;
         aGraphics12 = method11(0).getGraphics();
-        aClass15_13 = new Class15(anInt10, anInt11, method11(0), 0);
+        aClass15_13 = new ProducingGraphicsBuffer(anInt10, anInt11, method11(0), 0);
         method12(this, 1);
         if(!flag);
     }
@@ -299,27 +299,27 @@ public class Applet_Sub1 extends Applet
         int i = keyevent.getKeyCode();
         int j = keyevent.getKeyChar();
         if(i == KeyEvent.VK_F12){
-        	if(client.cameratoggle == 0){
+        	if(GameClient.cameratoggle == 0){
         		System.out.println("Camera Movement On");
-            client.cameratoggle = 1;
+            GameClient.cameratoggle = 1;
           }else
-          if(client.cameratoggle == 1){
+          if(GameClient.cameratoggle == 1){
         		System.out.println("Camera Movement Off");
-            client.cameratoggle = 0;
+            GameClient.cameratoggle = 0;
           }
         }
         if(i == KeyEvent.VK_INSERT)
-          client.zoom += 15;
+          GameClient.zoom += 15;
         if(i == KeyEvent.VK_PAGE_UP)
-          client.zoom -= 15;
+          GameClient.zoom -= 15;
         if(i == KeyEvent.VK_HOME)
-          client.fwdbwd -= 15;
+          GameClient.fwdbwd -= 15;
         if(i == KeyEvent.VK_END)
-          client.fwdbwd += 15;
+          GameClient.fwdbwd += 15;
         if(i == KeyEvent.VK_PAGE_DOWN)
-          client.lftrit -= 15;
+          GameClient.lftrit -= 15;
         if(i == KeyEvent.VK_DELETE)
-          client.lftrit += 15;
+          GameClient.lftrit += 15;
         if(j < 30)
             j = 0;
         if(i == 37)
@@ -543,7 +543,7 @@ public class Applet_Sub1 extends Applet
         }
     }
 
-    public Applet_Sub1()
+    public GameShell()
     {
         aBoolean1 = true;
         anInt2 = 24869;
@@ -571,9 +571,9 @@ public class Applet_Sub1 extends Applet
     public int anInt10;
     public int anInt11;
     public Graphics aGraphics12;
-    public Class15 aClass15_13;
+    public ProducingGraphicsBuffer aClass15_13;
     public Class30_Sub2_Sub1_Sub1 aClass30_Sub2_Sub1_Sub1Array14[];
-    public Frame_Sub1 aFrame_Sub1_15;
+    public GameFrame aFrame_Sub1_15;
     public boolean aBoolean16;
     public boolean aBoolean17;
     public int anInt18;

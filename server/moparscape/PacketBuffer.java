@@ -3,41 +3,41 @@
 // Decompiler options: packimports(3) 
 
 import java.math.BigInteger;
-import sign.signlink;
+import sign.SignLink;
 
-public final class Class30_Sub2_Sub2 extends Class30_Sub2
+public final class PacketBuffer extends Class30_Sub2
 {
 
-    public static Class30_Sub2_Sub2 method396(int i, int j)
+    public static PacketBuffer method396(int i, int j)
     {
         synchronized(aClass19_1415)
         {
-            Class30_Sub2_Sub2 class30_sub2_sub2_2 = null;
+            PacketBuffer class30_sub2_sub2_2 = null;
             if(i == 0 && anInt1411 > 0)
             {
                 anInt1411--;
-                class30_sub2_sub2_2 = (Class30_Sub2_Sub2)aClass19_1414.method251();
+                class30_sub2_sub2_2 = (PacketBuffer)aClass19_1414.method251();
             } else
             if(i == 1 && anInt1412 > 0)
             {
                 anInt1412--;
-                class30_sub2_sub2_2 = (Class30_Sub2_Sub2)aClass19_1415.method251();
+                class30_sub2_sub2_2 = (PacketBuffer)aClass19_1415.method251();
             } else
             if(i == 2 && anInt1413 > 0)
             {
                 anInt1413--;
-                class30_sub2_sub2_2 = (Class30_Sub2_Sub2)aClass19_1416.method251();
+                class30_sub2_sub2_2 = (PacketBuffer)aClass19_1416.method251();
             }
             if(class30_sub2_sub2_2 != null)
             {
                 class30_sub2_sub2_2.anInt1406 = 0;
-                Class30_Sub2_Sub2 class30_sub2_sub2 = class30_sub2_sub2_2;
+                PacketBuffer class30_sub2_sub2 = class30_sub2_sub2_2;
                 return class30_sub2_sub2;
             }
         }
         if(j < 9 || j > 9)
             throw new NullPointerException();
-        Class30_Sub2_Sub2 class30_sub2_sub2_1 = new Class30_Sub2_Sub2(false);
+        PacketBuffer class30_sub2_sub2_1 = new PacketBuffer(false);
         class30_sub2_sub2_1.anInt1406 = 0;
         if(i == 0)
             class30_sub2_sub2_1.aByteArray1405 = new byte[100];
@@ -49,7 +49,7 @@ public final class Class30_Sub2_Sub2 extends Class30_Sub2
         return class30_sub2_sub2_1;
     }
 
-    private Class30_Sub2_Sub2(boolean flag)
+    private PacketBuffer(boolean flag)
     {
         anInt1389 = 891;
         anInt1390 = 9;
@@ -73,7 +73,7 @@ public final class Class30_Sub2_Sub2 extends Class30_Sub2
             return;
     }
 
-    public Class30_Sub2_Sub2(byte abyte0[], int i)
+    public PacketBuffer(byte abyte0[], int i)
     {
         anInt1389 = 891;
         anInt1390 = 9;
@@ -177,7 +177,7 @@ public final class Class30_Sub2_Sub2 extends Class30_Sub2
         }
         catch(RuntimeException runtimeexception)
         {
-            signlink.reporterror("14395, " + i + ", " + l + ", " + runtimeexception.toString());
+            SignLink.reporterror("14395, " + i + ", " + l + ", " + runtimeexception.toString());
             throw new RuntimeException();
         }
     }
@@ -550,7 +550,7 @@ public final class Class30_Sub2_Sub2 extends Class30_Sub2
         0xfffff, 0x1fffff, 0x3fffff, 0x7fffff, 0xffffff, 0x1ffffff, 0x3ffffff, 0x7ffffff, 0xfffffff, 0x1fffffff, 
         0x3fffffff, 0x7fffffff, -1
     };
-    public Class17 aClass17_1410;
+    public IsaacCipher aClass17_1410;
     private static int anInt1411;
     private static int anInt1412;
     private static int anInt1413;

@@ -2,7 +2,7 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
 public final class Class1
 {
@@ -56,7 +56,7 @@ public final class Class1
         }
         catch(RuntimeException runtimeexception)
         {
-            signlink.reporterror("91499, " + class30 + ", " + l + ", " + byte0 + ", " + runtimeexception.toString());
+            SignLink.reporterror("91499, " + class30 + ", " + l + ", " + byte0 + ", " + runtimeexception.toString());
         }
         throw new RuntimeException();
     }

@@ -2,7 +2,7 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
 public final class Class50
 {
@@ -50,7 +50,7 @@ public final class Class50
         }
         catch(RuntimeException runtimeexception)
         {
-            signlink.reporterror("81570, " + l + ", " + byte0 + ", " + runtimeexception.toString());
+            SignLink.reporterror("81570, " + l + ", " + byte0 + ", " + runtimeexception.toString());
         }
         throw new RuntimeException();
     }

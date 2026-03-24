@@ -3,10 +3,10 @@
 // Decompiler options: packimports(3) 
 
 
-public class Class30_Sub2_Sub3 extends Class30_Sub2
+public class OnDemandRequest extends Class30_Sub2
 {
 
-    public Class30_Sub2_Sub3()
+    public OnDemandRequest()
     {
         aBoolean1422 = true;
     }

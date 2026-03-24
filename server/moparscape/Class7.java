@@ -483,7 +483,7 @@ final class Class7 {
         return n3;
     }
 
-    public static final void method173(byte by, Class30_Sub2_Sub2 class30_Sub2_Sub2, Class42_Sub1 class42_Sub1) {
+    public static final void method173(byte by, PacketBuffer class30_Sub2_Sub2, OnDemandFetcher class42_Sub1) {
         int n;
         int n2 = -1;
         if (by != -107) {
@@ -890,7 +890,7 @@ final class Class7 {
                 ++n9;
             }
         }
-        Class30_Sub2_Sub2 class30_Sub2_Sub2 = new Class30_Sub2_Sub2(byArray, 891);
+        PacketBuffer class30_Sub2_Sub2 = new PacketBuffer(byArray, 891);
         int n12 = 0;
         while (n12 < 4) {
             int n13 = 0;
@@ -929,7 +929,7 @@ final class Class7 {
             }
             ++n6;
         }
-        Class30_Sub2_Sub2 class30_Sub2_Sub2 = new Class30_Sub2_Sub2(byArray, 891);
+        PacketBuffer class30_Sub2_Sub2 = new PacketBuffer(byArray, 891);
         n5 = 0;
         while (n5 < 4) {
             int n9 = 0;
@@ -948,7 +948,7 @@ final class Class7 {
         }
     }
 
-    private final void method181(int n, int n2, Class30_Sub2_Sub2 class30_Sub2_Sub2, int n3, int n4, int n5, int n6, int n7) {
+    private final void method181(int n, int n2, PacketBuffer class30_Sub2_Sub2, int n3, int n4, int n5, int n6, int n7) {
         int n8;
         n6 = 36 / n6;
         if (n3 >= 0 && n3 < 104 && n >= 0 && n < 104) {
@@ -1013,7 +1013,7 @@ final class Class7 {
 
     public final void method183(Class11[] class11Array, Class25 class25, int n, int n2, int n3, boolean bl, int n4, byte[] byArray, int n5, int n6, int n7) {
         int n8;
-        Class30_Sub2_Sub2 class30_Sub2_Sub2 = new Class30_Sub2_Sub2(byArray, 891);
+        PacketBuffer class30_Sub2_Sub2 = new PacketBuffer(byArray, 891);
         int n9 = -1;
         if (!bl) {
             boolean bl2 = this.aBoolean143 = !this.aBoolean143;
@@ -1255,7 +1255,7 @@ final class Class7 {
             throw new NullPointerException();
         }
         boolean bl = true;
-        Class30_Sub2_Sub2 class30_Sub2_Sub2 = new Class30_Sub2_Sub2(byArray, 891);
+        PacketBuffer class30_Sub2_Sub2 = new PacketBuffer(byArray, 891);
         int n5 = -1;
         block0: while ((n4 = class30_Sub2_Sub2.method422()) != 0) {
             n5 += n4;
@@ -1291,7 +1291,7 @@ final class Class7 {
         if (n3 < 7 || n3 > 7) {
             return;
         }
-        Class30_Sub2_Sub2 class30_Sub2_Sub2 = new Class30_Sub2_Sub2(byArray, 891);
+        PacketBuffer class30_Sub2_Sub2 = new PacketBuffer(byArray, 891);
         int n5 = -1;
         while ((n4 = class30_Sub2_Sub2.method422()) != 0) {
             int n6;

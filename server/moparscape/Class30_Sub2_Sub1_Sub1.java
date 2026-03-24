@@ -5,7 +5,7 @@
 import java.awt.*;
 import java.awt.image.PixelGrabber;
 import java.io.PrintStream;
-import sign.signlink;
+import sign.SignLink;
 
 public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
 {
@@ -63,7 +63,7 @@ public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
         }
     }
 
-    public Class30_Sub2_Sub1_Sub1(Class44 class44, String s, int i)
+    public Class30_Sub2_Sub1_Sub1(Archive class44, String s, int i)
     {
         aBoolean1428 = false;
         anInt1429 = 24869;
@@ -75,8 +75,8 @@ public final class Class30_Sub2_Sub1_Sub1 extends Class30_Sub2_Sub1
         aBoolean1436 = true;
         aBoolean1437 = true;
         aBoolean1438 = false;
-        Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(class44.method571(s + ".dat", null), 891);
-        Class30_Sub2_Sub2 class30_sub2_sub2_1 = new Class30_Sub2_Sub2(class44.method571("index.dat", null), 891);
+        PacketBuffer class30_sub2_sub2 = new PacketBuffer(class44.method571(s + ".dat", null), 891);
+        PacketBuffer class30_sub2_sub2_1 = new PacketBuffer(class44.method571("index.dat", null), 891);
         class30_sub2_sub2_1.anInt1406 = class30_sub2_sub2.method410();
         anInt1444 = class30_sub2_sub2_1.method410();
         anInt1445 = class30_sub2_sub2_1.method410();

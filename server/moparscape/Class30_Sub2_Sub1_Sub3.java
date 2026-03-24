@@ -2,7 +2,7 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
 public class Class30_Sub2_Sub1_Sub3 extends Class30_Sub2_Sub1
 {
@@ -86,7 +86,7 @@ public class Class30_Sub2_Sub1_Sub3 extends Class30_Sub2_Sub1
         }
     }
 
-    public static final void method368(Class44 class44, int i)
+    public static final void method368(Archive class44, int i)
     {
         anInt1473 = 0;
         if(i != 0)

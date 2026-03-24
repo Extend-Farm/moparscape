@@ -2,7 +2,7 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
 public class Class9
 {
@@ -21,10 +21,10 @@ public class Class9
         anIntArray252[j] = k;
     }
 
-    public static void method205(Class44 class44, Class30_Sub2_Sub1_Sub4 aclass30_sub2_sub1_sub4[], byte byte0, Class44 class44_1)
+    public static void method205(Archive class44, Class30_Sub2_Sub1_Sub4 aclass30_sub2_sub1_sub4[], byte byte0, Archive class44_1)
     {
         aClass12_238 = new Class12(false, 50000);
-        Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(class44.method571("data", null), 891);
+        PacketBuffer class30_sub2_sub2 = new PacketBuffer(class44.method571("data", null), 891);
         int i = -1;
         int j = class30_sub2_sub2.method410();
         aClass9Array210 = new Class9[j];
@@ -259,7 +259,7 @@ public class Class9
         if(i == 2)
             class30_sub2_sub4_sub6 = Class5.method159(j).method160(true);
         if(i == 3)
-            class30_sub2_sub4_sub6 = client.aClass30_Sub2_Sub4_Sub1_Sub2_1126.method453((byte)-41);
+            class30_sub2_sub4_sub6 = GameClient.aClass30_Sub2_Sub4_Sub1_Sub2_1126.method453((byte)-41);
         if(i == 4)
             class30_sub2_sub4_sub6 = Class8.method198(j).method202(50, true);
         if(i == 5)
@@ -269,7 +269,7 @@ public class Class9
         return class30_sub2_sub4_sub6;
     }
 
-    private static Class30_Sub2_Sub1_Sub1 method207(int i, boolean flag, Class44 class44, String s)
+    private static Class30_Sub2_Sub1_Sub1 method207(int i, boolean flag, Archive class44, String s)
     {
         long l = (Class50.method585((byte)1, s) << 8) + (long)i;
         if(flag)

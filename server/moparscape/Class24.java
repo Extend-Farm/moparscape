@@ -4,13 +4,13 @@
 
 import java.io.*;
 import java.net.Socket;
-import sign.signlink;
+import sign.SignLink;
 
 public final class Class24
     implements Runnable
 {
 
-    public Class24(Applet_Sub1 applet_sub1, int i, Socket socket)
+    public Class24(GameShell applet_sub1, int i, Socket socket)
         throws IOException
     {
         anInt416 = -53;
@@ -193,7 +193,7 @@ public final class Class24
     private OutputStream anOutputStream420;
     private Socket aSocket421;
     private boolean aBoolean422;
-    Applet_Sub1 anApplet_Sub1_423;
+    GameShell anApplet_Sub1_423;
     private byte aByteArray424[];
     private int anInt425;
     private int anInt426;

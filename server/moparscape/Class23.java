@@ -3,14 +3,14 @@
 // Decompiler options: packimports(3) 
 
 import java.io.PrintStream;
-import sign.signlink;
+import sign.SignLink;
 
 public class Class23
 {
 
-    public static void method264(int i, Class44 class44)
+    public static void method264(int i, Archive class44)
     {
-        Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(class44.method571("spotanim.dat", null), 891);
+        PacketBuffer class30_sub2_sub2 = new PacketBuffer(class44.method571("spotanim.dat", null), 891);
         if(i != 0)
             aBoolean401 = !aBoolean401;
         anInt402 = class30_sub2_sub2.method410();
@@ -26,7 +26,7 @@ public class Class23
 
     }
 
-    public void method265(boolean flag, Class30_Sub2_Sub2 class30_sub2_sub2)
+    public void method265(boolean flag, PacketBuffer class30_sub2_sub2)
     {
         if(!flag)
             throw new NullPointerException();

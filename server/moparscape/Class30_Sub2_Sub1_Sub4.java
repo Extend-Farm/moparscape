@@ -3,12 +3,12 @@
 // Decompiler options: packimports(3) 
 
 import java.util.Random;
-import sign.signlink;
+import sign.SignLink;
 
 public final class Class30_Sub2_Sub1_Sub4 extends Class30_Sub2_Sub1
 {
 
-    public Class30_Sub2_Sub1_Sub4(boolean flag, String s, int i, Class44 class44)
+    public Class30_Sub2_Sub1_Sub4(boolean flag, String s, int i, Archive class44)
     {
         aBoolean1484 = false;
         anInt1485 = 445;
@@ -25,8 +25,8 @@ public final class Class30_Sub2_Sub1_Sub4 extends Class30_Sub2_Sub1
         anIntArray1496 = new int[256];
         aRandom1498 = new Random();
         aBoolean1499 = false;
-        Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(class44.method571(s + ".dat", null), 891);
-        Class30_Sub2_Sub2 class30_sub2_sub2_1 = new Class30_Sub2_Sub2(class44.method571("index.dat", null), 891);
+        PacketBuffer class30_sub2_sub2 = new PacketBuffer(class44.method571(s + ".dat", null), 891);
+        PacketBuffer class30_sub2_sub2_1 = new PacketBuffer(class44.method571("index.dat", null), 891);
         byte byte0 = -1;
         if(i != 0)
             aBoolean1490 = !aBoolean1490;

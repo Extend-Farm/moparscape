@@ -2,7 +2,7 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 
-import sign.signlink;
+import sign.SignLink;
 
 final class Class8
 {
@@ -39,10 +39,10 @@ final class Class8
         return flag;
     }
 
-    public static final void method193(Class44 class44)
+    public static final void method193(Archive class44)
     {
-        aClass30_Sub2_Sub2_183 = new Class30_Sub2_Sub2(class44.method571("obj.dat", null), 891);
-        Class30_Sub2_Sub2 class30_sub2_sub2 = new Class30_Sub2_Sub2(class44.method571("obj.idx", null), 891);
+        aClass30_Sub2_Sub2_183 = new PacketBuffer(class44.method571("obj.dat", null), 891);
+        PacketBuffer class30_sub2_sub2 = new PacketBuffer(class44.method571("obj.idx", null), 891);
         anInt203 = class30_sub2_sub2.method410();
         anIntArray195 = new int[anInt203];
         int i = 2;
@@ -451,7 +451,7 @@ final class Class8
         return class30_sub2_sub4_sub6;
     }
 
-    public final void method203(boolean flag, Class30_Sub2_Sub2 class30_sub2_sub2)
+    public final void method203(boolean flag, PacketBuffer class30_sub2_sub2)
     {
         if(!flag)
             throw new NullPointerException();
@@ -639,7 +639,7 @@ final class Class8
     private static int anInt180;
     public int anInt181;
     public static boolean aBoolean182 = true;
-    private static Class30_Sub2_Sub2 aClass30_Sub2_Sub2_183;
+    private static PacketBuffer aClass30_Sub2_Sub2_183;
     private int anInt184;
     public int anInt185;
     private boolean aBoolean186;
