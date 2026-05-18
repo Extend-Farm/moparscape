@@ -23,6 +23,7 @@ Use this skill when the task is code quality, review, or cleanup around an activ
 ## Rules
 
 - Prefer small extractions over broad rewrites.
+- Do not introduce new files or types with `Legacy` in the name; describe compatibility or reference-client behavior in comments/docs instead.
 - Keep protocol numbers, interface ids, and magic states behind named constants when touching them.
 - Add comments only for non-obvious behavior boundaries or compatibility constraints.
 - Do not add comment noise for self-explanatory code.

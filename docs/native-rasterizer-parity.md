@@ -91,8 +91,8 @@ Current native status:
 - `WorldViewportRenderer` delegates queue execution to `OpenGlSceneRasterBackend`
 - cache terrain shape/rotation now reaches that queue as distinct `TILE_PAINT` and `TILE_MODEL`
   batches
-- overlay floor texture ids now reach native scene state, but the world viewport currently routes
-  terrain through the Gouraud/lit-color path until floor-texture parity is credible
+- overlay floor texture ids now reach native scene state and the world viewport now submits those
+  overlay floors through the textured terrain path while keeping underlays on the Gouraud/lit-color path
 - underlays stay on the lit-color path to match the legacy floor contract more closely
 - native terrain now treats overlay shapes `1..12` as modeled tiles instead of skipping shape `1`
 - terrain batches now execute through a native Gouraud-style color-interpolation path
@@ -102,13 +102,18 @@ Current native status:
   collapsing everything to one flat triangle pass
 - the raster backend now loads the native `textures` archive and executes textured static-object
   faces through a real OpenGL texture path instead of a color-only fallback
+- textured faces now have a native UV fallback when cache-provided texture anchors are missing or
+  degenerate, so static-object foliage and similar props can stay on the textured path instead of
+  dropping back to dark Gouraud fallback faces
 - actor geometry now preserves raw face raster modes, face alpha, and texture anchors, and native
   actor submissions split into `FLAT`, `GOURAUD`, and `TEXTURED` batches when cache-backed actor
   geometry is available
 - terrain texturing now follows the legacy floor split more closely:
   - underlays stay Gouraud/lit-color
   - overlay floor definitions remain the only terrain texture candidates
-  - the current viewport still suppresses textured terrain batches and falls them back to Gouraud terrain until the terrain texture path stops harming parity
+  - the current viewport now emits textured terrain batches for those overlay floors instead of collapsing them back to Gouraud terrain
+- terrain, queue submission, click-hit tests, and occluder sampling now share one lowered native
+  height scale so the viewport stops exaggerating slopes differently across subsystems
 - queue construction now applies a camera-centered submission-time visibility window so terrain and
   object batches stop covering the whole stitched region on every frame
 - queue construction now also sees current-plane tile flags and a first `method182`-style effective
@@ -146,6 +151,16 @@ The next implementation slice should introduce an explicit boundary between:
 - submitted render primitives
 - raster execution
 
+The package target for that split is now explicit:
+
+- `client.desktop.world.terrain`
+- `client.desktop.world.object`
+  - extracted
+- `client.desktop.world.raster`
+  - extracted
+- `client.desktop.world.visibility`
+- `client.desktop.world.minimap`
+
 That boundary should be visible in both code ownership and documentation.
 
 Recommended native split:
@@ -159,6 +174,11 @@ Recommended native split:
   - owns triangle mode selection, clipping, ordering, and screen-space emission
 - viewport/chrome shell:
   - owns camera selection and render-target orchestration only
+
+The important texture rule is also explicit now: loading textures is not enough. Texture ids, UV
+planning, brightness/gradient rules, alpha/cutout behavior, and the final raster-mode execution
+all belong to one coherent raster contract, not scattered local fallbacks inside terrain/object
+builders.
 
 This is the code-quality guardrail for the next slice. If `OpenGlTileRenderSystem` grows new
 terrain/object/face submission loops directly, the native client will recreate the same god-class

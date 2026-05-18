@@ -173,6 +173,8 @@ Current priority has moved past the first queue-integration slice.
 
 Recently landed:
 
+- the desktop-client world refactor now uses `io.github.ffakira.rsps.client.desktop` as its package root
+- `io.github.ffakira.rsps.client.desktop.world.minimap` is the first extracted world slice
 - unified world render queue for terrain, static objects, and the local actor
 - overlay-only textured terrain submissions that respect the legacy floor contract more closely
 - textured static-object execution from the native `textures` archive
@@ -185,6 +187,8 @@ Recently landed:
 
 Current priority is the next raster-parity slice:
 
+- keep `io.github.ffakira.rsps.client.desktop.world.terrain` as the terrain-owned package slice and
+  avoid pushing submission/raster code back into it
 - stabilize the native-vs-legacy comparison harness so slices can be judged on real side-by-side movement
 - finish terrain submission parity before more viewport-only tuning
 - improve textured triangle fidelity and UV behavior

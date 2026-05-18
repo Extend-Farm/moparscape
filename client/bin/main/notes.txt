@@ -1,0 +1,15 @@
+[start notes]
+Added restart switch to ServerGUI - Rictoo
+WTF?! Someone deleted the data, cachedir, and character dirs? LOL Money is now non-stackable.. I had to fix this - Rictoo
+Nobody deleted it, it was just never there - Fasga
+BanHandler added, PlayerHandler made completely static, no instances of it floating around in JVM's memory - newbiehacker
+Hmm, I think comments work, I don't think notes.txt is needed... but w/e - Rictoo
+Hopefully this might speed it up a bit... all handlers are now static seeing as only 1 instance of them is ever made - newbiehacker
+Small Addition too the ServerGui - Silabsoft
+modified the NPCHANDLER it was making the npcs stay dead for too long changed it from 10 too 3 now they fall and die in 1 fluid motion :) - silasoft
+Turning snow on and off via snow on or snow off now affects the checkbox.  Also, commands in the serverGUI are automatically lowercased, make sure to make your checks check for the lowercased version of the command. -Fasga...HAX
+**notes.txt isn't needed anymore, the comments on SVN work =) - Rictoo
+I LIKE THE NOTES.TXT - newbiehacker
+Added JavaDocs to *most* java files, run jdoc.bat to generate it :) PLEASE COULD EVERYONE FROM NOW ON ADD JAVADOC COMMENTS TO *ALL* YOUR WORK SO IT NEVER ENDS UP IN A HUGE MESS AGAIN - newbiehacker
+Edited ServerGUI a little bit :) - newbiehacker
+Done the think Silab was on about on IRC (making online players on that list thingy) - newbiehacker

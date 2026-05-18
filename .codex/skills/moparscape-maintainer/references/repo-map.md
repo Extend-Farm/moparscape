@@ -32,7 +32,7 @@
 
 - Emulator main class: `server`
 - Desktop client main class: `io.github.ffakira.moparscape.client.GameClient`
-- Native LWJGL client main class: `io.github.ffakira.rsps.client.lwjgl.LwjglClientMain`
+- Native LWJGL client main class: `io.github.ffakira.rsps.client.desktop.core.DesktopClientMain`
 
 ## High-risk files
 
@@ -45,9 +45,9 @@
   - `server/moparscape/src/main/java/io/github/ffakira/moparscape/client/GameShell.java`
   - `server/moparscape/src/main/java/io/github/ffakira/moparscape/client/GameFrame.java`
 - Native client bootstrap and rendering:
-  - `rs-client-lwjgl/src/main/java/io/github/ffakira/rsps/client/lwjgl/LwjglClientMain.java`
-  - `rs-client-lwjgl/src/main/java/io/github/ffakira/rsps/client/lwjgl/OpenGlTileRenderSystem.java`
-  - `rs-client-lwjgl/src/main/java/io/github/ffakira/rsps/client/lwjgl/CacheBackedWorldSceneLoader.java`
+  - `rs-client-lwjgl/src/main/java/io/github/ffakira/rsps/client/desktop/core/DesktopClientMain.java`
+  - `rs-client-lwjgl/src/main/java/io/github/ffakira/rsps/client/desktop/core/OpenGlTileRenderSystem.java`
+  - `rs-client-lwjgl/src/main/java/io/github/ffakira/rsps/client/desktop/core/CacheBackedWorldSceneLoader.java`
 
 ## Persistence today
 

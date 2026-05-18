@@ -27,5 +27,5 @@ dependencies {
 }
 
 application {
-  mainClass.set("io.github.ffakira.rsps.client.lwjgl.LwjglClientMain")
+  mainClass.set("io.github.ffakira.rsps.client.desktop.core.DesktopClientMain")
 }

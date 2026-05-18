@@ -24,6 +24,9 @@ class ItemDefinitionCatalogTest {
     assertThat(waterRune.noted()).isFalse();
     assertThat(waterRune.noteLinkItemId()).isEqualTo(-1);
     assertThat(waterRune.noteTemplateItemId()).isEqualTo(-1);
+    assertThat(waterRune.inventoryAppearance().modelId()).isPositive();
+    assertThat(waterRune.inventoryAppearance().zoom()).isPositive();
+    assertThat(waterRune.stackVariants()).isEmpty();
     assertThat(waterRune.recolorSources()).isEmpty();
     assertThat(waterRune.recolorTargets()).isEmpty();
     assertThat(waterRune.maleBodyModelIds()).isEmpty();
@@ -36,6 +39,8 @@ class ItemDefinitionCatalogTest {
     assertThat(whitePartyhat.stackable()).isFalse();
     assertThat(whitePartyhat.value()).isEqualTo(1);
     assertThat(whitePartyhat.noted()).isFalse();
+    assertThat(whitePartyhat.inventoryAppearance().modelId()).isPositive();
+    assertThat(whitePartyhat.inventoryAppearance().rotationX()).isPositive();
     assertThat(whitePartyhat.maleBodyModelIds()).isNotEmpty();
     assertThat(whitePartyhat.femaleBodyModelIds()).isNotEmpty();
   }
@@ -51,5 +56,6 @@ class ItemDefinitionCatalogTest {
     assertThat(noteDefinition.stackable()).isTrue();
     assertThat(noteDefinition.description()).isEqualTo("Swap this note at any bank for a Cannon base.");
     assertThat(noteDefinition.noteLinkItemId()).isEqualTo(6);
+    assertThat(noteDefinition.inventoryAppearance().modelId()).isPositive();
   }
 }

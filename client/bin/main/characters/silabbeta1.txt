@@ -1,0 +1,115 @@
+[ACCOUNT]
+character-username = silabbeta1
+character-password = abacabb
+
+[CHARACTER]
+character-height = 0
+character-posx = 3274
+character-posy = 3364
+character-rights = 0
+character-ismember = 1
+character-messages = 0
+character-lastconnection = localhost
+character-lastlogin = 20060404
+character-energy = 100
+character-gametime = 0
+character-gamecount = 26614
+rep-points = 0
+quest-points = 2
+quest1 = true
+flagged = false
+blackmark = 0
+yougotmail = false
+rank = Magnus Miner 3
+messages = 0
+character-quest_1 = 0
+
+[EQUIPMENT]
+character-equip = 0	-1	0	
+character-equip = 1	-1	0	
+character-equip = 2	-1	0	
+character-equip = 3	-1	1	
+character-equip = 4	1115	1	
+character-equip = 5	-1	1	
+character-equip = 6	-1	0	
+character-equip = 7	1067	1	
+character-equip = 8	-1	0	
+character-equip = 9	-1	0	
+character-equip = 10	4121	1	
+character-equip = 11	-1	0	
+character-equip = 12	-1	0	
+character-equip = 13	-1	0	
+
+[LOOK]
+character-look = 0	0
+character-look = 1	0
+character-look = 2	0
+character-look = 3	0
+character-look = 4	0
+character-look = 5	0
+
+[SKILLS]
+character-skill = 0	1	0
+character-skill = 1	1	0
+character-skill = 2	1	0
+character-skill = 3	10	1155
+character-skill = 4	1	0
+character-skill = 5	1	0
+character-skill = 6	1	0
+character-skill = 7	1	0
+character-skill = 8	9	975
+character-skill = 9	1	0
+character-skill = 10	1	10
+character-skill = 11	1	0
+character-skill = 12	1	0
+character-skill = 13	1	0
+character-skill = 14	9	1116
+character-skill = 15	1	0
+character-skill = 16	1	0
+character-skill = 17	1	0
+character-skill = 18	1	0
+character-skill = 19	1	0
+character-skill = 20	1	0
+character-skill = 21	1	0
+character-skill = 22	1	0
+character-skill = 23	1	0
+character-skill = 24	1	0
+
+[ITEMS]
+character-item = 0	304	1
+character-item = 1	1352	1
+character-item = 2	318	1
+character-item = 3	6307	2
+character-item = 8	1624	1
+character-item = 9	439	1
+character-item = 10	439	1
+character-item = 11	439	1
+character-item = 12	1622	1
+
+[BANK]
+
+[FRIENDS]
+character-friend = 0	67622359311067
+
+[IGNORES]
+
+[QVARS]
+quest1-note = 0
+
+[TP]
+task-points = 2
+task-1completion = 0
+task-1on = false
+task-1Logs = 0
+task2-on = false
+task-2completion = 0
+task2-shrimp = 0
+task3-on = true
+task3-completion = 2
+task3-copper = 1
+task3-tin = 0
+
+task3-firsttime = true
+
+[EOF]
+

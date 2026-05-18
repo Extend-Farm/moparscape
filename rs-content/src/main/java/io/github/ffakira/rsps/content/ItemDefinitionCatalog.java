@@ -107,6 +107,19 @@ public final class ItemDefinitionCatalog {
     private boolean membersOnly;
     private int noteLinkItemId = -1;
     private int noteTemplateItemId = -1;
+    private int inventoryModelId = -1;
+    private int inventoryZoom = 2000;
+    private int inventoryRotationX;
+    private int inventoryRotationY;
+    private int inventoryRotationZ;
+    private int inventoryOffsetX;
+    private int inventoryOffsetY;
+    private int resizeX = 128;
+    private int resizeY = 128;
+    private int resizeZ = 128;
+    private int ambient;
+    private int contrast;
+    private final List<ItemDefinition.StackVariant> stackVariants = new ArrayList<>();
     private final List<Integer> recolorSources = new ArrayList<>();
     private final List<Integer> recolorTargets = new ArrayList<>();
     private final List<Integer> maleBodyModelIds = new ArrayList<>();
@@ -125,12 +138,15 @@ public final class ItemDefinitionCatalog {
           return;
         }
         switch (opcode) {
-          case 1 -> cursor.readUnsignedShort();
+          case 1 -> inventoryModelId = cursor.readUnsignedShort();
           case 2 -> name = cursor.readString();
           case 3 -> description = cursor.readString();
-          case 4, 5, 6, 10, 90, 91, 92, 93, 95, 97, 98, 110, 111, 112 ->
-              cursor.readUnsignedShort();
-          case 7, 8 -> cursor.readUnsignedShort();
+          case 4 -> inventoryZoom = cursor.readUnsignedShort();
+          case 5 -> inventoryRotationX = cursor.readUnsignedShort();
+          case 6 -> inventoryRotationY = cursor.readUnsignedShort();
+          case 7 -> inventoryOffsetX = signedShort(cursor.readUnsignedShort());
+          case 8 -> inventoryOffsetY = signedShort(cursor.readUnsignedShort());
+          case 10, 90, 91, 92, 93, 97, 98 -> cursor.readUnsignedShort();
           case 11 -> stackable = true;
           case 12 -> value = cursor.readInt();
           case 16 -> membersOnly = true;
@@ -155,10 +171,19 @@ public final class ItemDefinitionCatalog {
           case 78 -> maleBodyModelIds.add(cursor.readUnsignedShort());
           case 79 -> femaleBodyModelIds.add(cursor.readUnsignedShort());
           case 100, 101, 102, 103, 104, 105, 106, 107, 108, 109 -> {
-            cursor.readUnsignedShort();
-            cursor.readUnsignedShort();
+            int variantItemId = cursor.readUnsignedShort();
+            int minimumQuantity = cursor.readUnsignedShort();
+            if (variantItemId > 0 && minimumQuantity > 0) {
+              stackVariants.add(new ItemDefinition.StackVariant(variantItemId, minimumQuantity));
+            }
           }
-          case 113, 114, 115 -> cursor.readUnsignedByte();
+          case 95 -> inventoryRotationZ = cursor.readUnsignedShort();
+          case 110 -> resizeX = cursor.readUnsignedShort();
+          case 111 -> resizeY = cursor.readUnsignedShort();
+          case 112 -> resizeZ = cursor.readUnsignedShort();
+          case 113 -> ambient = cursor.readSignedByte();
+          case 114 -> contrast = cursor.readSignedByte() * 5;
+          case 115 -> cursor.readUnsignedByte();
           default -> throw new IllegalStateException(
               "Unsupported item definition opcode " + opcode + " for item " + id
           );
@@ -178,6 +203,9 @@ public final class ItemDefinitionCatalog {
       boolean resolvedMembersOnly = membersOnly;
       boolean resolvedStackable = stackable;
       boolean noted = noteLinkItemId >= 0 && noteTemplateItemId >= 0;
+      ItemDefinition.InventoryAppearance resolvedInventoryAppearance = inventoryAppearance();
+      List<Integer> resolvedRecolorSources = recolorSources;
+      List<Integer> resolvedRecolorTargets = recolorTargets;
 
       if (noted && noteLinkItemId < definitions.length) {
         MutableItemDefinition linkedDefinition = definitions[noteLinkItemId];
@@ -191,6 +219,12 @@ public final class ItemDefinitionCatalog {
                 + linkedDefinition.name
                 + ".";
         resolvedStackable = true;
+      }
+      if (noted && noteTemplateItemId < definitions.length) {
+        MutableItemDefinition templateDefinition = definitions[noteTemplateItemId];
+        resolvedInventoryAppearance = templateDefinition.inventoryAppearance();
+        resolvedRecolorSources = templateDefinition.recolorSources;
+        resolvedRecolorTargets = templateDefinition.recolorTargets;
       }
 
       if (resolvedName == null || resolvedName.isBlank()) {
@@ -207,13 +241,36 @@ public final class ItemDefinitionCatalog {
           noted,
           noteLinkItemId,
           noteTemplateItemId,
-          recolorSources,
-          recolorTargets,
+          resolvedInventoryAppearance,
+          stackVariants,
+          resolvedRecolorSources,
+          resolvedRecolorTargets,
           maleBodyModelIds,
           maleBodyOffsetY,
           femaleBodyModelIds,
           femaleBodyOffsetY
       );
+    }
+
+    private ItemDefinition.InventoryAppearance inventoryAppearance() {
+      return new ItemDefinition.InventoryAppearance(
+          inventoryModelId,
+          inventoryZoom,
+          inventoryRotationX,
+          inventoryRotationY,
+          inventoryRotationZ,
+          inventoryOffsetX,
+          inventoryOffsetY,
+          resizeX,
+          resizeY,
+          resizeZ,
+          ambient,
+          contrast
+      );
+    }
+
+    private int signedShort(int value) {
+      return value > 32767 ? value - 65536 : value;
     }
   }
 

@@ -43,7 +43,7 @@ gameplay chrome.
    - overlay/underlay texture ids needed by the terrain submission layer
    - placed object metadata
    - static object geometry derived from cache model bytes through `ObjectSceneGeometryBuilder`
-   - a scene-state minimap image derived from terrain plus object semantics
+   - a scene-state minimap image derived from terrain plus legacy-style wall/mapscene semantics
    - temporary projection metadata
 8. `OpenGlTileRenderSystem` renders:
    - a camera-centered submission-time visibility window around the local player instead of emitting the whole stitched region into every world queue build
@@ -53,12 +53,26 @@ gameplay chrome.
    - Gouraud terrain triangles for the remaining floor path
    - cache-object model geometry in the main world viewport
    - textured static-object faces sampled from the native `textures` archive where face metadata resolves cleanly
+   - a planar UV fallback for textured static/object actor faces when cache texture anchors are missing or degenerate, so foliage-like faces do not collapse back to flat dark shading
+   - a shared world-up transform convention for static objects and actors, so cache model Y is not inverted between object and character assembly
    - a native character mesh assembled from identity kits, wearable item body models, and palette swaps
+   - one shared assembled-body transform for actor geometry, so identity-kit and equipment models stay in one coherent body space instead of being normalized part-by-part
    - actor batches that preserve cache face raster modes, alpha, and textured-face anchors when native actor geometry is available
    - a scene-state minimap inside `mapback`
    - a player-centered local minimap crop masked into the `mapback` radar, now rasterized at a legacy-style multi-pixel tile scale instead of one pixel per tile
+   - a legacy-style minimap base contract that paints 4x4 tile blocks from terrain masks and overlays wall marks plus `mapscene` sprites instead of synthetic object-footprint fills
    - cache-backed gameplay frame art from the `media` archive
-   - an explicit depth-buffered, backface-culled, multisampled world viewport instead of relying on platform-default 3D surface state
+   - a native inventory tab that renders cache-model item icons plus live stack counts from bootstrap inventory state, while true note-paper overlays and full widget decoding remain pending
+   - an explicit depth-buffered, multisampled world viewport instead of relying on platform-default 3D surface state
+
+### Gameplay input contract
+
+Gameplay input is now split the same way as the visible shell:
+
+- sidebar clicks stay inside `GameplayChromeRenderer`
+- world-viewport clicks are resolved through `WorldViewportClickPlanner`
+- the current runtime still only exposes direct move deltas, so viewport click-to-walk currently sends one direct delta intent to the clicked tile rather than a legacy path queue
+- terrain, queue submission, click-hit tests, and occluder sampling now share one lowered native height scale so the world surface no longer exaggerates slopes differently per subsystem
 
 ### Character bootstrap contract
 
@@ -80,6 +94,7 @@ The visible body is assembled natively from:
 - legacy-equivalent visibility rules such as plate bodies hiding arms and full helms hiding head hair
 - legacy-equivalent palette swaps for body colors
 - preserved face raster semantics so actor geometry can enter the same flat/Gouraud/textured render queue as static models
+- a shared assembled-body transform so the final actor scale comes from the whole combined body instead of each contribution expanding to full actor size on its own
 
 That distinction matters: persistence supplies appearance controls, while the cache supplies the
 body parts and wearable geometry.
@@ -104,11 +119,11 @@ These pieces are still absent from the native world path:
 - native depth/priority/clipping behavior equivalent to the legacy raster path
 - full legacy-equivalent walls, decorations, interactives, and ground objects
 - true NPC model composition
-- full scene-driven minimap rasterization with mapscene/mapfunction parity
+- full scene-driven minimap rasterization with mapfunction parity and final icon/rotation behavior
 - legacy-equivalent camera, visibility, and occlusion behavior
 
 The minimap and camera are now planned from native scene state, but they are still below legacy
-parity because they do not yet consume the eventual scene graph, mapscene icons, or NPC/player
+parity because they do not yet consume the eventual scene graph, mapfunction icons, or NPC/player
 overlay set. The current camera is intentionally a tighter player-follow camera rather than a
 scene-wide overview, and the viewport now uses explicit depth/cull/multisample state, but this is
 still a transitional approximation of the legacy viewport rules rather than full scene parity. A
@@ -141,17 +156,22 @@ The static-object path is now split more cleanly as well:
 - `WorldSceneObjectAssembler` owns placement-to-scene-object translation and preserves colocated tile entries
 - `WorldSceneOccluderBuilder` owns the first native wall/structure occluder extraction step from assembled scene objects
 - `ObjectSceneGeometryBuilder` owns raw-model transforms, recolors, normals, alpha, and raster-mode metadata for static objects
+  - static object geometry now preserves cache-model Y origin instead of forcing every model's minimum Y back to zero, because bridges and other large structures legitimately extend below the tile surface
 - `WorldSceneSubmissionBuilder` owns render-queue assembly
 - `WorldSceneVisibilityPlanner` owns the current coarse pre-submit tile/object culling window
 - `WorldSceneOcclusionPlanner` owns first-pass plane-local active-occluder selection and object/actor rejection before queue emission
   - wall occluders are active today
   - horizontal roof-plane occluders are intentionally withheld until the native client has a legacy-like render-plane chooser, because the simplified planner otherwise cuts open interiors and hides floor surfaces incorrectly
-- `TerrainSceneMeshBuilder` now follows the legacy floor contract more closely:
+- `TerrainSceneMeshBuilder` now lives in `io.github.ffakira.rsps.client.desktop.world.terrain` and
+  follows the legacy floor contract more closely:
   - underlay floors stay on the lit-color path
   - overlay floors are the only terrain texture candidates
-  - the live viewport currently falls those candidates back to Gouraud terrain until floor-texture parity is credible
+  - the live viewport now submits overlay-textured terrain directly, while the underlay floor path stays on Gouraud/lit color
   - flat paint tiles now split across the legacy north-east/south-west diagonal instead of the earlier wrong diagonal
   - shaped terrain triangles now normalize to one stable tile-space winding before queue submission, so the viewport does not depend on inconsistent face order while culling stays disabled
+- `TerrainSurfaceElevationResolver` now preserves per-plane height samples through scene capture
+  and resolves each shared terrain corner from the highest adjacent visible surface
+  - this is the first native fix for bridge/water seam collapse before raster parity is complete
 - `OpenGlSceneRasterBackend` owns the current raster execution split, including the first native textured static-object path
 
 That split is intentional. It keeps object-model growth out of the loader and avoids recreating a
@@ -162,6 +182,37 @@ and ground objects that share a tile are preserved as separate `WorldSceneObject
 next upstream scene-input gap is no longer tile flattening; it is deeper render-plane selection,
 legacy-like occluder activation, and stronger ordering/clipping behavior on top of those fuller
 scene inputs.
+
+## Package Direction
+
+The native world stack is large enough that package structure now matters. The intended package
+split is:
+
+- `client.desktop.world.minimap`
+  - minimap rasterization
+  - local radar crop
+  - `mapback` clip masks
+- `client.desktop.world.terrain`
+  - terrain tile paints/models
+  - floor textures
+  - gradients and height-mesh submission
+- `client.desktop.world.object`
+  - extracted
+  - object placement translation
+  - static-object geometry assembly
+- `client.desktop.world.raster`
+  - extracted
+  - queue execution
+  - triangle modes
+  - UV/composition/clipping
+- `client.desktop.world.visibility`
+  - extracted
+  - bridge/roof plane rules
+  - visibility windows
+  - occluder selection/rejection
+
+That split keeps future texture, meshing, gradient, and visibility work out of one flat LWJGL
+namespace and makes ownership explicit in source.
 
 ### Required native split
 

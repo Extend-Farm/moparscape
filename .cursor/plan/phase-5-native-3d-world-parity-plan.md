@@ -71,6 +71,12 @@ The next active implementation boundary is:
 - comparison-driven raster and submission parity
 - terrain/tile correctness before more camera polish
 - scene-ordering, clipping, and render-plane parity on top of the existing queue
+- explicit package ownership so minimap, terrain, raster, object, and visibility work do not keep
+  accumulating in one flat `client.desktop` package
+
+The package root for this refactor is now `io.github.ffakira.rsps.client.desktop`.
+The first extracted world slice is `io.github.ffakira.rsps.client.desktop.world.minimap`.
+The second extracted world slice is `io.github.ffakira.rsps.client.desktop.world.terrain`.
 
 This is now the priority over more viewport-only tuning. Terrain, object placement, static object
 geometry, local-player assembly, minimap scaffolding, textured floor/object/actor inputs, and the
@@ -85,6 +91,41 @@ The colocated scene-entry correctness blocker is now closed on the native path: 
 preserves multiple placements on the same tile instead of collapsing them by tile key. The next
 upstream correctness target is deeper roof/plane selection plus stronger occluder activation and
 ordering/clipping semantics on top of those preserved inputs.
+
+## Package Map
+
+The world stack should now converge on these package boundaries:
+
+- `io.github.ffakira.rsps.client.desktop.world.minimap`
+  - first extracted slice
+  - local radar crop
+  - `mapback` clip masks
+  - minimap rasterization and icon work
+- `io.github.ffakira.rsps.client.desktop.world.terrain`
+  - extracted
+  - tile paints
+  - tile models
+  - floor texture, gradient, and height-mesh submission
+- `io.github.ffakira.rsps.client.desktop.world.object`
+  - extracted
+  - object placement translation
+  - raw-model transforms
+  - object geometry assembly
+- `io.github.ffakira.rsps.client.desktop.world.raster`
+  - extracted
+  - queue execution
+  - flat/Gouraud/textured behavior
+  - UV handling
+  - ordering/clipping/composition
+- `io.github.ffakira.rsps.client.desktop.world.visibility`
+  - extracted
+  - bridge/roof plane rules
+  - visibility windows
+  - occluder activation/rejection
+
+`OpenGlTileRenderSystem`, `GameplayChromeRenderer`, and `CacheBackedWorldSceneLoader` remain the
+top-level orchestrators for now, but new world work should move into those packages rather than
+staying in the root LWJGL package.
 
 ## Delivery Rule For The Next Slices
 
@@ -130,6 +171,10 @@ Work:
 - verify overlay-only texturing against legacy `MapRegion`
 - verify tile-paint vs tile-model split for shaped tiles
 - verify terrain triangle winding consistency
+- verify terrain mesh height scaling and bridge/river surface selection
+- verify floor gradients and brightness interpolation against the legacy floor contract
+- make floor texture candidates flow through one explicit terrain-texture path instead of scattered
+  local fallbacks
 - avoid relying on OpenGL backface culling until winding parity is proven
 
 Exit condition:
@@ -146,6 +191,8 @@ Work:
 
 - tighten flat/Gouraud/textured face behavior
 - tighten UV and texture composition behavior
+- make object and terrain textured faces use one coherent texture-loading contract
+- tighten alpha/cutout handling for foliage, bridge rails, and water-adjacent props
 - tighten ordering/clipping semantics inside the raster backend
   - current native step in progress: opaque-first plus translucent-second execution, so the backend stops compositing every face through one blended stream
 
@@ -208,6 +255,7 @@ Current ownership after the latest static-object slice:
   - the live viewport currently keeps terrain on the Gouraud path even when overlay texture ids exist
   - flat paint tiles now use the legacy north-east/south-west split
   - shaped terrain triangles now normalize to one stable tile-space winding before queue submission
+  - shared bridge/water corner heights now resolve from adjacent visible surfaces instead of one flattened tile plane
 
 ## Appearance Contract Correction
 
