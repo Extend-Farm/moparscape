@@ -15,7 +15,6 @@ import java.util.GregorianCalendar;
  * @version 1.0
  */
 public class PlayerHandler {
-    public static String htaccess = "http://" + ServerGUI.byte22 + ReTT.byte44;
     // Remark: the player structures are just a temporary solution for now
     // Later we will avoid looping through all the players for each player
     // by making use of a hash table maybe based on map regions (8x8 granularity should be ok)

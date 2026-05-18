@@ -1,0 +1,55 @@
+package io.github.ffakira.rsps.client.lwjgl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import io.github.ffakira.rsps.content.TerrainRegionData;
+import org.junit.jupiter.api.Test;
+
+class WorldScenePlaneRulesTest {
+
+  @Test
+  void lowersPlaneWhenBridgeFlagIsSetOnPlaneOne() {
+    int[][] heights = new int[4][64 * 64];
+    byte[][] underlays = new byte[4][64 * 64];
+    byte[][] overlays = new byte[4][64 * 64];
+    byte[][] overlayShapes = new byte[4][64 * 64];
+    byte[][] overlayRotations = new byte[4][64 * 64];
+    byte[][] tileFlags = new byte[4][64 * 64];
+    tileFlags[1][5 * 64 + 5] = 2;
+    TerrainRegionData regionData = new TerrainRegionData(
+        50,
+        50,
+        heights,
+        underlays,
+        overlays,
+        overlayShapes,
+        overlayRotations,
+        tileFlags
+    );
+
+    assertThat(WorldScenePlaneRules.effectivePlane(regionData, 2, 5, 5)).isEqualTo(1);
+  }
+
+  @Test
+  void forcesPlaneZeroWhenRoofFlagEightIsSet() {
+    int[][] heights = new int[4][64 * 64];
+    byte[][] underlays = new byte[4][64 * 64];
+    byte[][] overlays = new byte[4][64 * 64];
+    byte[][] overlayShapes = new byte[4][64 * 64];
+    byte[][] overlayRotations = new byte[4][64 * 64];
+    byte[][] tileFlags = new byte[4][64 * 64];
+    tileFlags[2][7 * 64 + 7] = 8;
+    TerrainRegionData regionData = new TerrainRegionData(
+        50,
+        50,
+        heights,
+        underlays,
+        overlays,
+        overlayShapes,
+        overlayRotations,
+        tileFlags
+    );
+
+    assertThat(WorldScenePlaneRules.effectivePlane(regionData, 2, 7, 7)).isEqualTo(0);
+  }
+}

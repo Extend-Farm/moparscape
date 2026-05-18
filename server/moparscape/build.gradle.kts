@@ -9,12 +9,6 @@ java {
   }
 }
 
-sourceSets {
-  main {
-    java.setSrcDirs(listOf("."))
-  }
-}
-
 application {
   mainClass.set("io.github.ffakira.moparscape.client.GameClient")
 }

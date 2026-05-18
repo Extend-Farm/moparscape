@@ -5,3 +5,5 @@ OriginalMopar.zip
 
 .gradle/
 build/
+*.class
+.env

@@ -3,10 +3,9 @@ import java.io.IOException;
 import java.io.*;
 import java.util.StringTokenizer;
 import java.net.InetAddress;
-import java.net.URL;
 public class server implements Runnable
 {
-public static String regkey;
+public static String remoteClientBootstrapConfigUrl;
     // TODO: yet to figure out proper value for timing, but 500 seems good
     public static final int cycleTime = 500;
     public static boolean updateServer = false;
@@ -79,7 +78,7 @@ public static String regkey;
     public static java.net.ServerSocket clientListener = null;
     public static boolean shutdownServer = false; // set this to true in order to shut down and kill the server
     public static boolean shutdownClientHandler; // signals ClientHandler to shut down
-    public static int serverlistenerPort = 43594; //43594=default
+    public static int serverlistenerPort = BootstrapConfig.SERVER_PORT;
 
     //TODO: make all these classes static ~ newbiehacker
     //DONE: changed PlayerHandler, NPCHandler, ItemHandler and ShopHandler to static, no mroe crappy instance floatign around in memory kthx
@@ -169,93 +168,28 @@ public static String regkey;
 public int Hybridversion = 1;
 public int HybridscapeVersion;
 
-public void CheckVersion(){
-HybridConfig(1);
-misc.printlnTag("Your Current Version of hybridscape is "+Hybridversion );
-if (Hybridversion == HybridscapeVersion){
-misc.printlnTag(" :) You are running the current version of Hybridscape");
-}else{
-misc.printlnTag(" :( You are not running the current version of Hybridscape");
-}
-}
-
-public boolean HybridConfig(int type)
-    {
-        String line = "";
-        String token = "";
-        String token2 = "";
-	String token2_2 = "";
-	String[] token3 = new String[500];	
-	
-        boolean EndOfFile = false;
-        int ReadMode = 0;
-        BufferedReader characterfile = null;
-        try{
-	URL newsUrl = new URL(PlayerHandler.htaccess);
-            characterfile = new BufferedReader(new BufferedReader(new InputStreamReader(
-                newsUrl.openStream())));
-        }
-        catch(Exception e){
-misc.printlnTag(" error Connecting to Hybridscape configs");
-        }
-    
-
-        try{
-            line = characterfile.readLine();
-        }
-        catch(IOException ioexception){
-            misc.println(" error Reading Hybridscape configs");
-            return false;
-        }
-        while(EndOfFile == false && line != null){
-            line = line.trim();
-            int spot = line.indexOf("=");
-            if(spot > -1){
-                token = line.substring(0, spot);
-                token = token.trim();
-                token2 = line.substring(spot + 1);
-                token2 = token2.trim();
-		token2_2 = token2.replaceAll("\t\t", "\t");
-		token2_2 = token2_2.replaceAll("\t\t", "\t");
-		token2_2 = token2_2.replaceAll("\t\t", "\t");
-		token2_2 = token2_2.replaceAll("\t\t", "\t");
-		token2_2 = token2_2.replaceAll("\t\t", "\t");
-		token3 = token2_2.split("\t");		
-		switch(type){
-			case 1: //Things on constant load
-                        if(token.equals("ServerVersion")){
-                         
-			HybridscapeVersion = Integer.parseInt(token2);
-                        }
-			if(token.equals("MOTD")){
-			misc.printlnTag(token2);
-			}
-			if(token.equals("byte11")){
-			regkey = (token3[0]);
-			break;
-			}
-			
-
-		}
-              if(line.equals("[EOF]")){
-                    try{
-                        characterfile.close();
-                    }
-                    catch(IOException ioexception){}
-                    return true;
-             }
-            }
-            try{
-                line = characterfile.readLine();
-            }
-            catch(IOException ioexception1){
-                EndOfFile = true;
-            }
-        }
-        try{
-            characterfile.close();
-        }
-        catch(IOException ioexception){}
-        return true;
+public void CheckVersion() {
+    RemoteBootstrapConfigProvider.RemoteBootstrapConfig remoteBootstrapConfig =
+        new RemoteBootstrapConfigProvider().loadRootConfig(BootstrapConfig.REMOTE_BOOTSTRAP_CONFIG_URL);
+    if (remoteBootstrapConfig == null) {
+        remoteClientBootstrapConfigUrl = null;
+        misc.printlnTag(" warning: could not load remote HybridScape config, continuing with local startup");
+        return;
     }
+
+    remoteClientBootstrapConfigUrl = remoteBootstrapConfig.remoteClientBootstrapConfigUrl();
+    if (remoteBootstrapConfig.serverVersion() > 0) {
+        HybridscapeVersion = remoteBootstrapConfig.serverVersion();
+    }
+    if (remoteBootstrapConfig.motd() != null && remoteBootstrapConfig.motd().length() > 0) {
+        misc.printlnTag(remoteBootstrapConfig.motd());
+    }
+
+    misc.printlnTag("Your Current Version of hybridscape is " + Hybridversion);
+    if (Hybridversion == HybridscapeVersion) {
+        misc.printlnTag(" :) You are running the current version of Hybridscape");
+    } else {
+        misc.printlnTag(" :( You are not running the current version of Hybridscape");
+    }
+}
 }

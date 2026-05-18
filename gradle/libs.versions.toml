@@ -1,0 +1,24 @@
+[versions]
+slf4j = "2.0.13"
+logback = "1.5.6"
+flyway = "10.15.0"
+postgres = "42.7.3"
+testcontainers = "1.19.8"
+lwjgl = "3.3.3"
+commons-compress = "1.26.2"
+
+[libraries]
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flyway" }
+flyway-database-postgresql = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
+postgres = { module = "org.postgresql:postgresql", version.ref = "postgres" }
+testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers" }
+testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter" }
+testcontainers-postgresql = { module = "org.testcontainers:postgresql" }
+lwjgl-bom = { module = "org.lwjgl:lwjgl-bom", version.ref = "lwjgl" }
+lwjgl = { module = "org.lwjgl:lwjgl" }
+lwjgl-glfw = { module = "org.lwjgl:lwjgl-glfw" }
+lwjgl-opengl = { module = "org.lwjgl:lwjgl-opengl" }
+lwjgl-stb = { module = "org.lwjgl:lwjgl-stb" }
+commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "commons-compress" }

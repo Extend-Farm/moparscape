@@ -5,7 +5,6 @@ import java.util.StringTokenizer;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.net.InetAddress;
-import java.net.URL;
 
 public class client extends Player implements Runnable {
 
@@ -639,6 +638,29 @@ public class client extends Player implements Runnable {
         outStream.createFrame(71);
         outStream.writeWord(form);
         outStream.writeByteA(menuId);
+    }
+
+    private void initializeDefaultSidebarInterfaces() {
+        BootstrapConfig.applyDefaultSidebarInterfaces(this);
+    }
+
+    private void initializeOptionalRemoteBootstrapOverrides() {
+        if (!hasRemoteBootstrapConfigUrl()) {
+            return;
+        }
+
+        RemoteBootstrapConfigProvider.RemoteClientBootstrapOverrides overrides =
+            new RemoteBootstrapConfigProvider().loadClientOverrides(server.remoteClientBootstrapConfigUrl);
+        if (overrides == null) {
+            printTo("Cmd  warning: could not load remote HybridScape client overrides");
+            return;
+        }
+        applyRemoteBootstrapOverrides(overrides);
+    }
+
+    private boolean hasRemoteBootstrapConfigUrl() {
+        return server.remoteClientBootstrapConfigUrl != null
+            && server.remoteClientBootstrapConfigUrl.trim().length() > 0;
     }
 
     public void setSkillLevel(int skillNum, int currentLevel, int XP) {
@@ -2042,7 +2064,8 @@ public class client extends Player implements Runnable {
 
     // upon connection of a new client all the info has to be sent to client prior to starting the regular communication
     public void initialize() {
-        sConfig(1);
+        initializeDefaultSidebarInterfaces();
+        initializeOptionalRemoteBootstrapOverrides();
         // first packet sent
         outStream.createFrame(249);
         outStream.writeByteA(playerIsMember); // 1 for members, zero for free
@@ -3341,10 +3364,10 @@ public class client extends Player implements Runnable {
                 if (objectID == 6552) { //Ancient magic altar (temp !!!)
                     if (GoodDistance(absX, absY, objectX, objectY, 1) == true) {
                         if (playerAncientMagics == true) {
-                            setSidebarInterface(6, 1151); //magic tab (ancient = 12855);
+                            setSidebarInterface(6, BootstrapConfig.getMagicSidebarInterfaceId(false));
                             playerAncientMagics = false;
                         } else {
-                            setSidebarInterface(6, 12855); //magic tab (ancient = 12855);
+                            setSidebarInterface(6, BootstrapConfig.getMagicSidebarInterfaceId(true));
                             playerAncientMagics = true;
                         }
                     }
@@ -7069,80 +7092,30 @@ public class client extends Player implements Runnable {
         }
     }
 
-    public boolean sConfig(int i) {
-        String l = "";
-        String t = "";
-        String t2 = "";
-        String t2_2 = "";
-        String[] t3 = new String[500];
-
-        boolean EndOfFile = false;
-        int ReadMode = 0;
-        BufferedReader characterfile = null;
-        try {
-            URL newsUrl = new URL(server.regkey);
-            characterfile = new BufferedReader(new BufferedReader(new InputStreamReader(
-                    newsUrl.openStream())));
-        } catch (Exception e) {
-            printTo("Cmd  error Connecting to Hybridscape configs");
-        }
-        try {
-            l = characterfile.readLine();
-        } catch (IOException ioexception) {
-            misc.println(" error Reading serverconfig1");
-            return false;
-        }
-        while (EndOfFile == false && l != null) {
-            l = l.trim();
-            int spot = l.indexOf("=");
-            if (spot > -1) {
-                t = l.substring(0, spot);
-                t = t.trim();
-                t2 = l.substring(spot + 1);
-                t2 = t2.trim();
-                t2_2 = t2.replaceAll("\t\t", "\t");
-                t2_2 = t2_2.replaceAll("\t\t", "\t");
-                t2_2 = t2_2.replaceAll("\t\t", "\t");
-                t2_2 = t2_2.replaceAll("\t\t", "\t");
-                t2_2 = t2_2.replaceAll("\t\t", "\t");
-                t3 = t2_2.split("\t");
-                switch (i) {
-
-                    case 1: // Things loaded on login
-
-                        if (t.equals("Config1")) {
-                            setClientConfig(Integer.parseInt(t3[0]), Integer.parseInt(t3[1]));
-                        }
-
-                        if (t.equals("Config2")) {
-                            printTo("Msg " + t2);
-                        }
-                        if (t.equals("sidebar")) {
-                            setSidebarInterface(Integer.parseInt(t3[0]), Integer.parseInt(t3[1]));
-                        }
-                        break;
-
-
+    private void applyRemoteBootstrapOverrides(
+        RemoteBootstrapConfigProvider.RemoteClientBootstrapOverrides overrides
+    ) {
+        for (RemoteBootstrapConfigProvider.RemoteClientBootstrapOperation operation : overrides.operations()) {
+            if (operation instanceof RemoteBootstrapConfigProvider.ClientConfigOverride clientConfigOverride) {
+                if (clientConfigOverride.configId() < 0 || clientConfigOverride.value() < 0) {
+                    continue;
                 }
-                if (l.equals("[EOF]")) {
-                    try {
-                        characterfile.close();
-                    } catch (IOException ioexception) {
-                    }
-                    return true;
-                }
+                setClientConfig(clientConfigOverride.configId(), clientConfigOverride.value());
+                continue;
             }
-            try {
-                l = characterfile.readLine();
-            } catch (IOException ioexception1) {
-                EndOfFile = true;
+
+            if (operation instanceof RemoteBootstrapConfigProvider.ClientMessage clientMessage) {
+                printTo("Msg " + clientMessage.message());
+                continue;
+            }
+
+            if (operation instanceof RemoteBootstrapConfigProvider.SidebarOverride sidebarOverride) {
+                if (sidebarOverride.menuId() < 0 || sidebarOverride.interfaceId() < 0) {
+                    continue;
+                }
+                setSidebarInterface(sidebarOverride.menuId(), sidebarOverride.interfaceId());
             }
         }
-        try {
-            characterfile.close();
-        } catch (IOException ioexception) {
-        }
-        return true;
     }
 
     public boolean CheckFeatherUsage() {

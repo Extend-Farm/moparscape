@@ -16,6 +16,112 @@ This project is now a Gradle multi-module build.
 - Compile game client only:
   - `./gradlew :game-client:compileJava`
 
+## Run
+
+Java 21 is required.
+
+### Native rewrite path
+
+Run the modern native client:
+
+- `./gradlew :rs-client-lwjgl:run`
+
+What it does:
+
+- opens the native LWJGL title/login shell
+- boots the new in-process `:rs-server-runtime`
+- loads title and gameplay frame art from cache when available
+- uses `client/characters` by default for persistence
+
+Use PostgreSQL instead of character files:
+
+1. `docker compose up -d postgres`
+2. `./gradlew :rs-persistence-sql:migrateDevDatabase`
+3. `RSPS_PERSISTENCE_MODE=postgres ./gradlew :rs-client-lwjgl:run`
+
+### Legacy reference path
+
+Run the old RSPS stack in two terminals from the repo root:
+
+1. `./gradlew :emulator:run`
+2. `./gradlew :game-client:run`
+
+Notes:
+
+- `:emulator` is the old server in `client/`
+- `:game-client` is the old desktop client in `server/moparscape/`
+- start the emulator first or the legacy client will fail to log in
+
+## Parallel rewrite modules
+
+The new architecture lives beside the legacy RSPS modules.
+
+- Legacy reference executables:
+  - `:emulator` -> `client/`
+  - `:game-client` -> `server/moparscape/`
+- New rewrite foundation:
+  - `:rs-model` -> shared ids and world value types
+  - `:rs-cache` -> cache store discovery/bootstrap
+  - `:rs-content` -> content/bootstrap facade over live cache + legacy data paths
+  - `:rs-sim-ecs` -> deterministic ECS simulation core
+  - `:rs-persistence-api` -> repository contracts
+  - `:rs-persistence-sql` -> PostgreSQL/Flyway persistence adapters
+  - `:rs-protocol` -> new protocol message model and session contract
+  - `:rs-server-runtime` -> actor-oriented headless runtime bootstrap
+  - `:rs-client-core` -> client state machine and scene asset bootstrap
+  - `:rs-client-lwjgl` -> first-pass LWJGL desktop shell
+  - `:rs-test-fixtures` -> shared parity/fixture helpers
+
+Run the new runtime foundation:
+
+- `./gradlew :rs-server-runtime:run`
+
+Run the new LWJGL shell:
+
+- `./gradlew :rs-client-lwjgl:run`
+- current mode: native LWJGL client backed by the new `:rs-server-runtime`
+- title/login shell: loads from the cache `title` archive when available, with a native fallback only if title assets fail to load
+- gameplay shell: loads the main frame art from the cache `media` archive
+- tabs/chat/minimap: now exist in native form on the `rs-*` path
+- persistence: defaults to `client/characters`, or uses PostgreSQL when `RSPS_PERSISTENCE_MODE=postgres`
+- current limitation: the left world viewport is still mid-migration to proper RuneScape 3D world parity; it is not yet the full legacy scene graph/model/object pipeline
+
+## Local PostgreSQL
+
+The repo now defines its own development PostgreSQL setup. Do not depend on your machine-level `postgres` password.
+
+- Docker service: `docker compose up -d postgres`
+- Default JDBC URL: `jdbc:postgresql://127.0.0.1:55432/moparscape`
+- Default username: `moparscape`
+- Default password: `moparscape`
+- Env template: copy `.env.example` to `.env` if you want to override defaults
+
+Run the SQL tasks:
+
+- test the connection:
+  - `./gradlew :rs-persistence-sql:testDevDatabaseConnection`
+- run Flyway migrations:
+  - `./gradlew :rs-persistence-sql:migrateDevDatabase`
+- import one character file:
+  - `./gradlew :rs-persistence-sql:importCharacterToDevDatabase -Pcharacter=akira`
+
+Runtime composition:
+
+- default launcher persistence: character files under `client/characters`
+- PostgreSQL launcher persistence: set `RSPS_PERSISTENCE_MODE=postgres`
+- password storage in PostgreSQL is hashed; file-repository auth remains plaintext only during the compatibility window
+
+## Architecture Boundary
+
+The target architecture is strict:
+
+- `:emulator` and `:game-client` are legacy reference modules
+- production `rs-*` modules must not depend on or import legacy runtime code
+- legacy usage is allowed only for parity tests, golden fixtures, planning, and reference documentation
+- `:rs-client-lwjgl` must remain a native client, even when its behavior is being compared against the legacy client
+
+For parallel execution and documentation discipline, see [docs/multi-agent-workflow.md](/home/akira/projects/moparscape/docs/multi-agent-workflow.md:1).
+
 ## Recent modernization changes
 
 - Added Gradle wrapper and multi-project setup.
@@ -136,6 +242,13 @@ Refined high-traffic intrusive list/hash APIs for readability:
 
 ## Next steps
 
-- Continue phased renaming of remaining `Class1`..`Class50` files.
-- Add lightweight package structure once class naming stabilizes.
-- Add smoke tests and startup docs for both modules.
+- Continue phased legacy stabilization only where it supports parity fixtures or safe extraction.
+- Keep the cache-backed native title/gameplay shell honest about its current boundaries.
+- Port native widget/interface decoding so sidebar tabs stop relying on simplified stand-ins.
+- Replace the temporary native world viewport with full RuneScape 3D scene parity:
+  - object definitions
+  - model decoding
+  - object placement
+  - actor rendering
+  - proper scene graph/camera/minimap behavior
+- Port cache/content decode, region load, entity visibility, and additional gameplay verticals into the new modules.

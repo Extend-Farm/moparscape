@@ -1,3 +1,3 @@
 @echo off
-java -jar moparclient.jar
+java -jar build\libs\game-client.jar
 pause

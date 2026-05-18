@@ -1,17 +1,47 @@
 # Game Client Module (`server/moparscape`)
 
-This folder contains the legacy game client codebase, currently being modernized in-place.
+This module is the legacy desktop game client. It is kept as a reference executable while the
+native `rs-*` client is being rebuilt in parallel.
+
+If you want the modern native client, do not run this module directly. Use:
+
+- `./gradlew :rs-client-lwjgl:run`
 
 ## Build
 
 From repository root:
 
 - `./gradlew :game-client:compileJava`
-- `./gradlew :game-client:run`
+
+## Run
+
+From repository root:
+
+1. Start the legacy server:
+   - `./gradlew :emulator:run`
+2. Start this legacy client:
+   - `./gradlew :game-client:run`
+
+Important:
+
+- this module is not standalone
+- it expects the legacy emulator in `client/` to be running first
+- Java 21 is required for the Gradle build
 
 ## Entry point
 
 - Main class: `GameClient`
+
+## Module role
+
+- `server/moparscape/` -> legacy desktop client
+- `client/` -> legacy emulator/server
+- `rs-client-lwjgl/` -> modern native client under active rewrite
+
+The modernization rule is:
+
+- this module is reference-only for parity and investigation
+- production `rs-*` modules must not depend on or execute legacy runtime code
 
 ## Rename tracking
 
