@@ -1,11 +1,11 @@
 package io.github.ffakira.rsps.client.desktop.core;
 
-final class ArgbImageTransforms {
+public final class ArgbImageTransforms {
 
   private ArgbImageTransforms() {
   }
 
-  static ArgbImage flipHorizontally(ArgbImage image) {
+  public static ArgbImage flipHorizontally(ArgbImage image) {
     int[] transformedPixels = new int[image.width() * image.height()];
     for (int y = 0; y < image.height(); y++) {
       for (int x = 0; x < image.width(); x++) {
@@ -15,7 +15,7 @@ final class ArgbImageTransforms {
     return new ArgbImage(image.width(), image.height(), transformedPixels);
   }
 
-  static ArgbImage flipVertically(ArgbImage image) {
+  public static ArgbImage flipVertically(ArgbImage image) {
     int[] transformedPixels = new int[image.width() * image.height()];
     for (int y = 0; y < image.height(); y++) {
       int sourceRow = image.height() - y - 1;

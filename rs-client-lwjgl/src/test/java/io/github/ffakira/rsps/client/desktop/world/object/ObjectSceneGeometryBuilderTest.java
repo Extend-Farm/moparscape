@@ -47,10 +47,14 @@ class ObjectSceneGeometryBuilderTest {
         true,
         true,
         false,
+        false,
         true,
         false,
         16,
         -1,
+        -1,
+        0,
+        0,
         0,
         128,
         128,
@@ -101,10 +105,14 @@ class ObjectSceneGeometryBuilderTest {
         true,
         true,
         false,
+        false,
         true,
         false,
         16,
         -1,
+        -1,
+        0,
+        0,
         0,
         128,
         128,
@@ -154,10 +162,14 @@ class ObjectSceneGeometryBuilderTest {
         true,
         true,
         false,
+        false,
         true,
         false,
         16,
         -1,
+        -1,
+        0,
+        0,
         0,
         128,
         128,
@@ -203,6 +215,48 @@ class ObjectSceneGeometryBuilderTest {
       assertThat(green(geometry.faceColorC()[faceIndex])).isEqualTo(blue(geometry.faceColorC()[faceIndex]));
     }
     assertThat(foundWaterFace).isTrue();
+  }
+
+  @Test
+  void keepsTexturedTreeCanopiesAboveTheOldNearBlackBrightnessFloor() {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    ObjectDefinitionCatalog catalog = ObjectDefinitionCatalog.load(manifest);
+    ObjectDefinition definition = catalog.require(1276);
+    ObjectSceneGeometryBuilder builder = new ObjectSceneGeometryBuilder(new RawModelRepository(manifest.cacheStore()));
+
+    WorldSceneObjectGeometry geometry = builder.build(
+        definition,
+        0,
+        definition.modelIds()
+    );
+
+    assertThat(geometry).isNotNull();
+    int minimumTextureBrightness = Integer.MAX_VALUE;
+    boolean foundLeafTextureFace = false;
+    for (int faceIndex = 0; faceIndex < geometry.faceTextureIds().length; faceIndex++) {
+      if (geometry.faceTextureIds()[faceIndex] != 8) {
+        continue;
+      }
+      foundLeafTextureFace = true;
+      minimumTextureBrightness = Math.min(minimumTextureBrightness, red(geometry.faceColorA()[faceIndex]));
+      minimumTextureBrightness = Math.min(minimumTextureBrightness, red(geometry.faceColorB()[faceIndex]));
+      minimumTextureBrightness = Math.min(minimumTextureBrightness, red(geometry.faceColorC()[faceIndex]));
+    }
+    assertThat(foundLeafTextureFace).isTrue();
+    assertThat(minimumTextureBrightness).isGreaterThanOrEqualTo(108);
+  }
+
+  @Test
+  void returnsNullForBridgeWallDefinitionsWhoseCacheModelsHaveNoFaces() {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    ObjectDefinitionCatalog catalog = ObjectDefinitionCatalog.load(manifest);
+    ObjectDefinition definition = catalog.require(85);
+    ObjectSceneGeometryBuilder builder = new ObjectSceneGeometryBuilder(new RawModelRepository(manifest.cacheStore()));
+
+    assertThat(builder.build(definition, 0, definition.modelIdsForType(0))).isNull();
+    assertThat(builder.build(definition, 0, definition.modelIdsForType(9))).isNull();
+    assertThat(builder.hasRenderableSourceModels(definition.modelIdsForType(0))).isFalse();
+    assertThat(builder.hasRenderableSourceModels(definition.modelIdsForType(9))).isFalse();
   }
 
   private static int red(int rgb) {

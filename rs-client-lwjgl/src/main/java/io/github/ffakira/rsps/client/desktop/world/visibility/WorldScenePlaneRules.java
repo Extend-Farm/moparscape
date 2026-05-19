@@ -1,6 +1,6 @@
 package io.github.ffakira.rsps.client.desktop.world.visibility;
 
-import io.github.ffakira.rsps.client.desktop.core.WorldScene;
+import io.github.ffakira.rsps.client.desktop.world.WorldScene;
 import io.github.ffakira.rsps.content.TerrainRegionData;
 
 public final class WorldScenePlaneRules {
@@ -29,6 +29,28 @@ public final class WorldScenePlaneRules {
       return 1;
     }
     return effectivePlane(terrainRegionData, requestedPlane, tileX, tileY);
+  }
+
+  public static int objectScenePlane(
+      TerrainRegionData terrainRegionData,
+      int requestedPlane,
+      int placementPlane,
+      int tileX,
+      int tileY
+  ) {
+    if (placementPlane == requestedPlane) {
+      return requestedPlane;
+    }
+    // Bridge objects follow the same visible-surface contract as the deck terrain: the old client
+    // can show plane-1 bridge pieces while the active gameplay plane remains 0 underneath them.
+    // Without this explicit projection rule, the native scene keeps the ground deck but drops the
+    // matching plane-1 bridge walls and trims, which is why Lumbridge bridge still looks broken.
+    if (requestedPlane == 0
+        && placementPlane == 1
+        && (terrainRegionData.tileFlagAt(1, tileX, tileY) & 2) != 0) {
+      return 0;
+    }
+    return -1;
   }
 
   public static boolean hasRoofFlag(WorldScene worldScene, int localX, int localY) {

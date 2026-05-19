@@ -2,6 +2,8 @@ package io.github.ffakira.rsps.client.desktop.world.minimap;
 
 import io.github.ffakira.rsps.client.desktop.core.ArgbImage;
 import io.github.ffakira.rsps.client.desktop.world.object.WorldSceneObject;
+import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainLayerSource;
+import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainTileColorResolver;
 import java.util.List;
 
 public final class WorldSceneMinimapRasterizer {
@@ -46,6 +48,7 @@ public final class WorldSceneMinimapRasterizer {
   public ArgbImage rasterize(
       int tileWidth,
       int tileHeight,
+      int[] elevations,
       int[] tileColors,
       int[] underlayColors,
       int[] overlayColors,
@@ -55,6 +58,18 @@ public final class WorldSceneMinimapRasterizer {
       byte[] overlayRotations,
       List<WorldSceneObject> sceneObjects
   ) {
+    TerrainLayerSource terrainLayerSource = new MinimapTerrainLayerSource(
+        tileWidth,
+        tileHeight,
+        elevations,
+        tileColors,
+        underlayColors,
+        overlayColors,
+        underlayTextureIds,
+        overlayTextureIds,
+        overlayShapes,
+        overlayRotations
+    );
     int pixelWidth = tileWidth * TILE_PIXELS;
     int pixelHeight = tileHeight * TILE_PIXELS;
     int[] pixels = new int[pixelWidth * pixelHeight];
@@ -62,6 +77,7 @@ public final class WorldSceneMinimapRasterizer {
       for (int sceneX = 0; sceneX < tileWidth; sceneX++) {
         int sourceIndex = sceneY * tileWidth + sceneX;
         rasterizeTile(
+            terrainLayerSource,
             tileHeight,
             pixelWidth,
             pixelHeight,
@@ -85,6 +101,7 @@ public final class WorldSceneMinimapRasterizer {
   }
 
   private void rasterizeTile(
+      TerrainLayerSource terrainLayerSource,
       int tileHeight,
       int pixelWidth,
       int pixelHeight,
@@ -99,13 +116,34 @@ public final class WorldSceneMinimapRasterizer {
       int overlayShape,
       int overlayRotation
   ) {
-    int paintRgb = minimapColor(tileRgb, underlayRgb, overlayRgb, underlayTextureId, overlayTextureId);
+    TileCornerColors paintColors = activePaintCornerColors(
+        terrainLayerSource,
+        sceneX,
+        sceneY,
+        tileRgb,
+        underlayRgb,
+        overlayRgb,
+        underlayTextureId,
+        overlayTextureId
+    );
     if (overlayShape <= 1 || overlayShape >= TILE_SHAPE_MASKS.length) {
-      fillTile(tileHeight, pixelWidth, pixelHeight, pixels, sceneX, sceneY, paintRgb);
+      fillGradientTile(tileHeight, pixelWidth, pixelHeight, pixels, sceneX, sceneY, paintColors);
       return;
     }
-    int fillUnderlayRgb = minimapColor(underlayRgb, tileRgb, overlayRgb, underlayTextureId, -1);
-    int fillOverlayRgb = minimapColor(overlayRgb, tileRgb, underlayRgb, -1, overlayTextureId);
+    TileCornerColors underlayCornerColors = layerCornerColors(
+        terrainLayerSource,
+        sceneX,
+        sceneY,
+        TerrainTileColorResolver.FloorColorLayer.UNDERLAY,
+        minimapBaseColor(underlayRgb, tileRgb, overlayRgb, underlayTextureId, -1)
+    );
+    TileCornerColors overlayCornerColors = layerCornerColors(
+        terrainLayerSource,
+        sceneX,
+        sceneY,
+        TerrainTileColorResolver.FloorColorLayer.OVERLAY,
+        minimapBaseColor(overlayRgb, tileRgb, underlayRgb, -1, overlayTextureId)
+    );
     int[] shapeMask = TILE_SHAPE_MASKS[overlayShape];
     int[] rotationMap = TILE_ROTATION_MAP[overlayRotation];
     int startX = sceneX * TILE_PIXELS;
@@ -114,7 +152,11 @@ public final class WorldSceneMinimapRasterizer {
       for (int offsetX = 0; offsetX < TILE_PIXELS; offsetX++) {
         int maskIndex = offsetY * TILE_PIXELS + offsetX;
         boolean useOverlay = shapeMask[rotationMap[maskIndex]] != 0;
-        int pixelRgb = useOverlay ? fillOverlayRgb : fillUnderlayRgb;
+        int pixelRgb = sampleTileGradient(
+            useOverlay ? overlayCornerColors : underlayCornerColors,
+            offsetX,
+            offsetY
+        );
         setPixel(pixelWidth, pixelHeight, pixels, startX + offsetX, startY + offsetY, pixelRgb);
       }
     }
@@ -240,23 +282,27 @@ public final class WorldSceneMinimapRasterizer {
     }
   }
 
-  private void fillTileInset(int tileHeight, int pixelWidth, int pixelHeight, int[] pixels, int sceneX, int sceneY, int inset, int rgb) {
-    int startX = sceneX * TILE_PIXELS + inset;
-    int startY = tileTopY(tileHeight, sceneY) + inset;
-    int size = Math.max(1, TILE_PIXELS - inset * 2);
-    for (int offsetY = 0; offsetY < size; offsetY++) {
-      for (int offsetX = 0; offsetX < size; offsetX++) {
-        setPixel(pixelWidth, pixelHeight, pixels, startX + offsetX, startY + offsetY, rgb);
-      }
-    }
-  }
-
-  private void fillTile(int tileHeight, int pixelWidth, int pixelHeight, int[] pixels, int sceneX, int sceneY, int rgb) {
+  private void fillGradientTile(
+      int tileHeight,
+      int pixelWidth,
+      int pixelHeight,
+      int[] pixels,
+      int sceneX,
+      int sceneY,
+      TileCornerColors colors
+  ) {
     int startX = sceneX * TILE_PIXELS;
     int startY = tileTopY(tileHeight, sceneY);
     for (int offsetY = 0; offsetY < TILE_PIXELS; offsetY++) {
       for (int offsetX = 0; offsetX < TILE_PIXELS; offsetX++) {
-        setPixel(pixelWidth, pixelHeight, pixels, startX + offsetX, startY + offsetY, rgb);
+        setPixel(
+            pixelWidth,
+            pixelHeight,
+            pixels,
+            startX + offsetX,
+            startY + offsetY,
+            sampleTileGradient(colors, offsetX, offsetY)
+        );
       }
     }
   }
@@ -284,7 +330,78 @@ public final class WorldSceneMinimapRasterizer {
     return WALL_COLOR_RGB;
   }
 
-  private int minimapColor(
+  private TileCornerColors activePaintCornerColors(
+      TerrainLayerSource terrainLayerSource,
+      int tileX,
+      int tileY,
+      int tileRgb,
+      int underlayRgb,
+      int overlayRgb,
+      int underlayTextureId,
+      int overlayTextureId
+  ) {
+    if (isWaterTexture(underlayTextureId) || isWaterTexture(overlayTextureId)) {
+      return shadedBaseCornerColors(terrainLayerSource, tileX, tileY, MINIMAP_WATER_RGB);
+    }
+    TerrainTileColorResolver.FloorColorLayer paintLayer = TerrainTileColorResolver.paintLayer(
+        terrainLayerSource,
+        tileX,
+        tileY
+    );
+    int fallbackRgb = paintLayer == TerrainTileColorResolver.FloorColorLayer.OVERLAY
+        ? minimapBaseColor(overlayRgb, tileRgb, underlayRgb, -1, overlayTextureId)
+        : minimapBaseColor(underlayRgb, tileRgb, overlayRgb, underlayTextureId, overlayTextureId);
+    return layerCornerColors(terrainLayerSource, tileX, tileY, paintLayer, fallbackRgb);
+  }
+
+  private TileCornerColors layerCornerColors(
+      TerrainLayerSource terrainLayerSource,
+      int tileX,
+      int tileY,
+      TerrainTileColorResolver.FloorColorLayer layer,
+      int fallbackRgb
+  ) {
+    if (fallbackRgb == MINIMAP_WATER_RGB) {
+      return shadedBaseCornerColors(terrainLayerSource, tileX, tileY, fallbackRgb);
+    }
+    return new TileCornerColors(
+        TerrainTileColorResolver.cornerColor(terrainLayerSource, tileX, tileY, layer, fallbackRgb),
+        TerrainTileColorResolver.cornerColor(terrainLayerSource, tileX + 1, tileY, layer, fallbackRgb),
+        TerrainTileColorResolver.cornerColor(terrainLayerSource, tileX + 1, tileY + 1, layer, fallbackRgb),
+        TerrainTileColorResolver.cornerColor(terrainLayerSource, tileX, tileY + 1, layer, fallbackRgb)
+    );
+  }
+
+  private TileCornerColors shadedBaseCornerColors(
+      TerrainLayerSource terrainLayerSource,
+      int tileX,
+      int tileY,
+      int baseRgb
+  ) {
+    return new TileCornerColors(
+        applyBrightness(baseRgb, TerrainTileColorResolver.terrainLightBrightness(terrainLayerSource, tileX, tileY)),
+        applyBrightness(baseRgb, TerrainTileColorResolver.terrainLightBrightness(terrainLayerSource, tileX + 1, tileY)),
+        applyBrightness(baseRgb, TerrainTileColorResolver.terrainLightBrightness(terrainLayerSource, tileX + 1, tileY + 1)),
+        applyBrightness(baseRgb, TerrainTileColorResolver.terrainLightBrightness(terrainLayerSource, tileX, tileY + 1))
+    );
+  }
+
+  private int sampleTileGradient(TileCornerColors colors, int offsetX, int offsetY) {
+    float u = (offsetX + 0.5f) / TILE_PIXELS;
+    float v = (offsetY + 0.5f) / TILE_PIXELS;
+    float topRed = lerp(channel(colors.northWest(), 16), channel(colors.northEast(), 16), u);
+    float topGreen = lerp(channel(colors.northWest(), 8), channel(colors.northEast(), 8), u);
+    float topBlue = lerp(channel(colors.northWest(), 0), channel(colors.northEast(), 0), u);
+    float bottomRed = lerp(channel(colors.southWest(), 16), channel(colors.southEast(), 16), u);
+    float bottomGreen = lerp(channel(colors.southWest(), 8), channel(colors.southEast(), 8), u);
+    float bottomBlue = lerp(channel(colors.southWest(), 0), channel(colors.southEast(), 0), u);
+    int red = clamp(Math.round(lerp(topRed, bottomRed, v)), 0, 255);
+    int green = clamp(Math.round(lerp(topGreen, bottomGreen, v)), 0, 255);
+    int blue = clamp(Math.round(lerp(topBlue, bottomBlue, v)), 0, 255);
+    return (red << 16) | (green << 8) | blue;
+  }
+
+  private int minimapBaseColor(
       int primaryRgb,
       int secondaryRgb,
       int tertiaryRgb,
@@ -292,22 +409,26 @@ public final class WorldSceneMinimapRasterizer {
       int fallbackTextureId
   ) {
     if (isWaterTexture(primaryTextureId) || isWaterTexture(fallbackTextureId)) {
-      return applyBrightness(MINIMAP_WATER_RGB, 126);
+      return MINIMAP_WATER_RGB;
     }
     if (primaryRgb != 0) {
-      return applyBrightness(primaryRgb, 118);
+      return primaryRgb;
     }
     if (secondaryRgb != 0) {
-      return applyBrightness(secondaryRgb, 118);
+      return secondaryRgb;
     }
     if (tertiaryRgb != 0) {
-      return applyBrightness(tertiaryRgb, 118);
+      return tertiaryRgb;
     }
-    return applyBrightness(0x2f3946, 118);
+    return 0x2f3946;
   }
 
   private boolean isWaterTexture(int textureId) {
     return textureId == WATER_TEXTURE_ID;
+  }
+
+  private int channel(int rgb, int shift) {
+    return (rgb >>> shift) & 0xff;
   }
 
   private int applyBrightness(int rgb, int brightness) {
@@ -318,7 +439,68 @@ public final class WorldSceneMinimapRasterizer {
     return (red << 16) | (green << 8) | blue;
   }
 
+  private float lerp(float start, float end, float amount) {
+    return start + (end - start) * amount;
+  }
+
   private int clamp(int value, int minimum, int maximum) {
     return Math.max(minimum, Math.min(maximum, value));
+  }
+
+  private record TileCornerColors(int northWest, int northEast, int southEast, int southWest) {
+  }
+
+  private record MinimapTerrainLayerSource(
+      int tileWidth,
+      int tileHeight,
+      int[] elevations,
+      int[] tileColors,
+      int[] underlayColors,
+      int[] overlayColors,
+      int[] underlayTextureIds,
+      int[] overlayTextureIds,
+      byte[] overlayShapes,
+      byte[] overlayRotations
+  ) implements TerrainLayerSource {
+
+    @Override
+    public int elevationAt(int localX, int localY) {
+      return elevations[localY * tileWidth + localX];
+    }
+
+    @Override
+    public int tileColorAt(int localX, int localY) {
+      return tileColors[localY * tileWidth + localX];
+    }
+
+    @Override
+    public int underlayColorAt(int localX, int localY) {
+      return underlayColors[localY * tileWidth + localX];
+    }
+
+    @Override
+    public int overlayColorAt(int localX, int localY) {
+      return overlayColors[localY * tileWidth + localX];
+    }
+
+    @Override
+    public int underlayTextureIdAt(int localX, int localY) {
+      return underlayTextureIds[localY * tileWidth + localX];
+    }
+
+    @Override
+    public int overlayTextureIdAt(int localX, int localY) {
+      return overlayTextureIds[localY * tileWidth + localX];
+    }
+
+    @Override
+    public int overlayShapeAt(int localX, int localY) {
+      return overlayShapes[localY * tileWidth + localX] & 0xff;
+    }
+
+    @Override
+    public int overlayRotationAt(int localX, int localY) {
+      return overlayRotations[localY * tileWidth + localX] & 0xff;
+    }
   }
 }

@@ -10,8 +10,8 @@ class WorldSceneOccluderBuilderTest {
 
   @Test
   void buildsWallAndHorizontalOccludersFromSceneObjects() {
-    WorldSceneObject wall = new WorldSceneObject(1, "Wall", 10, 8, 0, 0, 0, 1, 1, -1, List.of(), null);
-    WorldSceneObject roof = new WorldSceneObject(2, "Roof", 12, 12, 0, 10, 0, 3, 2, -1, List.of(), null);
+    WorldSceneObject wall = new WorldSceneObject(1, "Wall", 10, 8, 0, 0, 0, 1, 1, false, -1, -1, List.of(), true, null);
+    WorldSceneObject roof = new WorldSceneObject(2, "Roof", 12, 12, 0, 10, 0, 3, 2, false, -1, -1, List.of(), true, null);
 
     List<WorldSceneOccluder> occluders = new WorldSceneOccluderBuilder().build(
         0,

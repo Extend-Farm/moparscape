@@ -147,6 +147,16 @@ final class ObjectSceneGeometryBuilder {
     );
   }
 
+  boolean hasRenderableSourceModels(List<Integer> modelIds) {
+    for (Integer modelId : modelIds) {
+      RawModelData rawModelData = rawModelRepository.loadModel(modelId);
+      if (rawModelData.vertexCount() > 0 || rawModelData.faceCount() > 0 || rawModelData.texturedFaceCount() > 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private WorldSceneObjectGeometry finalizeGeometry(
       List<float[]> vertices,
       List<int[]> faces,
@@ -160,6 +170,9 @@ final class ObjectSceneGeometryBuilder {
       List<Integer> textureVertexB,
       List<Integer> textureVertexC
   ) {
+    if (vertices.isEmpty() || faces.isEmpty()) {
+      return null;
+    }
     float[] vertexX = new float[vertices.size()];
     float[] vertexY = new float[vertices.size()];
     float[] vertexZ = new float[vertices.size()];
@@ -342,8 +355,8 @@ final class ObjectSceneGeometryBuilder {
     return new float[][]{vertexNormalX, vertexNormalY, vertexNormalZ};
   }
 
-  private int shadeObjectColor(int baseRgb, float normalX, float normalY, float normalZ) {
-    return applyBrightness(baseRgb, textureBrightness(normalX, normalY, normalZ));
+  private int shadeObjectColor(ObjectDefinition definition, int baseRgb, float normalX, float normalY, float normalZ) {
+    return applyBrightness(baseRgb, textureBrightness(definition, normalX, normalY, normalZ));
   }
 
   private int colorForFaceVertex(
@@ -355,20 +368,39 @@ final class ObjectSceneGeometryBuilder {
       float normalZ
   ) {
     if (faceMode >= 2) {
-      return shadeObjectTexture(normalX, normalY, normalZ);
+      return shadeObjectTexture(definition, normalX, normalY, normalZ);
     }
     int recoloredHsl = recolor(sourceColorHsl, definition);
-    return shadeObjectColor(hslToRgb(recoloredHsl), normalX, normalY, normalZ);
+    return shadeObjectColor(definition, hslToRgb(recoloredHsl), normalX, normalY, normalZ);
   }
 
-  private int shadeObjectTexture(float normalX, float normalY, float normalZ) {
-    int brightness = textureBrightness(normalX, normalY, normalZ);
+  private int shadeObjectTexture(ObjectDefinition definition, float normalX, float normalY, float normalZ) {
+    int brightness = textureBrightness(definition, normalX, normalY, normalZ);
     return (brightness << 16) | (brightness << 8) | brightness;
   }
 
-  private int textureBrightness(float normalX, float normalY, float normalZ) {
+  private int textureBrightness(ObjectDefinition definition, float normalX, float normalY, float normalZ) {
     float lightDot = normalX * OBJECT_LIGHT_X + normalY * OBJECT_LIGHT_Y + normalZ * OBJECT_LIGHT_Z;
-    return clamp(Math.round(122 + lightDot * 74.0f), 68, 228);
+    float amplitude = Math.max(28.0f, Math.min(92.0f, 74.0f + definition.contrast() * 0.55f));
+    float base = 122.0f + definition.ambient();
+    int minimumBrightness = 68;
+    if (isFoliageObject(definition)) {
+      // The 317 tree and bush canopies are textured foliage, not flat dark solids. Using the same
+      // modulation range as hard-surface objects drives texture `8` close to black, so keep a
+      // brighter floor and softer directional contrast for foliage.
+      base += 28.0f;
+      amplitude *= 0.52f;
+      minimumBrightness = 112;
+    }
+    return clamp(Math.round(base + lightDot * amplitude), minimumBrightness, 228);
+  }
+
+  private boolean isFoliageObject(ObjectDefinition definition) {
+    String lowercaseName = definition.name().toLowerCase();
+    return lowercaseName.contains("tree")
+        || lowercaseName.contains("bush")
+        || lowercaseName.contains("hedge")
+        || lowercaseName.contains("evergreen");
   }
 
   private int hslToRgb(int colorHsl) {

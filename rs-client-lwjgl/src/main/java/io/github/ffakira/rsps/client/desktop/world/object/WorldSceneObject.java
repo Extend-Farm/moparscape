@@ -12,8 +12,11 @@ public record WorldSceneObject(
     int orientation,
     int sizeX,
     int sizeY,
+    boolean contouredGround,
     int mapSceneId,
+    int mapFunctionId,
     List<Integer> modelIds,
+    boolean allowFallbackProxy,
     WorldSceneObjectGeometry geometry
 ) {
 

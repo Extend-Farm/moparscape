@@ -1,6 +1,6 @@
 package io.github.ffakira.rsps.client.desktop.world.visibility;
 
-import io.github.ffakira.rsps.client.desktop.core.WorldSceneScale;
+import io.github.ffakira.rsps.client.desktop.world.WorldSceneScale;
 import io.github.ffakira.rsps.client.desktop.world.object.WorldSceneObject;
 import java.util.ArrayList;
 import java.util.List;

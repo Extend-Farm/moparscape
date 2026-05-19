@@ -2,6 +2,23 @@ package io.github.ffakira.rsps.client.desktop.core;
 
 import io.github.ffakira.rsps.client.core.ClientViewModel;
 import io.github.ffakira.rsps.client.core.RenderSystem;
+import io.github.ffakira.rsps.client.desktop.character.ActorAnimationState;
+import io.github.ffakira.rsps.client.desktop.character.CharacterModelAssembler;
+import io.github.ffakira.rsps.client.desktop.character.LocalPlayerAnimationTracker;
+import io.github.ffakira.rsps.client.desktop.gameplay.GameplayCameraController;
+import io.github.ffakira.rsps.client.desktop.gameplay.GameplayChromeRenderer;
+import io.github.ffakira.rsps.client.desktop.gameplay.GameplayClickResult;
+import io.github.ffakira.rsps.client.desktop.gameplay.GameplayFrameAssets;
+import io.github.ffakira.rsps.client.desktop.gameplay.GameplayLayout;
+import io.github.ffakira.rsps.client.desktop.login.LoginScreenState;
+import io.github.ffakira.rsps.client.desktop.login.TitleScreenAssets;
+import io.github.ffakira.rsps.client.desktop.login.TitleScreenLayout;
+import io.github.ffakira.rsps.client.desktop.login.TitleScreenRenderer;
+import io.github.ffakira.rsps.client.desktop.world.WorldScene;
+import io.github.ffakira.rsps.client.desktop.world.WorldSceneRenderSubmission;
+import io.github.ffakira.rsps.client.desktop.world.WorldSceneSubmissionBuilder;
+import io.github.ffakira.rsps.client.desktop.world.WorldViewportClickPlanner;
+import io.github.ffakira.rsps.client.desktop.world.WorldViewportRenderer;
 import io.github.ffakira.rsps.client.desktop.world.raster.SceneTextureAssets;
 import io.github.ffakira.rsps.content.ItemDefinitionCatalog;
 import io.github.ffakira.rsps.model.WorldPoint;
@@ -75,7 +92,10 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
   public void setWorldScene(WorldScene worldScene) {
     this.worldScene = Objects.requireNonNull(worldScene, "worldScene");
     closeTexture(worldMinimapTexture);
-    worldMinimapTexture = OpenGlTexture.fromArgbImage(worldScene.minimapImage());
+    worldMinimapTexture = OpenGlTexture.fromArgbImage(
+        worldScene.minimapImage(),
+        OpenGlTexture.FilterMode.LINEAR
+    );
   }
 
   public void clearWorldScene() {

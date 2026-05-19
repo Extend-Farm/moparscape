@@ -76,4 +76,28 @@ class WorldScenePlaneRulesTest {
 
     assertThat(WorldScenePlaneRules.surfacePlane(regionData, 0, 9, 9)).isEqualTo(1);
   }
+
+  @Test
+  void projectsPlaneOneBridgeObjectsIntoGroundScenes() {
+    int[][] heights = new int[4][64 * 64];
+    byte[][] underlays = new byte[4][64 * 64];
+    byte[][] overlays = new byte[4][64 * 64];
+    byte[][] overlayShapes = new byte[4][64 * 64];
+    byte[][] overlayRotations = new byte[4][64 * 64];
+    byte[][] tileFlags = new byte[4][64 * 64];
+    tileFlags[1][11 * 64 + 11] = 2;
+    TerrainRegionData regionData = new TerrainRegionData(
+        50,
+        50,
+        heights,
+        underlays,
+        overlays,
+        overlayShapes,
+        overlayRotations,
+        tileFlags
+    );
+
+    assertThat(WorldScenePlaneRules.objectScenePlane(regionData, 0, 1, 11, 11)).isEqualTo(0);
+    assertThat(WorldScenePlaneRules.objectScenePlane(regionData, 0, 1, 10, 10)).isEqualTo(-1);
+  }
 }

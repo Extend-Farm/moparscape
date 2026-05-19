@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-final class ItemIconRenderer {
+public final class ItemIconRenderer {
 
   private static final int ICON_SIZE = 32;
   private static final float ICON_CENTER = ICON_SIZE * 0.5f;
@@ -45,11 +45,11 @@ final class ItemIconRenderer {
     this.sceneTextureAssets = sceneTextureAssets == null ? EMPTY_TEXTURE_ASSETS : sceneTextureAssets;
   }
 
-  int iconKey(int itemId, int quantity) {
+  public int iconKey(int itemId, int quantity) {
     return resolveRenderableItemId(itemId, quantity);
   }
 
-  ArgbImage render(int itemId, int quantity) {
+  public ArgbImage render(int itemId, int quantity) {
     int renderableItemId = resolveRenderableItemId(itemId, quantity);
     if (renderableItemId < 0) {
       return null;

@@ -14,12 +14,16 @@ public record ObjectDefinition(
     boolean solid,
     boolean impenetrable,
     boolean interactive,
+    boolean contouredGround,
     boolean mirrored,
     boolean castsShadow,
     boolean obstructsGround,
     int decorDisplacement,
     int mapSceneId,
+    int mapFunctionId,
     int blockingMask,
+    int ambient,
+    int contrast,
     int scaleX,
     int scaleY,
     int scaleZ,
@@ -47,12 +51,21 @@ public record ObjectDefinition(
     if (modelTypes.isEmpty()) {
       return modelIds;
     }
+    int canonicalType = canonicalModelType(objectType);
     java.util.ArrayList<Integer> selectedIds = new java.util.ArrayList<>();
     for (int index = 0; index < modelTypes.size(); index++) {
-      if (modelTypes.get(index) == objectType && index < modelIds.size()) {
+      if (modelTypes.get(index) == canonicalType && index < modelIds.size()) {
         selectedIds.add(modelIds.get(index));
       }
     }
     return List.copyOf(selectedIds);
+  }
+
+  private static int canonicalModelType(int objectType) {
+    // In the 317 client, wall-decoration placement variants 5..8 reuse model type 4.
+    return switch (objectType) {
+      case 5, 6, 7, 8 -> 4;
+      default -> objectType;
+    };
   }
 }

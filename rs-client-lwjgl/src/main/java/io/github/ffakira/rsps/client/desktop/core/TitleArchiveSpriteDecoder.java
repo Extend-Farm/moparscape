@@ -1,6 +1,7 @@
 package io.github.ffakira.rsps.client.desktop.core;
 
 import io.github.ffakira.rsps.cache.CacheArchiveContainer;
+import io.github.ffakira.rsps.client.desktop.login.TitleScreenRuneMask;
 import java.util.ArrayList;
 import java.util.List;
 

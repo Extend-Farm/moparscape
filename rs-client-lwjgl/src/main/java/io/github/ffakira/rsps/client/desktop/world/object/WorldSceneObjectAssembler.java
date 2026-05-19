@@ -37,6 +37,9 @@ public final class WorldSceneObjectAssembler {
     WorldSceneObjectGeometry geometry = definition == null
         ? null
         : objectGeometryBuilder.build(definition, placement.orientation(), modelIds);
+    boolean allowFallbackProxy = definition == null
+        || modelIds.isEmpty()
+        || objectGeometryBuilder.hasRenderableSourceModels(modelIds);
     return new WorldSceneObject(
         placement.objectId(),
         name,
@@ -47,8 +50,11 @@ public final class WorldSceneObjectAssembler {
         placement.orientation(),
         sizeX,
         sizeY,
+        definition != null && definition.contouredGround(),
         definition == null ? -1 : definition.mapSceneId(),
+        definition == null ? -1 : definition.mapFunctionId(),
         modelIds,
+        allowFallbackProxy,
         geometry
     );
   }

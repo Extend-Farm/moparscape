@@ -1,6 +1,6 @@
 package io.github.ffakira.rsps.client.desktop.world.minimap;
 
-import io.github.ffakira.rsps.client.desktop.core.WorldScene;
+import io.github.ffakira.rsps.client.desktop.world.WorldScene;
 import io.github.ffakira.rsps.model.WorldPoint;
 
 public final class MinimapViewportPlanner {

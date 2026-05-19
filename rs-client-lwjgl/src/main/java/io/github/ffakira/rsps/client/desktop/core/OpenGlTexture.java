@@ -3,6 +3,7 @@ package io.github.ffakira.rsps.client.desktop.core;
 import java.nio.ByteBuffer;
 import org.lwjgl.BufferUtils;
 
+import static org.lwjgl.opengl.GL11.GL_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_RGBA;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
@@ -18,6 +19,17 @@ import static org.lwjgl.opengl.GL11.glTexSubImage2D;
 
 public final class OpenGlTexture implements AutoCloseable {
 
+  public enum FilterMode {
+    NEAREST(GL_NEAREST),
+    LINEAR(GL_LINEAR);
+
+    private final int glValue;
+
+    FilterMode(int glValue) {
+      this.glValue = glValue;
+    }
+  }
+
   private final int id;
   private final int width;
   private final int height;
@@ -31,16 +43,24 @@ public final class OpenGlTexture implements AutoCloseable {
   }
 
   public static OpenGlTexture fromArgbImage(ArgbImage image) {
-    OpenGlTexture texture = create(image.width(), image.height());
+    return fromArgbImage(image, FilterMode.NEAREST);
+  }
+
+  public static OpenGlTexture fromArgbImage(ArgbImage image, FilterMode filterMode) {
+    OpenGlTexture texture = create(image.width(), image.height(), filterMode);
     texture.update(image);
     return texture;
   }
 
   public static OpenGlTexture create(int width, int height) {
+    return create(width, height, FilterMode.NEAREST);
+  }
+
+  public static OpenGlTexture create(int width, int height, FilterMode filterMode) {
     int textureId = glGenTextures();
     glBindTexture(GL_TEXTURE_2D, textureId);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterMode.glValue);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterMode.glValue);
     glTexImage2D(
         GL_TEXTURE_2D,
         0,

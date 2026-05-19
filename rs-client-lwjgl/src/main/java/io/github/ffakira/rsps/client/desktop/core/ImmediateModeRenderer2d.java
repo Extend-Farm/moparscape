@@ -28,20 +28,20 @@ import static org.lwjgl.opengl.GL11.glTexCoord2f;
 import static org.lwjgl.opengl.GL11.glVertex2f;
 import static org.lwjgl.opengl.GL11.glVertexPointer;
 
-final class ImmediateModeRenderer2d {
+public final class ImmediateModeRenderer2d {
 
   private static final int TEXT_VERTEX_BUFFER_CAPACITY = 64 * 1024;
 
   private final ByteBuffer textVertexBuffer = BufferUtils.createByteBuffer(TEXT_VERTEX_BUFFER_CAPACITY);
 
-  void drawTexturedQuad(OpenGlTexture texture, ScreenRect rect) {
+  public void drawTexturedQuad(OpenGlTexture texture, ScreenRect rect) {
     if (texture == null) {
       return;
     }
     drawCroppedTexturedQuad(texture, 0, 0, texture.width(), texture.height(), rect);
   }
 
-  void drawCroppedTexturedQuad(OpenGlTexture texture, int sourceX, int sourceY, int sourceWidth, int sourceHeight, ScreenRect rect) {
+  public void drawCroppedTexturedQuad(OpenGlTexture texture, int sourceX, int sourceY, int sourceWidth, int sourceHeight, ScreenRect rect) {
     if (texture == null) {
       return;
     }
@@ -65,7 +65,7 @@ final class ImmediateModeRenderer2d {
     endTexturedAlpha();
   }
 
-  void drawCroppedTexturedOval(OpenGlTexture texture, int sourceX, int sourceY, int sourceWidth, int sourceHeight, ScreenRect rect) {
+  public void drawCroppedTexturedOval(OpenGlTexture texture, int sourceX, int sourceY, int sourceWidth, int sourceHeight, ScreenRect rect) {
     if (texture == null) {
       return;
     }
@@ -99,7 +99,7 @@ final class ImmediateModeRenderer2d {
     endTexturedAlpha();
   }
 
-  void drawMaskedRotatedTexturedRows(
+  public void drawMaskedRotatedTexturedRows(
       OpenGlTexture texture,
       ScreenRect rect,
       int logicalWidth,
@@ -204,7 +204,7 @@ final class ImmediateModeRenderer2d {
     endTexturedAlpha();
   }
 
-  void drawQuad(float left, float top, float width, float height) {
+  public void drawQuad(float left, float top, float width, float height) {
     glBegin(GL_QUADS);
     glVertex2f(left, top);
     glVertex2f(left + width, top);
@@ -213,7 +213,7 @@ final class ImmediateModeRenderer2d {
     glEnd();
   }
 
-  void drawOutline(float left, float top, float width, float height) {
+  public void drawOutline(float left, float top, float width, float height) {
     glBegin(GL_LINE_LOOP);
     glVertex2f(left, top);
     glVertex2f(left + width, top);
@@ -222,11 +222,11 @@ final class ImmediateModeRenderer2d {
     glEnd();
   }
 
-  void drawText(float left, float top, String text, float red, float green, float blue) {
+  public void drawText(float left, float top, String text, float red, float green, float blue) {
     drawText(left, top, text, red, green, blue, 1.0f);
   }
 
-  void drawText(float left, float top, String text, float red, float green, float blue, float scale) {
+  public void drawText(float left, float top, String text, float red, float green, float blue, float scale) {
     if (text == null || text.isEmpty()) {
       return;
     }
@@ -243,7 +243,7 @@ final class ImmediateModeRenderer2d {
     glDisableClientState(GL_VERTEX_ARRAY);
   }
 
-  void drawCenteredText(float centerX, float top, String text, float red, float green, float blue) {
+  public void drawCenteredText(float centerX, float top, String text, float red, float green, float blue) {
     if (text == null || text.isEmpty()) {
       return;
     }
@@ -251,11 +251,11 @@ final class ImmediateModeRenderer2d {
     drawText(centerX - textWidth / 2.0f, top, text, red, green, blue);
   }
 
-  float measureTextWidth(String text) {
+  public float measureTextWidth(String text) {
     return measureTextWidth(text, 1.0f);
   }
 
-  float measureTextWidth(String text, float scale) {
+  public float measureTextWidth(String text, float scale) {
     if (text == null || text.isEmpty()) {
       return 0.0f;
     }
@@ -295,12 +295,12 @@ final class ImmediateModeRenderer2d {
       int textureWidth,
       int textureHeight
   ) {
-    float centeredX = sampleX - logicalWidth / 2.0f;
-    float centeredY = sampleY - logicalHeight / 2.0f;
+    float centeredX = sampleX + 0.5f - logicalWidth / 2.0f;
+    float centeredY = sampleY + 0.5f - logicalHeight / 2.0f;
     float sourceX = sourceCenterX + centeredY * sine + centeredX * cosine;
     float sourceY = sourceCenterY + centeredY * cosine - centeredX * sine;
-    float clampedX = clamp(sourceX, 0.0f, textureWidth - 1.0f);
-    float clampedY = clamp(sourceY, 0.0f, textureHeight - 1.0f);
+    float clampedX = clamp(sourceX, 0.5f, textureWidth - 0.5f);
+    float clampedY = clamp(sourceY, 0.5f, textureHeight - 0.5f);
     return new float[]{
         clampedX / textureWidth,
         clampedY / textureHeight

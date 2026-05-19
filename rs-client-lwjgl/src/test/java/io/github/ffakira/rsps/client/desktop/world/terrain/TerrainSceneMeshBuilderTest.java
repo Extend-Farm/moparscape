@@ -1,8 +1,8 @@
 package io.github.ffakira.rsps.client.desktop.world.terrain;
 
 import io.github.ffakira.rsps.client.desktop.core.ArgbImage;
-import io.github.ffakira.rsps.client.desktop.core.WorldScene;
-import io.github.ffakira.rsps.client.desktop.core.WorldSceneProjection;
+import io.github.ffakira.rsps.client.desktop.world.WorldScene;
+import io.github.ffakira.rsps.client.desktop.world.WorldSceneProjection;
 import io.github.ffakira.rsps.client.desktop.world.raster.SceneTriangleMesh;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -110,6 +110,73 @@ class TerrainSceneMeshBuilderTest {
     for (int faceIndex = 0; faceIndex < mesh.faceVertexA().length; faceIndex++) {
       assertThat(signedArea(mesh, faceIndex)).isGreaterThanOrEqualTo(0.0f);
     }
+  }
+
+  @Test
+  void emitsTheLowerBridgeSurfaceUnderBridgeDeckTiles() {
+    int width = 2;
+    int height = 2;
+    int[] elevations = new int[]{20, 20, 20, 20};
+    int[] tileColors = filledInts(width * height, 0x505050);
+    int[] underlayColors = filledInts(width * height, 0x3f5a35);
+    int[] overlayColors = filledInts(width * height, 0x505050);
+    int[] underlayTextureIds = filledInts(width * height, -1);
+    int[] overlayTextureIds = filledInts(width * height, -1);
+    byte[] overlayShapes = new byte[width * height];
+    byte[] overlayRotations = new byte[width * height];
+    byte[] tileFlags = new byte[width * height];
+
+    int[] bridgeElevations = new int[]{0, 0, 0, 0};
+    int[] bridgeTileColors = filledInts(width * height, 0x5a7ea3);
+    int[] bridgeUnderlayColors = filledInts(width * height, 0x3f5a35);
+    int[] bridgeOverlayColors = filledInts(width * height, 0x5a7ea3);
+    int[] bridgeUnderlayTextureIds = filledInts(width * height, -1);
+    int[] bridgeOverlayTextureIds = filledInts(width * height, 1);
+    byte[] bridgeOverlayShapes = new byte[width * height];
+    byte[] bridgeOverlayRotations = new byte[width * height];
+    byte[] bridgeActiveTiles = new byte[]{1, 0, 0, 0};
+
+    WorldScene worldScene = new WorldScene(
+        "bridge-terrain-test",
+        3200,
+        3200,
+        0,
+        width,
+        height,
+        elevations,
+        tileColors,
+        underlayColors,
+        overlayColors,
+        underlayTextureIds,
+        overlayTextureIds,
+        overlayShapes,
+        overlayRotations,
+        tileFlags,
+        java.util.List.of(),
+        java.util.List.of(),
+        new ArgbImage(1, 1, new int[]{0xff000000}),
+        new ArgbImage(width, height, filledInts(width * height, 0xff334455)),
+        new WorldSceneProjection(5, 3, 0, 0),
+        new BridgeTerrainLayer(
+            width,
+            height,
+            bridgeElevations,
+            bridgeTileColors,
+            bridgeUnderlayColors,
+            bridgeOverlayColors,
+            bridgeUnderlayTextureIds,
+            bridgeOverlayTextureIds,
+            bridgeOverlayShapes,
+            bridgeOverlayRotations,
+            bridgeActiveTiles
+        )
+    );
+    TerrainSceneMeshBuilder builder = new TerrainSceneMeshBuilder();
+
+    SceneTriangleMesh mesh = builder.buildTexturedTilePaintMesh(worldScene);
+
+    assertThat(mesh.isEmpty()).isFalse();
+    assertThat(mesh.faceTextureIds()).contains(1);
   }
 
   private static java.util.List<String> trianglePoints(SceneTriangleMesh mesh, int faceIndex) {

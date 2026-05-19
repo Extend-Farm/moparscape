@@ -20,6 +20,7 @@ import io.github.ffakira.rsps.protocol.ProtocolSession;
 import io.github.ffakira.rsps.protocol.ServerMessage;
 import io.github.ffakira.rsps.server.runtime.InProcessServerRuntime;
 import io.github.ffakira.rsps.server.runtime.PlayerSessionActor;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.function.Consumer;
@@ -75,6 +76,62 @@ class InProcessGameplayFlowTest {
       assertThat(gameplayClientSession.viewModel().inventoryPresentation().getFirst().name()).isEqualTo("Water rune");
       assertThat(gameplayClientSession.viewModel().equipmentPresentation().getFirst().slotName()).isEqualTo("Head");
       assertThat(gameplayClientSession.viewModel().skillPresentation().getFirst().name()).isEqualTo("Attack");
+    }
+  }
+
+  @Test
+  void expandsClickMovementIntoAPacedWalkPath() {
+    AccountRecord accountRecord = new AccountRecord(new AccountId(101L), "akira", "swordfish");
+    CharacterSnapshot characterSnapshot = new CharacterSnapshot(
+        new CharacterId(202L),
+        accountRecord.id(),
+        "Akira",
+        new WorldPoint(3200, 3201, 0),
+        new CharacterProfile((short) 2, true, 100, null, 0L, 0L),
+        new CharacterAppearance(List.of(-1, -1, -1, -1, -1, -1)),
+        List.of(new CharacterSkill(0, 99, 14_000_000)),
+        List.of(),
+        List.of()
+    );
+
+    try (InProcessServerRuntime runtime = new InProcessServerRuntime(
+        new InMemoryAccountRepository(accountRecord),
+        new InMemoryCharacterRepository(characterSnapshot)
+    )) {
+      ClientCore clientCore = new ClientCore();
+      BridgedProtocolSession bridgedSession = new BridgedProtocolSession();
+      TestNanoClock clock = new TestNanoClock();
+      GameplayClientSession gameplayClientSession = new GameplayClientSession(
+          clientCore,
+          bridgedSession,
+          "integration-test",
+          new DefaultSceneAssetService(),
+          Path.of("."),
+          clock::now
+      );
+      bridgedSession.bindInbound(gameplayClientSession::accept);
+      PlayerSessionActor playerSessionActor = runtime.openSession(bridgedSession);
+      bridgedSession.bindOutbound(playerSessionActor::accept);
+
+      gameplayClientSession.bootstrap();
+      gameplayClientSession.connect();
+      gameplayClientSession.login("akira", "swordfish");
+      assertThat(bridgedSession.awaitMessageCount(5, Duration.ofSeconds(2))).isTrue();
+
+      gameplayClientSession.move(3, 2, MovementMode.WALK);
+      gameplayClientSession.pumpMovement();
+      assertThat(bridgedSession.awaitMessageCount(6, Duration.ofSeconds(2))).isTrue();
+      assertThat(gameplayClientSession.viewModel().localPlayerPosition()).isEqualTo(new WorldPoint(3201, 3202, 0));
+
+      clock.advanceNanos(120_000_000L);
+      gameplayClientSession.pumpMovement();
+      assertThat(bridgedSession.awaitMessageCount(7, Duration.ofSeconds(2))).isTrue();
+      assertThat(gameplayClientSession.viewModel().localPlayerPosition()).isEqualTo(new WorldPoint(3202, 3202, 0));
+
+      clock.advanceNanos(120_000_000L);
+      gameplayClientSession.pumpMovement();
+      assertThat(bridgedSession.awaitMessageCount(8, Duration.ofSeconds(2))).isTrue();
+      assertThat(gameplayClientSession.viewModel().localPlayerPosition()).isEqualTo(new WorldPoint(3203, 3203, 0));
     }
   }
 
@@ -179,6 +236,19 @@ class InProcessGameplayFlowTest {
     @Override
     public CharacterSnapshot save(CharacterSnapshot characterSnapshot) {
       return characterSnapshot;
+    }
+  }
+
+  private static final class TestNanoClock {
+
+    private long now;
+
+    long now() {
+      return now;
+    }
+
+    void advanceNanos(long nanos) {
+      now += nanos;
     }
   }
 }

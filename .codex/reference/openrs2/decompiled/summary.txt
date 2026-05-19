@@ -1,0 +1,973 @@
+Summary for .codex/reference/openrs2/runescape-live-317-client.jar
+Decompiled with CFR 0.152
+
+
+AFCKELYG
+----------------------------
+
+a(int int int int[] )
+  Handled impossible loop by adding 'first' condition
+a(boolean )
+  Handled impossible loop by adding 'first' condition
+a(int int int int int int int )
+  Handled impossible loop by adding 'first' condition
+a(int int int int int int )
+  Handled impossible loop by adding 'first' condition
+b(int int int int int int int )
+  Handled impossible loop by adding 'first' condition
+a(int int int int byte )
+  Handled impossible loop by adding 'first' condition
+a(int int int boolean int int )
+  Handled impossible loop by adding 'first' condition
+a(int int int int int )
+  Handled impossible loop by adding 'first' condition
+a(int int int int byte int )
+  Handled impossible loop by adding 'first' condition
+
+
+ARZPHHDH
+----------------------------
+
+a(long )
+  Handled impossible loop by adding 'first' condition
+
+
+BISVHPUN
+----------------------------
+
+c()
+  Handled impossible loop by adding 'first' condition
+
+
+CDEJWOSB
+----------------------------
+
+a(int int int boolean )
+  Handled impossible loop by adding 'first' condition
+
+
+CKDEJADD
+----------------------------
+
+a(int )
+  Handled impossible loop by adding 'first' condition
+a(boolean )
+  Handled impossible loop by adding 'first' condition
+a(XTGLDHGX )
+  Handled impossible loop by adding 'first' condition
+a(int int int int[] )
+  Handled impossible loop by adding 'first' condition
+a(boolean MBMGIXGO )
+  Handled impossible loop by adding 'first' condition
+
+
+client
+----------------------------
+
+a(int int )
+  Handled impossible loop by adding 'first' condition
+h(int )
+  Handled impossible loop by adding 'first' condition
+i(int )
+  Handled impossible loop by adding 'first' condition
+k(int )
+  Unable to fully structure code
+a(boolean )
+  Handled impossible loop by adding 'first' condition
+b(boolean int )
+  Handled impossible loop by adding 'first' condition
+c(boolean int )
+  Handled impossible loop by adding 'first' condition
+a(int int DUCMKFAY int int int int )
+  Handled impossible loop by adding 'first' condition
+a(MBMGIXGO int int )
+  Handled impossible loop by adding 'first' condition
+c(boolean )
+  Handled impossible loop by adding 'first' condition
+m(int )
+  Handled impossible loop by adding 'first' condition
+a(boolean long )
+  Handled impossible loop by adding 'first' condition
+d(int int )
+  Handled impossible loop by adding 'first' condition
+c(byte )
+  Handled impossible loop by adding 'first' condition
+e(byte )
+  Handled impossible loop by adding 'first' condition
+a(byte long )
+  Handled impossible loop by adding 'first' condition
+d(boolean )
+  Handled impossible loop by adding 'first' condition
+n(int )
+  Handled impossible loop by adding 'first' condition
+a(int MBMGIXGO byte )
+  Handled impossible loop by adding 'first' condition
+a(int boolean )
+  Handled impossible loop by adding 'first' condition
+a(int DUCMKFAY )
+  Unable to fully structure code
+a(int byte MBMGIXGO )
+  Handled impossible loop by adding 'first' condition
+o(int )
+  Handled impossible loop by adding 'first' condition
+f(byte )
+  Handled impossible loop by adding 'first' condition
+q(int )
+  Handled impossible loop by adding 'first' condition
+r(int )
+  Handled impossible loop by adding 'first' condition
+f(boolean )
+  Handled impossible loop by adding 'first' condition
+s(int )
+  Handled impossible loop by adding 'first' condition
+a(int byte )
+  Unable to fully structure code
+u(int )
+  Unable to fully structure code
+v(int )
+  Handled impossible loop by adding 'first' condition
+a(int byte java.lang.String )
+  Handled impossible loop by adding 'first' condition
+a(int java.lang.String java.lang.String int byte int )
+  Handled impossible loop by adding 'first' condition
+x(int )
+  Handled impossible loop by adding 'first' condition
+b(int boolean )
+  Handled impossible loop by adding 'first' condition
+z(int )
+  Handled impossible loop by adding 'first' condition
+A(int )
+  Handled impossible loop by adding 'first' condition
+a(int int int )
+  Handled impossible loop by adding 'first' condition
+b(int DUCMKFAY )
+  Unable to fully structure code
+h(byte )
+  Handled impossible loop by adding 'first' condition
+a(java.lang.String int java.lang.String boolean )
+  Handled impossible loop by adding 'first' condition
+D(int )
+  Handled impossible loop by adding 'first' condition
+a(java.lang.String java.lang.String boolean )
+  Unable to fully structure code
+a(int int int int int int int int int int boolean int )
+  Unable to fully structure code
+a(int MBMGIXGO boolean )
+  Handled impossible loop by adding 'first' condition
+a(CKDEJADD int boolean int int )
+  Handled impossible loop by adding 'first' condition
+a(int int DLZHLHNK boolean int )
+  Handled impossible loop by adding 'first' condition
+a(boolean DYMVKFXP )
+  Handled impossible loop by adding 'first' condition
+h(boolean )
+  Handled impossible loop by adding 'first' condition
+a()
+  Handled impossible loop by adding 'first' condition
+E(int )
+  Handled impossible loop by adding 'first' condition
+F(int )
+  Handled impossible loop by adding 'first' condition
+b(GQOSZKJC int )
+  Handled impossible loop by adding 'first' condition
+k(boolean )
+  Handled impossible loop by adding 'first' condition
+a(int int int DUCMKFAY int )
+  Handled impossible loop by adding 'first' condition
+a(DSMJIEPN int )
+  Handled impossible loop by adding 'first' condition
+a(int int MBMGIXGO byte DLZHLHNK )
+  Handled impossible loop by adding 'first' condition
+G(int )
+  Handled impossible loop by adding 'first' condition
+a(boolean java.lang.String )
+  Handled impossible loop by adding 'first' condition
+a(long int )
+  Handled impossible loop by adding 'first' condition
+i(byte )
+  Handled impossible loop by adding 'first' condition
+j(byte )
+  Handled impossible loop by adding 'first' condition
+l(boolean )
+  Handled impossible loop by adding 'first' condition
+I(int )
+  Handled impossible loop by adding 'first' condition
+c(int boolean int )
+  Unable to fully structure code
+J(int )
+  Handled impossible loop by adding 'first' condition
+K(int )
+  Handled impossible loop by adding 'first' condition
+a(int long )
+  Unable to fully structure code
+a(int DUCMKFAY int )
+  Handled impossible loop by adding 'first' condition
+L(int )
+  Handled impossible loop by adding 'first' condition
+m(boolean )
+  Unable to fully structure code
+n(boolean )
+  Handled impossible loop by adding 'first' condition
+a(int int int int int int int int int int )
+  Handled impossible loop by adding 'first' condition
+b(DUCMKFAY boolean )
+  Handled impossible loop by adding 'first' condition
+k(byte )
+  Handled impossible loop by adding 'first' condition
+a(byte int MBMGIXGO )
+  Handled impossible loop by adding 'first' condition
+l(byte )
+  Handled impossible loop by adding 'first' condition
+a(int MBMGIXGO int )
+  Unable to fully structure code
+m(byte )
+  Handled impossible loop by adding 'first' condition
+b(MBMGIXGO int int )
+  Handled impossible loop by adding 'first' condition
+o(boolean )
+  Handled impossible loop by adding 'first' condition
+b(int MBMGIXGO int )
+  Handled impossible loop by adding 'first' condition
+p(boolean )
+  Unable to fully structure code
+n(byte )
+  Handled impossible loop by adding 'first' condition
+
+
+CLRWXPOI
+----------------------------
+
+a()
+  Handled impossible loop by adding 'first' condition
+a(int int )
+  Unable to fully structure code
+a(boolean MBMGIXGO )
+  Unable to fully structure code
+
+
+CRRWDRTI
+----------------------------
+
+<init>(byte[][][] int int int int[][][] )
+  Handled impossible loop by adding 'first' condition
+a(FTPNODIB[] NYFUGYQS int )
+  Exception : org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [22[DOLOOP]], but top level block is 23[WHILELOOP]
+a(int int int int int )
+  Handled impossible loop by adding 'first' condition
+a(int NYFUGYQS FTPNODIB int int int int boolean int )
+  Unable to fully structure code
+  Could not resolve type clashes
+c(int int int )
+  Handled impossible loop by adding 'first' condition
+a(int int FTPNODIB[] int int int byte[] int int int )
+  Handled impossible loop by adding 'first' condition
+a(byte[] int int int int byte FTPNODIB[] )
+  Handled impossible loop by adding 'first' condition
+a(int int MBMGIXGO int int int int int )
+  Unable to fully structure code
+
+
+CWNCPMLX
+----------------------------
+
+b(int )
+  Handled impossible loop by adding 'first' condition
+
+
+CXGZMTJK
+----------------------------
+
+<init>(XTGLDHGX java.lang.String int )
+  Unable to fully structure code
+a(int int int int )
+  Handled impossible loop by adding 'first' condition
+c(int )
+  Handled impossible loop by adding 'first' condition
+a(int int int int int int int int[] int[] )
+  Handled impossible loop by adding 'first' condition
+a(int[] int[] int int int int int int int )
+  Handled impossible loop by adding 'first' condition
+a(int int int boolean )
+  Handled impossible loop by adding 'first' condition
+a(int int int[] int int[] int int int int int int )
+  Handled impossible loop by adding 'first' condition
+b(int int int[] int int[] int int int int int int )
+  Handled impossible loop by adding 'first' condition
+a(int int int int int int int double int )
+  Handled impossible loop by adding 'first' condition
+a(int[] int byte[] int int[] int boolean int int int int )
+  Handled impossible loop by adding 'first' condition
+
+
+DJRMEMXO
+----------------------------
+
+a(XTGLDHGX )
+  Handled impossible loop by adding 'first' condition
+b(int int )
+  Handled impossible loop by adding 'first' condition
+a(boolean int )
+  Handled impossible loop by adding 'first' condition
+b(int )
+  Handled impossible loop by adding 'first' condition
+a(int int int int )
+  Handled impossible loop by adding 'first' condition
+c(int )
+  Handled impossible loop by adding 'first' condition
+a(int boolean )
+  Handled impossible loop by adding 'first' condition
+a(boolean MBMGIXGO )
+  Handled impossible loop by adding 'first' condition
+
+
+DLZHLHNK
+----------------------------
+
+a(int MBMGIXGO )
+  Handled impossible loop by adding 'first' condition
+b(int )
+  Handled impossible loop by adding 'first' condition
+a(byte )
+  Handled impossible loop by adding 'first' condition
+
+
+DSMJIEPN
+----------------------------
+
+<init>(XTGLDHGX java.lang.String int )
+  Unable to fully structure code
+b(boolean )
+  Handled impossible loop by adding 'first' condition
+c(boolean )
+  Handled impossible loop by adding 'first' condition
+b(int )
+  Handled impossible loop by adding 'first' condition
+d(boolean )
+  Handled impossible loop by adding 'first' condition
+a(int int int int )
+  Handled impossible loop by adding 'first' condition
+a(int byte int[] byte[] int int int int int[] int )
+  Handled impossible loop by adding 'first' condition
+
+
+DUCMKFAY
+----------------------------
+
+a(XTGLDHGX YXVQXWYR[] byte XTGLDHGX )
+  Handled impossible loop by adding 'first' condition
+
+
+FTPNODIB
+----------------------------
+
+a()
+  Handled impossible loop by adding 'first' condition
+a(boolean int int int int int int )
+  Handled impossible loop by adding 'first' condition
+a(int int int int byte int boolean )
+  Handled impossible loop by adding 'first' condition
+
+
+GHOWLKWN
+----------------------------
+
+b(int )
+  Handled impossible loop by adding 'first' condition
+a(XTGLDHGX client )
+  Handled impossible loop by adding 'first' condition
+a(boolean int )
+  Handled impossible loop by adding 'first' condition
+a(int PHKHJKBS )
+  Handled impossible loop by adding 'first' condition
+b(int int )
+  Handled impossible loop by adding 'first' condition
+run()
+  Unable to fully structure code
+c()
+  Exception : org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[DOLOOP]], but top level block is 13[SIMPLE_IF_TAKEN]
+a(int int int int )
+  Handled impossible loop by adding 'first' condition
+d(int int )
+  Handled impossible loop by adding 'first' condition
+a(boolean )
+  Unable to fully structure code
+d(int )
+  Handled impossible loop by adding 'first' condition
+b(boolean )
+  Unable to fully structure code
+a(byte )
+  Unable to fully structure code
+
+
+GQOSZKJC
+----------------------------
+
+a(int int boolean boolean )
+  Unable to fully structure code
+a(boolean )
+  Handled impossible loop by adding 'first' condition
+a(int int int int )
+  Handled impossible loop by adding 'first' condition
+a(boolean byte int )
+  Handled impossible loop by adding 'first' condition
+b(boolean )
+  Handled impossible loop by adding 'first' condition
+
+
+HZTFWEML
+----------------------------
+
+a(QPNUVGRI )
+  Unable to fully structure code
+b(QPNUVGRI )
+  Handled impossible loop by adding 'first' condition
+e(QPNUVGRI )
+  Handled impossible loop by adding 'first' condition
+a(int[] int[] int[] byte[] int int int )
+  Handled impossible loop by adding 'first' condition
+
+
+IGSLDTHC
+----------------------------
+
+a(boolean int )
+  Handled impossible loop by adding 'first' condition
+a(boolean int int int byte[] )
+  Unable to fully structure code
+
+
+IVIFZQBK
+----------------------------
+
+a(int )
+  Handled impossible loop by adding 'first' condition
+
+
+JHDAGNBV
+----------------------------
+
+a(boolean MBMGIXGO )
+  Handled impossible loop by adding 'first' condition
+a(int )
+  Handled impossible loop by adding 'first' condition
+a(int int )
+  Handled impossible loop by adding 'first' condition
+b(int )
+  Handled impossible loop by adding 'first' condition
+
+
+JOCFVBOI
+----------------------------
+
+<init>(int int[] )
+  Handled impossible loop by adding 'first' condition
+b()
+  Handled impossible loop by adding 'first' condition
+c()
+  Handled impossible loop by adding 'first' condition
+
+
+KHACHIFW
+----------------------------
+
+run()
+  Exception : org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [1[CATCHBLOCK]], but top level block is 5[DOLOOP]
+b(int )
+  Handled impossible loop by adding 'first' condition
+focusLost(java.awt.event.FocusEvent )
+  Handled impossible loop by adding 'first' condition
+e(int )
+  Handled impossible loop by adding 'first' condition
+f(int )
+  Handled impossible loop by adding 'first' condition
+a(int byte java.lang.String )
+  Handled impossible loop by adding 'first' condition
+
+
+KVCQPLIW
+----------------------------
+
+<init>(int MBMGIXGO )
+  Handled impossible loop by adding 'first' condition
+
+
+LHGXPZPG
+----------------------------
+
+a(int PKVMXVTO )
+  Handled impossible loop by adding 'first' condition
+
+
+LKGEGIEW
+----------------------------
+
+a(int XTGLDHGX )
+  Handled impossible loop by adding 'first' condition
+a(int byte )
+  Handled impossible loop by adding 'first' condition
+a(boolean MBMGIXGO )
+  Handled impossible loop by adding 'first' condition
+
+
+MBMGIXGO
+----------------------------
+
+a(byte int )
+  Handled impossible loop by adding 'first' condition
+a(byte[] int boolean int )
+  Handled impossible loop by adding 'first' condition
+a(byte )
+  Handled impossible loop by adding 'first' condition
+a(int byte int byte[] )
+  Handled impossible loop by adding 'first' condition
+f(int )
+  Handled impossible loop by adding 'first' condition
+c(int int )
+  Handled impossible loop by adding 'first' condition
+a(boolean )
+  Handled impossible loop by adding 'first' condition
+d(int int )
+  Handled impossible loop by adding 'first' condition
+i(int )
+  Handled impossible loop by adding 'first' condition
+f(int int )
+  Handled impossible loop by adding 'first' condition
+c(boolean )
+  Handled impossible loop by adding 'first' condition
+d(byte )
+  Handled impossible loop by adding 'first' condition
+d(boolean )
+  Handled impossible loop by adding 'first' condition
+a(int byte byte[] int )
+  Handled impossible loop by adding 'first' condition
+a(int int boolean byte[] )
+  Handled impossible loop by adding 'first' condition
+
+
+MNHKFPQO
+----------------------------
+
+a(int XTGLDHGX )
+  Handled impossible loop by adding 'first' condition
+
+
+MUDLUUBC
+----------------------------
+
+a(int XTGLDHGX )
+  Handled impossible loop by adding 'first' condition
+a()
+  Handled impossible loop by adding 'first' condition
+
+
+NQABEVLK
+----------------------------
+
+<init>(KHACHIFW int java.net.Socket )
+  Handled impossible loop by adding 'first' condition
+a(byte[] int int )
+  Unable to fully structure code
+a(int int byte[] int )
+  Handled impossible loop by adding 'first' condition
+run()
+  Handled impossible loop by adding 'first' condition
+
+
+NYFUGYQS
+----------------------------
+
+a(int )
+  Handled impossible loop by adding 'first' condition
+b(int )
+  Handled impossible loop by adding 'first' condition
+a(int int )
+  Handled impossible loop by adding 'first' condition
+a(int int int )
+  Handled impossible loop by adding 'first' condition
+a(int int int int int int int int int )
+  Handled impossible loop by adding 'first' condition
+a(int int int int int int int int int int int int int int int int int int int int )
+  Unable to fully structure code
+a(byte int int XHHRODPC int XHHRODPC XHHRODPC int int )
+  Handled impossible loop by adding 'first' condition
+a(int XHHRODPC boolean int int byte int XHHRODPC int int int )
+  Handled impossible loop by adding 'first' condition
+a(int int int int int int int XHHRODPC int byte int int )
+  Handled impossible loop by adding 'first' condition
+a(int int int XHHRODPC int int int int int int int int byte )
+  Handled impossible loop by adding 'first' condition
+a(int int int int int int int int XHHRODPC int boolean int byte )
+  Handled impossible loop by adding 'first' condition
+a(byte )
+  Handled impossible loop by adding 'first' condition
+a(int OPNPFUJE )
+  Handled impossible loop by adding 'first' condition
+c(int int int int )
+  Handled impossible loop by adding 'first' condition
+a(int int byte int )
+  Handled impossible loop by adding 'first' condition
+e(int int int int )
+  Handled impossible loop by adding 'first' condition
+d(int int int )
+  Handled impossible loop by adding 'first' condition
+g(int int int int )
+  Handled impossible loop by adding 'first' condition
+a(int byte int int int int )
+  Handled impossible loop by adding 'first' condition
+a(int int ZKARKDQW byte int )
+  Handled impossible loop by adding 'first' condition
+a(int int int int byte int ZKARKDQW )
+  Handled impossible loop by adding 'first' condition
+a(ZKARKDQW ZKARKDQW int int int boolean )
+  Handled impossible loop by adding 'first' condition
+a(int[] int int int int int )
+  Unable to fully structure code
+a(int int int int int[] boolean )
+  Handled impossible loop by adding 'first' condition
+a(boolean int int )
+  Handled impossible loop by adding 'first' condition
+a(int int int int int int boolean )
+  Handled impossible loop by adding 'first' condition
+a(QTKGMFHL boolean )
+  Handled impossible loop by adding 'first' condition
+a(int byte int int VBAXKVMG int int int )
+  Handled impossible loop by adding 'first' condition
+c(int )
+  Handled impossible loop by adding 'first' condition
+a(int int int int int int )
+  Handled impossible loop by adding 'first' condition
+h(int int int )
+  Handled impossible loop by adding 'first' condition
+
+
+OJEALINP
+----------------------------
+
+a(int boolean )
+  Handled impossible loop by adding 'first' condition
+
+
+OPPOFIOL
+----------------------------
+
+b(int )
+  Handled impossible loop by adding 'first' condition
+a(byte )
+  Handled impossible loop by adding 'first' condition
+a(int int int )
+  Handled impossible loop by adding 'first' condition
+c(int )
+  Handled impossible loop by adding 'first' condition
+a(int boolean )
+  Handled impossible loop by adding 'first' condition
+a(XTGLDHGX int )
+  Handled impossible loop by adding 'first' condition
+a(int int )
+  Handled impossible loop by adding 'first' condition
+b(int int )
+  Handled impossible loop by adding 'first' condition
+d(int )
+  Handled impossible loop by adding 'first' condition
+a(double byte )
+  Handled impossible loop by adding 'first' condition
+a(int int int int int int int int int )
+  Unable to fully structure code
+a(int[] int int int int int int int )
+  Unable to fully structure code
+c(int int int int int int int )
+  Unable to fully structure code
+a(int[] int int int int int )
+  Unable to fully structure code
+a(int int int int int int int int int int int int int int int int int int int )
+  Unable to fully structure code
+a(int[] int[] int int int int int int int int int int int int int )
+  Unable to fully structure code
+
+
+OZKFTHAD
+----------------------------
+
+a(byte MBMGIXGO )
+  Handled impossible loop by adding 'first' condition
+
+
+RKAYAFDQ
+----------------------------
+
+a(byte MBMGIXGO )
+  Handled impossible loop by adding 'first' condition
+a(MBMGIXGO boolean )
+  Handled impossible loop by adding 'first' condition
+a(MBMGIXGO char[][] boolean byte[][][] )
+  Handled impossible loop by adding 'first' condition
+a(char[][] MBMGIXGO int )
+  Handled impossible loop by adding 'first' condition
+a(boolean char[] )
+  Handled impossible loop by adding 'first' condition
+a(java.lang.String int )
+  Handled impossible loop by adding 'first' condition
+a(char[] int char[] )
+  Handled impossible loop by adding 'first' condition
+a(int char[] )
+  Handled impossible loop by adding 'first' condition
+a(char[] boolean )
+  Handled impossible loop by adding 'first' condition
+a(byte char[] )
+  Handled impossible loop by adding 'first' condition
+a(int char[] char[] char[] char[] )
+  Handled impossible loop by adding 'first' condition
+a(char[] int char[] int )
+  Unable to fully structure code
+a(byte char[] int char[] )
+  Unable to fully structure code
+b(boolean char[] )
+  Handled impossible loop by adding 'first' condition
+a(char[] char[] int byte char[] char[] )
+  Handled impossible loop by adding 'first' condition
+a(int char[] int char[] )
+  Unable to fully structure code
+a(boolean char[] char[] int )
+  Unable to fully structure code
+a(byte[][] char[] int char[] )
+  Unable to fully structure code
+b(char int )
+  Handled impossible loop by adding 'first' condition
+a(char[] int )
+  Handled impossible loop by adding 'first' condition
+a(char[] int int )
+  Handled impossible loop by adding 'first' condition
+b(char[] int int )
+  Handled impossible loop by adding 'first' condition
+c(char int )
+  Handled impossible loop by adding 'first' condition
+e(char int )
+  Handled impossible loop by adding 'first' condition
+a(char[] byte )
+  Handled impossible loop by adding 'first' condition
+b(char[] int )
+  Handled impossible loop by adding 'first' condition
+
+
+RTHTIIVA
+----------------------------
+
+a(int boolean MBMGIXGO )
+  Handled impossible loop by adding 'first' condition
+a(java.lang.String boolean MBMGIXGO )
+  Handled impossible loop by adding 'first' condition
+
+
+SQHJOGRT
+----------------------------
+
+a(int )
+  Handled impossible loop by adding 'first' condition
+a(byte[] boolean )
+  Handled impossible loop by adding 'first' condition
+b(int )
+  Handled impossible loop by adding 'first' condition
+
+
+SWTXAYDT
+----------------------------
+
+a(int int )
+  Handled impossible loop by adding 'first' condition
+
+
+SXYSOXTR
+----------------------------
+
+a(int XTGLDHGX )
+  Handled impossible loop by adding 'first' condition
+
+
+TAVAECED
+----------------------------
+
+a(int XTGLDHGX )
+  Handled impossible loop by adding 'first' condition
+a(boolean MBMGIXGO )
+  Handled impossible loop by adding 'first' condition
+a(byte )
+  Handled impossible loop by adding 'first' condition
+a(boolean )
+  Unable to fully structure code
+b(boolean )
+  Handled impossible loop by adding 'first' condition
+a(int )
+  Unable to fully structure code
+
+
+VADHJTLJ
+----------------------------
+
+a(int float int )
+  Handled impossible loop by adding 'first' condition
+a(MBMGIXGO boolean OZKFTHAD )
+  Handled impossible loop by adding 'first' condition
+
+
+VBAXKVMG
+----------------------------
+
+<init>(int int int int int int int int int int int int int int int int int int int int )
+  Handled impossible loop by adding 'first' condition
+
+
+VGXVBFVC
+----------------------------
+
+a(int XTGLDHGX )
+  Handled impossible loop by adding 'first' condition
+
+
+WBWOBAFW
+----------------------------
+
+a(int )
+  Handled impossible loop by adding 'first' condition
+a(boolean )
+  Handled impossible loop by adding 'first' condition
+<init>(int int int int byte int int int int boolean )
+  Handled impossible loop by adding 'first' condition
+
+
+XTGLDHGX
+----------------------------
+
+a(byte[] byte )
+  Handled impossible loop by adding 'first' condition
+a(java.lang.String byte[] )
+  Unable to fully structure code
+
+
+YXVQXWYR
+----------------------------
+
+<init>(boolean java.lang.String int XTGLDHGX )
+  Handled impossible loop by adding 'first' condition
+a(java.lang.String int int byte int )
+  Handled impossible loop by adding 'first' condition
+a(int java.lang.String )
+  Handled impossible loop by adding 'first' condition
+a(java.lang.String boolean )
+  Handled impossible loop by adding 'first' condition
+b(int java.lang.String int int int )
+  Handled impossible loop by adding 'first' condition
+a(int boolean java.lang.String int int int )
+  Handled impossible loop by adding 'first' condition
+a(int java.lang.String int int byte int )
+  Handled impossible loop by adding 'first' condition
+a(int java.lang.String boolean int int int int )
+  Handled impossible loop by adding 'first' condition
+a(boolean boolean int int java.lang.String int )
+  Handled impossible loop by adding 'first' condition
+a(boolean int int java.lang.String int int int )
+  Handled impossible loop by adding 'first' condition
+a(int[] byte[] int int int int int int int )
+  Handled impossible loop by adding 'first' condition
+a(int int byte[] int int int boolean int )
+  Handled impossible loop by adding 'first' condition
+a(byte[] int int int[] int int int int int int int )
+  Handled impossible loop by adding 'first' condition
+
+
+YZDBYLRM
+----------------------------
+
+a(int )
+  Handled impossible loop by adding 'first' condition
+a(GHOWLKWN int )
+  Handled impossible loop by adding 'first' condition
+a(XTGLDHGX )
+  Handled impossible loop by adding 'first' condition
+a(int boolean )
+  Unable to fully structure code
+a(int int int int int int int )
+  Handled impossible loop by adding 'first' condition
+a(boolean )
+  Handled impossible loop by adding 'first' condition
+a(int int int int )
+  Unable to fully structure code
+a(boolean MBMGIXGO )
+  Handled impossible loop by adding 'first' condition
+
+
+ZIJPRJEC
+----------------------------
+
+run()
+  Handled impossible loop by adding 'first' condition
+
+
+ZKARKDQW
+----------------------------
+
+b(int int )
+  Handled impossible loop by adding 'first' condition
+<init>(int int )
+  Handled impossible loop by adding 'first' condition
+<init>(int ZKARKDQW[] int )
+  Handled impossible loop by adding 'first' condition
+<init>(int int boolean ZKARKDQW[] )
+  Handled impossible loop by adding 'first' condition
+<init>(int boolean boolean boolean ZKARKDQW )
+  Unable to fully structure code
+<init>(boolean int boolean ZKARKDQW )
+  Unable to fully structure code
+a(int ZKARKDQW boolean )
+  Unable to fully structure code
+a(ZKARKDQW int )
+  Handled impossible loop by adding 'first' condition
+a(boolean )
+  Handled impossible loop by adding 'first' condition
+b(boolean )
+  Handled impossible loop by adding 'first' condition
+d(int )
+  Handled impossible loop by adding 'first' condition
+a(byte )
+  Handled impossible loop by adding 'first' condition
+c(int int )
+  Handled impossible loop by adding 'first' condition
+a(int int[] int int )
+  Handled impossible loop by adding 'first' condition
+a(int int[] int int int )
+  Unable to fully structure code
+e(int )
+  Handled impossible loop by adding 'first' condition
+d(int int )
+  Handled impossible loop by adding 'first' condition
+a(int int int int )
+  Handled impossible loop by adding 'first' condition
+e(int int )
+  Handled impossible loop by adding 'first' condition
+f(int )
+  Handled impossible loop by adding 'first' condition
+b(int int int int )
+  Handled impossible loop by adding 'first' condition
+a(int int int int int boolean )
+  Handled impossible loop by adding 'first' condition
+a(int int int int int )
+  Handled impossible loop by adding 'first' condition
+a(int int int int int int int )
+  Handled impossible loop by adding 'first' condition
+a(int int int int int int int int int )
+  Handled impossible loop by adding 'first' condition
+a(boolean boolean int )
+  Unable to fully structure code
+
+
+ZTQFNQRH
+----------------------------
+
+a(java.lang.String )
+  Unable to fully structure code
+a(long byte )
+  Handled impossible loop by adding 'first' condition
+a(byte java.lang.String )
+  Handled impossible loop by adding 'first' condition
+a(int java.lang.String )
+  Handled impossible loop by adding 'first' condition
+a(java.lang.String int )
+  Handled impossible loop by adding 'first' condition

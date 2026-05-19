@@ -1,7 +1,7 @@
 package io.github.ffakira.rsps.client.desktop.world.visibility;
 
-import io.github.ffakira.rsps.client.desktop.core.WorldCameraState;
-import io.github.ffakira.rsps.client.desktop.core.WorldScene;
+import io.github.ffakira.rsps.client.desktop.world.WorldCameraState;
+import io.github.ffakira.rsps.client.desktop.world.WorldScene;
 
 public final class WorldSceneVisibilityPlanner {
 

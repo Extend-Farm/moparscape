@@ -130,6 +130,8 @@ Current native status:
   - opaque faces first without the blended path
   - translucent faces second with blending and depth writes disabled
   - textured faces keep alpha-test cutouts on both passes instead of forcing the whole scene through one blended stream
+- the raster backend now owns a first compatibility-profile GLSL path for colored and textured
+  scene batches while still keeping a fixed-function fallback if shader compilation fails at runtime
 
 That means the queue/raster ownership boundary now exists in source and the first textured terrain,
 textured object, and textured actor paths are live, but raster-mode parity still does not. The next

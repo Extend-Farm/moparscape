@@ -4,6 +4,8 @@ import io.github.ffakira.rsps.client.core.ClientDisconnectedEvent;
 import io.github.ffakira.rsps.client.core.ClientEvent;
 import io.github.ffakira.rsps.client.core.ClientViewModel;
 import io.github.ffakira.rsps.client.core.GameplayClientSession;
+import io.github.ffakira.rsps.client.desktop.login.LoginScreenController;
+import io.github.ffakira.rsps.client.desktop.world.CacheBackedWorldSceneLoader;
 import io.github.ffakira.rsps.protocol.ServerMessage;
 import java.util.concurrent.ConcurrentLinkedQueue;
 

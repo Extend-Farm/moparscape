@@ -31,16 +31,20 @@ public final class OpenGlSceneRasterBackend implements SceneRasterBackend, AutoC
   private final SceneMeshFacePassPlanner facePassPlanner;
   private final SceneTextureCoordinatePlanner textureCoordinatePlanner;
   private final SceneTextureAnimationPlanner textureAnimationPlanner;
+  private final OpenGlSceneShaderPipeline shaderPipeline;
   private final long animationStartNanos;
 
   // The native client now has an explicit raster boundary. Terrain already uses Gouraud batches,
   // static objects preserve texture intent from cache model faces, and this backend is where that
-  // intent becomes actual textured triangles instead of leaking back into scene assembly.
+  // intent becomes actual textured triangles instead of leaking back into scene assembly. The
+  // first GLSL path also lives here so scene assembly stays ignorant of shader/fixed-function
+  // details and the viewport keeps one raster owner.
   public OpenGlSceneRasterBackend(SceneTextureAssets sceneTextureAssets) {
     this.sceneTextures = createTextures(sceneTextureAssets);
     this.facePassPlanner = new SceneMeshFacePassPlanner();
     this.textureCoordinatePlanner = new SceneTextureCoordinatePlanner();
     this.textureAnimationPlanner = new SceneTextureAnimationPlanner();
+    this.shaderPipeline = OpenGlSceneShaderPipeline.create();
     this.animationStartNanos = System.nanoTime();
   }
 
@@ -64,6 +68,7 @@ public final class OpenGlSceneRasterBackend implements SceneRasterBackend, AutoC
 
   @Override
   public void close() {
+    shaderPipeline.close();
     for (OpenGlTexture texture : sceneTextures) {
       if (texture != null) {
         texture.close();
@@ -107,6 +112,7 @@ public final class OpenGlSceneRasterBackend implements SceneRasterBackend, AutoC
     if (mesh == null || mesh.isEmpty()) {
       return;
     }
+    shaderPipeline.bindColorProgram();
     glShadeModel(GL_FLAT);
     glBegin(GL_TRIANGLES);
     for (int faceIndex : faceIndices) {
@@ -116,18 +122,21 @@ public final class OpenGlSceneRasterBackend implements SceneRasterBackend, AutoC
       emitVertex(mesh, mesh.faceVertexC()[faceIndex]);
     }
     glEnd();
+    shaderPipeline.unbind();
   }
 
   private void drawGouraudMesh(SceneTriangleMesh mesh, int[] faceIndices) {
     if (mesh == null || mesh.isEmpty()) {
       return;
     }
+    shaderPipeline.bindColorProgram();
     glShadeModel(GL_SMOOTH);
     glBegin(GL_TRIANGLES);
     for (int faceIndex : faceIndices) {
       drawGouraudFace(mesh, faceIndex);
     }
     glEnd();
+    shaderPipeline.unbind();
   }
 
   private void drawTexturedMesh(SceneTriangleMesh mesh, int[] faceIndices) {
@@ -139,6 +148,7 @@ public final class OpenGlSceneRasterBackend implements SceneRasterBackend, AutoC
     glEnable(GL_ALPHA_TEST);
     glAlphaFunc(GL_GREATER, 0.02f);
     glShadeModel(GL_SMOOTH);
+    shaderPipeline.bindTexturedProgram();
     int boundTextureId = -1;
     boolean drawing = false;
     for (int faceIndex : faceIndices) {
@@ -157,7 +167,9 @@ public final class OpenGlSceneRasterBackend implements SceneRasterBackend, AutoC
           boundTextureId = -1;
         }
         glDisable(GL_TEXTURE_2D);
+        shaderPipeline.bindColorProgram();
         drawSingleGouraudFace(mesh, faceIndex);
+        shaderPipeline.bindTexturedProgram();
         glEnable(GL_TEXTURE_2D);
         glShadeModel(GL_SMOOTH);
         continue;
@@ -188,6 +200,7 @@ public final class OpenGlSceneRasterBackend implements SceneRasterBackend, AutoC
     glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_ALPHA_TEST);
     glDisable(GL_TEXTURE_2D);
+    shaderPipeline.unbind();
   }
 
   private void drawSingleGouraudFace(SceneTriangleMesh mesh, int faceIndex) {

@@ -3,9 +3,9 @@ package io.github.ffakira.rsps.client.desktop.world.visibility;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.ffakira.rsps.client.desktop.core.ArgbImage;
-import io.github.ffakira.rsps.client.desktop.core.WorldCameraState;
-import io.github.ffakira.rsps.client.desktop.core.WorldScene;
-import io.github.ffakira.rsps.client.desktop.core.WorldSceneProjection;
+import io.github.ffakira.rsps.client.desktop.world.WorldCameraState;
+import io.github.ffakira.rsps.client.desktop.world.WorldScene;
+import io.github.ffakira.rsps.client.desktop.world.WorldSceneProjection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

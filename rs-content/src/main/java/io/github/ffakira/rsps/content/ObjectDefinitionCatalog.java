@@ -73,15 +73,19 @@ public final class ObjectDefinitionCatalog {
     private boolean solid = true;
     private boolean impenetrable = true;
     private boolean interactive = false;
+    private boolean contouredGround = false;
     private boolean mirrored = false;
     private boolean castsShadow = true;
     private boolean obstructsGround = false;
     private int decorDisplacement = 16;
     private int mapSceneId = -1;
+    private int mapFunctionId = -1;
     private int blockingMask = 0;
     private boolean hasInteractiveFlag = false;
     private boolean hasActions = false;
     private boolean hollow = false;
+    private int ambient = 0;
+    private int contrast = 0;
     private int scaleX = 128;
     private int scaleY = 128;
     private int scaleZ = 128;
@@ -128,9 +132,9 @@ public final class ObjectDefinitionCatalog {
             definition.interactive = reader.readUnsignedByte() == 1;
             definition.hasInteractiveFlag = true;
           }
-          case 21, 22, 23 -> {
-            // Current native scene path uses placement metadata only. These flags still matter
-            // later for contouring/shading/scene clipping, but they do not need dedicated state yet.
+          case 21 -> definition.contouredGround = true;
+          case 22, 23 -> {
+            // Current native scene path still ignores delayed shading and occlusion flags.
           }
           case 24 -> {
             int animationId = reader.readUnsignedShort();
@@ -139,7 +143,8 @@ public final class ObjectDefinitionCatalog {
             }
           }
           case 28 -> definition.decorDisplacement = reader.readUnsignedByte();
-          case 29, 39 -> reader.readSignedByte();
+          case 29 -> definition.ambient = reader.readSignedByte();
+          case 39 -> definition.contrast = reader.readSignedByte();
           case 30, 31, 32, 33, 34 -> {
             String action = reader.readString();
             if (!"hidden".equalsIgnoreCase(action)) {
@@ -159,7 +164,7 @@ public final class ObjectDefinitionCatalog {
               definition.recolorTargets.add(reader.readUnsignedShort());
             }
           }
-          case 60 -> reader.readUnsignedShort();
+          case 60 -> definition.mapFunctionId = reader.readUnsignedShort();
           case 62 -> definition.mirrored = true;
           case 64 -> definition.castsShadow = false;
           case 65, 66, 67, 68 -> {
@@ -221,12 +226,16 @@ public final class ObjectDefinitionCatalog {
           resolvedSolid,
           resolvedImpenetrable,
           resolvedInteractive,
+          contouredGround,
           mirrored,
           castsShadow,
           obstructsGround,
           decorDisplacement,
           mapSceneId,
+          mapFunctionId,
           blockingMask,
+          ambient,
+          contrast,
           scaleX,
           scaleY,
           scaleZ,

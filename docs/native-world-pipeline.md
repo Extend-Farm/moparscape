@@ -69,7 +69,7 @@ gameplay chrome.
 
 Gameplay input is now split the same way as the visible shell:
 
-- sidebar clicks stay inside `GameplayChromeRenderer`
+- sidebar clicks stay inside `GameplayChromeRenderer`, which now lives under `io.github.ffakira.rsps.client.desktop.gameplay` and now delegates frame-art ownership, minimap rendering, and sidebar/chatbox rendering to helper classes in that package
 - world-viewport clicks are resolved through `WorldViewportClickPlanner`
 - the current runtime still only exposes direct move deltas, so viewport click-to-walk currently sends one direct delta intent to the clicked tile rather than a legacy path queue
 - terrain, queue submission, click-hit tests, and occluder sampling now share one lowered native height scale so the world surface no longer exaggerates slopes differently per subsystem
@@ -173,6 +173,7 @@ The static-object path is now split more cleanly as well:
   and resolves each shared terrain corner from the highest adjacent visible surface
   - this is the first native fix for bridge/water seam collapse before raster parity is complete
 - `OpenGlSceneRasterBackend` owns the current raster execution split, including the first native textured static-object path
+  - it now also owns the first compatibility-profile GLSL programs for colored and textured scene batches, with runtime fallback to the earlier fixed-function path if shader compilation fails
 
 That split is intentional. It keeps object-model growth out of the loader and avoids recreating a
 new god class while the native renderer gets more complex.

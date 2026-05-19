@@ -1,6 +1,16 @@
 package io.github.ffakira.rsps.client.desktop.core;
 
 import io.github.ffakira.rsps.client.core.GameplayClientSession;
+import io.github.ffakira.rsps.client.desktop.character.CharacterModelAssembler;
+import io.github.ffakira.rsps.client.desktop.gameplay.GameplayClickResult;
+import io.github.ffakira.rsps.client.desktop.gameplay.GameplayFrameAssets;
+import io.github.ffakira.rsps.client.desktop.login.LoginField;
+import io.github.ffakira.rsps.client.desktop.login.LoginScreenController;
+import io.github.ffakira.rsps.client.desktop.login.LoginScreenState;
+import io.github.ffakira.rsps.client.desktop.login.TitleScreenAssets;
+import io.github.ffakira.rsps.client.desktop.login.TitleScreenLayout;
+import io.github.ffakira.rsps.client.desktop.login.TitleScreenStage;
+import io.github.ffakira.rsps.client.desktop.world.CacheBackedWorldSceneLoader;
 import io.github.ffakira.rsps.client.desktop.world.raster.SceneTextureAssets;
 import io.github.ffakira.rsps.model.MovementMode;
 import io.github.ffakira.rsps.protocol.ServerMessage;
@@ -172,6 +182,7 @@ public final class DesktopClientMain {
           } else {
             gameplayBootstrapApplied[0] = false;
           }
+          session.pumpMovement();
           renderSystem.render(NativeClientRuntimeCoordinator.renderViewModel(titleScreenStatus[0], session.viewModel()));
           glfwSwapBuffers(window);
           glfwPollEvents();

@@ -58,6 +58,50 @@ class ObjectDefinitionCatalogTest {
     ).isTrue();
   }
 
+  @Test
+  void resolvesWallDecorationVariantPlacementsThroughModelTypeFour() {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    ObjectDefinitionCatalog catalog = ObjectDefinitionCatalog.load(manifest);
+
+    assertThat(catalog.require(196).modelIdsForType(7)).isNotEmpty();
+    assertThat(catalog.require(840).modelIdsForType(5)).isNotEmpty();
+    assertThat(catalog.require(1646).modelIdsForType(5)).isNotEmpty();
+  }
+
+  @Test
+  void preservesObjectAmbientAndContrastLightingMetadata() {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    ObjectDefinitionCatalog catalog = ObjectDefinitionCatalog.load(manifest);
+
+    assertThat(catalog.require(1308).name()).isEqualTo("Willow");
+    assertThat(catalog.require(1308).ambient()).isEqualTo(25);
+    assertThat(catalog.require(1308).contrast()).isZero();
+  }
+
+  @Test
+  void preservesMapFunctionMarkerMetadata() {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    ObjectDefinitionCatalog catalog = ObjectDefinitionCatalog.load(manifest);
+
+    long definitionsWithMapFunction = 0;
+    for (int objectId = 0; objectId < catalog.size(); objectId++) {
+      if (catalog.require(objectId).mapFunctionId() >= 0) {
+        definitionsWithMapFunction++;
+      }
+    }
+    assertThat(definitionsWithMapFunction).isGreaterThan(20);
+  }
+
+  @Test
+  void preservesContouredGroundMetadataForBridgeSideFenceObjects() {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    ObjectDefinitionCatalog catalog = ObjectDefinitionCatalog.load(manifest);
+
+    assertThat(catalog.require(980).contouredGround()).isTrue();
+    assertThat(catalog.require(981).contouredGround()).isTrue();
+    assertThat(catalog.require(3007).contouredGround()).isTrue();
+  }
+
   private static long countModelBackedDefinitions(ObjectDefinitionCatalog catalog) {
     long count = 0;
     for (int objectId = 0; objectId < catalog.size(); objectId++) {
