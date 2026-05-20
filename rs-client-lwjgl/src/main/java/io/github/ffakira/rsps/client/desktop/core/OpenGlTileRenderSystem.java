@@ -12,6 +12,7 @@ import io.github.ffakira.rsps.client.desktop.gameplay.GameplayFrameAssets;
 import io.github.ffakira.rsps.client.desktop.gameplay.GameplayLayout;
 import io.github.ffakira.rsps.client.desktop.gameplay.GameplayMenuAction;
 import io.github.ffakira.rsps.client.desktop.gameplay.GameplayMouseButton;
+import io.github.ffakira.rsps.client.desktop.itemicon.ItemIconRenderer;
 import io.github.ffakira.rsps.client.desktop.login.LoginScreenState;
 import io.github.ffakira.rsps.client.desktop.login.TitleScreenAssets;
 import io.github.ffakira.rsps.client.desktop.login.TitleScreenLayout;
@@ -209,7 +210,7 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
   }
 
   private void renderWorldScene(ClientViewModel viewModel) {
-    GameplayCameraController.CameraOrbitOffsets cameraOrbitOffsets = gameplayCameraController.update();
+    GameplayCameraController.CameraOrbitAngles cameraOrbitAngles = gameplayCameraController.update();
     ActorAnimationState actorAnimationState = localPlayerAnimationTracker.update(viewModel.localPlayerPosition());
     lastWorldSceneSubmission = worldSceneSubmissionBuilder.build(
         worldScene,
@@ -219,8 +220,8 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
         actorAnimationState,
         Math.max(1, Math.round(GameplayLayout.worldViewportInnerRect().width())),
         Math.max(1, Math.round(GameplayLayout.worldViewportInnerRect().height())),
-        cameraOrbitOffsets.yawOffsetDegrees(),
-        cameraOrbitOffsets.pitchOffsetDegrees()
+        cameraOrbitAngles.yawDegrees(),
+        cameraOrbitAngles.pitchDegrees()
     );
     worldViewportRenderer.render(GameplayLayout.worldViewportInnerRect(), width, height, lastWorldSceneSubmission);
   }

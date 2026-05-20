@@ -2,9 +2,9 @@ package io.github.ffakira.rsps.client.desktop.gameplay;
 
 import io.github.ffakira.rsps.client.core.ClientViewModel;
 import io.github.ffakira.rsps.client.desktop.core.ImmediateModeRenderer2d;
-import io.github.ffakira.rsps.client.desktop.core.ItemIconRenderer;
 import io.github.ffakira.rsps.client.desktop.core.OpenGlTexture;
 import io.github.ffakira.rsps.client.desktop.core.ScreenRect;
+import io.github.ffakira.rsps.client.desktop.itemicon.ItemIconRenderer;
 import io.github.ffakira.rsps.client.desktop.login.TitleScreenBitmapFont;
 import io.github.ffakira.rsps.client.desktop.login.TitleScreenFonts;
 import io.github.ffakira.rsps.client.desktop.world.WorldCameraState;

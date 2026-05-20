@@ -5,19 +5,27 @@ import java.util.function.LongSupplier;
 
 public final class GameplayCameraController {
 
-  static final float DEFAULT_YAW_OFFSET_DEGREES = 45.0f;
-  static final float DEFAULT_PITCH_OFFSET_DEGREES = 3.0f;
-  static final float MIN_PITCH_OFFSET_DEGREES = -6.0f;
-  static final float MAX_PITCH_OFFSET_DEGREES = 8.0f;
+  private static final float CAMERA_UNITS_PER_DEGREE = 2048.0f / 360.0f;
+  private static final float DEGREES_PER_CAMERA_UNIT = 360.0f / 2048.0f;
+  private static final float FULL_CAMERA_CIRCLE_UNITS = 2048.0f;
+  private static final float DEFAULT_YAW_UNITS = 1280.0f;
+  private static final float DEFAULT_PITCH_UNITS = 176.0f;
+  private static final float MIN_PITCH_UNITS = 128.0f;
+  private static final float MAX_PITCH_UNITS = 383.0f;
 
-  private static final float YAW_SMOOTH_DEGREES_PER_SECOND = 240.0f;
-  private static final float PITCH_SMOOTH_DEGREES_PER_SECOND = 90.0f;
+  static final float DEFAULT_YAW_DEGREES = degreesFromUnits(DEFAULT_YAW_UNITS);
+  static final float DEFAULT_PITCH_DEGREES = degreesFromUnits(DEFAULT_PITCH_UNITS);
+  static final float MIN_PITCH_DEGREES = degreesFromUnits(MIN_PITCH_UNITS);
+  static final float MAX_PITCH_DEGREES = degreesFromUnits(MAX_PITCH_UNITS);
+
+  private static final float YAW_SMOOTH_UNITS_PER_SECOND = 240.0f * CAMERA_UNITS_PER_DEGREE;
+  private static final float PITCH_SMOOTH_UNITS_PER_SECOND = 90.0f * CAMERA_UNITS_PER_DEGREE;
 
   private final LongSupplier nanoClock;
-  private float currentYawOffsetDegrees = DEFAULT_YAW_OFFSET_DEGREES;
-  private float currentPitchOffsetDegrees = DEFAULT_PITCH_OFFSET_DEGREES;
-  private float targetYawOffsetDegrees = DEFAULT_YAW_OFFSET_DEGREES;
-  private float targetPitchOffsetDegrees = DEFAULT_PITCH_OFFSET_DEGREES;
+  private float currentYawUnits = DEFAULT_YAW_UNITS;
+  private float currentPitchUnits = DEFAULT_PITCH_UNITS;
+  private float targetYawUnits = DEFAULT_YAW_UNITS;
+  private float targetPitchUnits = DEFAULT_PITCH_UNITS;
   private long lastUpdateNanos = Long.MIN_VALUE;
 
   public GameplayCameraController() {
@@ -29,29 +37,32 @@ public final class GameplayCameraController {
   }
 
   public void adjust(float yawDeltaDegrees, float pitchDeltaDegrees) {
-    targetYawOffsetDegrees = normalizeDegrees(targetYawOffsetDegrees + yawDeltaDegrees);
-    targetPitchOffsetDegrees = clamp(
-        targetPitchOffsetDegrees + pitchDeltaDegrees,
-        MIN_PITCH_OFFSET_DEGREES,
-        MAX_PITCH_OFFSET_DEGREES
+    targetYawUnits = normalizeUnits(targetYawUnits + yawDeltaDegrees * CAMERA_UNITS_PER_DEGREE);
+    targetPitchUnits = clamp(
+        targetPitchUnits + pitchDeltaDegrees * CAMERA_UNITS_PER_DEGREE,
+        MIN_PITCH_UNITS,
+        MAX_PITCH_UNITS
     );
   }
 
-  public CameraOrbitOffsets update() {
+  public CameraOrbitAngles update() {
     long now = nanoClock.getAsLong();
     float elapsedSeconds = elapsedSeconds(now);
-    currentYawOffsetDegrees = approachAngle(
-        currentYawOffsetDegrees,
-        targetYawOffsetDegrees,
-        YAW_SMOOTH_DEGREES_PER_SECOND * elapsedSeconds
+    currentYawUnits = approachWrappedUnits(
+        currentYawUnits,
+        targetYawUnits,
+        YAW_SMOOTH_UNITS_PER_SECOND * elapsedSeconds
     );
-    currentPitchOffsetDegrees = approach(
-        currentPitchOffsetDegrees,
-        targetPitchOffsetDegrees,
-        PITCH_SMOOTH_DEGREES_PER_SECOND * elapsedSeconds
+    currentPitchUnits = approach(
+        currentPitchUnits,
+        targetPitchUnits,
+        PITCH_SMOOTH_UNITS_PER_SECOND * elapsedSeconds
     );
     lastUpdateNanos = now;
-    return new CameraOrbitOffsets(currentYawOffsetDegrees, currentPitchOffsetDegrees);
+    return new CameraOrbitAngles(
+        normalizeDegrees(degreesFromUnits(currentYawUnits)),
+        degreesFromUnits(currentPitchUnits)
+    );
   }
 
   private float elapsedSeconds(long now) {
@@ -71,15 +82,25 @@ public final class GameplayCameraController {
     return Math.max(target, current - maximumDelta);
   }
 
-  private float approachAngle(float current, float target, float maximumDeltaDegrees) {
-    float delta = normalizeDegrees(target - current);
-    if (Math.abs(delta) <= maximumDeltaDegrees) {
-      return normalizeDegrees(target);
+  private float approachWrappedUnits(float current, float target, float maximumDeltaUnits) {
+    float delta = wrappedUnitDelta(current, target);
+    if (Math.abs(delta) <= maximumDeltaUnits) {
+      return normalizeUnits(target);
     }
-    return normalizeDegrees(current + Math.copySign(maximumDeltaDegrees, delta));
+    return normalizeUnits(current + Math.copySign(maximumDeltaUnits, delta));
   }
 
-  private float normalizeDegrees(float degrees) {
+  private static float wrappedUnitDelta(float current, float target) {
+    float delta = normalizeUnits(target) - normalizeUnits(current);
+    if (delta > FULL_CAMERA_CIRCLE_UNITS * 0.5f) {
+      delta -= FULL_CAMERA_CIRCLE_UNITS;
+    } else if (delta < -(FULL_CAMERA_CIRCLE_UNITS * 0.5f)) {
+      delta += FULL_CAMERA_CIRCLE_UNITS;
+    }
+    return delta;
+  }
+
+  private static float normalizeDegrees(float degrees) {
     float normalized = degrees % 360.0f;
     if (normalized > 180.0f) {
       normalized -= 360.0f;
@@ -89,10 +110,19 @@ public final class GameplayCameraController {
     return normalized;
   }
 
+  private static float normalizeUnits(float units) {
+    float normalized = units % FULL_CAMERA_CIRCLE_UNITS;
+    return normalized < 0.0f ? normalized + FULL_CAMERA_CIRCLE_UNITS : normalized;
+  }
+
+  private static float degreesFromUnits(float units) {
+    return units * DEGREES_PER_CAMERA_UNIT;
+  }
+
   private float clamp(float value, float minimum, float maximum) {
     return Math.max(minimum, Math.min(maximum, value));
   }
 
-  public record CameraOrbitOffsets(float yawOffsetDegrees, float pitchOffsetDegrees) {
+  public record CameraOrbitAngles(float yawDegrees, float pitchDegrees) {
   }
 }

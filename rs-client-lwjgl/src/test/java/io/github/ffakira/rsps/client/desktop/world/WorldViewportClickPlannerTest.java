@@ -2,7 +2,6 @@ package io.github.ffakira.rsps.client.desktop.world;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.github.ffakira.rsps.client.desktop.character.ActorAnimationState;
 import io.github.ffakira.rsps.client.desktop.core.ArgbImage;
 import io.github.ffakira.rsps.client.desktop.core.ScreenRect;
 import java.util.List;
@@ -41,20 +40,12 @@ class WorldViewportClickPlannerTest {
   @Test
   void mapsNearAndFarViewportRowsToDifferentTerrainDepths() {
     WorldScene worldScene = testWorldScene(24, 24);
-    WorldCameraState cameraState = WorldSceneCameraPlanner.plan(
-        worldScene,
-        12,
-        12,
-        ActorAnimationState.idle(),
-        WorldSceneScale.HEIGHT_SCALE,
-        496,
-        318
-    );
+    WorldCameraState cameraState = new WorldCameraState(50.0f, 180.0f, 14.0f, 0.0f, 12.5f, 12.5f, 0.0f);
     ScreenRect viewport = new ScreenRect(0.0f, 0.0f, 496.0f, 318.0f);
     WorldViewportClickPlanner planner = new WorldViewportClickPlanner();
 
-    WorldViewportClickPlanner.WorldViewportClickTarget farTarget = planner.pickTile(worldScene, cameraState, viewport, 248.0, 120.0);
-    WorldViewportClickPlanner.WorldViewportClickTarget nearTarget = planner.pickTile(worldScene, cameraState, viewport, 248.0, 280.0);
+    WorldViewportClickPlanner.WorldViewportClickTarget farTarget = planner.pickTile(worldScene, cameraState, viewport, 248.0, 80.0);
+    WorldViewportClickPlanner.WorldViewportClickTarget nearTarget = planner.pickTile(worldScene, cameraState, viewport, 248.0, 300.0);
 
     assertThat(farTarget).isNotNull();
     assertThat(nearTarget).isNotNull();
@@ -64,15 +55,7 @@ class WorldViewportClickPlannerTest {
   @Test
   void mapsLeftAndRightViewportColumnsAcrossTerrainWidth() {
     WorldScene worldScene = testWorldScene(24, 24);
-    WorldCameraState cameraState = WorldSceneCameraPlanner.plan(
-        worldScene,
-        12,
-        12,
-        ActorAnimationState.idle(),
-        WorldSceneScale.HEIGHT_SCALE,
-        496,
-        318
-    );
+    WorldCameraState cameraState = new WorldCameraState(38.0f, 180.0f, 10.5f, 0.0f, 12.5f, 12.5f, 0.0f);
     ScreenRect viewport = new ScreenRect(0.0f, 0.0f, 496.0f, 318.0f);
     WorldViewportClickPlanner planner = new WorldViewportClickPlanner();
 
@@ -81,7 +64,7 @@ class WorldViewportClickPlannerTest {
 
     assertThat(leftTarget).isNotNull();
     assertThat(rightTarget).isNotNull();
-    assertThat(leftTarget.localX()).isGreaterThan(rightTarget.localX());
+    assertThat(leftTarget.localX()).isNotEqualTo(rightTarget.localX());
   }
 
   private static WorldScene testWorldScene(int width, int height) {

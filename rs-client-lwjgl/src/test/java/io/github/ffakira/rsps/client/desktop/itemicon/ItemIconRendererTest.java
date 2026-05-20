@@ -1,8 +1,10 @@
-package io.github.ffakira.rsps.client.desktop.core;
+package io.github.ffakira.rsps.client.desktop.itemicon;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.ffakira.rsps.cache.RawModelRepository;
+import io.github.ffakira.rsps.client.desktop.core.ArgbImage;
+import io.github.ffakira.rsps.client.desktop.core.TextureArchiveAssetLoader;
 import io.github.ffakira.rsps.client.desktop.world.raster.SceneTextureAssets;
 import io.github.ffakira.rsps.content.ContentBootstrapService;
 import io.github.ffakira.rsps.content.ItemDefinition;
@@ -37,7 +39,7 @@ class ItemIconRendererTest {
   }
 
   @Test
-  void notedItemsReuseTheirLinkedItemIconUntilNativeNoteOverlayExists() {
+  void notedItemsCompositeTheNoteTemplateWithTheirLinkedItemIcon() {
     var manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
     SceneTextureAssets sceneTextureAssets = TextureArchiveAssetLoader.loadFromWorkingDirectory(Path.of("."));
     ItemIconRenderer itemIconRenderer = new ItemIconRenderer(
@@ -51,7 +53,9 @@ class ItemIconRendererTest {
 
     assertThat(baseItemIcon).isNotNull();
     assertThat(noteItemIcon).isNotNull();
-    assertThat(noteItemIcon.pixels()).containsExactly(baseItemIcon.pixels());
+    assertThat(itemIconRenderer.iconKey(7, 1)).isNotEqualTo(itemIconRenderer.iconKey(6, 1));
+    assertThat(noteItemIcon.pixels()).isNotEqualTo(baseItemIcon.pixels());
+    assertThat(opaquePixelCount(noteItemIcon)).isGreaterThan(opaquePixelCount(baseItemIcon));
   }
 
   @Test
@@ -131,10 +135,10 @@ class ItemIconRendererTest {
 
   @Test
   void clipsInventoryTrianglesAgainstTheNearPlaneInsteadOfDroppingThem() {
-    List<ItemIconRenderer.ClippedVertex> clippedVertices = ItemIconRenderer.clipTriangleToNearPlane(
-        new ItemIconRenderer.ClippedVertex(-8.0f, -4.0f, 32.0f, 0x112233, 0.0f, 0.0f),
-        new ItemIconRenderer.ClippedVertex(8.0f, -4.0f, 32.0f, 0x445566, 1.0f, 0.0f),
-        new ItemIconRenderer.ClippedVertex(0.0f, 12.0f, 0.25f, 0x778899, 0.5f, 1.0f)
+    List<ItemIconRasterizer.ClippedVertex> clippedVertices = ItemIconRasterizer.clipTriangleToNearPlane(
+        new ItemIconRasterizer.ClippedVertex(-8.0f, -4.0f, 32.0f, 0x112233, 0.0f, 0.0f),
+        new ItemIconRasterizer.ClippedVertex(8.0f, -4.0f, 32.0f, 0x445566, 1.0f, 0.0f),
+        new ItemIconRasterizer.ClippedVertex(0.0f, 12.0f, 0.25f, 0x778899, 0.5f, 1.0f)
     );
 
     assertThat(clippedVertices).hasSize(4);

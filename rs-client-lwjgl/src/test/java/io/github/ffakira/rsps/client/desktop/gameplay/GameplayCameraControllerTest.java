@@ -1,46 +1,45 @@
 package io.github.ffakira.rsps.client.desktop.gameplay;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import org.junit.jupiter.api.Test;
 
 class GameplayCameraControllerTest {
 
   @Test
-  void easesTowardAdjustedOrbitOffsetsInsteadOfSnappingImmediately() {
+  void easesTowardAdjustedOrbitAnglesInsteadOfSnappingImmediately() {
     TestNanoClock clock = new TestNanoClock();
     GameplayCameraController controller = new GameplayCameraController(clock::now);
 
-    GameplayCameraController.CameraOrbitOffsets initial = controller.update();
+    GameplayCameraController.CameraOrbitAngles initial = controller.update();
     controller.adjust(24.0f, 5.0f);
     clock.advanceNanos(50_000_000L);
-    GameplayCameraController.CameraOrbitOffsets smoothed = controller.update();
+    GameplayCameraController.CameraOrbitAngles smoothed = controller.update();
     clock.advanceNanos(500_000_000L);
-    GameplayCameraController.CameraOrbitOffsets settled = controller.update();
+    GameplayCameraController.CameraOrbitAngles settled = controller.update();
 
-    assertThat(initial.yawOffsetDegrees()).isEqualTo(GameplayCameraController.DEFAULT_YAW_OFFSET_DEGREES);
-    assertThat(initial.pitchOffsetDegrees()).isEqualTo(GameplayCameraController.DEFAULT_PITCH_OFFSET_DEGREES);
-    assertThat(smoothed.yawOffsetDegrees()).isBetween(56.0f, 58.0f);
-    assertThat(smoothed.pitchOffsetDegrees()).isBetween(7.4f, 7.6f);
-    assertThat(settled.yawOffsetDegrees()).isEqualTo(69.0f);
-    assertThat(settled.pitchOffsetDegrees()).isEqualTo(8.0f);
+    assertThat(initial.yawDegrees()).isEqualTo(-135.0f);
+    assertThat(initial.pitchDegrees()).isEqualTo(GameplayCameraController.DEFAULT_PITCH_DEGREES);
+    assertThat(smoothed.yawDegrees()).isBetween(-123.2f, -122.8f);
+    assertThat(smoothed.pitchDegrees()).isBetween(35.3f, 35.5f);
+    assertThat(settled.yawDegrees()).isEqualTo(-111.0f);
+    assertThat(settled.pitchDegrees()).isBetween(35.8f, 36.0f);
   }
 
   @Test
-  void clampsPitchTargetWithinSafeBounds() {
+  void clampsPitchTargetWithinLegacyOrbitBounds() {
     TestNanoClock clock = new TestNanoClock();
     GameplayCameraController controller = new GameplayCameraController(clock::now);
 
     controller.update();
     controller.adjust(0.0f, 50.0f);
-    clock.advanceNanos(1_000_000_000L);
-    GameplayCameraController.CameraOrbitOffsets raised = controller.update();
-    controller.adjust(0.0f, -50.0f);
-    clock.advanceNanos(1_000_000_000L);
-    GameplayCameraController.CameraOrbitOffsets lowered = controller.update();
+    GameplayCameraController.CameraOrbitAngles raised = advanceToSettledPose(controller, clock);
+    controller.adjust(0.0f, -90.0f);
+    GameplayCameraController.CameraOrbitAngles lowered = advanceToSettledPose(controller, clock);
 
-    assertThat(raised.pitchOffsetDegrees()).isEqualTo(GameplayCameraController.MAX_PITCH_OFFSET_DEGREES);
-    assertThat(lowered.pitchOffsetDegrees()).isEqualTo(GameplayCameraController.MIN_PITCH_OFFSET_DEGREES);
+    assertThat(raised.pitchDegrees()).isEqualTo(GameplayCameraController.MAX_PITCH_DEGREES);
+    assertThat(lowered.pitchDegrees()).isEqualTo(GameplayCameraController.MIN_PITCH_DEGREES);
   }
 
   @Test
@@ -54,9 +53,21 @@ class GameplayCameraControllerTest {
       clock.advanceNanos(250_000_000L);
       controller.update();
     }
-    GameplayCameraController.CameraOrbitOffsets wrapped = controller.update();
+    GameplayCameraController.CameraOrbitAngles wrapped = controller.update();
 
-    assertThat(wrapped.yawOffsetDegrees()).isEqualTo(-95.0f);
+    assertThat(wrapped.yawDegrees()).isCloseTo(85.0f, within(0.001f));
+  }
+
+  private GameplayCameraController.CameraOrbitAngles advanceToSettledPose(
+      GameplayCameraController controller,
+      TestNanoClock clock
+  ) {
+    GameplayCameraController.CameraOrbitAngles pose = controller.update();
+    for (int step = 0; step < 4; step++) {
+      clock.advanceNanos(250_000_000L);
+      pose = controller.update();
+    }
+    return pose;
   }
 
   private static final class TestNanoClock {

@@ -24,10 +24,12 @@ public final class WorldSceneSubmissionBuilder {
 
   private final CharacterModelAssembler characterModelAssembler;
   private final TerrainSceneMeshBuilder terrainSceneMeshBuilder;
+  private final WorldSceneCameraPlanner worldSceneCameraPlanner;
 
   public WorldSceneSubmissionBuilder(CharacterModelAssembler characterModelAssembler) {
     this.characterModelAssembler = characterModelAssembler;
     this.terrainSceneMeshBuilder = new TerrainSceneMeshBuilder();
+    this.worldSceneCameraPlanner = new WorldSceneCameraPlanner();
   }
 
   // This is the first native scene-submission boundary for the rewrite. It does not attempt full
@@ -82,11 +84,10 @@ public final class WorldSceneSubmissionBuilder {
     );
     int focusTileX = clampTile((int) Math.floor(actorLocalX), worldScene.tileWidth());
     int focusTileY = clampTile((int) Math.floor(actorLocalY), worldScene.tileHeight());
-    WorldCameraState cameraState = WorldSceneCameraPlanner.plan(
+    WorldCameraState cameraState = worldSceneCameraPlanner.plan(
         worldScene,
         actorLocalX,
         actorLocalY,
-        actorAnimationState,
         WorldSceneScale.HEIGHT_SCALE,
         viewportWidth,
         viewportHeight,

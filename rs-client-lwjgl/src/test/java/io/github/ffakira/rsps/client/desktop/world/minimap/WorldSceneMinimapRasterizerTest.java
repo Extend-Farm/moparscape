@@ -164,7 +164,7 @@ class WorldSceneMinimapRasterizerTest {
   }
 
   @Test
-  void appliesCornerGradientAcrossPaintTiles() {
+  void fillsPaintTilesAsSolidFourByFourBlocks() {
     WorldSceneMinimapRasterizer rasterizer = new WorldSceneMinimapRasterizer();
 
     ArgbImage image = rasterizer.rasterize(
@@ -188,9 +188,11 @@ class WorldSceneMinimapRasterizerTest {
         List.of()
     );
 
-    int topLeftPixel = image.pixels()[pixelIndex(8, 1, 1)];
-    int bottomRightPixel = image.pixels()[pixelIndex(8, 6, 6)];
-    assertThat(topLeftPixel).isNotEqualTo(bottomRightPixel);
+    int tileOneTopLeft = image.pixels()[pixelIndex(8, 0, 0)];
+    int tileOneBottomRight = image.pixels()[pixelIndex(8, 3, 3)];
+    int tileTwoTopLeft = image.pixels()[pixelIndex(8, 4, 0)];
+    assertThat(tileOneTopLeft).isEqualTo(tileOneBottomRight);
+    assertThat(tileOneTopLeft).isNotEqualTo(tileTwoTopLeft);
   }
 
   private int pixelIndex(int width, int pixelX, int pixelY) {

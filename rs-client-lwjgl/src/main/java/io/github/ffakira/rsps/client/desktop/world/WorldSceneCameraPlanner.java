@@ -1,26 +1,31 @@
 package io.github.ffakira.rsps.client.desktop.world;
 
-import io.github.ffakira.rsps.client.desktop.character.ActorAnimationState;
-
 final class WorldSceneCameraPlanner {
 
-  private static final int SAMPLE_RADIUS = 5;
-  private static final float BASE_MIN_PITCH_DEGREES = 28.0f;
-  private static final float BASE_MAX_PITCH_DEGREES = 36.0f;
-  private static final float MIN_PITCH_DEGREES = 22.5f;
-  private static final float MAX_PITCH_DEGREES = 50.0f;
-  private static final float DEFAULT_YAW_DEGREES = 180.0f;
-  private static final float MIN_DISTANCE = 12.4f;
-  private static final float MAX_DISTANCE = 16.8f;
+  private static final float CAMERA_UNITS_PER_DEGREE = 2048.0f / 360.0f;
+  private static final float DEGREES_PER_CAMERA_UNIT = 360.0f / 2048.0f;
+  private static final int MIN_CAMERA_PITCH_UNITS = 128;
+  private static final int MAX_CAMERA_PITCH_UNITS = 383;
+  private static final int MIN_CAMERA_PITCH_CLAMP = 32768;
+  private static final int MAX_CAMERA_PITCH_CLAMP = 98048;
+  private static final int PITCH_CLAMP_SAMPLE_RADIUS = 4;
+  private static final float FOCUS_SNAP_DISTANCE_TILES = 500.0f / 128.0f;
+  private static final float ORBIT_FOCUS_SMOOTHING = 16.0f;
+  private static final float DEFAULT_YAW_DEGREES = 225.0f;
+  private static final float DEFAULT_PITCH_DEGREES = 31.0f;
+  private static final float COMPATIBILITY_DISTANCE_DIVISOR = 80.0f;
+  private static final float COMPATIBILITY_SCREEN_OFFSET_Y = -0.65f;
 
-  private WorldSceneCameraPlanner() {
-  }
+  private String lastSceneKey;
+  private float smoothedFocusX;
+  private float smoothedFocusY;
+  private int cameraPitchClamp = MIN_CAMERA_PITCH_CLAMP;
+  private boolean initialized;
 
-  static WorldCameraState plan(
+  WorldCameraState plan(
       WorldScene worldScene,
       int focusTileX,
       int focusTileY,
-      ActorAnimationState actorAnimationState,
       float worldHeightScale,
       int viewportWidth,
       int viewportHeight
@@ -29,20 +34,18 @@ final class WorldSceneCameraPlanner {
         worldScene,
         focusTileX + 0.5f,
         focusTileY + 0.5f,
-        actorAnimationState,
         worldHeightScale,
         viewportWidth,
         viewportHeight,
-        0.0f,
-        0.0f
+        DEFAULT_YAW_DEGREES,
+        DEFAULT_PITCH_DEGREES
     );
   }
 
-  static WorldCameraState plan(
+  WorldCameraState plan(
       WorldScene worldScene,
       float focusLocalX,
       float focusLocalY,
-      ActorAnimationState actorAnimationState,
       float worldHeightScale,
       int viewportWidth,
       int viewportHeight
@@ -51,76 +54,92 @@ final class WorldSceneCameraPlanner {
         worldScene,
         focusLocalX,
         focusLocalY,
-        actorAnimationState,
         worldHeightScale,
         viewportWidth,
         viewportHeight,
-        0.0f,
-        0.0f
+        DEFAULT_YAW_DEGREES,
+        DEFAULT_PITCH_DEGREES
     );
   }
 
-  static WorldCameraState plan(
+  WorldCameraState plan(
       WorldScene worldScene,
       float focusLocalX,
       float focusLocalY,
-      ActorAnimationState actorAnimationState,
       float worldHeightScale,
       int viewportWidth,
       int viewportHeight,
-      float cameraYawOffsetDegrees,
-      float cameraPitchOffsetDegrees
+      float cameraYawDegrees,
+      float cameraPitchDegrees
   ) {
-    // Official 317 keeps the camera centered on the smoothed player world position, then derives
-    // pitch from nearby relief. It does not bias the focal point forward into the walk direction.
-    int focusTileX = clamp((int) Math.floor(focusLocalX), 0, worldScene.tileWidth() - 1);
-    int focusTileY = clamp((int) Math.floor(focusLocalY), 0, worldScene.tileHeight() - 1);
-    int minLocalX = clamp(focusTileX - SAMPLE_RADIUS, 0, worldScene.tileWidth() - 1);
-    int maxLocalX = clamp(focusTileX + SAMPLE_RADIUS, 0, worldScene.tileWidth() - 1);
-    int minLocalY = clamp(focusTileY - SAMPLE_RADIUS, 0, worldScene.tileHeight() - 1);
-    int maxLocalY = clamp(focusTileY + SAMPLE_RADIUS, 0, worldScene.tileHeight() - 1);
+    float targetFocusX = clamp(focusLocalX, 0.5f, worldScene.tileWidth() - 0.5f);
+    float targetFocusY = clamp(focusLocalY, 0.5f, worldScene.tileHeight() - 0.5f);
+    updateFocus(worldScene, targetFocusX, targetFocusY);
+    cameraPitchClamp = smoothPitchClamp(cameraPitchClamp, targetPitchClamp(worldScene));
 
-    int minElevation = Integer.MAX_VALUE;
-    int maxElevation = Integer.MIN_VALUE;
-    long elevationTotal = 0L;
-    int samples = 0;
-    for (int localY = minLocalY; localY <= maxLocalY; localY++) {
-      for (int localX = minLocalX; localX <= maxLocalX; localX++) {
-        int elevation = worldScene.elevationAt(localX, localY);
-        minElevation = Math.min(minElevation, elevation);
-        maxElevation = Math.max(maxElevation, elevation);
-        elevationTotal += elevation;
-        samples++;
-      }
-    }
-
-    float averageElevation = samples == 0 ? worldScene.elevationAt(focusTileX, focusTileY) : (float) elevationTotal / samples;
-    float relief = Math.max(0.0f, maxElevation - minElevation);
-    float aspectRatio = viewportWidth / (float) Math.max(1, viewportHeight);
-    float basePitchDegrees = clamp(
-        BASE_MIN_PITCH_DEGREES + relief * 0.0035f,
-        BASE_MIN_PITCH_DEGREES,
-        BASE_MAX_PITCH_DEGREES
-    );
-    float pitchDegrees = clamp(basePitchDegrees + cameraPitchOffsetDegrees, MIN_PITCH_DEGREES, MAX_PITCH_DEGREES);
-    float distance = clamp(
-        13.0f + relief * 0.0090f + Math.max(0.0f, 1.28f - aspectRatio) * 1.05f,
-        MIN_DISTANCE,
-        MAX_DISTANCE
-    );
-    float focusX = clamp(focusLocalX, 0.5f, worldScene.tileWidth() - 0.5f);
-    float focusY = clamp(focusLocalY, 0.5f, worldScene.tileHeight() - 0.5f);
-    float screenOffsetY = -0.50f - relief * 0.0010f;
-    float focusHeight = ((sampleHeight(worldScene, focusX, focusY) * 0.6f) + (averageElevation * 0.4f)) * worldHeightScale;
+    int requestedPitchUnits = clamp(Math.round(cameraPitchDegrees * CAMERA_UNITS_PER_DEGREE), MIN_CAMERA_PITCH_UNITS, MAX_CAMERA_PITCH_UNITS);
+    int finalPitchUnits = Math.max(requestedPitchUnits, cameraPitchClamp / 256);
+    int yawUnits = normalizeUnits(Math.round(cameraYawDegrees * CAMERA_UNITS_PER_DEGREE));
+    float focusHeight = sampleHeight(worldScene, smoothedFocusX, smoothedFocusY) * worldHeightScale;
     return new WorldCameraState(
-        pitchDegrees,
-        normalizeDegrees(DEFAULT_YAW_DEGREES + cameraYawOffsetDegrees),
-        distance,
-        screenOffsetY,
-        focusX,
-        focusY,
+        degreesFromUnits(finalPitchUnits),
+        normalizeDegrees(degreesFromUnits(yawUnits)),
+        (finalPitchUnits * 3.0f + 600.0f) / COMPATIBILITY_DISTANCE_DIVISOR,
+        COMPATIBILITY_SCREEN_OFFSET_Y,
+        smoothedFocusX,
+        smoothedFocusY,
         focusHeight
     );
+  }
+
+  private void updateFocus(WorldScene worldScene, float targetFocusX, float targetFocusY) {
+    if (!initialized
+        || !worldScene.sceneKey().equals(lastSceneKey)
+        || Math.hypot(targetFocusX - smoothedFocusX, targetFocusY - smoothedFocusY) > FOCUS_SNAP_DISTANCE_TILES) {
+      smoothedFocusX = targetFocusX;
+      smoothedFocusY = targetFocusY;
+      lastSceneKey = worldScene.sceneKey();
+      initialized = true;
+      return;
+    }
+    smoothedFocusX += (targetFocusX - smoothedFocusX) / ORBIT_FOCUS_SMOOTHING;
+    smoothedFocusY += (targetFocusY - smoothedFocusY) / ORBIT_FOCUS_SMOOTHING;
+  }
+
+  private int targetPitchClamp(WorldScene worldScene) {
+    int orbitTileX = clamp((int) smoothedFocusX, 0, worldScene.tileWidth() - 1);
+    int orbitTileY = clamp((int) smoothedFocusY, 0, worldScene.tileHeight() - 1);
+    int orbitHeight = Math.round(sampleHeight(worldScene, smoothedFocusX, smoothedFocusY));
+    int maxRelief = 0;
+    for (int tileY = Math.max(0, orbitTileY - PITCH_CLAMP_SAMPLE_RADIUS);
+         tileY <= Math.min(worldScene.tileHeight() - 1, orbitTileY + PITCH_CLAMP_SAMPLE_RADIUS);
+         tileY++) {
+      for (int tileX = Math.max(0, orbitTileX - PITCH_CLAMP_SAMPLE_RADIUS);
+           tileX <= Math.min(worldScene.tileWidth() - 1, orbitTileX + PITCH_CLAMP_SAMPLE_RADIUS);
+           tileX++) {
+        maxRelief = Math.max(maxRelief, orbitHeight - worldScene.elevationAt(tileX, tileY));
+      }
+    }
+    return clamp(maxRelief * 192, MIN_CAMERA_PITCH_CLAMP, MAX_CAMERA_PITCH_CLAMP);
+  }
+
+  private int smoothPitchClamp(int currentClamp, int targetClamp) {
+    if (targetClamp > currentClamp) {
+      return currentClamp + (targetClamp - currentClamp) / 24;
+    }
+    if (targetClamp < currentClamp) {
+      return currentClamp + (targetClamp - currentClamp) / 80;
+    }
+    return currentClamp;
+  }
+
+  private static int normalizeUnits(int units) {
+    int normalized = units % 2048;
+    return normalized < 0 ? normalized + 2048 : normalized;
+  }
+
+  private static float degreesFromUnits(int units) {
+    return units * DEGREES_PER_CAMERA_UNIT;
   }
 
   private static int clamp(int value, int minimum, int maximum) {

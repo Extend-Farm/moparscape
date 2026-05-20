@@ -2,7 +2,6 @@ package io.github.ffakira.rsps.client.desktop.world;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.github.ffakira.rsps.client.desktop.character.ActorAnimationState;
 import io.github.ffakira.rsps.client.desktop.core.ArgbImage;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -10,18 +9,94 @@ import org.junit.jupiter.api.Test;
 class WorldSceneCameraPlannerTest {
 
   @Test
-  void plansAPlayerFollowCameraInsteadOfSceneOverview() {
-    int tileWidth = 16;
-    int tileHeight = 16;
+  void plansLegacyStyleOrbitDistanceAndDefaultAngles() {
+    WorldScene scene = sceneWithSlope(16, 16, (x, y) -> x * 2 + y * 3);
+    WorldSceneCameraPlanner planner = new WorldSceneCameraPlanner();
+
+    WorldCameraState cameraState = planner.plan(
+        scene,
+        8.5f,
+        8.5f,
+        WorldSceneScale.HEIGHT_SCALE,
+        496,
+        318
+    );
+
+    assertThat(cameraState.pitchDegrees()).isEqualTo(30.9375f);
+    assertThat(cameraState.distance()).isEqualTo(14.1f);
+    assertThat(cameraState.focusX()).isEqualTo(8.5f);
+    assertThat(cameraState.focusY()).isEqualTo(8.5f);
+    assertThat(cameraState.screenOffsetY()).isEqualTo(-0.65f);
+    assertThat(cameraState.yawDegrees()).isEqualTo(-135.0f);
+  }
+
+  @Test
+  void smoothsOrbitFocusTowardTheRenderedActorPosition() {
+    WorldScene scene = sceneWithSlope(16, 16, (x, y) -> 0);
+    WorldSceneCameraPlanner planner = new WorldSceneCameraPlanner();
+
+    planner.plan(scene, 8.5f, 8.5f, WorldSceneScale.HEIGHT_SCALE, 496, 318);
+    WorldCameraState smoothedCamera = planner.plan(
+        scene,
+        10.5f,
+        6.5f,
+        WorldSceneScale.HEIGHT_SCALE,
+        496,
+        318
+    );
+
+    assertThat(smoothedCamera.focusX()).isEqualTo(8.625f);
+    assertThat(smoothedCamera.focusY()).isEqualTo(8.375f);
+  }
+
+  @Test
+  void raisesPitchWhenNearbyTerrainRequiresMoreClearance() {
+    WorldScene scene = sceneWithSlope(16, 16, (x, y) -> x >= 8 && y >= 8 ? 0 : -240);
+    WorldSceneCameraPlanner planner = new WorldSceneCameraPlanner();
+
+    WorldCameraState cameraState = planner.plan(
+        scene,
+        8.5f,
+        8.5f,
+        WorldSceneScale.HEIGHT_SCALE,
+        496,
+        318
+    );
+
+    assertThat(cameraState.pitchDegrees()).isGreaterThan(22.5f);
+    assertThat(cameraState.distance()).isGreaterThan(7.6875f);
+  }
+
+  @Test
+  void appliesManualOrbitAnglesOnTopOfTheLegacyPitchClamp() {
+    WorldScene scene = sceneWithSlope(16, 16, (x, y) -> 0);
+    WorldSceneCameraPlanner planner = new WorldSceneCameraPlanner();
+
+    WorldCameraState cameraState = planner.plan(
+        scene,
+        8.5f,
+        8.5f,
+        WorldSceneScale.HEIGHT_SCALE,
+        496,
+        318,
+        135.0f,
+        30.0f
+    );
+
+    assertThat(cameraState.yawDegrees()).isEqualTo(135.0f);
+    assertThat(cameraState.pitchDegrees()).isEqualTo(30.058594f);
+  }
+
+  private static WorldScene sceneWithSlope(int tileWidth, int tileHeight, ElevationSupplier elevationSupplier) {
     int[] elevations = new int[tileWidth * tileHeight];
     int[] colors = new int[tileWidth * tileHeight];
     for (int y = 0; y < tileHeight; y++) {
       for (int x = 0; x < tileWidth; x++) {
-        elevations[y * tileWidth + x] = x * 2 + y * 3;
+        elevations[y * tileWidth + x] = elevationSupplier.elevationAt(x, y);
         colors[y * tileWidth + x] = 0x2f3946;
       }
     }
-    WorldScene scene = new WorldScene(
+    return new WorldScene(
         "test",
         3200,
         3200,
@@ -43,106 +118,10 @@ class WorldSceneCameraPlannerTest {
         new ArgbImage(1, 1, new int[]{0xff000000}),
         new WorldSceneProjection(5, 3, 0, 0)
     );
-
-    WorldCameraState cameraState = WorldSceneCameraPlanner.plan(
-        scene,
-        8,
-        8,
-        ActorAnimationState.idle(),
-        0.18f,
-        496,
-        318
-    );
-
-    assertThat(cameraState.pitchDegrees()).isBetween(28.0f, 36.0f);
-    assertThat(cameraState.distance()).isBetween(12.4f, 16.8f);
-    assertThat(cameraState.focusX()).isBetween(8.45f, 8.55f);
-    assertThat(cameraState.focusY()).isBetween(8.45f, 8.55f);
-    assertThat(cameraState.screenOffsetY()).isBetween(-0.95f, -0.35f);
-    assertThat(cameraState.yawDegrees()).isEqualTo(180.0f);
   }
 
-  @Test
-  void followsTheSmoothedActorPositionInsteadOfBiasingAheadOfThePlayer() {
-    int tileWidth = 16;
-    int tileHeight = 16;
-    int[] elevations = new int[tileWidth * tileHeight];
-    int[] colors = new int[tileWidth * tileHeight];
-    WorldScene scene = new WorldScene(
-        "test",
-        3200,
-        3200,
-        0,
-        tileWidth,
-        tileHeight,
-        elevations,
-        colors,
-        colors,
-        colors,
-        new int[tileWidth * tileHeight],
-        new int[tileWidth * tileHeight],
-        new byte[tileWidth * tileHeight],
-        new byte[tileWidth * tileHeight],
-        new byte[tileWidth * tileHeight],
-        List.of(),
-        List.of(),
-        new ArgbImage(1, 1, new int[]{0xff000000}),
-        new ArgbImage(1, 1, new int[]{0xff000000}),
-        new WorldSceneProjection(5, 3, 0, 0)
-    );
-
-    WorldCameraState smoothedCamera = WorldSceneCameraPlanner.plan(
-        scene,
-        8.82f,
-        8.18f,
-        new ActorAnimationState(1.0f, 0.0f, 90.0f, 0.32f, -0.32f),
-        0.18f,
-        496,
-        318
-    );
-
-    assertThat(smoothedCamera.focusX()).isBetween(8.80f, 8.84f);
-    assertThat(smoothedCamera.focusY()).isBetween(8.16f, 8.20f);
-  }
-
-  @Test
-  void appliesManualCameraYawAndPitchOffsetsInsideSafeBounds() {
-    WorldScene scene = new WorldScene(
-        "test",
-        3200,
-        3200,
-        0,
-        16,
-        16,
-        new int[16 * 16],
-        new int[16 * 16],
-        new int[16 * 16],
-        new int[16 * 16],
-        new int[16 * 16],
-        new int[16 * 16],
-        new byte[16 * 16],
-        new byte[16 * 16],
-        new byte[16 * 16],
-        List.of(),
-        List.of(),
-        new ArgbImage(1, 1, new int[]{0xff000000}),
-        new ArgbImage(1, 1, new int[]{0xff000000}),
-        new WorldSceneProjection(5, 3, 0, 0)
-    );
-
-    WorldCameraState cameraState = WorldSceneCameraPlanner.plan(
-        scene,
-        8,
-        8,
-        ActorAnimationState.idle(),
-        0.18f,
-        496,
-        318,
-        -45.0f,
-        4.0f
-    );
-
-    assertThat(cameraState.yawDegrees()).isEqualTo(135.0f);
-    assertThat(cameraState.pitchDegrees()).isBetween(32.0f, 40.0f);
+  @FunctionalInterface
+  private interface ElevationSupplier {
+    int elevationAt(int x, int y);
   }
 }
