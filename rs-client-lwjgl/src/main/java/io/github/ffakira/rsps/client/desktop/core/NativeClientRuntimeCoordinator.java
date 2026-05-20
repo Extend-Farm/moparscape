@@ -19,8 +19,7 @@ final class NativeClientRuntimeCoordinator {
       GameplayClientSession gameplayClientSession,
       LoginScreenController loginScreenController,
       OpenGlTileRenderSystem renderSystem,
-      String[] titleScreenStatus,
-      String[] activeSceneKey,
+      DesktopClientState state,
       String worldBootstrapStatus
   ) {
     // This coordinator is the narrow bridge between protocol progress and renderer mode:
@@ -33,11 +32,11 @@ final class NativeClientRuntimeCoordinator {
           loginScreenController.showCredentials();
           renderSystem.setLoginScreenState(loginScreenController.state());
           renderSystem.clearWorldScene();
-          activeSceneKey[0] = null;
-          titleScreenStatus[0] = clientDisconnectedEvent.reason();
+          state.setActiveSceneKey(null);
+          state.setTitleScreenStatus(clientDisconnectedEvent.reason());
           continue;
         }
-        titleScreenStatus[0] = worldBootstrapStatus;
+        state.setTitleScreenStatus(worldBootstrapStatus);
       }
     }
   }
@@ -46,7 +45,7 @@ final class NativeClientRuntimeCoordinator {
       ClientViewModel viewModel,
       CacheBackedWorldSceneLoader worldSceneLoader,
       OpenGlTileRenderSystem renderSystem,
-      String[] activeSceneKey
+      DesktopClientState state
   ) {
     // Cache scenes are keyed by a 2x2 region window. The coordinator only rebuilds when the
     // player crosses into a different window, which keeps the temporary native world path cheap
@@ -55,11 +54,11 @@ final class NativeClientRuntimeCoordinator {
       return;
     }
     String targetSceneKey = CacheBackedWorldSceneLoader.sceneKeyFor(viewModel.localPlayerPosition());
-    if (targetSceneKey.equals(activeSceneKey[0])) {
+    if (targetSceneKey.equals(state.activeSceneKey())) {
       return;
     }
     renderSystem.setWorldScene(worldSceneLoader.load(viewModel.localPlayerPosition()));
-    activeSceneKey[0] = targetSceneKey;
+    state.setActiveSceneKey(targetSceneKey);
   }
 
   static ClientViewModel renderViewModel(String titleScreenStatus, ClientViewModel gameplayViewModel) {

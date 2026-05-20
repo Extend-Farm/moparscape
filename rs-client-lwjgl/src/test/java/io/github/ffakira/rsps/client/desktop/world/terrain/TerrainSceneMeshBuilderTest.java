@@ -65,6 +65,41 @@ class TerrainSceneMeshBuilderTest {
   }
 
   @Test
+  void promotesRawOverlayTypeOneIntoTheFirstCurvedMaskShape() {
+    WorldScene worldScene = smallWorldScene(
+        new int[]{0x187018, 0x187018, 0x187018, 0x187018},
+        new int[]{0x187018, 0x187018, 0x187018, 0x187018},
+        new int[]{0x8f7a38, 0x8f7a38, 0x8f7a38, 0x8f7a38},
+        (byte) 1,
+        -1,
+        -1
+    );
+    TerrainSceneMeshBuilder builder = new TerrainSceneMeshBuilder();
+
+    SceneTriangleMesh paintMesh = builder.buildTilePaintMesh(worldScene);
+    SceneTriangleMesh modelMesh = builder.buildTileModelMesh(worldScene);
+
+    assertThat(paintMesh.isEmpty()).isTrue();
+    assertThat(modelMesh.faceVertexA()).hasSize(2);
+    assertThat(hasDominantChannel(modelMesh, 8)).isTrue();
+    assertThat(hasDominantChannel(modelMesh, 16)).isTrue();
+  }
+
+  @Test
+  void keepsRotatedCurvedMaskVerticesOnTileCorners() {
+    WorldScene worldScene = smallWorldScene((byte) 9, (byte) 1, -1, -1);
+    TerrainSceneMeshBuilder builder = new TerrainSceneMeshBuilder();
+
+    SceneTriangleMesh mesh = builder.buildTileModelMesh(worldScene);
+
+    assertThat(mesh.isEmpty()).isFalse();
+    assertThat(minCoordinate(mesh.vertexX())).isEqualTo(0.0f);
+    assertThat(maxCoordinate(mesh.vertexX())).isEqualTo(1.0f);
+    assertThat(minCoordinate(mesh.vertexZ())).isEqualTo(0.0f);
+    assertThat(maxCoordinate(mesh.vertexZ())).isEqualTo(1.0f);
+  }
+
+  @Test
   void usesFaceLocalTextureAnchorsForNonFlatTexturedPaintTriangles() {
     WorldScene worldScene = smallWorldScene(
         new int[]{0, 16, 24, 8},
@@ -79,6 +114,27 @@ class TerrainSceneMeshBuilderTest {
     assertThat(mesh.faceVertexA()).hasSize(2);
     assertThat(textureAnchorOrder(mesh, 0)).isEqualTo(faceVertexOrder(mesh, 0));
     assertThat(textureAnchorOrder(mesh, 1)).isNotEqualTo(faceVertexOrder(mesh, 1));
+  }
+
+  @Test
+  void shadesTexturedPaintFacesWithNeutralLightInsteadOfFloorTint() {
+    WorldScene worldScene = smallWorldScene(
+        new int[]{0x204020, 0x204020, 0x204020, 0x204020},
+        new int[]{0x204020, 0x204020, 0x204020, 0x204020},
+        new int[]{0x75a23a, 0x75a23a, 0x75a23a, 0x75a23a},
+        (byte) 0,
+        12,
+        -1
+    );
+    TerrainSceneMeshBuilder builder = new TerrainSceneMeshBuilder();
+
+    SceneTriangleMesh mesh = builder.buildTexturedTilePaintMesh(worldScene);
+
+    assertThat(mesh.isEmpty()).isFalse();
+    for (int faceIndex = 0; faceIndex < mesh.faceVertexA().length; faceIndex++) {
+      assertThat(channel(mesh.faceColorA()[faceIndex], 16)).isEqualTo(channel(mesh.faceColorA()[faceIndex], 8));
+      assertThat(channel(mesh.faceColorA()[faceIndex], 8)).isEqualTo(channel(mesh.faceColorA()[faceIndex], 0));
+    }
   }
 
   @Test
@@ -246,6 +302,44 @@ class TerrainSceneMeshBuilderTest {
     return colors;
   }
 
+  private static int channel(int rgb, int shift) {
+    return (rgb >>> shift) & 0xff;
+  }
+
+  private static boolean hasDominantChannel(SceneTriangleMesh mesh, int dominantShift) {
+    for (int faceIndex = 0; faceIndex < mesh.faceVertexA().length; faceIndex++) {
+      if (dominantChannel(mesh.faceColorA()[faceIndex], dominantShift)
+          || dominantChannel(mesh.faceColorB()[faceIndex], dominantShift)
+          || dominantChannel(mesh.faceColorC()[faceIndex], dominantShift)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static boolean dominantChannel(int rgb, int dominantShift) {
+    int dominant = channel(rgb, dominantShift);
+    int otherA = channel(rgb, dominantShift == 16 ? 8 : 16);
+    int otherB = channel(rgb, dominantShift == 0 ? 8 : 0);
+    return dominant > otherA && dominant > otherB;
+  }
+
+  private static float minCoordinate(float[] values) {
+    float min = Float.POSITIVE_INFINITY;
+    for (float value : values) {
+      min = Math.min(min, value);
+    }
+    return min;
+  }
+
+  private static float maxCoordinate(float[] values) {
+    float max = Float.NEGATIVE_INFINITY;
+    for (float value : values) {
+      max = Math.max(max, value);
+    }
+    return max;
+  }
+
   private static WorldScene testWorldScene(byte overlayShape, int overlayTextureId, int underlayTextureId) {
     int width = 8;
     int height = 8;
@@ -286,6 +380,15 @@ class TerrainSceneMeshBuilderTest {
   }
 
   private static WorldScene smallWorldScene(byte overlayShape, int overlayTextureId, int underlayTextureId) {
+    return smallWorldScene(overlayShape, (byte) 0, overlayTextureId, underlayTextureId);
+  }
+
+  private static WorldScene smallWorldScene(
+      byte overlayShape,
+      byte overlayRotation,
+      int overlayTextureId,
+      int underlayTextureId
+  ) {
     int width = 2;
     int height = 2;
     int[] elevations = new int[width * height];
@@ -298,6 +401,7 @@ class TerrainSceneMeshBuilderTest {
         underlayColors,
         overlayColors,
         overlayShape,
+        overlayRotation,
         overlayTextureId,
         underlayTextureId
     );
@@ -313,6 +417,7 @@ class TerrainSceneMeshBuilderTest {
         underlayColors,
         overlayColors,
         overlayShape,
+        (byte) 0,
         overlayTextureId,
         underlayTextureId
     );
@@ -333,6 +438,7 @@ class TerrainSceneMeshBuilderTest {
         underlayColors,
         overlayColors,
         overlayShape,
+        (byte) 0,
         overlayTextureId,
         underlayTextureId
     );
@@ -344,6 +450,7 @@ class TerrainSceneMeshBuilderTest {
       int[] underlayColors,
       int[] overlayColors,
       byte overlayShape,
+      byte overlayRotation,
       int overlayTextureId,
       int underlayTextureId
   ) {
@@ -356,6 +463,7 @@ class TerrainSceneMeshBuilderTest {
     byte[] tileFlags = new byte[width * height];
     if (overlayShape != 0) {
       overlayShapes[0] = overlayShape;
+      overlayRotations[0] = overlayRotation;
     }
     return new WorldScene(
         "small-terrain-test",

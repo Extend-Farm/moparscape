@@ -5,7 +5,7 @@ import java.util.function.LongSupplier;
 
 public final class GameplayCameraController {
 
-  static final float DEFAULT_YAW_OFFSET_DEGREES = -45.0f;
+  static final float DEFAULT_YAW_OFFSET_DEGREES = 45.0f;
   static final float DEFAULT_PITCH_OFFSET_DEGREES = 3.0f;
   static final float MIN_PITCH_OFFSET_DEGREES = -6.0f;
   static final float MAX_PITCH_OFFSET_DEGREES = 8.0f;

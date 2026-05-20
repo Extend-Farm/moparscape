@@ -9,11 +9,13 @@ public final class TitleScreenFlameAnimator {
   private static final int PANEL_HEIGHT = 265;
   private static final int FLAME_WIDTH = 128;
   private static final int FLAME_HEIGHT = 256;
+  private static final int PANEL_TOP_OFFSET = 8;
+  private static final int LEFT_PANEL_X_OFFSET = 22;
+  private static final int RIGHT_PANEL_X_OFFSET = 24;
+  private static final int RIGHT_VISIBLE_WIDTH = 103;
 
   private final Random random = new Random();
   private final TitleScreenRuneMask[] runeMasks;
-  private final int[] leftBasePixels;
-  private final int[] rightBasePixels;
   private final int[] primaryPalette = new int[256];
   private final int[] secondaryPalette = new int[256];
   private final int[] tertiaryPalette = new int[256];
@@ -29,10 +31,8 @@ public final class TitleScreenFlameAnimator {
   private int noiseOffset;
   private int tick;
 
-  public TitleScreenFlameAnimator(TitleScreenRuneMask[] runeMasks, ArgbImage leftBase, ArgbImage rightBase) {
+  public TitleScreenFlameAnimator(TitleScreenRuneMask[] runeMasks) {
     this.runeMasks = runeMasks;
-    this.leftBasePixels = leftBase.pixels().clone();
-    this.rightBasePixels = rightBase.pixels().clone();
     initializePalettes();
     seedNoise(null);
   }
@@ -158,18 +158,18 @@ public final class TitleScreenFlameAnimator {
   }
 
   private int[] renderLeftPanel() {
-    int[] pixels = leftBasePixels.clone();
+    int[] pixels = new int[PANEL_WIDTH * PANEL_HEIGHT];
     int sourceIndex = 0;
     for (int sourceRow = 1; sourceRow < FLAME_HEIGHT - 1; sourceRow++) {
       int horizontalOffset = (lineOffsets[sourceRow] * (FLAME_HEIGHT - sourceRow)) / FLAME_HEIGHT;
-      int startX = Math.max(22 + horizontalOffset, 0);
-      int destinationRow = sourceRow + 8;
+      int startX = Math.max(LEFT_PANEL_X_OFFSET + horizontalOffset, 0);
+      int destinationRow = sourceRow + PANEL_TOP_OFFSET;
       sourceIndex += startX;
       for (int destinationX = startX; destinationX < PANEL_WIDTH; destinationX++) {
         int intensity = flame[sourceIndex++];
         if (intensity != 0 && destinationRow < PANEL_HEIGHT) {
           int destinationIndex = destinationX + destinationRow * PANEL_WIDTH;
-          pixels[destinationIndex] = blendOverBase(activePalette[intensity], pixels[destinationIndex], intensity);
+          pixels[destinationIndex] = flamePixel(activePalette[intensity], intensity);
         }
       }
     }
@@ -177,18 +177,18 @@ public final class TitleScreenFlameAnimator {
   }
 
   private int[] renderRightPanel() {
-    int[] pixels = rightBasePixels.clone();
+    int[] pixels = new int[PANEL_WIDTH * PANEL_HEIGHT];
     int sourceIndex = 0;
     for (int sourceRow = 1; sourceRow < FLAME_HEIGHT - 1; sourceRow++) {
       int horizontalOffset = (lineOffsets[sourceRow] * (FLAME_HEIGHT - sourceRow)) / FLAME_HEIGHT;
-      int visibleWidth = 103 - horizontalOffset;
-      int destinationRow = sourceRow + 8;
-      int destinationX = 24 + horizontalOffset;
+      int visibleWidth = RIGHT_VISIBLE_WIDTH - horizontalOffset;
+      int destinationRow = sourceRow + PANEL_TOP_OFFSET;
+      int destinationX = RIGHT_PANEL_X_OFFSET + horizontalOffset;
       for (int column = 0; column < visibleWidth; column++) {
         int intensity = flame[sourceIndex++];
         if (intensity != 0 && destinationRow < PANEL_HEIGHT && destinationX >= 0 && destinationX < PANEL_WIDTH) {
           int destinationIndex = destinationX + destinationRow * PANEL_WIDTH;
-          pixels[destinationIndex] = blendOverBase(activePalette[intensity], pixels[destinationIndex], intensity);
+          pixels[destinationIndex] = flamePixel(activePalette[intensity], intensity);
         }
         destinationX++;
       }
@@ -237,12 +237,7 @@ public final class TitleScreenFlameAnimator {
     ) >> 8;
   }
 
-  private int blendOverBase(int flameColor, int basePixel, int intensity) {
-    int baseColor = basePixel & 0x00ffffff;
-    int inverseIntensity = 256 - intensity;
-    return 0xff000000 | (
-        ((flameColor & 0xff00ff) * intensity + (baseColor & 0xff00ff) * inverseIntensity & 0xff00ff00)
-            + ((flameColor & 0x00ff00) * intensity + (baseColor & 0x00ff00) * inverseIntensity & 0x00ff0000)
-    ) >> 8;
+  private int flamePixel(int flameColor, int intensity) {
+    return (intensity << 24) | (flameColor & 0x00ffffff);
   }
 }

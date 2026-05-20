@@ -3,6 +3,7 @@ package io.github.ffakira.rsps.client.desktop.world.minimap;
 import io.github.ffakira.rsps.client.desktop.core.ArgbImage;
 import io.github.ffakira.rsps.client.desktop.world.object.WorldSceneObject;
 import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainLayerSource;
+import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainOverlayShapeResolver;
 import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainTileColorResolver;
 import java.util.List;
 
@@ -56,6 +57,7 @@ public final class WorldSceneMinimapRasterizer {
       int[] overlayTextureIds,
       byte[] overlayShapes,
       byte[] overlayRotations,
+      byte[] shadowSamples,
       List<WorldSceneObject> sceneObjects
   ) {
     TerrainLayerSource terrainLayerSource = new MinimapTerrainLayerSource(
@@ -68,7 +70,8 @@ public final class WorldSceneMinimapRasterizer {
         underlayTextureIds,
         overlayTextureIds,
         overlayShapes,
-        overlayRotations
+        overlayRotations,
+        shadowSamples
     );
     int pixelWidth = tileWidth * TILE_PIXELS;
     int pixelHeight = tileHeight * TILE_PIXELS;
@@ -126,7 +129,8 @@ public final class WorldSceneMinimapRasterizer {
         underlayTextureId,
         overlayTextureId
     );
-    if (overlayShape <= 1 || overlayShape >= TILE_SHAPE_MASKS.length) {
+    int sceneShape = TerrainOverlayShapeResolver.sceneShapeId(terrainLayerSource, sceneX, sceneY);
+    if (sceneShape <= 1 || sceneShape >= TILE_SHAPE_MASKS.length) {
       fillGradientTile(tileHeight, pixelWidth, pixelHeight, pixels, sceneX, sceneY, paintColors);
       return;
     }
@@ -144,7 +148,7 @@ public final class WorldSceneMinimapRasterizer {
         TerrainTileColorResolver.FloorColorLayer.OVERLAY,
         minimapBaseColor(overlayRgb, tileRgb, underlayRgb, -1, overlayTextureId)
     );
-    int[] shapeMask = TILE_SHAPE_MASKS[overlayShape];
+    int[] shapeMask = TILE_SHAPE_MASKS[sceneShape];
     int[] rotationMap = TILE_ROTATION_MAP[overlayRotation];
     int startX = sceneX * TILE_PIXELS;
     int startY = tileTopY(tileHeight, sceneY);
@@ -460,7 +464,8 @@ public final class WorldSceneMinimapRasterizer {
       int[] underlayTextureIds,
       int[] overlayTextureIds,
       byte[] overlayShapes,
-      byte[] overlayRotations
+      byte[] overlayRotations,
+      byte[] shadowSamples
   ) implements TerrainLayerSource {
 
     @Override
@@ -501,6 +506,11 @@ public final class WorldSceneMinimapRasterizer {
     @Override
     public int overlayRotationAt(int localX, int localY) {
       return overlayRotations[localY * tileWidth + localX] & 0xff;
+    }
+
+    @Override
+    public int shadowAt(int localX, int localY) {
+      return shadowSamples[localY * tileWidth + localX] & 0xff;
     }
   }
 }

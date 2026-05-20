@@ -31,6 +31,7 @@ public record GameplayFrameAssets(
     ArgbImage redstone2BothTransforms,
     ArgbImage[] sideIcons,
     ArgbImage[] mapFunctionIcons,
-    ArgbImage[] mapDotIcons
+    ArgbImage[] mapDotIcons,
+    ArgbImage[] clickCrosses
 ) {
 }

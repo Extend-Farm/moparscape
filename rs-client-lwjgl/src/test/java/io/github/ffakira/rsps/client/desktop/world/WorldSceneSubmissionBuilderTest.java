@@ -1,6 +1,7 @@
 package io.github.ffakira.rsps.client.desktop.world;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.data.Offset.offset;
 
 import io.github.ffakira.rsps.cache.RawModelRepository;
 import io.github.ffakira.rsps.client.desktop.character.ActorAnimationState;
@@ -216,7 +217,7 @@ class WorldSceneSubmissionBuilderTest {
   }
 
   @Test
-  void skipsFallbackCuboidsForStubBackedWorldObjects() {
+  void rendersFallbackWallSegmentsForStubBackedWorldObjects() {
     WorldScene worldScene = new WorldScene(
         "stub-backed-object",
         3200,
@@ -233,7 +234,7 @@ class WorldSceneSubmissionBuilderTest {
         new byte[64],
         new byte[64],
         new byte[64],
-        List.of(new WorldSceneObject(85, "Bridge wall stub", 3, 3, 0, 0, 0, 1, 1, false, 22, -1, List.of(2214, 2215), false, null)),
+        List.of(new WorldSceneObject(85, "Bridge wall stub", 3, 3, 0, 0, 0, 1, 1, false, 22, -1, List.of(2214, 2215), true, null)),
         List.of(),
         new ArgbImage(1, 1, new int[]{0xff000000}),
         new ArgbImage(8, 8, filledInts(64, 0xff334455)),
@@ -250,8 +251,61 @@ class WorldSceneSubmissionBuilderTest {
         318
     );
 
-    assertThat(submission.renderQueue().batches())
-        .noneMatch(batch -> batch.kind() == SceneSubmissionKind.STATIC_OBJECT && batch.rasterMode() == SceneRasterMode.FLAT);
+    SceneTriangleMesh staticObjectMesh = batchOf(submission, SceneSubmissionKind.STATIC_OBJECT, SceneRasterMode.FLAT).mesh();
+
+    assertThat(staticObjectMesh.faceVertexA()).hasSize(10);
+    assertThat(min(staticObjectMesh.vertexX())).isCloseTo(3.0f, offset(0.0001f));
+    assertThat(max(staticObjectMesh.vertexX())).isCloseTo(3.18f, offset(0.0001f));
+    assertThat(min(staticObjectMesh.vertexZ())).isCloseTo(3.0f, offset(0.0001f));
+    assertThat(max(staticObjectMesh.vertexZ())).isCloseTo(4.0f, offset(0.0001f));
+  }
+
+  @Test
+  void rendersPerimeterFallbacksForLargeMissingStructures() {
+    WorldScene worldScene = new WorldScene(
+        "missing-building",
+        3200,
+        3200,
+        0,
+        8,
+        8,
+        gradientHeights(8, 8),
+        filledInts(64, 0x4a6a3c),
+        filledInts(64, 0x4a6a3c),
+        filledInts(64, 0),
+        filledInts(64, -1),
+        filledInts(64, -1),
+        new byte[64],
+        new byte[64],
+        new byte[64],
+        List.of(new WorldSceneObject(1200, "Stone building", 2, 3, 0, 10, 0, 3, 2, false, -1, -1, List.of(9999), true, null)),
+        List.of(),
+        new ArgbImage(1, 1, new int[]{0xff000000}),
+        new ArgbImage(8, 8, filledInts(64, 0xff334455)),
+        new WorldSceneProjection(5, 3, 0, 0)
+    );
+
+    WorldSceneRenderSubmission submission = new WorldSceneSubmissionBuilder(null).build(
+        worldScene,
+        new WorldPoint(3204, 3204, 0),
+        null,
+        List.of(),
+        ActorAnimationState.idle(),
+        496,
+        318
+    );
+
+    SceneTriangleMesh staticObjectMesh = batchOf(submission, SceneSubmissionKind.STATIC_OBJECT, SceneRasterMode.FLAT).mesh();
+
+    assertThat(staticObjectMesh.faceVertexA()).hasSize(40);
+    assertThat(min(staticObjectMesh.vertexX())).isCloseTo(2.0f, offset(0.0001f));
+    assertThat(max(staticObjectMesh.vertexX())).isCloseTo(5.0f, offset(0.0001f));
+    assertThat(min(staticObjectMesh.vertexZ())).isCloseTo(3.0f, offset(0.0001f));
+    assertThat(max(staticObjectMesh.vertexZ())).isCloseTo(5.0f, offset(0.0001f));
+    assertThat(containsApprox(staticObjectMesh.vertexX(), 2.18f)).isTrue();
+    assertThat(containsApprox(staticObjectMesh.vertexX(), 4.82f)).isTrue();
+    assertThat(containsApprox(staticObjectMesh.vertexZ(), 3.18f)).isTrue();
+    assertThat(containsApprox(staticObjectMesh.vertexZ(), 4.82f)).isTrue();
   }
 
   @Test
@@ -544,5 +598,30 @@ class WorldSceneSubmissionBuilderTest {
     byte[] values = new byte[width * height];
     values[3 * width + 3] = 2;
     return values;
+  }
+
+  private static float min(float[] values) {
+    float minimum = Float.POSITIVE_INFINITY;
+    for (float value : values) {
+      minimum = Math.min(minimum, value);
+    }
+    return minimum;
+  }
+
+  private static float max(float[] values) {
+    float maximum = Float.NEGATIVE_INFINITY;
+    for (float value : values) {
+      maximum = Math.max(maximum, value);
+    }
+    return maximum;
+  }
+
+  private static boolean containsApprox(float[] values, float expected) {
+    for (float value : values) {
+      if (Math.abs(value - expected) <= 0.0001f) {
+        return true;
+      }
+    }
+    return false;
   }
 }

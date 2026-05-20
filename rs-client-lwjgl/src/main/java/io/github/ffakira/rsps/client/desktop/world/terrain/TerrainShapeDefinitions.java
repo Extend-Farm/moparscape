@@ -38,7 +38,7 @@ final class TerrainShapeDefinitions {
   }
 
   static boolean isSupportedShape(int shape) {
-    return shape > 0 && shape < POINTS.length;
+    return shape > 1 && shape < POINTS.length;
   }
 
   static int[] pointCodes(int shape) {
@@ -74,10 +74,10 @@ final class TerrainShapeDefinitions {
     if ((pointCode & 1) == 0 && pointCode <= 8) {
       return ((pointCode - rotation - rotation - 1) & 7) + 1;
     }
-    if (pointCode <= 12) {
+    if (pointCode > 8 && pointCode <= 12) {
       return ((pointCode - 9 - rotation) & 3) + 9;
     }
-    if (pointCode <= 16) {
+    if (pointCode > 12 && pointCode <= 16) {
       return ((pointCode - 13 - rotation) & 3) + 13;
     }
     return pointCode;

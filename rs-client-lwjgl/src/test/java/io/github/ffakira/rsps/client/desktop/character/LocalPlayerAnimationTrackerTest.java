@@ -56,6 +56,23 @@ class LocalPlayerAnimationTrackerTest {
     assertThat(idleState.headingDegrees()).isGreaterThan(0.0f);
   }
 
+  @Test
+  void advancesTheWalkFrameLifecycleWhileMovementIsActive() {
+    TestNanoClock clock = new TestNanoClock();
+    LocalPlayerAnimationTracker tracker = new LocalPlayerAnimationTracker(clock::now);
+
+    tracker.update(new WorldPoint(3200, 3200, 0));
+    clock.advanceNanos(100_000_000L);
+    ActorAnimationState firstWalkingState = tracker.update(new WorldPoint(3201, 3200, 0));
+    clock.advanceNanos(60_000_000L);
+    ActorAnimationState secondWalkingState = tracker.update(new WorldPoint(3201, 3200, 0));
+
+    assertThat(firstWalkingState.isIdle()).isFalse();
+    assertThat(secondWalkingState.isIdle()).isFalse();
+    assertThat(secondWalkingState.walkFrameIndex()).isNotEqualTo(firstWalkingState.walkFrameIndex());
+    assertThat(secondWalkingState.walkFrameProgress()).isBetween(0.0f, 1.0f);
+  }
+
   private static final class TestNanoClock {
 
     private long now;

@@ -24,6 +24,7 @@ public record WorldScene(
     byte[] overlayShapes,
     byte[] overlayRotations,
     byte[] tileFlags,
+    byte[] shadowSamples,
     List<WorldSceneObject> objects,
     List<WorldSceneOccluder> occluders,
     ArgbImage image,
@@ -31,6 +32,55 @@ public record WorldScene(
     WorldSceneProjection projection,
     BridgeTerrainLayer bridgeTerrainLayer
 ) implements TerrainLayerSource {
+
+  public WorldScene(
+      String sceneKey,
+      int originWorldX,
+      int originWorldY,
+      int plane,
+      int tileWidth,
+      int tileHeight,
+      int[] elevations,
+      int[] tileColors,
+      int[] underlayColors,
+      int[] overlayColors,
+      int[] underlayTextureIds,
+      int[] overlayTextureIds,
+      byte[] overlayShapes,
+      byte[] overlayRotations,
+      byte[] tileFlags,
+      List<WorldSceneObject> objects,
+      List<WorldSceneOccluder> occluders,
+      ArgbImage image,
+      ArgbImage minimapImage,
+      WorldSceneProjection projection,
+      BridgeTerrainLayer bridgeTerrainLayer
+  ) {
+    this(
+        sceneKey,
+        originWorldX,
+        originWorldY,
+        plane,
+        tileWidth,
+        tileHeight,
+        elevations,
+        tileColors,
+        underlayColors,
+        overlayColors,
+        underlayTextureIds,
+        overlayTextureIds,
+        overlayShapes,
+        overlayRotations,
+        tileFlags,
+        emptyShadowSamples(tileWidth, tileHeight),
+        objects,
+        occluders,
+        image,
+        minimapImage,
+        projection,
+        bridgeTerrainLayer
+    );
+  }
 
   public WorldScene(
       String sceneKey,
@@ -70,6 +120,7 @@ public record WorldScene(
         overlayShapes,
         overlayRotations,
         tileFlags,
+        emptyShadowSamples(tileWidth, tileHeight),
         objects,
         occluders,
         image,
@@ -82,6 +133,7 @@ public record WorldScene(
   public WorldScene {
     objects = List.copyOf(objects);
     occluders = List.copyOf(occluders);
+    shadowSamples = shadowSamples == null ? emptyShadowSamples(tileWidth, tileHeight) : shadowSamples;
     bridgeTerrainLayer = bridgeTerrainLayer == null
         ? BridgeTerrainLayer.empty(tileWidth, tileHeight)
         : bridgeTerrainLayer;
@@ -160,7 +212,16 @@ public record WorldScene(
     return overlayRotations[localY * tileWidth + localX] & 0xff;
   }
 
+  @Override
+  public int shadowAt(int localX, int localY) {
+    return shadowSamples[localY * tileWidth + localX] & 0xff;
+  }
+
   public int tileFlagAt(int localX, int localY) {
     return tileFlags[localY * tileWidth + localX] & 0xff;
+  }
+
+  private static byte[] emptyShadowSamples(int tileWidth, int tileHeight) {
+    return new byte[tileWidth * tileHeight];
   }
 }

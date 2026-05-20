@@ -9,9 +9,10 @@ public final class LoginScreenController {
   private String username = "";
   private String password = "";
   private LoginField focusedField = LoginField.USERNAME;
+  private int loadingPercent;
 
   public LoginScreenState state() {
-    return new LoginScreenState(stage, username, password, focusedField);
+    return new LoginScreenState(stage, username, password, focusedField, loadingPercent);
   }
 
   public void focus(LoginField loginField) {
@@ -61,17 +62,25 @@ public final class LoginScreenController {
     focusedField = LoginField.USERNAME;
   }
 
+  public void showLoading(int progressPercent) {
+    stage = TitleScreenStage.LOADING;
+    loadingPercent = clampProgress(progressPercent);
+  }
+
   public void showWelcome() {
     stage = TitleScreenStage.WELCOME;
+    loadingPercent = 0;
   }
 
   public void showCredentials() {
     stage = TitleScreenStage.CREDENTIALS;
     focusedField = LoginField.USERNAME;
+    loadingPercent = 0;
   }
 
   public void showPrivateServerInfo() {
     stage = TitleScreenStage.PRIVATE_SERVER_INFO;
+    loadingPercent = 0;
   }
 
   public boolean canSubmit() {
@@ -83,5 +92,9 @@ public final class LoginScreenController {
       return value;
     }
     return value.substring(0, value.length() - 1);
+  }
+
+  private int clampProgress(int progressPercent) {
+    return Math.max(0, Math.min(100, progressPercent));
   }
 }

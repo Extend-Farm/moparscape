@@ -26,6 +26,7 @@ class WorldSceneMinimapRasterizerTest {
         new int[16],
         new byte[16],
         new byte[16],
+        new byte[16],
         List.of(
             new WorldSceneObject(1, "Stone wall", 1, 1, 0, 0, 0, 1, 1, false, -1, -1, List.of(), true, null)
         )
@@ -59,6 +60,38 @@ class WorldSceneMinimapRasterizerTest {
         overlayTextureIds,
         overlayShapes,
         overlayRotations,
+        new byte[1],
+        List.of()
+    );
+
+    assertThat(image.pixels()[pixelIndex(4, 1, 0)]).isNotEqualTo(image.pixels()[pixelIndex(4, 2, 0)]);
+    assertThat(image.pixels()[pixelIndex(4, 1, 0)]).isNotEqualTo(0);
+    assertThat(image.pixels()[pixelIndex(4, 2, 0)]).isNotEqualTo(0);
+  }
+
+  @Test
+  void promotesRawOverlayTypeOneIntoTheFirstCurvedMinimapMask() {
+    int[] tileColors = new int[]{0x2f3946};
+    int[] underlayColors = new int[]{0x654d24};
+    int[] overlayColors = new int[]{0x97a34a};
+    int[] underlayTextureIds = new int[]{-1};
+    int[] overlayTextureIds = new int[]{-1};
+    byte[] overlayShapes = new byte[]{1};
+    byte[] overlayRotations = new byte[]{0};
+    WorldSceneMinimapRasterizer rasterizer = new WorldSceneMinimapRasterizer();
+
+    ArgbImage image = rasterizer.rasterize(
+        1,
+        1,
+        new int[]{0},
+        tileColors,
+        underlayColors,
+        overlayColors,
+        underlayTextureIds,
+        overlayTextureIds,
+        overlayShapes,
+        overlayRotations,
+        new byte[1],
         List.of()
     );
 
@@ -95,6 +128,7 @@ class WorldSceneMinimapRasterizerTest {
         new int[16],
         new byte[16],
         new byte[16],
+        new byte[16],
         List.of(
             new WorldSceneObject(100, "Small house", 1, 1, 0, 10, 0, 1, 1, false, 0, -1, List.of(), true, null)
         )
@@ -117,6 +151,7 @@ class WorldSceneMinimapRasterizerTest {
         new int[]{0},
         new int[]{-1},
         new int[]{1},
+        new byte[]{0},
         new byte[]{0},
         new byte[]{0},
         List.of()
@@ -147,6 +182,7 @@ class WorldSceneMinimapRasterizerTest {
         new int[4],
         new int[]{-1, -1, -1, -1},
         new int[]{-1, -1, -1, -1},
+        new byte[4],
         new byte[4],
         new byte[4],
         List.of()

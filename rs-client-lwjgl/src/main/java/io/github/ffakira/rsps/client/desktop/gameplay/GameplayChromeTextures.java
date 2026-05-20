@@ -8,70 +8,57 @@ import io.github.ffakira.rsps.client.desktop.world.minimap.MapBackClipMasks;
 
 final class GameplayChromeTextures implements AutoCloseable {
 
+  private static final float[][] SIDE_ICON_POSITIONS = {
+      {545.0f, 173.0f},
+      {569.0f, 171.0f},
+      {598.0f, 171.0f},
+      {631.0f, 172.0f},
+      {669.0f, 173.0f},
+      {696.0f, 171.0f},
+      {724.0f, 173.0f},
+      {570.0f, 468.0f},
+      {598.0f, 469.0f},
+      {633.0f, 470.0f},
+      {670.0f, 468.0f},
+      {697.0f, 468.0f},
+      {722.0f, 468.0f}
+  };
+
   private final boolean available;
-  private final OpenGlTexture backLeft1Texture;
-  private final OpenGlTexture backLeft2Texture;
-  private final OpenGlTexture backRight1Texture;
-  private final OpenGlTexture backRight2Texture;
-  private final OpenGlTexture backTop1Texture;
-  private final OpenGlTexture backVmid1Texture;
-  private final OpenGlTexture backVmid2Texture;
-  private final OpenGlTexture backVmid3Texture;
-  private final OpenGlTexture backHmid2Texture;
-  private final OpenGlTexture invBackTexture;
-  private final OpenGlTexture chatBackTexture;
-  private final OpenGlTexture mapBackTexture;
-  private final OpenGlTexture backBase1Texture;
-  private final OpenGlTexture backBase2Texture;
-  private final OpenGlTexture backHMid1Texture;
+  private final FrameTextures frameTextures;
   private final OpenGlTexture compassTexture;
-  private final OpenGlTexture redstone1Texture;
-  private final OpenGlTexture redstone2Texture;
-  private final OpenGlTexture redstone3Texture;
-  private final OpenGlTexture redstone1FlippedTexture;
-  private final OpenGlTexture redstone2FlippedTexture;
-  private final OpenGlTexture redstone1MirroredTexture;
-  private final OpenGlTexture redstone2MirroredTexture;
-  private final OpenGlTexture redstone3MirroredTexture;
-  private final OpenGlTexture redstone1BothTransformsTexture;
-  private final OpenGlTexture redstone2BothTransformsTexture;
+  private final TabHighlightTextures tabHighlightTextures;
+  private final OpenGlTexture[] tabHighlightTexturesByIndex;
   private final OpenGlTexture[] sideIconTextures;
   private final OpenGlTexture[] mapFunctionTextures;
   private final OpenGlTexture[] mapDotTextures;
+  private final OpenGlTexture[] clickCrossTextures;
   private final MapBackClipMasks mapBackClipMasks;
 
   GameplayChromeTextures(GameplayFrameAssets gameplayFrameAssets) {
     available = gameplayFrameAssets != null;
-    backLeft1Texture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.backLeft1());
-    backLeft2Texture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.backLeft2());
-    backRight1Texture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.backRight1());
-    backRight2Texture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.backRight2());
-    backTop1Texture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.backTop1());
-    backVmid1Texture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.backVmid1());
-    backVmid2Texture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.backVmid2());
-    backVmid3Texture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.backVmid3());
-    backHmid2Texture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.backHmid2());
-    invBackTexture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.invBack());
-    chatBackTexture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.chatBack());
-    mapBackTexture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.mapBack());
-    backBase1Texture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.backBase1());
-    backBase2Texture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.backBase2());
-    backHMid1Texture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.backHMid1());
-    compassTexture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.compass());
-    redstone1Texture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.redstone1());
-    redstone2Texture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.redstone2());
-    redstone3Texture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.redstone3());
-    redstone1FlippedTexture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.redstone1Flipped());
-    redstone2FlippedTexture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.redstone2Flipped());
-    redstone1MirroredTexture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.redstone1Mirrored());
-    redstone2MirroredTexture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.redstone2Mirrored());
-    redstone3MirroredTexture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.redstone3Mirrored());
-    redstone1BothTransformsTexture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.redstone1BothTransforms());
-    redstone2BothTransformsTexture = texture(gameplayFrameAssets == null ? null : gameplayFrameAssets.redstone2BothTransforms());
-    sideIconTextures = textures(gameplayFrameAssets == null ? null : gameplayFrameAssets.sideIcons());
-    mapFunctionTextures = textures(gameplayFrameAssets == null ? null : gameplayFrameAssets.mapFunctionIcons());
-    mapDotTextures = textures(gameplayFrameAssets == null ? null : gameplayFrameAssets.mapDotIcons());
-    mapBackClipMasks = gameplayFrameAssets == null ? null : MapBackClipMasks.fromMapBack(gameplayFrameAssets.mapBack());
+    if (gameplayFrameAssets == null) {
+      frameTextures = FrameTextures.empty();
+      compassTexture = null;
+      tabHighlightTextures = TabHighlightTextures.empty();
+      tabHighlightTexturesByIndex = new OpenGlTexture[0];
+      sideIconTextures = new OpenGlTexture[0];
+      mapFunctionTextures = new OpenGlTexture[0];
+      mapDotTextures = new OpenGlTexture[0];
+      clickCrossTextures = new OpenGlTexture[0];
+      mapBackClipMasks = null;
+      return;
+    }
+
+    frameTextures = FrameTextures.from(gameplayFrameAssets);
+    compassTexture = requireTexture("compass", gameplayFrameAssets.compass());
+    tabHighlightTextures = TabHighlightTextures.from(gameplayFrameAssets);
+    tabHighlightTexturesByIndex = tabHighlightTextures.byTabIndex();
+    sideIconTextures = textures(gameplayFrameAssets.sideIcons());
+    mapFunctionTextures = textures(gameplayFrameAssets.mapFunctionIcons());
+    mapDotTextures = textures(gameplayFrameAssets.mapDotIcons());
+    clickCrossTextures = textures(gameplayFrameAssets.clickCrosses());
+    mapBackClipMasks = MapBackClipMasks.fromMapBack(requireImage("mapBack", gameplayFrameAssets.mapBack()));
   }
 
   boolean isAvailable() {
@@ -94,6 +81,17 @@ final class GameplayChromeTextures implements AutoCloseable {
     return mapDotTextures;
   }
 
+  OpenGlTexture clickCrossTexture(GameplayMouseButton button, int frameIndex) {
+    if (frameIndex < 0 || frameIndex >= GameplayCursorMarker.FRAME_COUNT) {
+      return null;
+    }
+    int textureIndex = (button == GameplayMouseButton.LEFT ? 0 : GameplayCursorMarker.FRAME_COUNT) + frameIndex;
+    if (textureIndex < 0 || textureIndex >= clickCrossTextures.length) {
+      return null;
+    }
+    return clickCrossTextures[textureIndex];
+  }
+
   void drawFrame(ImmediateModeRenderer2d primitives) {
     if (!available) {
       return;
@@ -101,51 +99,30 @@ final class GameplayChromeTextures implements AutoCloseable {
     // These are the real cache `media` frame pieces. The legacy client builds the shell from both
     // the central panel art and the separate outer back-buffer sprites; omitting the latter leaves
     // black gutters around the minimap, sidebar, and chatbox.
-    primitives.drawTexturedQuad(backLeft1Texture, new ScreenRect(0.0f, 4.0f, backLeft1Texture.width(), backLeft1Texture.height()));
-    primitives.drawTexturedQuad(backLeft2Texture, new ScreenRect(0.0f, 357.0f, backLeft2Texture.width(), backLeft2Texture.height()));
-    primitives.drawTexturedQuad(backRight1Texture, new ScreenRect(722.0f, 4.0f, backRight1Texture.width(), backRight1Texture.height()));
-    primitives.drawTexturedQuad(backRight2Texture, new ScreenRect(743.0f, 205.0f, backRight2Texture.width(), backRight2Texture.height()));
-    primitives.drawTexturedQuad(backTop1Texture, new ScreenRect(0.0f, 0.0f, backTop1Texture.width(), backTop1Texture.height()));
-    primitives.drawTexturedQuad(backVmid1Texture, new ScreenRect(516.0f, 4.0f, backVmid1Texture.width(), backVmid1Texture.height()));
-    primitives.drawTexturedQuad(backVmid2Texture, new ScreenRect(516.0f, 205.0f, backVmid2Texture.width(), backVmid2Texture.height()));
-    primitives.drawTexturedQuad(backVmid3Texture, new ScreenRect(496.0f, 357.0f, backVmid3Texture.width(), backVmid3Texture.height()));
-    primitives.drawTexturedQuad(backHmid2Texture, new ScreenRect(0.0f, 338.0f, backHmid2Texture.width(), backHmid2Texture.height()));
-    primitives.drawTexturedQuad(mapBackTexture, GameplayLayout.minimapPanelRect());
-    primitives.drawTexturedQuad(backHMid1Texture, GameplayLayout.topTabRect());
-    primitives.drawTexturedQuad(backBase2Texture, GameplayLayout.bottomTabRect());
-    primitives.drawTexturedQuad(invBackTexture, GameplayLayout.sidebarPanelRect());
-    primitives.drawTexturedQuad(chatBackTexture, GameplayLayout.chatboxPanelRect());
-    primitives.drawTexturedQuad(backBase1Texture, new ScreenRect(0.0f, 453.0f, 496.0f, 50.0f));
+    drawAt(primitives, frameTextures.backLeft1(), 0.0f, 4.0f);
+    drawAt(primitives, frameTextures.backLeft2(), 0.0f, 357.0f);
+    drawAt(primitives, frameTextures.backRight1(), 722.0f, 4.0f);
+    drawAt(primitives, frameTextures.backRight2(), 743.0f, 205.0f);
+    drawAt(primitives, frameTextures.backTop1(), 0.0f, 0.0f);
+    drawAt(primitives, frameTextures.backVmid1(), 516.0f, 4.0f);
+    drawAt(primitives, frameTextures.backVmid2(), 516.0f, 205.0f);
+    drawAt(primitives, frameTextures.backVmid3(), 496.0f, 357.0f);
+    drawAt(primitives, frameTextures.backHmid2(), 0.0f, 338.0f);
+    draw(primitives, frameTextures.mapBack(), GameplayLayout.minimapPanelRect());
+    draw(primitives, frameTextures.backHMid1(), GameplayLayout.topTabRect());
+    draw(primitives, frameTextures.backBase2(), GameplayLayout.bottomTabRect());
+    draw(primitives, frameTextures.invBack(), GameplayLayout.sidebarPanelRect());
+    draw(primitives, frameTextures.chatBack(), GameplayLayout.chatboxPanelRect());
+    draw(primitives, frameTextures.backBase1(), new ScreenRect(0.0f, 453.0f, 496.0f, 50.0f));
   }
 
   void drawSideIcons(ImmediateModeRenderer2d primitives) {
-    if (sideIconTextures.length < 13) {
+    if (sideIconTextures.length < SIDE_ICON_POSITIONS.length) {
       return;
     }
-    float[][] positions = {
-        {516.0f + 29.0f, 160.0f + 13.0f},
-        {516.0f + 53.0f, 160.0f + 11.0f},
-        {516.0f + 82.0f, 160.0f + 11.0f},
-        {516.0f + 115.0f, 160.0f + 12.0f},
-        {516.0f + 153.0f, 160.0f + 13.0f},
-        {516.0f + 180.0f, 160.0f + 11.0f},
-        {516.0f + 208.0f, 160.0f + 13.0f},
-        {496.0f + 74.0f, 466.0f + 2.0f},
-        {496.0f + 102.0f, 466.0f + 3.0f},
-        {496.0f + 137.0f, 466.0f + 4.0f},
-        {496.0f + 174.0f, 466.0f + 2.0f},
-        {496.0f + 201.0f, 466.0f + 2.0f},
-        {496.0f + 226.0f, 466.0f + 2.0f}
-    };
-    for (int index = 0; index < Math.min(sideIconTextures.length, positions.length); index++) {
+    for (int index = 0; index < Math.min(sideIconTextures.length, SIDE_ICON_POSITIONS.length); index++) {
       OpenGlTexture sideIconTexture = sideIconTextures[index];
-      if (sideIconTexture == null) {
-        continue;
-      }
-      primitives.drawTexturedQuad(
-          sideIconTexture,
-          new ScreenRect(positions[index][0], positions[index][1], sideIconTexture.width(), sideIconTexture.height())
-      );
+      drawAt(primitives, sideIconTexture, SIDE_ICON_POSITIONS[index][0], SIDE_ICON_POSITIONS[index][1]);
     }
   }
 
@@ -161,62 +138,37 @@ final class GameplayChromeTextures implements AutoCloseable {
   }
 
   private OpenGlTexture gameplayTabHighlightTexture(GameplayTab gameplayTab) {
-    return switch (gameplayTab.index()) {
-      case 0 -> redstone1Texture;
-      case 1, 2 -> redstone2Texture;
-      case 3 -> redstone3Texture;
-      case 4, 5 -> redstone2FlippedTexture;
-      case 6 -> redstone1FlippedTexture;
-      case 7 -> redstone1MirroredTexture;
-      case 8, 9 -> redstone2MirroredTexture;
-      case 10 -> redstone3MirroredTexture;
-      case 11, 12 -> redstone2BothTransformsTexture;
-      case 13 -> redstone1BothTransformsTexture;
-      default -> redstone3Texture;
-    };
+    int tabIndex = gameplayTab.index();
+    if (tabIndex < 0 || tabIndex >= tabHighlightTexturesByIndex.length) {
+      return tabHighlightTextures.redstone3();
+    }
+    return tabHighlightTexturesByIndex[tabIndex];
   }
 
   @Override
   public void close() {
-    closeTexture(backLeft1Texture);
-    closeTexture(backLeft2Texture);
-    closeTexture(backRight1Texture);
-    closeTexture(backRight2Texture);
-    closeTexture(backTop1Texture);
-    closeTexture(backVmid1Texture);
-    closeTexture(backVmid2Texture);
-    closeTexture(backVmid3Texture);
-    closeTexture(backHmid2Texture);
-    closeTexture(invBackTexture);
-    closeTexture(chatBackTexture);
-    closeTexture(mapBackTexture);
-    closeTexture(backBase1Texture);
-    closeTexture(backBase2Texture);
-    closeTexture(backHMid1Texture);
+    frameTextures.close();
     closeTexture(compassTexture);
-    closeTexture(redstone1Texture);
-    closeTexture(redstone2Texture);
-    closeTexture(redstone3Texture);
-    closeTexture(redstone1FlippedTexture);
-    closeTexture(redstone2FlippedTexture);
-    closeTexture(redstone1MirroredTexture);
-    closeTexture(redstone2MirroredTexture);
-    closeTexture(redstone3MirroredTexture);
-    closeTexture(redstone1BothTransformsTexture);
-    closeTexture(redstone2BothTransformsTexture);
-    for (OpenGlTexture sideIconTexture : sideIconTextures) {
-      closeTexture(sideIconTexture);
-    }
-    for (OpenGlTexture mapFunctionTexture : mapFunctionTextures) {
-      closeTexture(mapFunctionTexture);
-    }
-    for (OpenGlTexture mapDotTexture : mapDotTextures) {
-      closeTexture(mapDotTexture);
-    }
+    tabHighlightTextures.close();
+    closeTextures(sideIconTextures);
+    closeTextures(mapFunctionTextures);
+    closeTextures(mapDotTextures);
+    closeTextures(clickCrossTextures);
   }
 
   private static OpenGlTexture texture(ArgbImage image) {
     return image == null ? null : OpenGlTexture.fromArgbImage(image);
+  }
+
+  private static OpenGlTexture requireTexture(String name, ArgbImage image) {
+    return OpenGlTexture.fromArgbImage(requireImage(name, image));
+  }
+
+  private static ArgbImage requireImage(String name, ArgbImage image) {
+    if (image == null) {
+      throw new IllegalStateException("Missing gameplay chrome asset: " + name);
+    }
+    return image;
   }
 
   private static OpenGlTexture[] textures(ArgbImage[] images) {
@@ -230,9 +182,186 @@ final class GameplayChromeTextures implements AutoCloseable {
     return textures;
   }
 
+  private static void drawAt(ImmediateModeRenderer2d primitives, OpenGlTexture texture, float x, float y) {
+    if (texture == null) {
+      return;
+    }
+    primitives.drawTexturedQuad(texture, new ScreenRect(x, y, texture.width(), texture.height()));
+  }
+
+  private static void draw(ImmediateModeRenderer2d primitives, OpenGlTexture texture, ScreenRect rect) {
+    if (texture == null) {
+      return;
+    }
+    primitives.drawTexturedQuad(texture, rect);
+  }
+
   private static void closeTexture(OpenGlTexture texture) {
     if (texture != null) {
       texture.close();
+    }
+  }
+
+  private static void closeTextures(OpenGlTexture[] textures) {
+    for (OpenGlTexture texture : textures) {
+      closeTexture(texture);
+    }
+  }
+
+  private record FrameTextures(
+      OpenGlTexture backLeft1,
+      OpenGlTexture backLeft2,
+      OpenGlTexture backRight1,
+      OpenGlTexture backRight2,
+      OpenGlTexture backTop1,
+      OpenGlTexture backVmid1,
+      OpenGlTexture backVmid2,
+      OpenGlTexture backVmid3,
+      OpenGlTexture backHmid2,
+      OpenGlTexture invBack,
+      OpenGlTexture chatBack,
+      OpenGlTexture mapBack,
+      OpenGlTexture backBase1,
+      OpenGlTexture backBase2,
+      OpenGlTexture backHMid1
+  ) {
+
+    private static final FrameTextures EMPTY = new FrameTextures(
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+
+    private static FrameTextures empty() {
+      return EMPTY;
+    }
+
+    private static FrameTextures from(GameplayFrameAssets gameplayFrameAssets) {
+      return new FrameTextures(
+          requireTexture("backLeft1", gameplayFrameAssets.backLeft1()),
+          requireTexture("backLeft2", gameplayFrameAssets.backLeft2()),
+          requireTexture("backRight1", gameplayFrameAssets.backRight1()),
+          requireTexture("backRight2", gameplayFrameAssets.backRight2()),
+          requireTexture("backTop1", gameplayFrameAssets.backTop1()),
+          requireTexture("backVmid1", gameplayFrameAssets.backVmid1()),
+          requireTexture("backVmid2", gameplayFrameAssets.backVmid2()),
+          requireTexture("backVmid3", gameplayFrameAssets.backVmid3()),
+          requireTexture("backHmid2", gameplayFrameAssets.backHmid2()),
+          requireTexture("invBack", gameplayFrameAssets.invBack()),
+          requireTexture("chatBack", gameplayFrameAssets.chatBack()),
+          requireTexture("mapBack", gameplayFrameAssets.mapBack()),
+          requireTexture("backBase1", gameplayFrameAssets.backBase1()),
+          requireTexture("backBase2", gameplayFrameAssets.backBase2()),
+          requireTexture("backHMid1", gameplayFrameAssets.backHMid1())
+      );
+    }
+
+    private void close() {
+      closeTexture(backLeft1);
+      closeTexture(backLeft2);
+      closeTexture(backRight1);
+      closeTexture(backRight2);
+      closeTexture(backTop1);
+      closeTexture(backVmid1);
+      closeTexture(backVmid2);
+      closeTexture(backVmid3);
+      closeTexture(backHmid2);
+      closeTexture(invBack);
+      closeTexture(chatBack);
+      closeTexture(mapBack);
+      closeTexture(backBase1);
+      closeTexture(backBase2);
+      closeTexture(backHMid1);
+    }
+  }
+
+  private record TabHighlightTextures(
+      OpenGlTexture redstone1,
+      OpenGlTexture redstone2,
+      OpenGlTexture redstone3,
+      OpenGlTexture redstone1Flipped,
+      OpenGlTexture redstone2Flipped,
+      OpenGlTexture redstone1Mirrored,
+      OpenGlTexture redstone2Mirrored,
+      OpenGlTexture redstone3Mirrored,
+      OpenGlTexture redstone1BothTransforms,
+      OpenGlTexture redstone2BothTransforms
+  ) {
+
+    private static final TabHighlightTextures EMPTY = new TabHighlightTextures(
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+
+    private static TabHighlightTextures empty() {
+      return EMPTY;
+    }
+
+    private static TabHighlightTextures from(GameplayFrameAssets gameplayFrameAssets) {
+      return new TabHighlightTextures(
+          requireTexture("redstone1", gameplayFrameAssets.redstone1()),
+          requireTexture("redstone2", gameplayFrameAssets.redstone2()),
+          requireTexture("redstone3", gameplayFrameAssets.redstone3()),
+          requireTexture("redstone1Flipped", gameplayFrameAssets.redstone1Flipped()),
+          requireTexture("redstone2Flipped", gameplayFrameAssets.redstone2Flipped()),
+          requireTexture("redstone1Mirrored", gameplayFrameAssets.redstone1Mirrored()),
+          requireTexture("redstone2Mirrored", gameplayFrameAssets.redstone2Mirrored()),
+          requireTexture("redstone3Mirrored", gameplayFrameAssets.redstone3Mirrored()),
+          requireTexture("redstone1BothTransforms", gameplayFrameAssets.redstone1BothTransforms()),
+          requireTexture("redstone2BothTransforms", gameplayFrameAssets.redstone2BothTransforms())
+      );
+    }
+
+    private OpenGlTexture[] byTabIndex() {
+      return new OpenGlTexture[] {
+          redstone1,
+          redstone2,
+          redstone2,
+          redstone3,
+          redstone2Flipped,
+          redstone2Flipped,
+          redstone1Flipped,
+          redstone1Mirrored,
+          redstone2Mirrored,
+          redstone2Mirrored,
+          redstone3Mirrored,
+          redstone2BothTransforms,
+          redstone2BothTransforms,
+          redstone1BothTransforms
+      };
+    }
+
+    private void close() {
+      closeTexture(redstone1);
+      closeTexture(redstone2);
+      closeTexture(redstone3);
+      closeTexture(redstone1Flipped);
+      closeTexture(redstone2Flipped);
+      closeTexture(redstone1Mirrored);
+      closeTexture(redstone2Mirrored);
+      closeTexture(redstone3Mirrored);
+      closeTexture(redstone1BothTransforms);
+      closeTexture(redstone2BothTransforms);
     }
   }
 }

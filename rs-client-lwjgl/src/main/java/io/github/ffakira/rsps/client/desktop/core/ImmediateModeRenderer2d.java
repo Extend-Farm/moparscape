@@ -7,6 +7,7 @@ import org.lwjgl.stb.STBEasyFont;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_LINES;
 import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_QUADS;
@@ -219,6 +220,13 @@ public final class ImmediateModeRenderer2d {
     glVertex2f(left + width, top);
     glVertex2f(left + width, top + height);
     glVertex2f(left, top + height);
+    glEnd();
+  }
+
+  public void drawLine(float startX, float startY, float endX, float endY) {
+    glBegin(GL_LINES);
+    glVertex2f(startX, startY);
+    glVertex2f(endX, endY);
     glEnd();
   }
 

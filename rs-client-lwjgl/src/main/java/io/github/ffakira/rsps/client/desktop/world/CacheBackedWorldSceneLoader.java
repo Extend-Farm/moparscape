@@ -24,6 +24,8 @@ import io.github.ffakira.rsps.client.desktop.world.minimap.WorldSceneMinimapRast
 import io.github.ffakira.rsps.client.desktop.world.object.WorldSceneObject;
 import io.github.ffakira.rsps.client.desktop.world.object.WorldSceneObjectAssembler;
 import io.github.ffakira.rsps.client.desktop.world.terrain.BridgeTerrainLayer;
+import io.github.ffakira.rsps.client.desktop.world.terrain.FloorSurfaceColorResolver;
+import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainShadowResolver;
 import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainSurfaceElevationResolver;
 import io.github.ffakira.rsps.client.desktop.world.visibility.WorldSceneOccluder;
 import io.github.ffakira.rsps.client.desktop.world.visibility.WorldSceneOccluderBuilder;
@@ -45,20 +47,19 @@ public final class CacheBackedWorldSceneLoader {
   private static final int SCENE_TILE_SIZE = SCENE_REGION_SPAN * REGION_SIZE;
   private static final int TOP_LEVEL_ARCHIVE_STORE = 0;
   private static final int MAP_STORE_INDEX = 4;
-  private static final int DEFAULT_TILE_RGB = 0x2f3946;
-  private static final int WATER_TEXTURE_ID = 1;
-  private static final int WATER_SURFACE_RGB = 0x5a7ea3;
   private static final int TILE_HALF_WIDTH = 5;
   private static final int TILE_HALF_HEIGHT = 3;
   private static final int IMAGE_PADDING = 12;
   private static final int PLANE_COUNT = 4;
   private final ContentManifest manifest;
   private final FloorColorCatalog floorColors;
+  private final FloorSurfaceColorResolver floorSurfaceColorResolver;
   private final MapArchiveIndex mapArchiveIndex;
   private final WorldSceneObjectAssembler objectAssembler;
   private final WorldSceneOccluderBuilder occluderBuilder = new WorldSceneOccluderBuilder();
   private final WorldSceneMinimapRasterizer minimapRasterizer;
   private final TerrainSurfaceElevationResolver terrainSurfaceElevationResolver = new TerrainSurfaceElevationResolver();
+  private final TerrainShadowResolver terrainShadowResolver = new TerrainShadowResolver();
   private final TerrainRegionDecoder terrainRegionDecoder = new TerrainRegionDecoder();
   private final MapObjectRegionDecoder mapObjectRegionDecoder = new MapObjectRegionDecoder();
   private final Map<Integer, TerrainRegionData> terrainRegionsById = new HashMap<>();
@@ -81,6 +82,7 @@ public final class CacheBackedWorldSceneLoader {
     this.manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(workingDirectory);
     ContentArchiveSnapshot archiveSnapshot = new ContentArchiveCatalog().load(manifest);
     this.floorColors = FloorColorCatalog.parse(archiveSnapshot.readConfigEntry("flo.dat"));
+    this.floorSurfaceColorResolver = new FloorSurfaceColorResolver(floorColors);
     this.mapArchiveIndex = MapArchiveIndex.parse(archiveSnapshot.readUpdateListEntry("map_index"));
     ObjectDefinitionCatalog objectDefinitions = ObjectDefinitionCatalog.parse(
         archiveSnapshot.readConfigEntry("loc.idx"),
@@ -109,6 +111,8 @@ public final class CacheBackedWorldSceneLoader {
     int startRegionY = sceneStartRegion(worldPoint.y());
     int originWorldX = startRegionX << 6;
     int originWorldY = startRegionY << 6;
+    int[] underlayIds = new int[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
+    int[] overlayIds = new int[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
     int[] tileColors = new int[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
     int[] underlayColors = new int[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
     int[] overlayColors = new int[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
@@ -119,6 +123,8 @@ public final class CacheBackedWorldSceneLoader {
     byte[] overlayShapes = new byte[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
     byte[] overlayRotations = new byte[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
     byte[] tileFlags = new byte[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
+    int[] bridgeLowerUnderlayIds = new int[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
+    int[] bridgeLowerOverlayIds = new int[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
     int[] bridgeLowerTileColors = new int[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
     int[] bridgeLowerUnderlayColors = new int[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
     int[] bridgeLowerOverlayColors = new int[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
@@ -142,19 +148,13 @@ public final class CacheBackedWorldSceneLoader {
         captureRegion(
             regionData,
             worldPoint.plane(),
-            tileColors,
-            underlayColors,
-            overlayColors,
-            underlayTextureIds,
-            overlayTextureIds,
+            underlayIds,
+            overlayIds,
             overlayShapes,
             overlayRotations,
             tileFlags,
-            bridgeLowerTileColors,
-            bridgeLowerUnderlayColors,
-            bridgeLowerOverlayColors,
-            bridgeLowerUnderlayTextureIds,
-            bridgeLowerOverlayTextureIds,
+            bridgeLowerUnderlayIds,
+            bridgeLowerOverlayIds,
             bridgeLowerOverlayShapes,
             bridgeLowerOverlayRotations,
             bridgeLowerActiveTiles,
@@ -167,6 +167,29 @@ public final class CacheBackedWorldSceneLoader {
         captureObjects(regionData, objectRegionData, worldPoint.plane(), originWorldX, originWorldY, sceneObjects);
       }
     }
+    floorSurfaceColorResolver.resolveSceneColors(
+        SCENE_TILE_SIZE,
+        SCENE_TILE_SIZE,
+        underlayIds,
+        overlayIds,
+        underlayColors,
+        overlayColors,
+        underlayTextureIds,
+        overlayTextureIds,
+        tileColors
+    );
+    floorSurfaceColorResolver.resolveSceneColors(
+        SCENE_TILE_SIZE,
+        SCENE_TILE_SIZE,
+        bridgeLowerUnderlayIds,
+        bridgeLowerOverlayIds,
+        bridgeLowerUnderlayColors,
+        bridgeLowerOverlayColors,
+        bridgeLowerUnderlayTextureIds,
+        bridgeLowerOverlayTextureIds,
+        bridgeLowerTileColors
+    );
+    byte[] terrainShadows = terrainShadowResolver.resolve(SCENE_TILE_SIZE, SCENE_TILE_SIZE, sceneObjects);
     // Visible bridge/water seams are shared-corner problems. The loader now keeps per-plane
     // height samples through region capture and resolves the final scene-local corner height from
     // the adjacent visible surfaces afterwards instead of flattening each point to one tile plane.
@@ -208,6 +231,7 @@ public final class CacheBackedWorldSceneLoader {
         overlayTextureIds,
         overlayShapes,
         overlayRotations,
+        terrainShadows,
         sceneObjects
     );
 
@@ -227,6 +251,7 @@ public final class CacheBackedWorldSceneLoader {
         overlayShapes,
         overlayRotations,
         tileFlags,
+        terrainShadows,
         sceneObjects,
         occluders,
         image,
@@ -300,19 +325,13 @@ public final class CacheBackedWorldSceneLoader {
   private void captureRegion(
       TerrainRegionData regionData,
       int plane,
-      int[] tileColors,
-      int[] underlayColors,
-      int[] overlayColors,
-      int[] underlayTextureIds,
-      int[] overlayTextureIds,
+      int[] underlayIds,
+      int[] overlayIds,
       byte[] overlayShapes,
       byte[] overlayRotations,
       byte[] tileFlags,
-      int[] bridgeLowerTileColors,
-      int[] bridgeLowerUnderlayColors,
-      int[] bridgeLowerOverlayColors,
-      int[] bridgeLowerUnderlayTextureIds,
-      int[] bridgeLowerOverlayTextureIds,
+      int[] bridgeLowerUnderlayIds,
+      int[] bridgeLowerOverlayIds,
       byte[] bridgeLowerOverlayShapes,
       byte[] bridgeLowerOverlayRotations,
       byte[] bridgeLowerActiveTiles,
@@ -339,11 +358,8 @@ public final class CacheBackedWorldSceneLoader {
           heightSamplesByPlane[samplePlane][sceneIndex] = tileElevation(regionData, samplePlane, tileX, tileY);
         }
         surfacePlanes[sceneIndex] = (byte) surfacePlane;
-        underlayColors[sceneIndex] = tileUnderlayColor(regionData, surfacePlane, tileX, tileY);
-        overlayColors[sceneIndex] = tileOverlayColor(regionData, surfacePlane, tileX, tileY);
-        underlayTextureIds[sceneIndex] = tileUnderlayTextureId(regionData, surfacePlane, tileX, tileY);
-        overlayTextureIds[sceneIndex] = tileOverlayTextureId(regionData, surfacePlane, tileX, tileY);
-        tileColors[sceneIndex] = tileActiveColor(underlayColors[sceneIndex], overlayColors[sceneIndex]);
+        underlayIds[sceneIndex] = regionData.underlayIdAt(surfacePlane, tileX, tileY);
+        overlayIds[sceneIndex] = regionData.overlayIdAt(surfacePlane, tileX, tileY);
         overlayShapes[sceneIndex] = (byte) regionData.overlayShapeAt(surfacePlane, tileX, tileY);
         overlayRotations[sceneIndex] = (byte) regionData.overlayRotationAt(surfacePlane, tileX, tileY);
         tileFlags[sceneIndex] = (byte) regionData.tileFlagAt(plane, tileX, tileY);
@@ -353,11 +369,8 @@ public final class CacheBackedWorldSceneLoader {
             tileX,
             tileY,
             sceneIndex,
-            bridgeLowerTileColors,
-            bridgeLowerUnderlayColors,
-            bridgeLowerOverlayColors,
-            bridgeLowerUnderlayTextureIds,
-            bridgeLowerOverlayTextureIds,
+            bridgeLowerUnderlayIds,
+            bridgeLowerOverlayIds,
             bridgeLowerOverlayShapes,
             bridgeLowerOverlayRotations,
             bridgeLowerActiveTiles
@@ -409,38 +422,6 @@ public final class CacheBackedWorldSceneLoader {
     }
   }
 
-  private int tileUnderlayColor(TerrainRegionData regionData, int plane, int tileX, int tileY) {
-    return floorColors.colorFor(regionData.underlayIdAt(plane, tileX, tileY));
-  }
-
-  private int tileOverlayColor(TerrainRegionData regionData, int plane, int tileX, int tileY) {
-    int overlayId = regionData.overlayIdAt(plane, tileX, tileY);
-    int textureId = floorColors.textureIdFor(overlayId);
-    int rgb = floorColors.colorFor(overlayId);
-    if (rgb == 0 && textureId == WATER_TEXTURE_ID) {
-      rgb = WATER_SURFACE_RGB;
-    }
-    return rgb;
-  }
-
-  private int tileUnderlayTextureId(TerrainRegionData regionData, int plane, int tileX, int tileY) {
-    return floorColors.textureIdFor(regionData.underlayIdAt(plane, tileX, tileY));
-  }
-
-  private int tileOverlayTextureId(TerrainRegionData regionData, int plane, int tileX, int tileY) {
-    return floorColors.textureIdFor(regionData.overlayIdAt(plane, tileX, tileY));
-  }
-
-  private int tileActiveColor(int underlayColor, int overlayColor) {
-    if (overlayColor != 0) {
-      return overlayColor;
-    }
-    if (underlayColor != 0) {
-      return underlayColor;
-    }
-    return DEFAULT_TILE_RGB;
-  }
-
   private int tileElevation(TerrainRegionData regionData, int plane, int tileX, int tileY) {
     return Math.max(0, -regionData.heightAt(plane, tileX, tileY) / 12);
   }
@@ -451,11 +432,8 @@ public final class CacheBackedWorldSceneLoader {
       int tileX,
       int tileY,
       int sceneIndex,
-      int[] bridgeLowerTileColors,
-      int[] bridgeLowerUnderlayColors,
-      int[] bridgeLowerOverlayColors,
-      int[] bridgeLowerUnderlayTextureIds,
-      int[] bridgeLowerOverlayTextureIds,
+      int[] bridgeLowerUnderlayIds,
+      int[] bridgeLowerOverlayIds,
       byte[] bridgeLowerOverlayShapes,
       byte[] bridgeLowerOverlayRotations,
       byte[] bridgeLowerActiveTiles
@@ -466,14 +444,8 @@ public final class CacheBackedWorldSceneLoader {
         || !hasSurfaceData(regionData, 0, tileX, tileY)) {
       return;
     }
-    bridgeLowerUnderlayColors[sceneIndex] = tileUnderlayColor(regionData, 0, tileX, tileY);
-    bridgeLowerOverlayColors[sceneIndex] = tileOverlayColor(regionData, 0, tileX, tileY);
-    bridgeLowerUnderlayTextureIds[sceneIndex] = tileUnderlayTextureId(regionData, 0, tileX, tileY);
-    bridgeLowerOverlayTextureIds[sceneIndex] = tileOverlayTextureId(regionData, 0, tileX, tileY);
-    bridgeLowerTileColors[sceneIndex] = tileActiveColor(
-        bridgeLowerUnderlayColors[sceneIndex],
-        bridgeLowerOverlayColors[sceneIndex]
-    );
+    bridgeLowerUnderlayIds[sceneIndex] = regionData.underlayIdAt(0, tileX, tileY);
+    bridgeLowerOverlayIds[sceneIndex] = regionData.overlayIdAt(0, tileX, tileY);
     bridgeLowerOverlayShapes[sceneIndex] = (byte) regionData.overlayShapeAt(0, tileX, tileY);
     bridgeLowerOverlayRotations[sceneIndex] = (byte) regionData.overlayRotationAt(0, tileX, tileY);
     bridgeLowerActiveTiles[sceneIndex] = 1;
@@ -564,6 +536,7 @@ public final class CacheBackedWorldSceneLoader {
       int[] overlayTextureIds,
       byte[] overlayShapes,
       byte[] overlayRotations,
+      byte[] shadowSamples,
       List<WorldSceneObject> sceneObjects
   ) {
     // Legacy minimap rendering is tile-first: it paints 4x4 tile blocks from floor data, then
@@ -580,6 +553,7 @@ public final class CacheBackedWorldSceneLoader {
         overlayTextureIds,
         overlayShapes,
         overlayRotations,
+        shadowSamples,
         sceneObjects
     );
   }

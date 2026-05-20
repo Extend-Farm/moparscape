@@ -1,5 +1,7 @@
 package io.github.ffakira.rsps.client.desktop.core;
 
+import io.github.ffakira.rsps.client.core.ClientCore;
+import io.github.ffakira.rsps.client.core.GameplayClientSession;
 import io.github.ffakira.rsps.cache.RawModelRepository;
 import io.github.ffakira.rsps.client.desktop.character.CharacterModelAssembler;
 import io.github.ffakira.rsps.client.desktop.gameplay.GameplayFrameAssetLoader;
@@ -15,14 +17,82 @@ import io.github.ffakira.rsps.persistence.AccountRepository;
 import io.github.ffakira.rsps.persistence.CharacterRepository;
 import io.github.ffakira.rsps.persistence.sql.PostgresAccountRepository;
 import io.github.ffakira.rsps.persistence.sql.PostgresCharacterRepository;
+import io.github.ffakira.rsps.protocol.ServerMessage;
 import io.github.ffakira.rsps.persistence.sql.SqlPersistenceEnvironment;
 import io.github.ffakira.rsps.server.runtime.CharacterFileRepository;
+import io.github.ffakira.rsps.server.runtime.InProcessServerRuntime;
+import io.github.ffakira.rsps.server.runtime.PlayerSessionActor;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.BiConsumer;
 
 final class NativeClientBootstrap {
 
   private NativeClientBootstrap() {
+  }
+
+  static NativeClientAssets loadAssets(Path workingDirectory) {
+    return loadAssets(workingDirectory, loadTitleScreenAssets(workingDirectory), null);
+  }
+
+  static NativeClientAssets loadAssets(
+      Path workingDirectory,
+      TitleScreenAssets titleScreenAssets,
+      BiConsumer<Integer, String> progressListener
+  ) {
+    BiConsumer<Integer, String> progress = progressListener == null ? (percent, status) -> {
+    } : progressListener;
+
+    progress.accept(15, "Unpacking game frame");
+    GameplayFrameAssets gameplayFrameAssets = loadGameplayFrameAssets(workingDirectory);
+    progress.accept(30, "Loading scene textures");
+    SceneTextureAssets sceneTextureAssets = loadSceneTextureAssets(workingDirectory);
+    progress.accept(45, "Loading item definitions");
+    ItemDefinitionCatalog itemDefinitionCatalog = loadItemDefinitionCatalog(workingDirectory);
+    progress.accept(60, "Preparing item icons");
+    ItemIconRenderer itemIconRenderer =
+        createItemIconRenderer(workingDirectory, itemDefinitionCatalog, sceneTextureAssets);
+    progress.accept(75, "Preparing character models");
+    CharacterModelAssembler characterModelAssembler =
+        createCharacterModelAssembler(workingDirectory, itemDefinitionCatalog);
+    progress.accept(90, "Loading world scene cache");
+    CacheBackedWorldSceneLoader worldSceneLoader = createWorldSceneLoader(workingDirectory);
+    return new NativeClientAssets(
+        titleScreenAssets,
+        gameplayFrameAssets,
+        sceneTextureAssets,
+        itemDefinitionCatalog,
+        itemIconRenderer,
+        characterModelAssembler,
+        worldSceneLoader
+    );
+  }
+
+  static NativeClientRuntimeContext openRuntimeContext(Path workingDirectory, String clientDescriptor) {
+    RepositoryPair repositories = createRepositories(workingDirectory);
+    InProcessProtocolBridge protocolBridge = new InProcessProtocolBridge();
+    ConcurrentLinkedQueue<ServerMessage> inboundMessages = new ConcurrentLinkedQueue<>();
+    protocolBridge.bindInbound(inboundMessages::add);
+
+    InProcessServerRuntime runtime =
+        new InProcessServerRuntime(repositories.accountRepository(), repositories.characterRepository());
+    GameplayClientSession gameplayClientSession = null;
+    try {
+      PlayerSessionActor playerSessionActor = runtime.openSession(protocolBridge);
+      protocolBridge.bindOutbound(playerSessionActor::accept);
+
+      gameplayClientSession = new GameplayClientSession(new ClientCore(), protocolBridge, clientDescriptor);
+      gameplayClientSession.bootstrap();
+      gameplayClientSession.connect();
+      return new NativeClientRuntimeContext(runtime, gameplayClientSession, inboundMessages);
+    } catch (RuntimeException | Error exception) {
+      if (gameplayClientSession != null) {
+        gameplayClientSession.close();
+      }
+      runtime.close();
+      throw exception;
+    }
   }
 
   static TitleScreenAssets loadTitleScreenAssets(Path workingDirectory) {

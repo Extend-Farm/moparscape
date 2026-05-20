@@ -17,11 +17,49 @@ public record WorldSceneObject(
     int mapFunctionId,
     List<Integer> modelIds,
     boolean allowFallbackProxy,
+    boolean castsShadow,
     WorldSceneObjectGeometry geometry
 ) {
 
   public WorldSceneObject {
     modelIds = List.copyOf(modelIds);
+  }
+
+  public WorldSceneObject(
+      int objectId,
+      String name,
+      int localX,
+      int localY,
+      int plane,
+      int type,
+      int orientation,
+      int sizeX,
+      int sizeY,
+      boolean contouredGround,
+      int mapSceneId,
+      int mapFunctionId,
+      List<Integer> modelIds,
+      boolean allowFallbackProxy,
+      WorldSceneObjectGeometry geometry
+  ) {
+    this(
+        objectId,
+        name,
+        localX,
+        localY,
+        plane,
+        type,
+        orientation,
+        sizeX,
+        sizeY,
+        contouredGround,
+        mapSceneId,
+        mapFunctionId,
+        modelIds,
+        allowFallbackProxy,
+        true,
+        geometry
+    );
   }
 
   public float centerX() {

@@ -21,4 +21,8 @@ public interface TerrainLayerSource {
   int overlayShapeAt(int localX, int localY);
 
   int overlayRotationAt(int localX, int localY);
+
+  default int shadowAt(int localX, int localY) {
+    return 0;
+  }
 }

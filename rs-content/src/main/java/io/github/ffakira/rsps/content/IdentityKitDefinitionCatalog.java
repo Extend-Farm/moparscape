@@ -8,8 +8,6 @@ public final class IdentityKitDefinitionCatalog {
 
   private static final String IDENTITY_KIT_ENTRY = "idk.dat";
 
-  private static final int[] DEFAULT_MALE_KIT_IDS = {7, 25, 29, 35, 39, 44};
-
   private final IdentityKitDefinition[] definitionsById;
 
   private IdentityKitDefinitionCatalog(IdentityKitDefinition[] definitionsById) {
@@ -43,10 +41,10 @@ public final class IdentityKitDefinitionCatalog {
   }
 
   public int defaultBodyKitId(int bodyPartIndex, boolean female) {
-    if (!female && bodyPartIndex >= 0 && bodyPartIndex < DEFAULT_MALE_KIT_IDS.length) {
-      return DEFAULT_MALE_KIT_IDS[bodyPartIndex];
+    int targetBodyPartId = targetVisibleBodyPartId(bodyPartIndex, female);
+    if (targetBodyPartId < 0) {
+      return -1;
     }
-    int targetBodyPartId = female ? bodyPartIndex + 7 : bodyPartIndex;
     for (int id = 0; id < definitionsById.length; id++) {
       IdentityKitDefinition definition = definitionsById[id];
       if (definition == null || definition.nonSelectable()) {
@@ -57,6 +55,22 @@ public final class IdentityKitDefinitionCatalog {
       }
     }
     return -1;
+  }
+
+  private int targetVisibleBodyPartId(int bodyPartIndex, boolean female) {
+    int baseBodyPartId = switch (bodyPartIndex) {
+      case 0 -> 0;
+      case 1 -> 2;
+      case 2 -> 3;
+      case 3 -> 4;
+      case 4 -> 5;
+      case 5 -> 6;
+      default -> -1;
+    };
+    if (baseBodyPartId < 0) {
+      return -1;
+    }
+    return female ? baseBodyPartId + 7 : baseBodyPartId;
   }
 
   private static IdentityKitDefinition parseDefinition(int id, ContentDataReader reader) {

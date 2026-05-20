@@ -11,10 +11,17 @@ public final class TitleScreenRenderer implements AutoCloseable {
 
   private static final float TITLE_SCREEN_WIDTH = 765.0f;
   private static final float TITLE_SCREEN_HEIGHT = 503.0f;
-  private static final float LEFT_FLAME_X = 0.0f;
+  private static final long FLAME_FRAME_INTERVAL_NANOS = 40_000_000L;
+  private static final float LEFT_FLAME_X = -20.0f;
   private static final float LEFT_FLAME_Y = 0.0f;
   private static final float RIGHT_FLAME_X = 637.0f;
   private static final float RIGHT_FLAME_Y = 0.0f;
+  private static final float LOADING_HEADER_Y = 228.0f;
+  private static final float LOADING_BAR_LEFT = 232.0f;
+  private static final float LOADING_BAR_TOP = 253.0f;
+  private static final float LOADING_BAR_WIDTH = 301.0f;
+  private static final float LOADING_BAR_HEIGHT = 33.0f;
+  private static final String LOADING_HEADING = "MoparScape is loading - Hold onto your butts...";
 
   private final ImmediateModeRenderer2d primitives;
   private final TitleScreenAssets titleScreenAssets;
@@ -27,6 +34,8 @@ public final class TitleScreenRenderer implements AutoCloseable {
   private final TitleScreenFlameAnimator titleScreenFlameAnimator;
   private final OpenGlTexture leftFlameTexture;
   private final OpenGlTexture rightFlameTexture;
+  private TitleScreenFlameFrame cachedFlameFrame;
+  private long lastFlameFrameNanos;
   private LoginScreenState loginScreenState =
       new LoginScreenState(TitleScreenStage.WELCOME, "", "", LoginField.USERNAME);
 
@@ -44,11 +53,7 @@ public final class TitleScreenRenderer implements AutoCloseable {
     this.titleTextOverlayTexture = titleScreenAssets == null ? null : OpenGlTexture.create((int) TITLE_SCREEN_WIDTH, (int) TITLE_SCREEN_HEIGHT);
     this.titleScreenFlameAnimator = titleScreenAssets == null
         ? null
-        : new TitleScreenFlameAnimator(
-            titleScreenAssets.runeMasks(),
-            crop(composedBackground, 0, 0, 128, 265),
-            crop(composedBackground, 637, 0, 128, 265)
-        );
+        : new TitleScreenFlameAnimator(titleScreenAssets.runeMasks());
     this.leftFlameTexture = titleScreenAssets == null ? null : OpenGlTexture.create(128, 265);
     this.rightFlameTexture = titleScreenAssets == null ? null : OpenGlTexture.create(128, 265);
   }
@@ -78,7 +83,9 @@ public final class TitleScreenRenderer implements AutoCloseable {
     primitives.drawTexturedQuad(backgroundTexture, layout.background());
     drawTitleScreenFlames(layout);
     primitives.drawTexturedQuad(logoTexture, layout.logo());
-    primitives.drawTexturedQuad(titleBoxTexture, layout.titleBox());
+    if (loginScreenState.stage() != TitleScreenStage.LOADING) {
+      primitives.drawTexturedQuad(titleBoxTexture, layout.titleBox());
+    }
     drawTitleScreenButtons(layout);
     drawTitleScreenTextOverlay(viewModel, layout);
   }
@@ -87,19 +94,32 @@ public final class TitleScreenRenderer implements AutoCloseable {
     if (titleScreenFlameAnimator == null || leftFlameTexture == null || rightFlameTexture == null) {
       return;
     }
-    TitleScreenFlameFrame flameFrame = titleScreenFlameAnimator.renderNextFrame();
+    TitleScreenFlameFrame flameFrame = currentFlameFrame();
     leftFlameTexture.update(flameFrame.leftPanel());
     rightFlameTexture.update(flameFrame.rightPanel());
 
     float scale = layout.background().width() / TITLE_SCREEN_WIDTH;
     float rootLeft = layout.background().left();
     float rootTop = layout.background().top();
+    // The overlay still needs to sit on the original fixed side-panel anchors so it lines up with
+    // the braziers in the composed title background.
     primitives.drawTexturedQuad(leftFlameTexture, scaledRect(rootLeft, rootTop, LEFT_FLAME_X, LEFT_FLAME_Y, 128.0f, 265.0f, scale));
     primitives.drawTexturedQuad(rightFlameTexture, scaledRect(rootLeft, rootTop, RIGHT_FLAME_X, RIGHT_FLAME_Y, 128.0f, 265.0f, scale));
   }
 
+  private TitleScreenFlameFrame currentFlameFrame() {
+    long now = System.nanoTime();
+    if (cachedFlameFrame == null || now - lastFlameFrameNanos >= FLAME_FRAME_INTERVAL_NANOS) {
+      cachedFlameFrame = titleScreenFlameAnimator.renderNextFrame();
+      lastFlameFrameNanos = now;
+    }
+    return cachedFlameFrame;
+  }
+
   private void drawTitleScreenButtons(TitleScreenLayout layout) {
     switch (loginScreenState.stage()) {
+      case LOADING -> {
+      }
       case WELCOME, CREDENTIALS -> {
         if (loginScreenState.stage() == TitleScreenStage.WELCOME) {
           primitives.drawTexturedQuad(titleButtonTexture, layout.infoButton());
@@ -136,6 +156,7 @@ public final class TitleScreenRenderer implements AutoCloseable {
     );
 
     switch (loginScreenState.stage()) {
+      case LOADING -> drawFallbackLoadingScreen(viewModel.statusText(), layout);
       case WELCOME -> {
         primitives.drawCenteredText(
             layout.titleBox().left() + layout.titleBox().width() / 2.0f,
@@ -182,6 +203,43 @@ public final class TitleScreenRenderer implements AutoCloseable {
         drawFallbackButton(layout.exitButton(), "EXIT", false);
       }
     }
+  }
+
+  private void drawFallbackLoadingScreen(String statusText, TitleScreenLayout layout) {
+    float scale = layout.background().width() / TITLE_SCREEN_WIDTH;
+    float rootLeft = layout.background().left();
+    float rootTop = layout.background().top();
+    ScreenRect loadingBar = scaledRect(rootLeft, rootTop, LOADING_BAR_LEFT, LOADING_BAR_TOP, LOADING_BAR_WIDTH, LOADING_BAR_HEIGHT, scale);
+    float centeredTextX = rootLeft + TITLE_SCREEN_WIDTH * scale / 2.0f;
+
+    primitives.drawCenteredText(
+        centeredTextX,
+        rootTop + LOADING_HEADER_Y * scale,
+        LOADING_HEADING,
+        0.92f,
+        0.94f,
+        0.98f
+    );
+
+    org.lwjgl.opengl.GL11.glColor3f(0.0f, 0.0f, 0.0f);
+    primitives.drawQuad(loadingBar.left(), loadingBar.top(), loadingBar.width(), loadingBar.height());
+    org.lwjgl.opengl.GL11.glColor3f(0.55f, 0.07f, 0.07f);
+    primitives.drawOutline(loadingBar.left(), loadingBar.top(), loadingBar.width(), loadingBar.height());
+
+    float filledWidth = Math.max(0.0f, (loadingBar.width() - 2.0f) * loginScreenState.loadingPercent() / 100.0f);
+    if (filledWidth > 0.0f) {
+      org.lwjgl.opengl.GL11.glColor3f(0.49f, 0.0f, 0.0f);
+      primitives.drawQuad(loadingBar.left() + 1.0f, loadingBar.top() + 1.0f, filledWidth, loadingBar.height() - 2.0f);
+    }
+
+    primitives.drawCenteredText(
+        loadingBar.left() + loadingBar.width() / 2.0f,
+        loadingBar.top() + loadingBar.height() / 2.0f + 5.0f,
+        statusText == null || statusText.isBlank() ? "Preparing native client..." : statusText,
+        0.95f,
+        0.95f,
+        0.95f
+    );
   }
 
   private void drawTitleScreenTextOverlay(ClientViewModel viewModel, TitleScreenLayout layout) {
@@ -262,15 +320,6 @@ public final class TitleScreenRenderer implements AutoCloseable {
         designWidth * scale,
         designHeight * scale
     );
-  }
-
-  private static ArgbImage crop(ArgbImage image, int left, int top, int cropWidth, int cropHeight) {
-    int[] pixels = new int[cropWidth * cropHeight];
-    for (int y = 0; y < cropHeight; y++) {
-      int sourceOffset = (top + y) * image.width() + left;
-      System.arraycopy(image.pixels(), sourceOffset, pixels, y * cropWidth, cropWidth);
-    }
-    return new ArgbImage(cropWidth, cropHeight, pixels);
   }
 
   @Override

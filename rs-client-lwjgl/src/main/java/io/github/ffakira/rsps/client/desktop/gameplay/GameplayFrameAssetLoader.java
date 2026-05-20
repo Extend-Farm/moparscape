@@ -30,6 +30,7 @@ public final class GameplayFrameAssetLoader {
       }
       ArgbImage[] mapFunctionIcons = spriteDecoder.decodeSprites(mediaArchive, "mapfunction", false);
       ArgbImage[] mapDotIcons = spriteDecoder.decodeSprites(mediaArchive, "mapdots", false);
+      ArgbImage[] clickCrosses = optionalSprites(spriteDecoder, mediaArchive, "cross");
       ArgbImage redstone1 = spriteDecoder.decodeSprite(mediaArchive, "redstone1", 0, false);
       ArgbImage redstone2 = spriteDecoder.decodeSprite(mediaArchive, "redstone2", 0, false);
       ArgbImage redstone3 = spriteDecoder.decodeSprite(mediaArchive, "redstone3", 0, false);
@@ -71,10 +72,23 @@ public final class GameplayFrameAssetLoader {
           ArgbImageTransforms.flipVertically(redstone2Flipped),
           sideIcons,
           mapFunctionIcons,
-          mapDotIcons
+          mapDotIcons,
+          clickCrosses
       );
     } catch (Exception exception) {
       throw new IllegalStateException("Failed to load gameplay frame assets from media archive", exception);
+    }
+  }
+
+  private static ArgbImage[] optionalSprites(
+      TitleArchiveSpriteDecoder spriteDecoder,
+      CacheArchiveContainer archive,
+      String entryName
+  ) {
+    try {
+      return spriteDecoder.decodeSprites(archive, entryName, false);
+    } catch (Exception ignored) {
+      return new ArgbImage[0];
     }
   }
 }

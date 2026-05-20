@@ -253,19 +253,71 @@ public final class WorldSceneSubmissionBuilder {
     float baseHeight = sampleObjectBaseHeight(worldScene, worldSceneObject, maxX, maxZ);
     float objectHeight = fallbackObjectHeight(worldSceneObject);
     float topHeight = baseHeight + objectHeight;
-
-    float widthAdjustment = worldSceneObject.type() <= 3 ? 0.18f : 0.0f;
-    if (worldSceneObject.type() <= 3) {
-      if ((worldSceneObject.orientation() & 1) == 0) {
-        minX += widthAdjustment;
-        maxX -= widthAdjustment;
-      } else {
-        minZ += widthAdjustment;
-        maxZ -= widthAdjustment;
-      }
+    int objectColor = fallbackObjectColor(worldSceneObject);
+    if (isStraightWallType(worldSceneObject.type())) {
+      appendEdgeWallFallback(
+          builder,
+          minX,
+          maxX,
+          minZ,
+          maxZ,
+          baseHeight,
+          topHeight,
+          worldSceneObject.orientation(),
+          fallbackWallThickness(worldSceneObject),
+          objectColor
+      );
+      return;
     }
-
-    appendCuboid(builder, minX, maxX, minZ, maxZ, baseHeight, topHeight, fallbackObjectColor(worldSceneObject));
+    if (worldSceneObject.type() == 2) {
+      float wallThickness = fallbackWallThickness(worldSceneObject);
+      appendEdgeWallFallback(
+          builder,
+          minX,
+          maxX,
+          minZ,
+          maxZ,
+          baseHeight,
+          topHeight,
+          worldSceneObject.orientation(),
+          wallThickness,
+          objectColor
+      );
+      appendEdgeWallFallback(
+          builder,
+          minX,
+          maxX,
+          minZ,
+          maxZ,
+          baseHeight,
+          topHeight,
+          worldSceneObject.orientation() + 1,
+          wallThickness,
+          objectColor
+      );
+      return;
+    }
+    if (isCornerWallType(worldSceneObject.type())) {
+      appendCornerPostFallback(
+          builder,
+          minX,
+          maxX,
+          minZ,
+          maxZ,
+          baseHeight,
+          topHeight,
+          worldSceneObject.orientation(),
+          fallbackWallThickness(worldSceneObject),
+          objectColor
+      );
+      return;
+    }
+    if (isLargeStructureType(worldSceneObject.type())
+        && (worldSceneObject.sizeX() > 1 || worldSceneObject.sizeY() > 1)) {
+      appendPerimeterFallback(builder, minX, maxX, minZ, maxZ, baseHeight, topHeight, objectColor);
+      return;
+    }
+    appendCuboid(builder, minX, maxX, minZ, maxZ, baseHeight, topHeight, objectColor);
   }
 
   private SceneTriangleMesh buildFallbackActorMesh(
@@ -447,12 +499,70 @@ public final class WorldSceneSubmissionBuilder {
     return worldScene.elevationAt(clampedX, clampedY) * WorldSceneScale.HEIGHT_SCALE;
   }
 
-  private int fallbackObjectHeight(WorldSceneObject worldSceneObject) {
+  private void appendPerimeterFallback(
+      SceneTriangleMeshBuilder builder,
+      float minX,
+      float maxX,
+      float minZ,
+      float maxZ,
+      float baseHeight,
+      float topHeight,
+      int rgb
+  ) {
+    float thickness = Math.min(0.18f, Math.min((maxX - minX) * 0.25f, (maxZ - minZ) * 0.25f));
+    appendCuboid(builder, minX, minX + thickness, minZ, maxZ, baseHeight, topHeight, rgb);
+    appendCuboid(builder, maxX - thickness, maxX, minZ, maxZ, baseHeight, topHeight, rgb);
+    appendCuboid(builder, minX + thickness, maxX - thickness, minZ, minZ + thickness, baseHeight, topHeight, rgb);
+    appendCuboid(builder, minX + thickness, maxX - thickness, maxZ - thickness, maxZ, baseHeight, topHeight, rgb);
+  }
+
+  private void appendEdgeWallFallback(
+      SceneTriangleMeshBuilder builder,
+      float minX,
+      float maxX,
+      float minZ,
+      float maxZ,
+      float baseHeight,
+      float topHeight,
+      int orientation,
+      float thickness,
+      int rgb
+  ) {
+    switch (orientation & 3) {
+      case 0 -> appendCuboid(builder, minX, minX + thickness, minZ, maxZ, baseHeight, topHeight, rgb);
+      case 1 -> appendCuboid(builder, minX, maxX, maxZ - thickness, maxZ, baseHeight, topHeight, rgb);
+      case 2 -> appendCuboid(builder, maxX - thickness, maxX, minZ, maxZ, baseHeight, topHeight, rgb);
+      default -> appendCuboid(builder, minX, maxX, minZ, minZ + thickness, baseHeight, topHeight, rgb);
+    }
+  }
+
+  private void appendCornerPostFallback(
+      SceneTriangleMeshBuilder builder,
+      float minX,
+      float maxX,
+      float minZ,
+      float maxZ,
+      float baseHeight,
+      float topHeight,
+      int orientation,
+      float thickness,
+      int rgb
+  ) {
+    switch (orientation & 3) {
+      case 0 -> appendCuboid(builder, minX, minX + thickness, maxZ - thickness, maxZ, baseHeight, topHeight, rgb);
+      case 1 -> appendCuboid(builder, maxX - thickness, maxX, maxZ - thickness, maxZ, baseHeight, topHeight, rgb);
+      case 2 -> appendCuboid(builder, maxX - thickness, maxX, minZ, minZ + thickness, baseHeight, topHeight, rgb);
+      default -> appendCuboid(builder, minX, minX + thickness, minZ, minZ + thickness, baseHeight, topHeight, rgb);
+    }
+  }
+
+  private float fallbackObjectHeight(WorldSceneObject worldSceneObject) {
     return switch (worldSceneObject.type()) {
-      case 0, 1, 2, 3 -> 2;
-      case 22 -> 0;
-      case 4, 5, 6, 7, 8 -> 1;
-      default -> 1;
+      case 0, 1, 2, 3 -> 1.9f;
+      case 10, 11 -> 2.4f;
+      case 12, 13, 14, 15, 16, 17 -> 2.0f;
+      case 22 -> 0.25f;
+      default -> 1.0f;
     };
   }
 
@@ -484,6 +594,32 @@ public final class WorldSceneSubmissionBuilder {
       return 0x6f665d;
     }
     return hashedColor(worldSceneObject.objectId(), 0x5e4f39, 0xa88d63);
+  }
+
+  private boolean isStraightWallType(int objectType) {
+    return objectType == 0;
+  }
+
+  private boolean isCornerWallType(int objectType) {
+    return objectType == 1 || objectType == 3;
+  }
+
+  private boolean isLargeStructureType(int objectType) {
+    return switch (objectType) {
+      case 9, 10, 11, 12, 13, 14, 15, 16, 17 -> true;
+      default -> false;
+    };
+  }
+
+  private float fallbackWallThickness(WorldSceneObject worldSceneObject) {
+    String lowercaseName = worldSceneObject.name().toLowerCase();
+    if (lowercaseName.contains("door") || lowercaseName.contains("gate")) {
+      return 0.12f;
+    }
+    if (lowercaseName.contains("fence")) {
+      return 0.10f;
+    }
+    return 0.18f;
   }
 
   private int shade(int rgb, float factor) {

@@ -20,9 +20,9 @@ class GameplayCameraControllerTest {
 
     assertThat(initial.yawOffsetDegrees()).isEqualTo(GameplayCameraController.DEFAULT_YAW_OFFSET_DEGREES);
     assertThat(initial.pitchOffsetDegrees()).isEqualTo(GameplayCameraController.DEFAULT_PITCH_OFFSET_DEGREES);
-    assertThat(smoothed.yawOffsetDegrees()).isBetween(-34.0f, -32.0f);
+    assertThat(smoothed.yawOffsetDegrees()).isBetween(56.0f, 58.0f);
     assertThat(smoothed.pitchOffsetDegrees()).isBetween(7.4f, 7.6f);
-    assertThat(settled.yawOffsetDegrees()).isEqualTo(-21.0f);
+    assertThat(settled.yawOffsetDegrees()).isEqualTo(69.0f);
     assertThat(settled.pitchOffsetDegrees()).isEqualTo(8.0f);
   }
 
@@ -56,7 +56,7 @@ class GameplayCameraControllerTest {
     }
     GameplayCameraController.CameraOrbitOffsets wrapped = controller.update();
 
-    assertThat(wrapped.yawOffsetDegrees()).isEqualTo(175.0f);
+    assertThat(wrapped.yawOffsetDegrees()).isEqualTo(-95.0f);
   }
 
   private static final class TestNanoClock {

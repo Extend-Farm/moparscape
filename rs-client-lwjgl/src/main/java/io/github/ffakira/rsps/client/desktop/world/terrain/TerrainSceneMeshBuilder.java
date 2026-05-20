@@ -26,7 +26,7 @@ public final class TerrainSceneMeshBuilder {
     appendBridgeLowerPaintTiles(builder, worldScene, visibilityWindow);
     for (int tileY = visibilityWindow.minLocalY(); tileY <= visibilityWindow.maxLocalY(); tileY++) {
       for (int tileX = visibilityWindow.minLocalX(); tileX <= visibilityWindow.maxLocalX(); tileX++) {
-        if (worldScene.overlayShapeAt(tileX, tileY) > 0) {
+        if (TerrainOverlayShapeResolver.sceneShapeId(worldScene, tileX, tileY) > 1) {
           continue;
         }
         if (TerrainTileColorResolver.activePaintTextureId(worldScene, tileX, tileY, ENABLE_TEXTURED_TERRAIN) >= 0) {
@@ -52,7 +52,7 @@ public final class TerrainSceneMeshBuilder {
     appendBridgeLowerTexturedPaintTiles(builder, worldScene, visibilityWindow);
     for (int tileY = visibilityWindow.minLocalY(); tileY <= visibilityWindow.maxLocalY(); tileY++) {
       for (int tileX = visibilityWindow.minLocalX(); tileX <= visibilityWindow.maxLocalX(); tileX++) {
-        if (worldScene.overlayShapeAt(tileX, tileY) > 0) {
+        if (TerrainOverlayShapeResolver.sceneShapeId(worldScene, tileX, tileY) > 1) {
           continue;
         }
         int textureId = TerrainTileColorResolver.activePaintTextureId(worldScene, tileX, tileY, ENABLE_TEXTURED_TERRAIN);
@@ -81,7 +81,7 @@ public final class TerrainSceneMeshBuilder {
     appendBridgeLowerShapedTiles(builder, worldScene, visibilityWindow, false);
     for (int tileY = visibilityWindow.minLocalY(); tileY <= visibilityWindow.maxLocalY(); tileY++) {
       for (int tileX = visibilityWindow.minLocalX(); tileX <= visibilityWindow.maxLocalX(); tileX++) {
-        int shape = worldScene.overlayShapeAt(tileX, tileY);
+        int shape = TerrainOverlayShapeResolver.sceneShapeId(worldScene, tileX, tileY);
         if (!TerrainShapeDefinitions.isSupportedShape(shape)) {
           continue;
         }
@@ -103,7 +103,7 @@ public final class TerrainSceneMeshBuilder {
     appendBridgeLowerShapedTiles(builder, worldScene, visibilityWindow, true);
     for (int tileY = visibilityWindow.minLocalY(); tileY <= visibilityWindow.maxLocalY(); tileY++) {
       for (int tileX = visibilityWindow.minLocalX(); tileX <= visibilityWindow.maxLocalX(); tileX++) {
-        int shape = worldScene.overlayShapeAt(tileX, tileY);
+        int shape = TerrainOverlayShapeResolver.sceneShapeId(worldScene, tileX, tileY);
         if (!TerrainShapeDefinitions.isSupportedShape(shape)) {
           continue;
         }
@@ -413,7 +413,8 @@ public final class TerrainSceneMeshBuilder {
     }
     for (int tileY = visibilityWindow.minLocalY(); tileY <= visibilityWindow.maxLocalY(); tileY++) {
       for (int tileX = visibilityWindow.minLocalX(); tileX <= visibilityWindow.maxLocalX(); tileX++) {
-        if (!bridgeTerrainLayer.activeAt(tileX, tileY) || bridgeTerrainLayer.overlayShapeAt(tileX, tileY) > 0) {
+        if (!bridgeTerrainLayer.activeAt(tileX, tileY)
+            || TerrainOverlayShapeResolver.sceneShapeId(bridgeTerrainLayer, tileX, tileY) > 1) {
           continue;
         }
         if (TerrainTileColorResolver.activePaintTextureId(bridgeTerrainLayer, tileX, tileY, ENABLE_TEXTURED_TERRAIN) >= 0) {
@@ -449,7 +450,8 @@ public final class TerrainSceneMeshBuilder {
     }
     for (int tileY = visibilityWindow.minLocalY(); tileY <= visibilityWindow.maxLocalY(); tileY++) {
       for (int tileX = visibilityWindow.minLocalX(); tileX <= visibilityWindow.maxLocalX(); tileX++) {
-        if (!bridgeTerrainLayer.activeAt(tileX, tileY) || bridgeTerrainLayer.overlayShapeAt(tileX, tileY) > 0) {
+        if (!bridgeTerrainLayer.activeAt(tileX, tileY)
+            || TerrainOverlayShapeResolver.sceneShapeId(bridgeTerrainLayer, tileX, tileY) > 1) {
           continue;
         }
         int textureId = TerrainTileColorResolver.activePaintTextureId(bridgeTerrainLayer, tileX, tileY, ENABLE_TEXTURED_TERRAIN);
@@ -483,7 +485,7 @@ public final class TerrainSceneMeshBuilder {
         if (!bridgeTerrainLayer.activeAt(tileX, tileY)) {
           continue;
         }
-        int shape = bridgeTerrainLayer.overlayShapeAt(tileX, tileY);
+        int shape = TerrainOverlayShapeResolver.sceneShapeId(bridgeTerrainLayer, tileX, tileY);
         if (!TerrainShapeDefinitions.isSupportedShape(shape)) {
           continue;
         }

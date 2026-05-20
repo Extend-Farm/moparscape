@@ -2,7 +2,6 @@ package io.github.ffakira.rsps.client.desktop.login;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.github.ffakira.rsps.client.desktop.core.ArgbImage;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
@@ -14,18 +13,8 @@ class TitleScreenFlameAnimatorTest {
     for (int index = 0; index < runeMasks.length; index++) {
       runeMasks[index] = new TitleScreenRuneMask(new boolean[128 * 256]);
     }
-    int[] leftBasePixels = new int[128 * 265];
-    int[] rightBasePixels = new int[128 * 265];
-    for (int index = 0; index < leftBasePixels.length; index++) {
-      leftBasePixels[index] = 0xff222222;
-      rightBasePixels[index] = 0xff222222;
-    }
 
-    TitleScreenFlameFrame flameFrame = new TitleScreenFlameAnimator(
-        runeMasks,
-        new ArgbImage(128, 265, leftBasePixels),
-        new ArgbImage(128, 265, rightBasePixels)
-    ).renderNextFrame();
+    TitleScreenFlameFrame flameFrame = new TitleScreenFlameAnimator(runeMasks).renderNextFrame();
 
     assertThat(flameFrame.leftPanel().width()).isEqualTo(128);
     assertThat(flameFrame.leftPanel().height()).isEqualTo(265);
@@ -33,5 +22,7 @@ class TitleScreenFlameAnimatorTest {
     assertThat(flameFrame.rightPanel().height()).isEqualTo(265);
     assertThat(Arrays.stream(flameFrame.leftPanel().pixels()).anyMatch(pixel -> pixel != 0)).isTrue();
     assertThat(Arrays.stream(flameFrame.rightPanel().pixels()).anyMatch(pixel -> pixel != 0)).isTrue();
+    assertThat(Arrays.stream(flameFrame.leftPanel().pixels()).anyMatch(pixel -> (pixel >>> 24) == 0)).isTrue();
+    assertThat(Arrays.stream(flameFrame.rightPanel().pixels()).anyMatch(pixel -> (pixel >>> 24) == 0)).isTrue();
   }
 }

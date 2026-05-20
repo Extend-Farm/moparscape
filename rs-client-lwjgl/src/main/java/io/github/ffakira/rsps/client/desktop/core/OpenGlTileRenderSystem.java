@@ -10,6 +10,8 @@ import io.github.ffakira.rsps.client.desktop.gameplay.GameplayChromeRenderer;
 import io.github.ffakira.rsps.client.desktop.gameplay.GameplayClickResult;
 import io.github.ffakira.rsps.client.desktop.gameplay.GameplayFrameAssets;
 import io.github.ffakira.rsps.client.desktop.gameplay.GameplayLayout;
+import io.github.ffakira.rsps.client.desktop.gameplay.GameplayMenuAction;
+import io.github.ffakira.rsps.client.desktop.gameplay.GameplayMouseButton;
 import io.github.ffakira.rsps.client.desktop.login.LoginScreenState;
 import io.github.ffakira.rsps.client.desktop.login.TitleScreenAssets;
 import io.github.ffakira.rsps.client.desktop.login.TitleScreenLayout;
@@ -101,6 +103,7 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
   public void clearWorldScene() {
     worldScene = null;
     lastWorldSceneSubmission = null;
+    gameplayChromeRenderer.closeContextMenu();
     closeTexture(worldMinimapTexture);
     worldMinimapTexture = null;
   }
@@ -122,6 +125,7 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
       anchorPoint = null;
       lastWorldSceneSubmission = null;
       localPlayerAnimationTracker.reset();
+      gameplayChromeRenderer.closeContextMenu();
       titleScreenRenderer.render(viewModel, width, height);
       return;
     }
@@ -132,35 +136,38 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
     return titleScreenRenderer.currentLayout(width, height);
   }
 
-  public GameplayClickResult handleGameplayClick(double x, double y) {
-    if (gameplayChromeRenderer.handleClick(x, y)) {
-      return GameplayClickResult.handledClick();
+  public void setPointerPosition(double x, double y) {
+    gameplayChromeRenderer.setPointerPosition(x, y);
+  }
+
+  public GameplayClickResult handleGameplayClick(double x, double y, GameplayMouseButton button) {
+    if (button == GameplayMouseButton.LEFT && gameplayChromeRenderer.hasOpenContextMenu()) {
+      GameplayMenuAction selectedAction = gameplayChromeRenderer.consumeContextMenuSelection(x, y);
+      if (selectedAction == null) {
+        return GameplayClickResult.handledClick();
+      }
+      return executeMenuAction(selectedAction, GameplayMouseButton.RIGHT, x, y);
     }
-    if (worldScene == null || lastWorldSceneSubmission == null || lastLocalPlayerPosition == null) {
-      return GameplayClickResult.ignored();
+    if (button == GameplayMouseButton.LEFT && gameplayChromeRenderer.handleClick(x, y)) {
+      gameplayChromeRenderer.closeContextMenu();
+      return GameplayClickResult.handledClick();
     }
     ScreenRect worldViewport = GameplayLayout.worldViewportInnerRect();
     if (!worldViewport.contains(x, y)) {
+      gameplayChromeRenderer.closeContextMenu();
       return GameplayClickResult.ignored();
     }
-    WorldViewportClickPlanner.WorldViewportClickTarget clickTarget = worldViewportClickPlanner.pickTile(
-        worldScene,
-        lastWorldSceneSubmission.cameraState(),
-        worldViewport,
-        x,
-        y
-    );
-    if (clickTarget == null) {
-      return GameplayClickResult.ignored();
-    }
-    int playerLocalX = lastLocalPlayerPosition.x() - worldScene.originWorldX();
-    int playerLocalY = lastLocalPlayerPosition.y() - worldScene.originWorldY();
-    int deltaX = clickTarget.localX() - playerLocalX;
-    int deltaY = clickTarget.localY() - playerLocalY;
-    if (deltaX == 0 && deltaY == 0) {
+    if (button == GameplayMouseButton.RIGHT) {
+      gameplayChromeRenderer.closeContextMenu();
+      WorldPoint targetWorldPoint = pickWorldTarget(x, y, worldViewport);
+      if (targetWorldPoint == null) {
+        return GameplayClickResult.ignored();
+      }
+      gameplayChromeRenderer.openWalkHereContextMenu(x, y, targetWorldPoint);
       return GameplayClickResult.handledClick();
     }
-    return GameplayClickResult.move(deltaX, deltaY);
+    gameplayChromeRenderer.closeContextMenu();
+    return executeMenuAction(GameplayMenuAction.walkTo(pickWorldTarget(x, y, worldViewport)), GameplayMouseButton.LEFT, x, y);
   }
 
   public void resetGameplayTabForBootstrap() {
@@ -272,6 +279,63 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
     primitives.drawQuad(playerLeft, playerBottom, TILE_SIZE - 12.0f, TILE_SIZE - 12.0f);
     glColor3f(0.75f, 0.93f, 0.84f);
     primitives.drawOutline(playerLeft, playerBottom, TILE_SIZE - 12.0f, TILE_SIZE - 12.0f);
+  }
+
+  private WorldPoint pickWorldTarget(double x, double y, ScreenRect worldViewport) {
+    if (worldScene == null || lastWorldSceneSubmission == null) {
+      return null;
+    }
+    WorldViewportClickPlanner.WorldViewportClickTarget clickTarget = worldViewportClickPlanner.pickTile(
+        worldScene,
+        lastWorldSceneSubmission.cameraState(),
+        worldViewport,
+        x,
+        y
+    );
+    if (clickTarget == null) {
+      return null;
+    }
+    return new WorldPoint(
+        worldScene.originWorldX() + clickTarget.localX(),
+        worldScene.originWorldY() + clickTarget.localY(),
+        worldScene.plane()
+    );
+  }
+
+  private GameplayClickResult executeMenuAction(
+      GameplayMenuAction action,
+      GameplayMouseButton markerButton,
+      double clickX,
+      double clickY
+  ) {
+    if (action == null) {
+      return GameplayClickResult.handledClick();
+    }
+    return switch (action.kind()) {
+      case CANCEL -> GameplayClickResult.handledClick();
+      case WALK_TO_WORLD_POINT -> executeWorldWalk(action.targetWorldPoint(), markerButton, clickX, clickY);
+    };
+  }
+
+  private GameplayClickResult executeWorldWalk(
+      WorldPoint targetWorldPoint,
+      GameplayMouseButton markerButton,
+      double clickX,
+      double clickY
+  ) {
+    if (targetWorldPoint == null || lastLocalPlayerPosition == null) {
+      return GameplayClickResult.ignored();
+    }
+    if (targetWorldPoint.plane() != lastLocalPlayerPosition.plane()) {
+      return GameplayClickResult.handledClick();
+    }
+    gameplayChromeRenderer.activateCursorMarker(markerButton, clickX, clickY);
+    int deltaX = targetWorldPoint.x() - lastLocalPlayerPosition.x();
+    int deltaY = targetWorldPoint.y() - lastLocalPlayerPosition.y();
+    if (deltaX == 0 && deltaY == 0) {
+      return GameplayClickResult.handledClick();
+    }
+    return GameplayClickResult.move(deltaX, deltaY);
   }
 
   @Override

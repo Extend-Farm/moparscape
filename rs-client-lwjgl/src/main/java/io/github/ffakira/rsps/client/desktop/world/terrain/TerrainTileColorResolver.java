@@ -3,6 +3,7 @@ package io.github.ffakira.rsps.client.desktop.world.terrain;
 public final class TerrainTileColorResolver {
 
   private static final int TEXTURE_SHADE_RGB = 0xffffff;
+  private static final int LEGACY_FLOOR_RGB_BASELINE_LIGHT = 96;
   private static final int LEGACY_LIGHT_AMBIENT = 96;
   private static final int LEGACY_LIGHT_DIFFUSION = 0x300;
   private static final int LEGACY_LIGHT_X = -50;
@@ -36,11 +37,11 @@ public final class TerrainTileColorResolver {
 
   public static int cornerColor(TerrainLayerSource terrainLayerSource, int gridX, int gridY, FloorColorLayer layer, int fallbackRgb) {
     int brightness = terrainLightBrightness(terrainLayerSource, gridX, gridY);
-    return applyBrightness(cornerBaseColor(terrainLayerSource, gridX, gridY, layer, fallbackRgb), brightness);
+    return applyFloorBrightness(cornerBaseColor(terrainLayerSource, gridX, gridY, layer, fallbackRgb), brightness);
   }
 
   public static int textureCornerColor(TerrainLayerSource terrainLayerSource, int gridX, int gridY) {
-    return cornerColor(terrainLayerSource, gridX, gridY, FloorColorLayer.ACTIVE, TEXTURE_SHADE_RGB);
+    return applyBrightness(TEXTURE_SHADE_RGB, terrainLightBrightness(terrainLayerSource, gridX, gridY));
   }
 
   public static int pointColor(int pointCode, int northWest, int northEast, int southEast, int southWest) {
@@ -132,23 +133,28 @@ public final class TerrainTileColorResolver {
     return (red << 16) | (green << 8) | blue;
   }
 
-  // The old client subtracts a local shadow term derived from tile-edge shading buffers. The
-  // native scene does not carry that byte grid today, so approximate the same "rough terrain darkens"
-  // effect from the immediate elevation discontinuities around the corner.
   private static int terrainShadow(TerrainLayerSource terrainLayerSource, int tileX, int tileY) {
-    int center = terrainLayerSource.elevationAt(tileX, tileY);
-    int west = terrainLayerSource.elevationAt(clamp(tileX - 1, 0, terrainLayerSource.tileWidth() - 1), tileY);
-    int east = terrainLayerSource.elevationAt(clamp(tileX + 1, 0, terrainLayerSource.tileWidth() - 1), tileY);
-    int south = terrainLayerSource.elevationAt(tileX, clamp(tileY - 1, 0, terrainLayerSource.tileHeight() - 1));
-    int north = terrainLayerSource.elevationAt(tileX, clamp(tileY + 1, 0, terrainLayerSource.tileHeight() - 1));
-    return ((Math.abs(center - west) + Math.abs(center - south)) >> 2)
-        + ((Math.abs(center - east) + Math.abs(center - north)) >> 3);
+    int clampedX = clamp(tileX, 0, terrainLayerSource.tileWidth() - 1);
+    int clampedY = clamp(tileY, 0, terrainLayerSource.tileHeight() - 1);
+    int west = terrainLayerSource.shadowAt(clamp(clampedX - 1, 0, terrainLayerSource.tileWidth() - 1), clampedY);
+    int east = terrainLayerSource.shadowAt(clamp(clampedX + 1, 0, terrainLayerSource.tileWidth() - 1), clampedY);
+    int south = terrainLayerSource.shadowAt(clamp(clampedX, 0, terrainLayerSource.tileWidth() - 1), clamp(clampedY - 1, 0, terrainLayerSource.tileHeight() - 1));
+    int north = terrainLayerSource.shadowAt(clamp(clampedX, 0, terrainLayerSource.tileWidth() - 1), clamp(clampedY + 1, 0, terrainLayerSource.tileHeight() - 1));
+    int center = terrainLayerSource.shadowAt(clampedX, clampedY);
+    return (west >> 2) + (east >> 3) + (south >> 2) + (north >> 3) + (center >> 1);
   }
 
   private static int applyBrightness(int rgb, int brightness) {
     int red = (((rgb >>> 16) & 0xff) * brightness) / 128;
     int green = (((rgb >>> 8) & 0xff) * brightness) / 128;
     int blue = ((rgb & 0xff) * brightness) / 128;
+    return (clamp(red, 0, 255) << 16) | (clamp(green, 0, 255) << 8) | clamp(blue, 0, 255);
+  }
+
+  private static int applyFloorBrightness(int rgb, int brightness) {
+    int red = (((rgb >>> 16) & 0xff) * brightness) / LEGACY_FLOOR_RGB_BASELINE_LIGHT;
+    int green = (((rgb >>> 8) & 0xff) * brightness) / LEGACY_FLOOR_RGB_BASELINE_LIGHT;
+    int blue = ((rgb & 0xff) * brightness) / LEGACY_FLOOR_RGB_BASELINE_LIGHT;
     return (clamp(red, 0, 255) << 16) | (clamp(green, 0, 255) << 8) | clamp(blue, 0, 255);
   }
 

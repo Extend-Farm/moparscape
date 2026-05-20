@@ -9,6 +9,12 @@ final class CharacterWalkPoseAnimator {
   private static final float WALK_FORWARD_LEAN_DEGREES = 1.6f;
   private static final float WALK_FOOT_LIFT = 0.028f;
   private static final float WALK_PELVIS_SWAY = 0.008f;
+  private static final float ARM_SWING_TOP_PORTION = 0.84f;
+  private static final float TORSO_TWIST_TOP_PORTION = 0.90f;
+  private static final float[] WALK_FRAME_SWING = {1.0f, 0.18f, -1.0f, -0.18f, 1.0f};
+  private static final float[] WALK_FRAME_COUNTER_SWING = {0.0f, 1.0f, 0.0f, -1.0f, 0.0f};
+  private static final float[] WALK_FRAME_BOB = {0.20f, 1.0f, 0.20f, 1.0f, 0.20f};
+  private static final float[] WALK_FRAME_FORWARD_LEAN = {0.72f, 1.0f, 0.72f, 1.0f, 0.72f};
 
   private CharacterWalkPoseAnimator() {
   }
@@ -19,12 +25,19 @@ final class CharacterWalkPoseAnimator {
       ActorAnimationState animationState
   ) {
     float strideWeight = animationState.strideWeight();
-    float swing = (float) Math.sin(animationState.walkCycleRadians());
-    float counterSwing = (float) Math.cos(animationState.walkCycleRadians());
-    float bob = (float) Math.abs(Math.cos(animationState.walkCycleRadians() * 2.0f)) * WALK_BODY_BOB * strideWeight;
+    // The native client still lacks cache sequence application for player models, so walking is
+    // expressed as a small four-phase keyframe loop instead of a raw sine wave. That keeps the
+    // lifecycle frame-shaped now and gives the future sequence decoder an explicit contract.
+    int walkFrameIndex = animationState.walkFrameIndex();
+    float walkFrameProgress = animationState.walkFrameProgress();
+    float swing = interpolateWalkFrame(WALK_FRAME_SWING, walkFrameIndex, walkFrameProgress);
+    float counterSwing = interpolateWalkFrame(WALK_FRAME_COUNTER_SWING, walkFrameIndex, walkFrameProgress);
+    float bob = interpolateWalkFrame(WALK_FRAME_BOB, walkFrameIndex, walkFrameProgress) * WALK_BODY_BOB * strideWeight;
     float torsoTwist = swing * WALK_TORSO_TWIST_DEGREES * strideWeight;
     float pelvisSway = counterSwing * WALK_PELVIS_SWAY * strideWeight;
-    float forwardLean = (0.65f + 0.35f * Math.abs(counterSwing)) * WALK_FORWARD_LEAN_DEGREES * strideWeight;
+    float forwardLean = interpolateWalkFrame(WALK_FRAME_FORWARD_LEAN, walkFrameIndex, walkFrameProgress)
+        * WALK_FORWARD_LEAN_DEGREES
+        * strideWeight;
     float centerX = actorBounds.centerX();
     float centerZ = actorBounds.centerZ();
     float width = Math.max(0.001f, actorBounds.maxX() - actorBounds.minX());
@@ -32,6 +45,8 @@ final class CharacterWalkPoseAnimator {
     float kneeY = actorBounds.minY() + height * 0.28f;
     float hipY = actorBounds.minY() + height * 0.49f;
     float shoulderY = actorBounds.minY() + height * 0.77f;
+    float armSwingTopY = actorBounds.minY() + height * ARM_SWING_TOP_PORTION;
+    float torsoTwistTopY = actorBounds.minY() + height * TORSO_TWIST_TOP_PORTION;
     float armBlendStart = width * 0.14f;
     float armBlendRange = Math.max(0.001f, width * 0.20f);
     for (int vertexIndex = 0; vertexIndex < transformedVertices[0].length; vertexIndex++) {
@@ -53,7 +68,7 @@ final class CharacterWalkPoseAnimator {
         }
       } else {
         float armBlend = smoothstep((Math.abs(xOffset) - armBlendStart) / armBlendRange)
-            * smoothstep((y - hipY) / Math.max(0.001f, shoulderY - hipY));
+            * verticalBandBlend(y, hipY, shoulderY, armSwingTopY, actorBounds.maxY());
         if (armBlend > 0.0f) {
           float[] rotated = rotateAroundX(y, z, shoulderY, centerZ, -side * swing * WALK_ARM_SWING_DEGREES * strideWeight);
           y = lerp(y, rotated[0], armBlend);
@@ -61,7 +76,7 @@ final class CharacterWalkPoseAnimator {
         }
       }
 
-      float torsoBlend = smoothstep((y - hipY) / Math.max(0.001f, actorBounds.maxY() - hipY));
+      float torsoBlend = verticalBandBlend(y, hipY, shoulderY, torsoTwistTopY, actorBounds.maxY());
       if (torsoBlend > 0.0f) {
         float[] twisted = rotateAroundY(x, z, centerX, centerZ, torsoTwist);
         x = lerp(x, twisted[0], torsoBlend * 0.55f);
@@ -86,9 +101,20 @@ final class CharacterWalkPoseAnimator {
     return start + (end - start) * weight;
   }
 
+  private static float interpolateWalkFrame(float[] keyframes, int frameIndex, float frameProgress) {
+    int currentIndex = Math.max(0, Math.min(keyframes.length - 2, frameIndex));
+    return lerp(keyframes[currentIndex], keyframes[currentIndex + 1], smoothstep(frameProgress));
+  }
+
   private static float smoothstep(float value) {
     float clamped = Math.max(0.0f, Math.min(1.0f, value));
     return clamped * clamped * (3.0f - 2.0f * clamped);
+  }
+
+  private static float verticalBandBlend(float y, float startY, float fullBlendY, float falloffStartY, float maxY) {
+    float rise = smoothstep((y - startY) / Math.max(0.001f, fullBlendY - startY));
+    float fall = 1.0f - smoothstep((y - falloffStartY) / Math.max(0.001f, maxY - falloffStartY));
+    return rise * fall;
   }
 
   private static float[] rotateAroundX(float y, float z, float pivotY, float pivotZ, float degrees) {

@@ -83,6 +83,10 @@ class LoginScreenControllerTest {
   void canTransitionAcrossTitleScreenStages() {
     LoginScreenController controller = new LoginScreenController();
 
+    controller.showLoading(42);
+    assertThat(controller.state().stage()).isEqualTo(TitleScreenStage.LOADING);
+    assertThat(controller.state().loadingPercent()).isEqualTo(42);
+
     controller.showPrivateServerInfo();
     assertThat(controller.state().stage()).isEqualTo(TitleScreenStage.PRIVATE_SERVER_INFO);
 
@@ -115,5 +119,16 @@ class LoginScreenControllerTest {
     controller.append('t');
 
     assertThat(controller.advanceOrSubmitOnEnter()).isTrue();
+  }
+
+  @Test
+  void loadingProgressClampsIntoTheVisibleBarRange() {
+    LoginScreenController controller = new LoginScreenController();
+
+    controller.showLoading(-10);
+    assertThat(controller.state().loadingPercent()).isZero();
+
+    controller.showLoading(140);
+    assertThat(controller.state().loadingPercent()).isEqualTo(100);
   }
 }

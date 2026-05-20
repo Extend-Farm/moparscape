@@ -33,6 +33,8 @@ public final class OpenGlSceneRasterBackend implements SceneRasterBackend, AutoC
   private final SceneTextureAnimationPlanner textureAnimationPlanner;
   private final OpenGlSceneShaderPipeline shaderPipeline;
   private final long animationStartNanos;
+  private static final float TERRAIN_COLOR_SHADE_STRENGTH = 0.0f;
+  private static final float TERRAIN_TEXTURE_SHADE_STRENGTH = 0.0f;
 
   // The native client now has an explicit raster boundary. Terrain already uses Gouraud batches,
   // static objects preserve texture intent from cache model faces, and this backend is where that
@@ -82,13 +84,13 @@ public final class OpenGlSceneRasterBackend implements SceneRasterBackend, AutoC
       return;
     }
     if (shouldFallbackTexturedActorBatch(renderBatch)) {
-      drawGouraudMesh(renderBatch.mesh(), passPlan.opaqueFaces());
+      drawGouraudMesh(renderBatch.mesh(), passPlan.opaqueFaces(), terrainShadeStrength(renderBatch));
       return;
     }
     switch (renderBatch.rasterMode()) {
-      case FLAT -> drawFlatMesh(renderBatch.mesh(), passPlan.opaqueFaces());
-      case GOURAUD -> drawGouraudMesh(renderBatch.mesh(), passPlan.opaqueFaces());
-      case TEXTURED -> drawTexturedMesh(renderBatch.mesh(), passPlan.opaqueFaces());
+      case FLAT -> drawFlatMesh(renderBatch.mesh(), passPlan.opaqueFaces(), terrainShadeStrength(renderBatch));
+      case GOURAUD -> drawGouraudMesh(renderBatch.mesh(), passPlan.opaqueFaces(), terrainShadeStrength(renderBatch));
+      case TEXTURED -> drawTexturedMesh(renderBatch.mesh(), passPlan.opaqueFaces(), terrainShadeStrength(renderBatch));
     }
   }
 
@@ -98,21 +100,21 @@ public final class OpenGlSceneRasterBackend implements SceneRasterBackend, AutoC
       return;
     }
     if (shouldFallbackTexturedActorBatch(renderBatch)) {
-      drawGouraudMesh(renderBatch.mesh(), passPlan.translucentFaces());
+      drawGouraudMesh(renderBatch.mesh(), passPlan.translucentFaces(), terrainShadeStrength(renderBatch));
       return;
     }
     switch (renderBatch.rasterMode()) {
-      case FLAT -> drawFlatMesh(renderBatch.mesh(), passPlan.translucentFaces());
-      case GOURAUD -> drawGouraudMesh(renderBatch.mesh(), passPlan.translucentFaces());
-      case TEXTURED -> drawTexturedMesh(renderBatch.mesh(), passPlan.translucentFaces());
+      case FLAT -> drawFlatMesh(renderBatch.mesh(), passPlan.translucentFaces(), terrainShadeStrength(renderBatch));
+      case GOURAUD -> drawGouraudMesh(renderBatch.mesh(), passPlan.translucentFaces(), terrainShadeStrength(renderBatch));
+      case TEXTURED -> drawTexturedMesh(renderBatch.mesh(), passPlan.translucentFaces(), terrainShadeStrength(renderBatch));
     }
   }
 
-  private void drawFlatMesh(SceneTriangleMesh mesh, int[] faceIndices) {
+  private void drawFlatMesh(SceneTriangleMesh mesh, int[] faceIndices, float terrainShadeStrength) {
     if (mesh == null || mesh.isEmpty()) {
       return;
     }
-    shaderPipeline.bindColorProgram();
+    shaderPipeline.bindColorProgram(terrainShadeStrength);
     glShadeModel(GL_FLAT);
     glBegin(GL_TRIANGLES);
     for (int faceIndex : faceIndices) {
@@ -125,11 +127,11 @@ public final class OpenGlSceneRasterBackend implements SceneRasterBackend, AutoC
     shaderPipeline.unbind();
   }
 
-  private void drawGouraudMesh(SceneTriangleMesh mesh, int[] faceIndices) {
+  private void drawGouraudMesh(SceneTriangleMesh mesh, int[] faceIndices, float terrainShadeStrength) {
     if (mesh == null || mesh.isEmpty()) {
       return;
     }
-    shaderPipeline.bindColorProgram();
+    shaderPipeline.bindColorProgram(terrainShadeStrength);
     glShadeModel(GL_SMOOTH);
     glBegin(GL_TRIANGLES);
     for (int faceIndex : faceIndices) {
@@ -139,7 +141,7 @@ public final class OpenGlSceneRasterBackend implements SceneRasterBackend, AutoC
     shaderPipeline.unbind();
   }
 
-  private void drawTexturedMesh(SceneTriangleMesh mesh, int[] faceIndices) {
+  private void drawTexturedMesh(SceneTriangleMesh mesh, int[] faceIndices, float terrainShadeStrength) {
     if (mesh == null || mesh.isEmpty()) {
       return;
     }
@@ -148,7 +150,7 @@ public final class OpenGlSceneRasterBackend implements SceneRasterBackend, AutoC
     glEnable(GL_ALPHA_TEST);
     glAlphaFunc(GL_GREATER, 0.02f);
     glShadeModel(GL_SMOOTH);
-    shaderPipeline.bindTexturedProgram();
+    shaderPipeline.bindTexturedProgram(terrainShadeStrength);
     int boundTextureId = -1;
     boolean drawing = false;
     for (int faceIndex : faceIndices) {
@@ -167,9 +169,9 @@ public final class OpenGlSceneRasterBackend implements SceneRasterBackend, AutoC
           boundTextureId = -1;
         }
         glDisable(GL_TEXTURE_2D);
-        shaderPipeline.bindColorProgram();
+        shaderPipeline.bindColorProgram(terrainShadeStrength);
         drawSingleGouraudFace(mesh, faceIndex);
-        shaderPipeline.bindTexturedProgram();
+        shaderPipeline.bindTexturedProgram(terrainShadeStrength);
         glEnable(GL_TEXTURE_2D);
         glShadeModel(GL_SMOOTH);
         continue;
@@ -229,6 +231,20 @@ public final class OpenGlSceneRasterBackend implements SceneRasterBackend, AutoC
 
   private boolean shouldFallbackTexturedActorBatch(SceneRenderBatch renderBatch) {
     return renderBatch.kind() == SceneSubmissionKind.ACTOR && renderBatch.rasterMode() == SceneRasterMode.TEXTURED;
+  }
+
+  static float terrainShadeStrength(SceneRenderBatch renderBatch) {
+    if (renderBatch == null) {
+      return 0.0f;
+    }
+    if (renderBatch.kind() != SceneSubmissionKind.TILE_PAINT
+        && renderBatch.kind() != SceneSubmissionKind.TILE_MODEL) {
+      return 0.0f;
+    }
+    return switch (renderBatch.rasterMode()) {
+      case FLAT, GOURAUD -> TERRAIN_COLOR_SHADE_STRENGTH;
+      case TEXTURED -> TERRAIN_TEXTURE_SHADE_STRENGTH;
+    };
   }
 
   private void applyColor(int rgb, int alpha) {
