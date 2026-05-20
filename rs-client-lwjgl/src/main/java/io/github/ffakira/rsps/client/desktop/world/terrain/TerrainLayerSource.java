@@ -8,6 +8,14 @@ public interface TerrainLayerSource {
 
   int elevationAt(int localX, int localY);
 
+  default int underlayIdAt(int localX, int localY) {
+    return 0;
+  }
+
+  default int overlayIdAt(int localX, int localY) {
+    return 0;
+  }
+
   int tileColorAt(int localX, int localY);
 
   int underlayColorAt(int localX, int localY);

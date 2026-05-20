@@ -217,6 +217,46 @@ class WorldSceneSubmissionBuilderTest {
   }
 
   @Test
+  void carriesTheSelectedRoofedRenderPlaneIntoTheSubmission() {
+    byte[] tileFlags = new byte[64];
+    tileFlags[4 * 8 + 4] = 4;
+    WorldScene worldScene = new WorldScene(
+        "roofed-submission",
+        3200,
+        3200,
+        0,
+        8,
+        8,
+        gradientHeights(8, 8),
+        filledInts(64, 0x4a6a3c),
+        filledInts(64, 0x4a6a3c),
+        filledInts(64, 0x7d9150),
+        filledInts(64, -1),
+        filledInts(64, 12),
+        mixedTileShapeArray(8, 8),
+        new byte[64],
+        tileFlags,
+        List.of(),
+        List.of(),
+        new ArgbImage(1, 1, new int[]{0xff000000}),
+        new ArgbImage(8, 8, filledInts(64, 0xff334455)),
+        new WorldSceneProjection(5, 3, 0, 0)
+    );
+
+    WorldSceneRenderSubmission submission = new WorldSceneSubmissionBuilder(null).build(
+        worldScene,
+        new WorldPoint(3204, 3204, 0),
+        null,
+        List.of(),
+        ActorAnimationState.idle(),
+        496,
+        318
+    );
+
+    assertThat(submission.renderPlane()).isEqualTo(0);
+  }
+
+  @Test
   void rendersFallbackWallSegmentsForStubBackedWorldObjects() {
     WorldScene worldScene = new WorldScene(
         "stub-backed-object",

@@ -1,10 +1,8 @@
 package io.github.ffakira.rsps.cache;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.zip.GZIPInputStream;
 
 public final class RawModelRepository {
 
@@ -25,22 +23,11 @@ public final class RawModelRepository {
   private RawModelData readAndDecodeModel(int modelId) {
     try (CacheStoreReader reader = new CacheStoreReader(cacheStoreLayout)) {
       byte[] bytes = reader.readArchive(MODEL_STORE_INDEX, modelId).bytes();
-      return decoder.decode(decompressGzip(bytes));
+      return decoder.decode(CacheCompression.decompressGzipIfNeeded(bytes, "model archive"));
     } catch (IOException ioException) {
       throw new IllegalStateException("Failed to close cache reader for model " + modelId, ioException);
     } catch (RuntimeException runtimeException) {
       throw new IllegalStateException("Failed to load model " + modelId, runtimeException);
-    }
-  }
-
-  private static byte[] decompressGzip(byte[] bytes) {
-    if (bytes.length < 2 || (bytes[0] & 0xff) != 0x1f || (bytes[1] & 0xff) != 0x8b) {
-      return bytes;
-    }
-    try (GZIPInputStream gzipInputStream = new GZIPInputStream(new ByteArrayInputStream(bytes))) {
-      return gzipInputStream.readAllBytes();
-    } catch (IOException ioException) {
-      throw new IllegalStateException("Failed to decompress model archive", ioException);
     }
   }
 }

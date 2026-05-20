@@ -225,12 +225,19 @@ public final class CharacterFileRepository implements AccountRepository, Charact
       }
       String[] fields = value.split("\\s+");
       int slotIndex = Integer.parseInt(fields[0]);
-      int itemId = Integer.parseInt(fields[1]);
+      int itemId = decodeLegacyItemId(containerKind, Integer.parseInt(fields[1]));
       int quantity = Integer.parseInt(fields[2]);
       if (itemId < 0 || quantity <= 0) {
         return;
       }
       builder.itemSlots.add(new CharacterItemSlot(containerKind, slotIndex, itemId, quantity));
+    }
+
+    static int decodeLegacyItemId(ItemContainerKind containerKind, int storedItemId) {
+      return switch (containerKind) {
+        case INVENTORY, BANK -> storedItemId - 1;
+        case EQUIPMENT -> storedItemId;
+      };
     }
 
     static void appendSocialLink(Builder builder, SocialLinkKind linkKind, String key, String value) {

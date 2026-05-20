@@ -13,6 +13,7 @@ import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainLayerSource;
 import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainSceneMeshBuilder;
 import io.github.ffakira.rsps.client.desktop.world.visibility.WorldSceneOcclusionContext;
 import io.github.ffakira.rsps.client.desktop.world.visibility.WorldSceneOcclusionPlanner;
+import io.github.ffakira.rsps.client.desktop.world.visibility.WorldScenePlaneRules;
 import io.github.ffakira.rsps.client.desktop.world.visibility.WorldSceneVisibilityPlanner;
 import io.github.ffakira.rsps.client.desktop.world.visibility.WorldSceneVisibilityWindow;
 import io.github.ffakira.rsps.model.WorldPoint;
@@ -94,6 +95,7 @@ public final class WorldSceneSubmissionBuilder {
         cameraYawOffsetDegrees,
         cameraPitchOffsetDegrees
     );
+    int renderPlane = WorldScenePlaneRules.renderPlane(worldScene, cameraState, focusTileX, focusTileY);
     WorldSceneVisibilityWindow visibilityWindow = WorldSceneVisibilityPlanner.plan(
         worldScene,
         cameraState,
@@ -148,7 +150,7 @@ public final class WorldSceneSubmissionBuilder {
         equipment,
         actorAnimationState
     );
-    return new WorldSceneRenderSubmission(cameraState, renderQueueBuilder.build());
+    return new WorldSceneRenderSubmission(renderPlane, cameraState, renderQueueBuilder.build());
   }
 
   private void addObjectBatches(

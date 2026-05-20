@@ -17,7 +17,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.GLFW_REPEAT;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
 
-final class LoginInputHandler {
+final class LoginInputHandler implements DesktopInputRouter.LoginInputPort {
 
   private final OpenGlTileRenderSystem renderSystem;
   private final LoginScreenController loginScreenController;
@@ -45,7 +45,8 @@ final class LoginInputHandler {
     this.authenticatingStatus = authenticatingStatus;
   }
 
-  void handleCharacter(int codePoint) {
+  @Override
+  public void handleCharacter(int codePoint) {
     if (loginScreenController.state().stage() != TitleScreenStage.CREDENTIALS) {
       return;
     }
@@ -53,7 +54,8 @@ final class LoginInputHandler {
     syncLoginScreenState();
   }
 
-  void handleMouseButton(int button, int action, double mouseX, double mouseY) {
+  @Override
+  public void handleMouseButton(int button, int action, double mouseX, double mouseY) {
     if (button != GLFW_MOUSE_BUTTON_LEFT || action != GLFW_PRESS) {
       return;
     }
@@ -90,7 +92,8 @@ final class LoginInputHandler {
     syncLoginScreenState();
   }
 
-  void handleKey(long windowHandle, int key, int action) {
+  @Override
+  public void handleKey(long windowHandle, int key, int action) {
     if (action != GLFW_PRESS && action != GLFW_REPEAT) {
       return;
     }

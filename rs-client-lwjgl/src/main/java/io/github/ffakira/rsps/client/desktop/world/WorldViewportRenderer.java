@@ -57,7 +57,10 @@ public final class WorldViewportRenderer implements AutoCloseable {
     WorldCameraState cameraState = submission.cameraState();
     glTranslatef(0.0f, cameraState.screenOffsetY(), -cameraState.distance());
     glRotatef(cameraState.pitchDegrees(), 1.0f, 0.0f, 0.0f);
-    glRotatef(cameraState.yawDegrees(), 0.0f, 1.0f, 0.0f);
+    // Gameplay/minimap space already treats positive world-east as the minimap's left edge at the
+    // default orbit. The viewport was rotating yaw in the opposite direction, which mirrored the
+    // whole 3D scene relative to the rest of the client.
+    glRotatef(-cameraState.yawDegrees(), 0.0f, 1.0f, 0.0f);
     glTranslatef(-cameraState.focusX(), -cameraState.focusHeight(), -cameraState.focusY());
 
     // The native renderer is not yet at legacy triangle-submission parity. Until terrain, tile

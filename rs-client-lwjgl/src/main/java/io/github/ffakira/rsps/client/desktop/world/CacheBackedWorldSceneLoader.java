@@ -25,6 +25,7 @@ import io.github.ffakira.rsps.client.desktop.world.object.WorldSceneObject;
 import io.github.ffakira.rsps.client.desktop.world.object.WorldSceneObjectAssembler;
 import io.github.ffakira.rsps.client.desktop.world.terrain.BridgeTerrainLayer;
 import io.github.ffakira.rsps.client.desktop.world.terrain.FloorSurfaceColorResolver;
+import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainOcclusionFlagResolver;
 import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainShadowResolver;
 import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainSurfaceElevationResolver;
 import io.github.ffakira.rsps.client.desktop.world.visibility.WorldSceneOccluder;
@@ -54,6 +55,7 @@ public final class CacheBackedWorldSceneLoader {
   private final ContentManifest manifest;
   private final FloorColorCatalog floorColors;
   private final FloorSurfaceColorResolver floorSurfaceColorResolver;
+  private final TerrainOcclusionFlagResolver terrainOcclusionFlagResolver;
   private final MapArchiveIndex mapArchiveIndex;
   private final WorldSceneObjectAssembler objectAssembler;
   private final WorldSceneOccluderBuilder occluderBuilder = new WorldSceneOccluderBuilder();
@@ -83,6 +85,7 @@ public final class CacheBackedWorldSceneLoader {
     ContentArchiveSnapshot archiveSnapshot = new ContentArchiveCatalog().load(manifest);
     this.floorColors = FloorColorCatalog.parse(archiveSnapshot.readConfigEntry("flo.dat"));
     this.floorSurfaceColorResolver = new FloorSurfaceColorResolver(floorColors);
+    this.terrainOcclusionFlagResolver = new TerrainOcclusionFlagResolver(floorColors);
     this.mapArchiveIndex = MapArchiveIndex.parse(archiveSnapshot.readUpdateListEntry("map_index"));
     ObjectDefinitionCatalog objectDefinitions = ObjectDefinitionCatalog.parse(
         archiveSnapshot.readConfigEntry("loc.idx"),
@@ -199,10 +202,21 @@ public final class CacheBackedWorldSceneLoader {
         surfacePlanes,
         heightSamplesByPlane
     );
+    int[] terrainOcclusionFlags = terrainOcclusionFlagResolver.resolve(
+        SCENE_TILE_SIZE,
+        SCENE_TILE_SIZE,
+        surfacePlanes,
+        heightSamplesByPlane,
+        underlayIds,
+        overlayIds,
+        overlayShapes
+    );
     BridgeTerrainLayer bridgeTerrainLayer = new BridgeTerrainLayer(
         SCENE_TILE_SIZE,
         SCENE_TILE_SIZE,
         java.util.Arrays.copyOf(heightSamplesByPlane[0], heightSamplesByPlane[0].length),
+        bridgeLowerUnderlayIds,
+        bridgeLowerOverlayIds,
         bridgeLowerTileColors,
         bridgeLowerUnderlayColors,
         bridgeLowerOverlayColors,
@@ -219,6 +233,8 @@ public final class CacheBackedWorldSceneLoader {
         SCENE_TILE_SIZE,
         SCENE_TILE_SIZE,
         tileElevations,
+        surfacePlanes,
+        terrainOcclusionFlags,
         sceneObjects
     );
     ArgbImage image = renderProjectedScene(tileColors, tileElevations, projection);
@@ -243,6 +259,8 @@ public final class CacheBackedWorldSceneLoader {
         SCENE_TILE_SIZE,
         SCENE_TILE_SIZE,
         tileElevations,
+        underlayIds,
+        overlayIds,
         tileColors,
         underlayColors,
         overlayColors,
@@ -257,7 +275,9 @@ public final class CacheBackedWorldSceneLoader {
         image,
         minimapImage,
         projection,
-        bridgeTerrainLayer
+        bridgeTerrainLayer,
+        surfacePlanes,
+        terrainOcclusionFlags
     );
     scenesByKey.put(sceneKey, worldScene);
     return worldScene;

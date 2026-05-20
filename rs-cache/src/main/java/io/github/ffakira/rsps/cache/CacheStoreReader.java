@@ -109,6 +109,15 @@ public class CacheStoreReader implements Closeable {
     return new RawCacheArchive(storeIndex, indexEntry, archiveBytes);
   }
 
+  public int archiveCount(int storeIndex) {
+    validateStoreIndex(storeIndex);
+    try {
+      return (int) (indexFiles.get(storeIndex).length() / INDEX_ENTRY_LENGTH);
+    } catch (IOException ioException) {
+      throw new IllegalStateException("Failed to inspect store " + storeIndex + " archive count", ioException);
+    }
+  }
+
   @Override
   public void close() throws IOException {
     IOException firstFailure = null;

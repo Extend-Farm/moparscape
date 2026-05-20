@@ -5,11 +5,7 @@ import io.github.ffakira.rsps.client.desktop.world.WorldScene;
 
 public final class WorldSceneVisibilityPlanner {
 
-  private static final int MIN_HALF_WIDTH = 12;
-  private static final int MAX_HALF_WIDTH = 25;
-  private static final int MIN_HALF_DEPTH = 11;
-  private static final int MAX_HALF_DEPTH = 25;
-  private static final int VISIBILITY_MARGIN = 5;
+  private static final int LEGACY_HALF_WINDOW = 25;
   private static final int ROOFED_HALF_WIDTH_REDUCTION = 6;
   private static final int ROOFED_HALF_DEPTH_REDUCTION = 5;
 
@@ -24,31 +20,23 @@ public final class WorldSceneVisibilityPlanner {
       int viewportWidth,
       int viewportHeight
   ) {
-    float aspectRatio = viewportWidth / (float) Math.max(1, viewportHeight);
-    int halfWidth = clamp(
-        Math.round(cameraState.distance() * 0.55f * Math.max(0.90f, aspectRatio)) + VISIBILITY_MARGIN,
-        MIN_HALF_WIDTH,
-        MAX_HALF_WIDTH
-    );
-    int halfDepth = clamp(
-        Math.round(cameraState.distance() * 0.60f) + VISIBILITY_MARGIN,
-        MIN_HALF_DEPTH,
-        MAX_HALF_DEPTH
-    );
-
-    // The native renderer still lacks the legacy visible-tile traversal, so submission keeps a
-    // coarse camera-centered window. Bias it toward the old 51x51 working area rather than the
-    // earlier tiny window, otherwise the play viewport reads like a clipped scene preview.
-    int centerX = clamp(Math.round(cameraState.focusX()), 0, worldScene.tileWidth() - 2);
-    int centerY = clamp(Math.round(cameraState.focusY()), 0, worldScene.tileHeight() - 2);
-    boolean roofedPath = WorldScenePlaneRules.roofFlagOnPath(worldScene, centerX, centerY, focusTileX, focusTileY)
-        || WorldScenePlaneRules.hasRoofFlag(worldScene, focusTileX, focusTileY);
-    if (roofedPath) {
+    int halfWidth = LEGACY_HALF_WINDOW;
+    int halfDepth = LEGACY_HALF_WINDOW;
+    int renderPlane = WorldScenePlaneRules.renderPlane(worldScene, cameraState, focusTileX, focusTileY);
+    int[] cameraTile = WorldScenePlaneRules.cameraTile(worldScene, cameraState);
+    int centerX = cameraTile[0];
+    int centerY = cameraTile[1];
+    // Legacy SceneGraph traversal works from the camera tile and always considers a 51x51 tile
+    // neighborhood around that tile before the deeper visibility tests trim it down. The native
+    // client still lacks those per-tile visibility masks, but keeping the same camera-anchored
+    // working area is much closer than a player-centered radius heuristic.
+    if (renderPlane == worldScene.plane()) {
       // Legacy camera-plane selection line-steps between the camera tile and player tile looking
-      // for roof flag `& 4`. The native client does not yet switch scene planes like the old
-      // client, but it can still react to that same signal by tightening the submitted view.
-      halfWidth = Math.max(MIN_HALF_WIDTH, halfWidth - ROOFED_HALF_WIDTH_REDUCTION);
-      halfDepth = Math.max(MIN_HALF_DEPTH, halfDepth - ROOFED_HALF_DEPTH_REDUCTION);
+      // for roof flag `& 4`, but only while the camera pitch is below the classic 310-unit
+      // threshold. The rewrite still renders one stitched surface instead of full per-plane
+      // traversal, so it reacts to that selected roofed plane by tightening the submitted view.
+      halfWidth = LEGACY_HALF_WINDOW - ROOFED_HALF_WIDTH_REDUCTION;
+      halfDepth = LEGACY_HALF_WINDOW - ROOFED_HALF_DEPTH_REDUCTION;
       centerX = clamp(focusTileX, 0, worldScene.tileWidth() - 2);
       centerY = clamp(focusTileY, 0, worldScene.tileHeight() - 2);
     }

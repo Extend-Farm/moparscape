@@ -4,6 +4,7 @@ import io.github.ffakira.rsps.persistence.CharacterItemSlot;
 import io.github.ffakira.rsps.persistence.CharacterSkill;
 import io.github.ffakira.rsps.persistence.CharacterSnapshot;
 import io.github.ffakira.rsps.protocol.BootstrapAppearance;
+import io.github.ffakira.rsps.protocol.BootstrapAnimationProfile;
 import io.github.ffakira.rsps.protocol.BootstrapItemSlot;
 import io.github.ffakira.rsps.protocol.BootstrapProfile;
 import io.github.ffakira.rsps.protocol.BootstrapSkill;
@@ -33,7 +34,7 @@ final class BootstrapMessageBatch {
             characterSnapshot.profile().member(),
             characterSnapshot.profile().runEnergy()
         ),
-        new BootstrapAppearance(characterSnapshot.appearance().lookValues()),
+        new BootstrapAppearance(characterSnapshot.appearance().lookValues(), BootstrapAnimationProfile.referencePlayer()),
         mapItemSlots(characterSnapshot.inventorySlots()),
         mapItemSlots(characterSnapshot.equipmentSlots()),
         mapSkills(characterSnapshot.skills())

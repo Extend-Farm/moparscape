@@ -3,6 +3,7 @@ package io.github.ffakira.rsps.client.desktop.core;
 import io.github.ffakira.rsps.client.core.GameplayClientSession;
 import io.github.ffakira.rsps.client.desktop.login.LoginScreenController;
 import org.lwjgl.system.MemoryStack;
+import java.util.function.BooleanSupplier;
 
 import static org.lwjgl.glfw.GLFW.glfwGetCursorPos;
 import static org.lwjgl.glfw.GLFW.glfwSetCharCallback;
@@ -16,10 +17,10 @@ final class DesktopInputRouter {
 
   private final long window;
   private final OpenGlTileRenderSystem renderSystem;
-  private final GameplayClientSession gameplayClientSession;
   private final DesktopClientState state;
-  private final LoginInputHandler loginInputHandler;
+  private final LoginInputPort loginInputHandler;
   private final GameplayInputHandler gameplayInputHandler;
+  private final BooleanSupplier gameplayActiveSupplier;
 
   DesktopInputRouter(
       long window,
@@ -33,7 +34,6 @@ final class DesktopInputRouter {
   ) {
     this.window = window;
     this.renderSystem = renderSystem;
-    this.gameplayClientSession = gameplayClientSession;
     this.state = state;
     this.loginInputHandler = new LoginInputHandler(
         renderSystem,
@@ -45,6 +45,23 @@ final class DesktopInputRouter {
         authenticatingStatus
     );
     this.gameplayInputHandler = new GameplayInputHandler(renderSystem, gameplayClientSession);
+    this.gameplayActiveSupplier = () -> NativeClientRuntimeCoordinator.isGameplayActive(gameplayClientSession.viewModel());
+  }
+
+  DesktopInputRouter(
+      long window,
+      OpenGlTileRenderSystem renderSystem,
+      DesktopClientState state,
+      LoginInputPort loginInputHandler,
+      GameplayInputHandler gameplayInputHandler,
+      BooleanSupplier gameplayActiveSupplier
+  ) {
+    this.window = window;
+    this.renderSystem = renderSystem;
+    this.state = state;
+    this.loginInputHandler = loginInputHandler;
+    this.gameplayInputHandler = gameplayInputHandler;
+    this.gameplayActiveSupplier = gameplayActiveSupplier;
   }
 
   void bind() {
@@ -56,30 +73,43 @@ final class DesktopInputRouter {
     glfwSetFramebufferSizeCallback(window, (windowHandle, width, height) -> renderSystem.resize(width, height));
     glfwSetCursorPosCallback(window, (windowHandle, cursorX, cursorY) -> updatePointerPosition(cursorX, cursorY));
     glfwSetCharCallback(window, (windowHandle, codePoint) -> {
-      if (isGameplayActive()) {
-        return;
-      }
-      loginInputHandler.handleCharacter(codePoint);
+      routeCharacter(codePoint);
     });
     glfwSetMouseButtonCallback(window, (windowHandle, button, action, mods) -> {
       syncMousePosition(windowHandle);
-      if (isGameplayActive()) {
-        gameplayInputHandler.handleMouseButton(button, action, state.mouseX(), state.mouseY());
-        return;
-      }
-      loginInputHandler.handleMouseButton(button, action, state.mouseX(), state.mouseY());
+      routeMouseButton(windowHandle, button, action);
     });
     glfwSetKeyCallback(window, (windowHandle, key, scancode, action, mods) -> {
-      if (isGameplayActive()) {
-        gameplayInputHandler.handleKey(windowHandle, key, action);
-        return;
-      }
-      loginInputHandler.handleKey(windowHandle, key, action);
+      routeKey(windowHandle, key, action);
     });
   }
 
+  void routeCharacter(int codePoint) {
+    if (isGameplayActive()) {
+      return;
+    }
+    loginInputHandler.handleCharacter(codePoint);
+  }
+
+  void routeMouseButton(long windowHandle, int button, int action) {
+    if (isGameplayActive()) {
+      gameplayInputHandler.handleMouseButton(button, action, state.mouseX(), state.mouseY());
+      return;
+    }
+    loginInputHandler.handleMouseButton(button, action, state.mouseX(), state.mouseY());
+  }
+
+  void routeKey(long windowHandle, int key, int action) {
+    if (isGameplayActive()) {
+      gameplayInputHandler.handleKey(windowHandle, key, action);
+      return;
+    }
+    gameplayInputHandler.clearCameraInputs();
+    loginInputHandler.handleKey(windowHandle, key, action);
+  }
+
   private boolean isGameplayActive() {
-    return NativeClientRuntimeCoordinator.isGameplayActive(gameplayClientSession.viewModel());
+    return gameplayActiveSupplier.getAsBoolean();
   }
 
   private void updatePointerPosition(double mouseX, double mouseY) {
@@ -94,5 +124,13 @@ final class DesktopInputRouter {
       glfwGetCursorPos(windowHandle, cursorX, cursorY);
       updatePointerPosition(cursorX.get(0), cursorY.get(0));
     }
+  }
+
+  interface LoginInputPort {
+    void handleCharacter(int codePoint);
+
+    void handleMouseButton(int button, int action, double mouseX, double mouseY);
+
+    void handleKey(long windowHandle, int key, int action);
   }
 }

@@ -4,16 +4,16 @@ character-password = password
 
 [CHARACTER]
 character-height = 0
-character-posx = 3237
-character-posy = 3211
+character-posx = 3235
+character-posy = 3216
 character-rights = 2
 character-ismember = 1
 character-messages = 0
 character-lastconnection = localhost
 character-lastlogin = 20260420
 character-energy = 100
-character-gametime = 7
-character-gamecount = 102697
+character-gametime = 8
+character-gamecount = 30711
 
 [EQUIPMENT]
 character-equip = 0	1048	1	

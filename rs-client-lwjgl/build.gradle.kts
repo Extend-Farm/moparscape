@@ -24,6 +24,8 @@ dependencies {
   runtimeOnly("org.lwjgl:lwjgl-glfw:$lwjglVersion:natives-linux")
   runtimeOnly("org.lwjgl:lwjgl-opengl:$lwjglVersion:natives-linux")
   runtimeOnly("org.lwjgl:lwjgl-stb:$lwjglVersion:natives-linux")
+
+  testRuntimeOnly(project(":game-client"))
 }
 
 application {

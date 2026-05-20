@@ -109,7 +109,7 @@ public final class WorldViewportClickPlanner {
   private float[] cameraOrigin(WorldCameraState cameraState) {
     float[] translatedOrigin = new float[]{0.0f, -cameraState.screenOffsetY(), cameraState.distance()};
     float[] pitchAdjusted = rotateAroundX(translatedOrigin, -cameraState.pitchDegrees());
-    float[] yawAdjusted = rotateAroundY(pitchAdjusted, -cameraState.yawDegrees());
+    float[] yawAdjusted = rotateAroundY(pitchAdjusted, cameraState.yawDegrees());
     yawAdjusted[0] += cameraState.focusX();
     yawAdjusted[1] += cameraState.focusHeight();
     yawAdjusted[2] += cameraState.focusY();
@@ -118,7 +118,7 @@ public final class WorldViewportClickPlanner {
 
   private float[] viewToWorldDirection(float[] viewDirection, WorldCameraState cameraState) {
     float[] pitchAdjusted = rotateAroundX(viewDirection, -cameraState.pitchDegrees());
-    return normalize(rotateAroundY(pitchAdjusted, -cameraState.yawDegrees()));
+    return normalize(rotateAroundY(pitchAdjusted, cameraState.yawDegrees()));
   }
 
   private float[] rotateAroundX(float[] vector, float degrees) {

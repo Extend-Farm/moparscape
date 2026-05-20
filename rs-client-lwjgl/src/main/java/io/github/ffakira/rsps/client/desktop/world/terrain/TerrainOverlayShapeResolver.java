@@ -16,6 +16,12 @@ public final class TerrainOverlayShapeResolver {
   }
 
   public static boolean hasVisibleOverlay(TerrainLayerSource terrainLayerSource, int tileX, int tileY) {
+    // Legacy scene assembly first checks whether an overlay exists on the tile, then chooses how
+    // that overlay resolves. The native scene needs the same rule so colorless overlays still
+    // keep their shaped mask instead of disappearing.
+    if (terrainLayerSource.overlayIdAt(tileX, tileY) > 0) {
+      return true;
+    }
     return terrainLayerSource.overlayTextureIdAt(tileX, tileY) >= 0
         || terrainLayerSource.overlayColorAt(tileX, tileY) != 0;
   }

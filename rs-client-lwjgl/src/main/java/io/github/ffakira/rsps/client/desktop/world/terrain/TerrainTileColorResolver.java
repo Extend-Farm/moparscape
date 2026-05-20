@@ -23,8 +23,18 @@ public final class TerrainTileColorResolver {
     return texturedTerrainEnabled ? terrainLayerSource.overlayTextureIdAt(tileX, tileY) : -1;
   }
 
+  public static boolean hasRenderableUnderlaySurface(TerrainLayerSource terrainLayerSource, int tileX, int tileY) {
+    return terrainLayerSource.underlayIdAt(tileX, tileY) > 0
+        || terrainLayerSource.underlayColorAt(tileX, tileY) != 0;
+  }
+
+  public static boolean hasRenderableOverlaySurface(TerrainLayerSource terrainLayerSource, int tileX, int tileY) {
+    return terrainLayerSource.overlayTextureIdAt(tileX, tileY) >= 0
+        || terrainLayerSource.overlayColorAt(tileX, tileY) != 0;
+  }
+
   public static FloorColorLayer paintLayer(TerrainLayerSource terrainLayerSource, int tileX, int tileY) {
-    return terrainLayerSource.overlayColorAt(tileX, tileY) != 0 ? FloorColorLayer.OVERLAY : FloorColorLayer.UNDERLAY;
+    return hasOverlayFloor(terrainLayerSource, tileX, tileY) ? FloorColorLayer.OVERLAY : FloorColorLayer.UNDERLAY;
   }
 
   public static int paintLayerColor(TerrainLayerSource terrainLayerSource, int tileX, int tileY, FloorColorLayer layer, int fallbackRgb) {
@@ -142,6 +152,12 @@ public final class TerrainTileColorResolver {
     int north = terrainLayerSource.shadowAt(clamp(clampedX, 0, terrainLayerSource.tileWidth() - 1), clamp(clampedY + 1, 0, terrainLayerSource.tileHeight() - 1));
     int center = terrainLayerSource.shadowAt(clampedX, clampedY);
     return (west >> 2) + (east >> 3) + (south >> 2) + (north >> 3) + (center >> 1);
+  }
+
+  private static boolean hasOverlayFloor(TerrainLayerSource terrainLayerSource, int tileX, int tileY) {
+    return terrainLayerSource.overlayIdAt(tileX, tileY) > 0
+        || terrainLayerSource.overlayTextureIdAt(tileX, tileY) >= 0
+        || terrainLayerSource.overlayColorAt(tileX, tileY) != 0;
   }
 
   private static int applyBrightness(int rgb, int brightness) {

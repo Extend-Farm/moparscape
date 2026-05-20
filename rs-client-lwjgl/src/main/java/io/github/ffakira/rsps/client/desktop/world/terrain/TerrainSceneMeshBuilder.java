@@ -122,6 +122,11 @@ public final class TerrainSceneMeshBuilder {
       int rotation,
       boolean texturedOnly
   ) {
+    boolean renderUnderlay = TerrainTileColorResolver.hasRenderableUnderlaySurface(terrainLayerSource, tileX, tileY);
+    boolean renderOverlay = TerrainTileColorResolver.hasRenderableOverlaySurface(terrainLayerSource, tileX, tileY);
+    if (!renderUnderlay && !renderOverlay) {
+      return;
+    }
     int underlayRgb = TerrainTileColorResolver.fallbackTerrainColor(terrainLayerSource.underlayColorAt(tileX, tileY), terrainLayerSource.tileColorAt(tileX, tileY));
     int overlayRgb = TerrainTileColorResolver.fallbackTerrainColor(terrainLayerSource.overlayColorAt(tileX, tileY), terrainLayerSource.tileColorAt(tileX, tileY));
     int overlayTextureId = TerrainTileColorResolver.activePaintTextureId(terrainLayerSource, tileX, tileY, ENABLE_TEXTURED_TERRAIN);
@@ -190,6 +195,12 @@ public final class TerrainSceneMeshBuilder {
       int vertexA = TerrainShapeDefinitions.rotateTriangleVertexIndex(triangles[triangleOffset + 1], rotation);
       int vertexB = TerrainShapeDefinitions.rotateTriangleVertexIndex(triangles[triangleOffset + 2], rotation);
       int vertexC = TerrainShapeDefinitions.rotateTriangleVertexIndex(triangles[triangleOffset + 3], rotation);
+      // Legacy terrain keeps the overlay shape mask even when one side resolves to the hidden
+      // sentinel color. In the native RGB mesh we express that by omitting the missing half
+      // instead of inventing fallback colors for it.
+      if (colorSelector == 0 && !renderUnderlay || colorSelector != 0 && !renderOverlay) {
+        continue;
+      }
       int textureId = colorSelector == 0 ? -1 : overlayTextureId;
       if (texturedOnly) {
         if (textureId < 0) {

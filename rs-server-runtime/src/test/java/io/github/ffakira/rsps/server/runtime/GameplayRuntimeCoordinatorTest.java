@@ -2,6 +2,7 @@ package io.github.ffakira.rsps.server.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.github.ffakira.rsps.protocol.BootstrapAnimationProfile;
 import io.github.ffakira.rsps.protocol.CharacterBootstrapMessage;
 import io.github.ffakira.rsps.protocol.HandshakeAccepted;
 import io.github.ffakira.rsps.protocol.HandshakeRequest;
@@ -78,8 +79,11 @@ class GameplayRuntimeCoordinatorTest {
       assertThat(session.messages().get(2))
           .isInstanceOfSatisfying(
               CharacterBootstrapMessage.class,
-              message -> assertThat(message.bootstrap().inventory()).singleElement()
-                  .satisfies(slot -> assertThat(slot.itemId()).isEqualTo(555))
+              message -> {
+                assertThat(message.bootstrap().appearance().animationProfile()).isEqualTo(BootstrapAnimationProfile.referencePlayer());
+                assertThat(message.bootstrap().inventory()).singleElement()
+                    .satisfies(slot -> assertThat(slot.itemId()).isEqualTo(554));
+              }
           );
       assertThat(session.messages().get(3)).isInstanceOf(WorldSnapshotMessage.class);
       assertThat(session.messages().get(4))

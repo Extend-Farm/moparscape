@@ -6,6 +6,7 @@ import io.github.ffakira.rsps.content.ItemDefinition;
 import io.github.ffakira.rsps.content.ItemDefinitionCatalog;
 import io.github.ffakira.rsps.model.WorldPoint;
 import io.github.ffakira.rsps.protocol.BootstrapAppearance;
+import io.github.ffakira.rsps.protocol.BootstrapAnimationProfile;
 import io.github.ffakira.rsps.protocol.BootstrapItemSlot;
 import io.github.ffakira.rsps.protocol.BootstrapProfile;
 import io.github.ffakira.rsps.protocol.BootstrapSkill;
@@ -90,6 +91,7 @@ class ClientCoreTest {
     assertThat(worldEvents.get(0)).isInstanceOf(CharacterBootstrappedEvent.class);
     assertThat(worldEvents.get(1)).isInstanceOf(WorldLoadedEvent.class);
     assertThat(clientCore.viewModel().localPlayerPosition()).isEqualTo(new WorldPoint(3200, 3201, 0));
+    assertThat(clientCore.viewModel().bootstrap().appearance().animationProfile()).isEqualTo(BootstrapAnimationProfile.referencePlayer());
     assertThat(clientCore.viewModel().inventory().getFirst().itemId()).isEqualTo(555);
     assertThat(clientCore.viewModel().equipment().getFirst().itemId()).isEqualTo(1048);
     assertThat(clientCore.viewModel().skills().getFirst().currentLevel()).isEqualTo(99);

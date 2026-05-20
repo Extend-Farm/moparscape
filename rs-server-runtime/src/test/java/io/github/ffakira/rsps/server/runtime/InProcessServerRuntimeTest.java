@@ -17,6 +17,7 @@ import io.github.ffakira.rsps.persistence.CharacterSnapshot;
 import io.github.ffakira.rsps.persistence.ItemContainerKind;
 import io.github.ffakira.rsps.protocol.CharacterBootstrapMessage;
 import io.github.ffakira.rsps.protocol.ClientMessage;
+import io.github.ffakira.rsps.protocol.BootstrapAnimationProfile;
 import io.github.ffakira.rsps.protocol.EntityPositionMessage;
 import io.github.ffakira.rsps.protocol.HandshakeAccepted;
 import io.github.ffakira.rsps.protocol.HandshakeRequest;
@@ -79,6 +80,7 @@ class InProcessServerRuntimeTest {
               CharacterBootstrapMessage.class,
               message -> {
                 assertThat(message.bootstrap().displayName()).isEqualTo("Akira");
+                assertThat(message.bootstrap().appearance().animationProfile()).isEqualTo(BootstrapAnimationProfile.referencePlayer());
                 assertThat(message.bootstrap().inventory()).singleElement()
                     .satisfies(slot -> assertThat(slot.itemId()).isEqualTo(555));
               }

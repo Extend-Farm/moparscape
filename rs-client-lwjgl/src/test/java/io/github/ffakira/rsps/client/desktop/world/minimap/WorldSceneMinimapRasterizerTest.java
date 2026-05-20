@@ -101,6 +101,37 @@ class WorldSceneMinimapRasterizerTest {
   }
 
   @Test
+  void leavesNonOverlayPixelsUntouchedForOverlayOnlyShapedTiles() {
+    int[] tileColors = new int[]{0x2f3946};
+    int[] underlayColors = new int[]{0};
+    int[] overlayColors = new int[]{0x97a34a};
+    int[] underlayTextureIds = new int[]{-1};
+    int[] overlayTextureIds = new int[]{-1};
+    byte[] overlayShapes = new byte[]{1};
+    byte[] overlayRotations = new byte[]{0};
+    WorldSceneMinimapRasterizer rasterizer = new WorldSceneMinimapRasterizer();
+
+    ArgbImage image = rasterizer.rasterize(
+        1,
+        1,
+        new int[]{0},
+        tileColors,
+        underlayColors,
+        overlayColors,
+        underlayTextureIds,
+        overlayTextureIds,
+        overlayShapes,
+        overlayRotations,
+        new byte[1],
+        List.of()
+    );
+
+    assertThat(image.pixels()[pixelIndex(4, 1, 0)]).isZero();
+    assertThat(image.pixels()[pixelIndex(4, 0, 0)]).isNotZero();
+    assertThat(image.pixels()[pixelIndex(4, 3, 3)]).isNotZero();
+  }
+
+  @Test
   void stampsMapSceneSpritesInsteadOfGenericAreaObjectFootprints() {
     int[] tileColors = new int[16];
     java.util.Arrays.fill(tileColors, 0x2f3946);

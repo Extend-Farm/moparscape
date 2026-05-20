@@ -2,12 +2,17 @@ package io.github.ffakira.rsps.client.desktop.world.visibility;
 
 import io.github.ffakira.rsps.client.desktop.world.WorldCameraState;
 import io.github.ffakira.rsps.client.desktop.world.WorldScene;
+import io.github.ffakira.rsps.client.desktop.world.WorldSceneScale;
 import java.util.ArrayList;
 import java.util.List;
 
 public final class WorldSceneOcclusionPlanner {
 
   private static final float OCCLUSION_EPSILON = 0.01f;
+  // Legacy SceneGraph only activates horizontal occluders when the occluding plane is at least
+  // 128 raw height units above the camera. Native world heights are already scaled down from raw
+  // cache units, so convert that threshold into the rewrite's world-space height scale.
+  private static final float HORIZONTAL_ACTIVATION_MIN_HEIGHT = 128.0f * WorldSceneScale.HEIGHT_SCALE / 12.0f;
 
   private WorldSceneOcclusionPlanner() {
   }
@@ -23,12 +28,6 @@ public final class WorldSceneOcclusionPlanner {
     float[] cameraPosition = cameraPosition(cameraState);
     List<WorldSceneOccluder> activeOccluders = new ArrayList<>();
     for (WorldSceneOccluder occluder : worldScene.occluders()) {
-      if (occluder.type() == WorldSceneOccluderType.HORIZONTAL_PLANE) {
-        // Legacy horizontal/roof occluders only make sense together with the old render-plane
-        // chooser and SceneGraph activation rules. The native client does not have that layer yet,
-        // so horizontal occluders currently over-hide interiors and floor surfaces.
-        continue;
-      }
       if (!occluder.intersectsWindow(visibilityWindow)) {
         continue;
       }
@@ -76,7 +75,7 @@ public final class WorldSceneOcclusionPlanner {
     return switch (occluder.type()) {
       case X_WALL -> Math.abs(cameraX - occluder.axis()) > 0.25f;
       case Z_WALL -> Math.abs(cameraZ - occluder.axis()) > 0.25f;
-      case HORIZONTAL_PLANE -> Math.abs(cameraY - occluder.axis()) > 0.25f;
+      case HORIZONTAL_PLANE -> occluder.axis() - cameraY > HORIZONTAL_ACTIVATION_MIN_HEIGHT;
     };
   }
 
@@ -155,8 +154,11 @@ public final class WorldSceneOcclusionPlanner {
       float targetZ,
       WorldSceneOccluder occluder
   ) {
+    if (cameraY >= occluder.axis() - OCCLUSION_EPSILON || targetY <= occluder.axis() + OCCLUSION_EPSILON) {
+      return false;
+    }
     float deltaY = targetY - cameraY;
-    if (Math.abs(deltaY) <= OCCLUSION_EPSILON || sameSide(cameraY - occluder.axis(), targetY - occluder.axis())) {
+    if (Math.abs(deltaY) <= OCCLUSION_EPSILON) {
       return false;
     }
     float t = (occluder.axis() - cameraY) / deltaY;
@@ -176,7 +178,7 @@ public final class WorldSceneOcclusionPlanner {
     float focusY = cameraState.focusY();
     float focusHeight = cameraState.focusHeight();
     float pitchRadians = (float) Math.toRadians(cameraState.pitchDegrees());
-    float yawRadians = (float) Math.toRadians(cameraState.yawDegrees());
+    float yawRadians = (float) Math.toRadians(-cameraState.yawDegrees());
     float offsetY = -cameraState.screenOffsetY();
     float offsetZ = cameraState.distance();
 

@@ -8,63 +8,93 @@ import org.junit.jupiter.api.Test;
 class GameplayCameraControllerTest {
 
   @Test
-  void easesTowardAdjustedOrbitAnglesInsteadOfSnappingImmediately() {
+  void acceleratesHeldYawInputUsingLegacyVelocitySteps() {
     TestNanoClock clock = new TestNanoClock();
     GameplayCameraController controller = new GameplayCameraController(clock::now);
 
-    GameplayCameraController.CameraOrbitAngles initial = controller.update();
-    controller.adjust(24.0f, 5.0f);
-    clock.advanceNanos(50_000_000L);
-    GameplayCameraController.CameraOrbitAngles smoothed = controller.update();
-    clock.advanceNanos(500_000_000L);
-    GameplayCameraController.CameraOrbitAngles settled = controller.update();
+    assertThat(controller.update().yawDegrees()).isCloseTo(-135.0f, within(0.0001f));
 
-    assertThat(initial.yawDegrees()).isEqualTo(-135.0f);
-    assertThat(initial.pitchDegrees()).isEqualTo(GameplayCameraController.DEFAULT_PITCH_DEGREES);
-    assertThat(smoothed.yawDegrees()).isBetween(-123.2f, -122.8f);
-    assertThat(smoothed.pitchDegrees()).isBetween(35.3f, 35.5f);
-    assertThat(settled.yawDegrees()).isEqualTo(-111.0f);
-    assertThat(settled.pitchDegrees()).isBetween(35.8f, 36.0f);
+    controller.setHeldInputs(true, false, false, false);
+    GameplayCameraController.CameraOrbitAngles firstTick = advanceTick(controller, clock);
+    GameplayCameraController.CameraOrbitAngles fourthTick = advanceTicks(controller, clock, 3);
+
+    assertThat(firstTick.yawDegrees()).isCloseTo(-136.05469f, within(0.0001f));
+    assertThat(fourthTick.yawDegrees()).isCloseTo(-141.32812f, within(0.0001f));
   }
 
   @Test
-  void clampsPitchTargetWithinLegacyOrbitBounds() {
+  void keepsTurningBrieflyAfterTheHeldKeyIsReleased() {
     TestNanoClock clock = new TestNanoClock();
     GameplayCameraController controller = new GameplayCameraController(clock::now);
 
     controller.update();
-    controller.adjust(0.0f, 50.0f);
-    GameplayCameraController.CameraOrbitAngles raised = advanceToSettledPose(controller, clock);
-    controller.adjust(0.0f, -90.0f);
-    GameplayCameraController.CameraOrbitAngles lowered = advanceToSettledPose(controller, clock);
+    controller.setHeldInputs(true, false, false, false);
+    GameplayCameraController.CameraOrbitAngles heldPose = advanceTicks(controller, clock, 4);
 
-    assertThat(raised.pitchDegrees()).isEqualTo(GameplayCameraController.MAX_PITCH_DEGREES);
-    assertThat(lowered.pitchDegrees()).isEqualTo(GameplayCameraController.MIN_PITCH_DEGREES);
+    controller.clearInputs();
+    GameplayCameraController.CameraOrbitAngles releasedPose = advanceTick(controller, clock);
+    GameplayCameraController.CameraOrbitAngles settledPose = advanceTicks(controller, clock, 4);
+
+    assertThat(releasedPose.yawDegrees()).isLessThan(heldPose.yawDegrees());
+    assertThat(settledPose.yawDegrees()).isCloseTo(-142.73438f, within(0.0001f));
   }
 
   @Test
-  void normalizesYawTargetAcrossTheWrapBoundary() {
+  void givesLeftAndUpPriorityWhenOppositeDirectionsAreHeldTogether() {
     TestNanoClock clock = new TestNanoClock();
     GameplayCameraController controller = new GameplayCameraController(clock::now);
 
     controller.update();
-    controller.adjust(220.0f, 0.0f);
-    for (int step = 0; step < 4; step++) {
-      clock.advanceNanos(250_000_000L);
-      controller.update();
-    }
-    GameplayCameraController.CameraOrbitAngles wrapped = controller.update();
+    controller.setHeldInputs(true, true, true, true);
+    GameplayCameraController.CameraOrbitAngles pose = advanceTick(controller, clock);
 
-    assertThat(wrapped.yawDegrees()).isCloseTo(85.0f, within(0.001f));
+    assertThat(pose.yawDegrees()).isLessThan(GameplayCameraController.DEFAULT_YAW_DEGREES);
+    assertThat(pose.pitchDegrees()).isGreaterThan(GameplayCameraController.DEFAULT_PITCH_DEGREES);
   }
 
-  private GameplayCameraController.CameraOrbitAngles advanceToSettledPose(
+  @Test
+  void clampsPitchWithinLegacyOrbitBounds() {
+    TestNanoClock clock = new TestNanoClock();
+    GameplayCameraController controller = new GameplayCameraController(clock::now);
+
+    controller.update();
+    controller.setHeldInputs(false, false, true, false);
+    GameplayCameraController.CameraOrbitAngles raisedPose = advanceTicks(controller, clock, 80);
+    controller.setHeldInputs(false, false, false, true);
+    GameplayCameraController.CameraOrbitAngles loweredPose = advanceTicks(controller, clock, 120);
+
+    assertThat(raisedPose.pitchDegrees()).isEqualTo(GameplayCameraController.MAX_PITCH_DEGREES);
+    assertThat(loweredPose.pitchDegrees()).isEqualTo(GameplayCameraController.MIN_PITCH_DEGREES);
+  }
+
+  @Test
+  void manualAdjustStillWrapsYawAndClampsPitch() {
+    TestNanoClock clock = new TestNanoClock();
+    GameplayCameraController controller = new GameplayCameraController(clock::now);
+
+    controller.update();
+    controller.adjust(220.0f, 80.0f);
+    GameplayCameraController.CameraOrbitAngles adjusted = controller.update();
+
+    assertThat(adjusted.yawDegrees()).isCloseTo(85.078125f, within(0.0001f));
+    assertThat(adjusted.pitchDegrees()).isEqualTo(GameplayCameraController.MAX_PITCH_DEGREES);
+  }
+
+  private GameplayCameraController.CameraOrbitAngles advanceTick(
       GameplayCameraController controller,
       TestNanoClock clock
   ) {
+    return advanceTicks(controller, clock, 1);
+  }
+
+  private GameplayCameraController.CameraOrbitAngles advanceTicks(
+      GameplayCameraController controller,
+      TestNanoClock clock,
+      int tickCount
+  ) {
     GameplayCameraController.CameraOrbitAngles pose = controller.update();
-    for (int step = 0; step < 4; step++) {
-      clock.advanceNanos(250_000_000L);
+    for (int step = 0; step < tickCount; step++) {
+      clock.advanceNanos(20_000_000L);
       pose = controller.update();
     }
     return pose;

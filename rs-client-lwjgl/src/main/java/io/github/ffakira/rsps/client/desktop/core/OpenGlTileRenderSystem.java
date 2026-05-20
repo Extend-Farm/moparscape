@@ -25,6 +25,7 @@ import io.github.ffakira.rsps.client.desktop.world.WorldViewportRenderer;
 import io.github.ffakira.rsps.client.desktop.world.raster.SceneTextureAssets;
 import io.github.ffakira.rsps.content.ItemDefinitionCatalog;
 import io.github.ffakira.rsps.model.WorldPoint;
+import io.github.ffakira.rsps.protocol.BootstrapAppearance;
 import java.util.Objects;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -81,7 +82,9 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
         primitives
     );
     this.gameplayCameraController = new GameplayCameraController();
-    this.localPlayerAnimationTracker = new LocalPlayerAnimationTracker();
+    this.localPlayerAnimationTracker = new LocalPlayerAnimationTracker(
+        characterModelAssembler == null ? null : characterModelAssembler.animationSequenceCatalog()
+    );
     this.worldSceneSubmissionBuilder = new WorldSceneSubmissionBuilder(characterModelAssembler);
     this.worldViewportRenderer = new WorldViewportRenderer(sceneTextureAssets);
     this.worldViewportClickPlanner = new WorldViewportClickPlanner();
@@ -126,6 +129,7 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
       anchorPoint = null;
       lastWorldSceneSubmission = null;
       localPlayerAnimationTracker.reset();
+      gameplayCameraController.clearInputs();
       gameplayChromeRenderer.closeContextMenu();
       titleScreenRenderer.render(viewModel, width, height);
       return;
@@ -175,8 +179,13 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
     gameplayChromeRenderer.resetToInventoryTab();
   }
 
-  public void adjustGameplayCamera(float yawDeltaDegrees, float pitchDeltaDegrees) {
-    gameplayCameraController.adjust(yawDeltaDegrees, pitchDeltaDegrees);
+  public void setGameplayCameraInputs(
+      boolean rotateLeftPressed,
+      boolean rotateRightPressed,
+      boolean pitchUpPressed,
+      boolean pitchDownPressed
+  ) {
+    gameplayCameraController.setHeldInputs(rotateLeftPressed, rotateRightPressed, pitchUpPressed, pitchDownPressed);
   }
 
   private void configureProjection() {
@@ -211,11 +220,15 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
 
   private void renderWorldScene(ClientViewModel viewModel) {
     GameplayCameraController.CameraOrbitAngles cameraOrbitAngles = gameplayCameraController.update();
-    ActorAnimationState actorAnimationState = localPlayerAnimationTracker.update(viewModel.localPlayerPosition());
+    BootstrapAppearance appearance = viewModel.bootstrap() == null ? null : viewModel.bootstrap().appearance();
+    ActorAnimationState actorAnimationState = localPlayerAnimationTracker.update(
+        viewModel.localPlayerPosition(),
+        appearance == null ? null : appearance.animationProfile()
+    );
     lastWorldSceneSubmission = worldSceneSubmissionBuilder.build(
         worldScene,
         viewModel.localPlayerPosition(),
-        viewModel.bootstrap() == null ? null : viewModel.bootstrap().appearance(),
+        appearance,
         viewModel.equipment(),
         actorAnimationState,
         Math.max(1, Math.round(GameplayLayout.worldViewportInnerRect().width())),

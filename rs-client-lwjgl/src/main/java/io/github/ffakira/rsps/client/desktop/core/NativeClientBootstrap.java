@@ -1,6 +1,7 @@
 package io.github.ffakira.rsps.client.desktop.core;
 
 import io.github.ffakira.rsps.client.core.ClientCore;
+import io.github.ffakira.rsps.cache.AnimationFrameCatalog;
 import io.github.ffakira.rsps.client.core.GameplayClientSession;
 import io.github.ffakira.rsps.cache.RawModelRepository;
 import io.github.ffakira.rsps.client.desktop.character.CharacterModelAssembler;
@@ -11,6 +12,7 @@ import io.github.ffakira.rsps.client.desktop.login.TitleScreenAssetLoader;
 import io.github.ffakira.rsps.client.desktop.login.TitleScreenAssets;
 import io.github.ffakira.rsps.client.desktop.world.CacheBackedWorldSceneLoader;
 import io.github.ffakira.rsps.client.desktop.world.raster.SceneTextureAssets;
+import io.github.ffakira.rsps.content.AnimationSequenceCatalog;
 import io.github.ffakira.rsps.content.ContentBootstrapService;
 import io.github.ffakira.rsps.content.IdentityKitDefinitionCatalog;
 import io.github.ffakira.rsps.content.ItemDefinitionCatalog;
@@ -140,7 +142,15 @@ final class NativeClientBootstrap {
       var manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(workingDirectory);
       IdentityKitDefinitionCatalog identityKitDefinitionCatalog = IdentityKitDefinitionCatalog.load(manifest);
       RawModelRepository rawModelRepository = new RawModelRepository(manifest.cacheStore());
-      return new CharacterModelAssembler(itemDefinitionCatalog, identityKitDefinitionCatalog, rawModelRepository);
+      AnimationFrameCatalog animationFrames = AnimationFrameCatalog.load(manifest.cacheStore());
+      AnimationSequenceCatalog animationSequences = AnimationSequenceCatalog.load(manifest, animationFrames);
+      return new CharacterModelAssembler(
+          itemDefinitionCatalog,
+          identityKitDefinitionCatalog,
+          rawModelRepository,
+          animationSequences,
+          animationFrames
+      );
     } catch (RuntimeException runtimeException) {
       System.err.println("Using proxy character renderer: " + runtimeException.getMessage());
       return null;

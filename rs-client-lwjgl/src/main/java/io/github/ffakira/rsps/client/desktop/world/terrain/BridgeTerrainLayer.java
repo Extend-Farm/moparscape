@@ -5,6 +5,8 @@ public final class BridgeTerrainLayer implements TerrainLayerSource {
   private final int tileWidth;
   private final int tileHeight;
   private final int[] elevations;
+  private final int[] underlayIds;
+  private final int[] overlayIds;
   private final int[] tileColors;
   private final int[] underlayColors;
   private final int[] overlayColors;
@@ -19,6 +21,8 @@ public final class BridgeTerrainLayer implements TerrainLayerSource {
       int tileWidth,
       int tileHeight,
       int[] elevations,
+      int[] underlayIds,
+      int[] overlayIds,
       int[] tileColors,
       int[] underlayColors,
       int[] overlayColors,
@@ -31,6 +35,8 @@ public final class BridgeTerrainLayer implements TerrainLayerSource {
     this.tileWidth = tileWidth;
     this.tileHeight = tileHeight;
     this.elevations = elevations;
+    this.underlayIds = underlayIds;
+    this.overlayIds = overlayIds;
     this.tileColors = tileColors;
     this.underlayColors = underlayColors;
     this.overlayColors = overlayColors;
@@ -49,8 +55,40 @@ public final class BridgeTerrainLayer implements TerrainLayerSource {
     this.empty = !hasActiveTiles;
   }
 
+  public BridgeTerrainLayer(
+      int tileWidth,
+      int tileHeight,
+      int[] elevations,
+      int[] tileColors,
+      int[] underlayColors,
+      int[] overlayColors,
+      int[] underlayTextureIds,
+      int[] overlayTextureIds,
+      byte[] overlayShapes,
+      byte[] overlayRotations,
+      byte[] activeTiles
+  ) {
+    this(
+        tileWidth,
+        tileHeight,
+        elevations,
+        new int[tileWidth * tileHeight],
+        new int[tileWidth * tileHeight],
+        tileColors,
+        underlayColors,
+        overlayColors,
+        underlayTextureIds,
+        overlayTextureIds,
+        overlayShapes,
+        overlayRotations,
+        activeTiles
+    );
+  }
+
   public static BridgeTerrainLayer empty(int tileWidth, int tileHeight) {
     int size = tileWidth * tileHeight;
+    int[] underlayIds = new int[size];
+    int[] overlayIds = new int[size];
     int[] underlayTextureIds = new int[size];
     int[] overlayTextureIds = new int[size];
     java.util.Arrays.fill(underlayTextureIds, -1);
@@ -59,6 +97,8 @@ public final class BridgeTerrainLayer implements TerrainLayerSource {
         tileWidth,
         tileHeight,
         new int[size],
+        underlayIds,
+        overlayIds,
         new int[size],
         new int[size],
         new int[size],
@@ -91,6 +131,16 @@ public final class BridgeTerrainLayer implements TerrainLayerSource {
   @Override
   public int elevationAt(int localX, int localY) {
     return elevations[localY * tileWidth + localX];
+  }
+
+  @Override
+  public int underlayIdAt(int localX, int localY) {
+    return underlayIds[localY * tileWidth + localX];
+  }
+
+  @Override
+  public int overlayIdAt(int localX, int localY) {
+    return overlayIds[localY * tileWidth + localX];
   }
 
   @Override

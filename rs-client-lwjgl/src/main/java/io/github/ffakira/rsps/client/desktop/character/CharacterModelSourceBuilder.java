@@ -16,6 +16,10 @@ import java.util.Map;
 final class CharacterModelSourceBuilder {
 
   private static final int[] DEFAULT_LOOK_VALUES = {0, 7, 8, 9, 5, 0};
+  // The legacy server persists only sex + five recolor slots. The visible body therefore still
+  // starts from the fixed default kit ids that its appearance block writes for unequipped players.
+  private static final int[] MALE_DEFAULT_BODY_KIT_IDS = {7, 25, 29, 35, 39, 44};
+  private static final int[] FEMALE_DEFAULT_BODY_KIT_IDS = {8, 11, 12, 13, 14, 15};
 
   private static final int SLOT_HAT = 0;
   private static final int SLOT_CAPE = 1;
@@ -23,9 +27,21 @@ final class CharacterModelSourceBuilder {
   private static final int SLOT_WEAPON = 3;
   private static final int SLOT_CHEST = 4;
   private static final int SLOT_SHIELD = 5;
+  private static final int SLOT_ARMS = 6;
   private static final int SLOT_LEGS = 7;
+  private static final int SLOT_HEAD = 8;
   private static final int SLOT_HANDS = 9;
   private static final int SLOT_FEET = 10;
+  private static final int SLOT_JAW = 11;
+
+  private static final int BODY_PART_HEAD = 0;
+  private static final int BODY_PART_TORSO = 1;
+  private static final int BODY_PART_ARMS = 2;
+  private static final int BODY_PART_HANDS = 3;
+  private static final int BODY_PART_LEGS = 4;
+  private static final int BODY_PART_FEET = 5;
+  private static final int IDENTITY_KIT_APPEARANCE_BASE = 0x100;
+  private static final int ITEM_APPEARANCE_BASE = 0x200;
 
   private final ItemDefinitionCatalog itemDefinitions;
   private final IdentityKitDefinitionCatalog identityKitDefinitions;
@@ -57,26 +73,21 @@ final class CharacterModelSourceBuilder {
   }
 
   PreparedCharacterSource prepareSourceModel(int[] lookValues, List<BootstrapItemSlot> equipment) {
+    return prepareSourceModel(lookValues, equipment, SequenceEquipmentOverrides.none());
+  }
+
+  PreparedCharacterSource prepareSourceModel(
+      int[] lookValues,
+      List<BootstrapItemSlot> equipment,
+      SequenceEquipmentOverrides equipmentOverrides
+  ) {
     boolean female = lookValues[0] == 1;
-    Map<Integer, Integer> equipmentBySlot = equipmentBySlot(equipment);
+    int[] appearanceEntries = resolveAppearanceEntries(lookValues, equipment, equipmentOverrides);
 
     ArrayList<ModelContribution> contributions = new ArrayList<>();
-    addEquipmentContribution(contributions, equipmentBySlot.get(SLOT_HAT), female);
-    addEquipmentContribution(contributions, equipmentBySlot.get(SLOT_CAPE), female);
-    addEquipmentContribution(contributions, equipmentBySlot.get(SLOT_AMULET), female);
-    addEquipmentContribution(contributions, equipmentBySlot.get(SLOT_WEAPON), female);
-    addChestContribution(contributions, equipmentBySlot.get(SLOT_CHEST), female);
-    addEquipmentContribution(contributions, equipmentBySlot.get(SLOT_SHIELD), female);
-    if (!EquipmentVisibilityRules.isPlateBody(equipmentBySlot.getOrDefault(SLOT_CHEST, -1))) {
-      addIdentityKitContribution(contributions, identityKitDefinitions.defaultBodyKitId(2, female));
+    for (int appearanceEntry : appearanceEntries) {
+      addAppearanceContribution(contributions, appearanceEntry, female);
     }
-    addLegsContribution(contributions, equipmentBySlot.get(SLOT_LEGS), female);
-    if (!EquipmentVisibilityRules.isFullHelm(equipmentBySlot.getOrDefault(SLOT_HAT, -1))
-        && !EquipmentVisibilityRules.isFullMask(equipmentBySlot.getOrDefault(SLOT_HAT, -1))) {
-      addIdentityKitContribution(contributions, identityKitDefinitions.defaultBodyKitId(0, female));
-    }
-    addHandsContribution(contributions, equipmentBySlot.get(SLOT_HANDS), female);
-    addFeetContribution(contributions, equipmentBySlot.get(SLOT_FEET), female);
 
     if (contributions.isEmpty()) {
       return null;
@@ -91,20 +102,23 @@ final class CharacterModelSourceBuilder {
     float maxZ = Float.NEGATIVE_INFINITY;
     for (ModelContribution contribution : contributions) {
       RawModelData rawModelData = contribution.rawModelData();
-      float[][] sourceVertices = extractContributionVertices(rawModelData, contribution.translateY());
+      int[][] modelVertices = extractContributionVertices(rawModelData, contribution.translateY());
       preparedContributions.add(new PreparedContribution(
           contribution,
-          sourceVertices[0],
-          sourceVertices[1],
-          sourceVertices[2]
+          modelVertices[0],
+          modelVertices[1],
+          modelVertices[2]
       ));
       for (int vertexIndex = 0; vertexIndex < rawModelData.vertexCount(); vertexIndex++) {
-        minX = Math.min(minX, sourceVertices[0][vertexIndex]);
-        minY = Math.min(minY, sourceVertices[1][vertexIndex]);
-        minZ = Math.min(minZ, sourceVertices[2][vertexIndex]);
-        maxX = Math.max(maxX, sourceVertices[0][vertexIndex]);
-        maxY = Math.max(maxY, sourceVertices[1][vertexIndex]);
-        maxZ = Math.max(maxZ, sourceVertices[2][vertexIndex]);
+        float sourceX = modelVertices[0][vertexIndex] / 128.0f;
+        float sourceY = -modelVertices[1][vertexIndex] / 128.0f;
+        float sourceZ = modelVertices[2][vertexIndex] / 128.0f;
+        minX = Math.min(minX, sourceX);
+        minY = Math.min(minY, sourceY);
+        minZ = Math.min(minZ, sourceZ);
+        maxX = Math.max(maxX, sourceX);
+        maxY = Math.max(maxY, sourceY);
+        maxZ = Math.max(maxZ, sourceZ);
       }
     }
     return new PreparedCharacterSource(
@@ -113,34 +127,72 @@ final class CharacterModelSourceBuilder {
     );
   }
 
-  private void addChestContribution(List<ModelContribution> contributions, Integer itemId, boolean female) {
-    if (itemId != null && itemId >= 0) {
-      if (addEquipmentContribution(contributions, itemId, female)) {
-        return;
-      }
+  int[] resolveAppearanceEntries(
+      int[] lookValues,
+      List<BootstrapItemSlot> equipment,
+      SequenceEquipmentOverrides equipmentOverrides
+  ) {
+    boolean female = lookValues[0] == 1;
+    Map<Integer, Integer> equipmentBySlot = equipmentBySlot(equipment);
+    int[] bodyKitIds = female ? FEMALE_DEFAULT_BODY_KIT_IDS : MALE_DEFAULT_BODY_KIT_IDS;
+    int[] appearanceEntries = new int[12];
+    int hatItemId = equipmentBySlot.getOrDefault(SLOT_HAT, -1);
+    int chestItemId = equipmentBySlot.getOrDefault(SLOT_CHEST, -1);
+    appearanceEntries[SLOT_HAT] = itemAppearanceEntry(hatItemId);
+    appearanceEntries[SLOT_CAPE] = itemAppearanceEntry(equipmentBySlot.getOrDefault(SLOT_CAPE, -1));
+    appearanceEntries[SLOT_AMULET] = itemAppearanceEntry(equipmentBySlot.getOrDefault(SLOT_AMULET, -1));
+    appearanceEntries[SLOT_WEAPON] = itemAppearanceEntry(equipmentBySlot.getOrDefault(SLOT_WEAPON, -1));
+    appearanceEntries[SLOT_CHEST] = itemOrKitAppearanceEntry(chestItemId, bodyKitIds[BODY_PART_TORSO]);
+    appearanceEntries[SLOT_SHIELD] = itemAppearanceEntry(equipmentBySlot.getOrDefault(SLOT_SHIELD, -1));
+    appearanceEntries[SLOT_ARMS] = EquipmentVisibilityRules.isPlateBody(chestItemId)
+        ? 0
+        : identityKitAppearanceEntry(bodyKitIds[BODY_PART_ARMS]);
+    appearanceEntries[SLOT_LEGS] = itemOrKitAppearanceEntry(
+        equipmentBySlot.getOrDefault(SLOT_LEGS, -1),
+        bodyKitIds[BODY_PART_LEGS]
+    );
+    appearanceEntries[SLOT_HEAD] = EquipmentVisibilityRules.isFullHelm(hatItemId)
+        || EquipmentVisibilityRules.isFullMask(hatItemId)
+        ? 0
+        : identityKitAppearanceEntry(bodyKitIds[BODY_PART_HEAD]);
+    appearanceEntries[SLOT_HANDS] = itemOrKitAppearanceEntry(
+        equipmentBySlot.getOrDefault(SLOT_HANDS, -1),
+        bodyKitIds[BODY_PART_HANDS]
+    );
+    appearanceEntries[SLOT_FEET] = itemOrKitAppearanceEntry(
+        equipmentBySlot.getOrDefault(SLOT_FEET, -1),
+        bodyKitIds[BODY_PART_FEET]
+    );
+    appearanceEntries[SLOT_JAW] = 0;
+    if (equipmentOverrides.mainhandAppearanceId() >= 0) {
+      appearanceEntries[SLOT_WEAPON] = equipmentOverrides.mainhandAppearanceId();
     }
-    addIdentityKitContribution(contributions, identityKitDefinitions.defaultBodyKitId(1, female));
+    if (equipmentOverrides.offhandAppearanceId() >= 0) {
+      appearanceEntries[SLOT_SHIELD] = equipmentOverrides.offhandAppearanceId();
+    }
+    return appearanceEntries;
   }
 
-  private void addLegsContribution(List<ModelContribution> contributions, Integer itemId, boolean female) {
-    if (itemId != null && itemId >= 0 && addEquipmentContribution(contributions, itemId, female)) {
+  private void addAppearanceContribution(List<ModelContribution> contributions, int appearanceEntry, boolean female) {
+    if (appearanceEntry >= IDENTITY_KIT_APPEARANCE_BASE && appearanceEntry < ITEM_APPEARANCE_BASE) {
+      addIdentityKitContribution(contributions, appearanceEntry - IDENTITY_KIT_APPEARANCE_BASE);
       return;
     }
-    addIdentityKitContribution(contributions, identityKitDefinitions.defaultBodyKitId(4, female));
+    if (appearanceEntry >= ITEM_APPEARANCE_BASE) {
+      addEquipmentContribution(contributions, appearanceEntry - ITEM_APPEARANCE_BASE, female);
+    }
   }
 
-  private void addHandsContribution(List<ModelContribution> contributions, Integer itemId, boolean female) {
-    if (itemId != null && itemId >= 0 && addEquipmentContribution(contributions, itemId, female)) {
-      return;
-    }
-    addIdentityKitContribution(contributions, identityKitDefinitions.defaultBodyKitId(3, female));
+  private int itemOrKitAppearanceEntry(int itemId, int bodyKitId) {
+    return itemId >= 0 ? itemAppearanceEntry(itemId) : identityKitAppearanceEntry(bodyKitId);
   }
 
-  private void addFeetContribution(List<ModelContribution> contributions, Integer itemId, boolean female) {
-    if (itemId != null && itemId >= 0 && addEquipmentContribution(contributions, itemId, female)) {
-      return;
-    }
-    addIdentityKitContribution(contributions, identityKitDefinitions.defaultBodyKitId(5, female));
+  private int itemAppearanceEntry(int itemId) {
+    return itemId < 0 ? 0 : ITEM_APPEARANCE_BASE + itemId;
+  }
+
+  private int identityKitAppearanceEntry(int bodyKitId) {
+    return bodyKitId < 0 ? 0 : IDENTITY_KIT_APPEARANCE_BASE + bodyKitId;
   }
 
   private boolean addEquipmentContribution(List<ModelContribution> contributions, Integer itemId, boolean female) {
@@ -191,20 +243,17 @@ final class CharacterModelSourceBuilder {
     return equipmentBySlot;
   }
 
-  private float[][] extractContributionVertices(RawModelData rawModelData, int translateY) {
+  private int[][] extractContributionVertices(RawModelData rawModelData, int translateY) {
     int vertexCount = rawModelData.vertexCount();
-    float[] worldX = new float[vertexCount];
-    float[] worldY = new float[vertexCount];
-    float[] worldZ = new float[vertexCount];
+    int[] modelX = new int[vertexCount];
+    int[] modelY = new int[vertexCount];
+    int[] modelZ = new int[vertexCount];
     for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
-      float x = rawModelData.vertexX()[vertexIndex] / 128.0f;
-      float y = -(rawModelData.vertexY()[vertexIndex] + translateY) / 128.0f;
-      float z = rawModelData.vertexZ()[vertexIndex] / 128.0f;
-      worldX[vertexIndex] = x;
-      worldY[vertexIndex] = y;
-      worldZ[vertexIndex] = z;
+      modelX[vertexIndex] = rawModelData.vertexX()[vertexIndex];
+      modelY[vertexIndex] = rawModelData.vertexY()[vertexIndex] + translateY;
+      modelZ[vertexIndex] = rawModelData.vertexZ()[vertexIndex];
     }
-    return new float[][]{worldX, worldY, worldZ};
+    return new int[][]{modelX, modelY, modelZ};
   }
 
   record ModelContribution(
@@ -221,9 +270,9 @@ final class CharacterModelSourceBuilder {
   // applies one shared actor transform across the assembled body.
   record PreparedContribution(
       ModelContribution contribution,
-      float[] sourceX,
-      float[] sourceY,
-      float[] sourceZ
+      int[] modelX,
+      int[] modelY,
+      int[] modelZ
   ) {
   }
 
@@ -245,6 +294,13 @@ final class CharacterModelSourceBuilder {
 
     float centerZ() {
       return (minZ + maxZ) * 0.5f;
+    }
+  }
+
+  record SequenceEquipmentOverrides(int mainhandAppearanceId, int offhandAppearanceId) {
+
+    static SequenceEquipmentOverrides none() {
+      return new SequenceEquipmentOverrides(-1, -1);
     }
   }
 }

@@ -2,14 +2,48 @@ package io.github.ffakira.rsps.client.desktop.world.visibility;
 
 import io.github.ffakira.rsps.client.desktop.world.WorldSceneScale;
 import io.github.ffakira.rsps.client.desktop.world.object.WorldSceneObject;
+import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainOcclusionFlagResolver;
 import java.util.ArrayList;
 import java.util.List;
 
 public final class WorldSceneOccluderBuilder {
 
   private static final float WALL_THICKNESS = 0.12f;
-  private static final float MIN_HORIZONTAL_OCCLUDER_AREA = 2.25f;
-  private static final float MIN_HORIZONTAL_OCCLUDER_HEIGHT = 1.5f;
+  private static final float HORIZONTAL_OCCLUDER_THICKNESS = 0.08f;
+  private static final int MIN_HORIZONTAL_OCCLUDER_TILE_AREA = 4;
+
+  public List<WorldSceneOccluder> build(
+      int scenePlane,
+      int tileWidth,
+      int tileHeight,
+      int[] elevations,
+      byte[] surfacePlanes,
+      int[] terrainOcclusionFlags,
+      List<WorldSceneObject> objects
+  ) {
+    // This is intentionally scene-side work, not viewport work. The loader captures cache-backed
+    // walls/structures once, and submission can then reason about occlusion without pushing map
+    // semantics down into the OpenGL render pass.
+    List<WorldSceneOccluder> occluders = new ArrayList<>();
+    addHorizontalTerrainOccluders(
+        occluders,
+        scenePlane,
+        tileWidth,
+        tileHeight,
+        elevations,
+        surfacePlanes,
+        terrainOcclusionFlags
+    );
+    for (WorldSceneObject object : objects) {
+      if (object.plane() != scenePlane) {
+        continue;
+      }
+      float baseHeight = sampleBaseHeight(object, tileWidth, tileHeight, elevations);
+      GeometryBounds bounds = geometryBounds(object, baseHeight);
+      addWallOccluders(occluders, object, bounds);
+    }
+    return List.copyOf(occluders);
+  }
 
   public List<WorldSceneOccluder> build(
       int scenePlane,
@@ -18,20 +52,15 @@ public final class WorldSceneOccluderBuilder {
       int[] elevations,
       List<WorldSceneObject> objects
   ) {
-    // This is intentionally scene-side work, not viewport work. The loader captures cache-backed
-    // walls/structures once, and submission can then reason about occlusion without pushing map
-    // semantics down into the OpenGL render pass.
-    List<WorldSceneOccluder> occluders = new ArrayList<>();
-    for (WorldSceneObject object : objects) {
-      if (object.plane() != scenePlane) {
-        continue;
-      }
-      float baseHeight = sampleBaseHeight(object, tileWidth, tileHeight, elevations);
-      GeometryBounds bounds = geometryBounds(object, baseHeight);
-      addWallOccluders(occluders, object, bounds);
-      addHorizontalOccluder(occluders, object, bounds);
-    }
-    return List.copyOf(occluders);
+    return build(
+        scenePlane,
+        tileWidth,
+        tileHeight,
+        elevations,
+        new byte[tileWidth * tileHeight],
+        new int[tileWidth * tileHeight],
+        objects
+    );
   }
 
   private void addWallOccluders(
@@ -117,36 +146,79 @@ public final class WorldSceneOccluderBuilder {
     }
   }
 
-  private void addHorizontalOccluder(
+  private void addHorizontalTerrainOccluders(
       List<WorldSceneOccluder> occluders,
-      WorldSceneObject object,
-      GeometryBounds bounds
+      int scenePlane,
+      int tileWidth,
+      int tileHeight,
+      int[] elevations,
+      byte[] surfacePlanes,
+      int[] terrainOcclusionFlags
   ) {
-    if (!isHorizontalOccluderCandidate(object, bounds)) {
-      return;
+    boolean[] consumedTiles = new boolean[tileWidth * tileHeight];
+    for (int tileY = 0; tileY < tileHeight - 1; tileY++) {
+      for (int tileX = 0; tileX < tileWidth - 1; tileX++) {
+        int tileIndex = tileY * tileWidth + tileX;
+        if (consumedTiles[tileIndex] || !hasHorizontalOccluderFlag(terrainOcclusionFlags[tileIndex])) {
+          continue;
+        }
+        int surfacePlane = surfacePlanes[tileIndex] & 0xff;
+        if (surfacePlane <= scenePlane) {
+          continue;
+        }
+        int maxTileX = tileX;
+        while (maxTileX + 1 < tileWidth - 1 && matchesHorizontalOccluderTile(
+            maxTileX + 1,
+            tileY,
+            tileWidth,
+            scenePlane,
+            surfacePlane,
+            surfacePlanes,
+            terrainOcclusionFlags,
+            consumedTiles
+        )) {
+          maxTileX++;
+        }
+        int maxTileY = tileY;
+        boolean extendSouth = true;
+        while (extendSouth && maxTileY + 1 < tileHeight - 1) {
+          for (int spanTileX = tileX; spanTileX <= maxTileX; spanTileX++) {
+            if (!matchesHorizontalOccluderTile(
+                spanTileX,
+                maxTileY + 1,
+                tileWidth,
+                scenePlane,
+                surfacePlane,
+                surfacePlanes,
+                terrainOcclusionFlags,
+                consumedTiles
+            )) {
+              extendSouth = false;
+              break;
+            }
+          }
+          if (extendSouth) {
+            maxTileY++;
+          }
+        }
+        int tileArea = (maxTileX - tileX + 1) * (maxTileY - tileY + 1);
+        if (tileArea >= MIN_HORIZONTAL_OCCLUDER_TILE_AREA) {
+          float height = elevations[tileIndex] * WorldSceneScale.HEIGHT_SCALE;
+          occluders.add(new WorldSceneOccluder(
+              WorldSceneOccluderType.HORIZONTAL_PLANE,
+              scenePlane,
+              height,
+              tileX,
+              maxTileX + 1.0f,
+              tileY,
+              maxTileY + 1.0f,
+              height - HORIZONTAL_OCCLUDER_THICKNESS,
+              height + HORIZONTAL_OCCLUDER_THICKNESS
+          ));
+          markConsumed(consumedTiles, tileWidth, tileX, maxTileX, tileY, maxTileY);
+        }
+      }
     }
-    occluders.add(new WorldSceneOccluder(
-        WorldSceneOccluderType.HORIZONTAL_PLANE,
-        object.plane(),
-        bounds.maxY() - 0.08f,
-        bounds.minX(),
-        bounds.maxX(),
-        bounds.minZ(),
-        bounds.maxZ(),
-        bounds.maxY() - 0.16f,
-        bounds.maxY() + 0.24f
-    ));
-  }
-
-  private boolean isHorizontalOccluderCandidate(WorldSceneObject object, GeometryBounds bounds) {
-    if (object.type() != 10 && object.type() != 11 && (object.type() < 12 || object.type() > 17)) {
-      return false;
-    }
-    float width = bounds.maxX() - bounds.minX();
-    float depth = bounds.maxZ() - bounds.minZ();
-    float height = bounds.maxY() - bounds.minY();
-    return width * depth >= MIN_HORIZONTAL_OCCLUDER_AREA
-        && height >= MIN_HORIZONTAL_OCCLUDER_HEIGHT;
   }
 
   private WorldSceneOccluder xWallOccluder(
@@ -252,6 +324,35 @@ public final class WorldSceneOccluderBuilder {
 
   private int clamp(int value, int minimum, int maximum) {
     return Math.max(minimum, Math.min(maximum, value));
+  }
+
+  private boolean hasHorizontalOccluderFlag(int terrainOcclusionFlags) {
+    return (terrainOcclusionFlags & TerrainOcclusionFlagResolver.LEGACY_FLAT_TILE_OCCLUSION_MASK) != 0;
+  }
+
+  private boolean matchesHorizontalOccluderTile(
+      int tileX,
+      int tileY,
+      int tileWidth,
+      int scenePlane,
+      int surfacePlane,
+      byte[] surfacePlanes,
+      int[] terrainOcclusionFlags,
+      boolean[] consumedTiles
+  ) {
+    int tileIndex = tileY * tileWidth + tileX;
+    return !consumedTiles[tileIndex]
+        && hasHorizontalOccluderFlag(terrainOcclusionFlags[tileIndex])
+        && (surfacePlanes[tileIndex] & 0xff) == surfacePlane
+        && surfacePlane > scenePlane;
+  }
+
+  private void markConsumed(boolean[] consumedTiles, int tileWidth, int minTileX, int maxTileX, int minTileY, int maxTileY) {
+    for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
+      for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
+        consumedTiles[tileY * tileWidth + tileX] = true;
+      }
+    }
   }
 
   private record GeometryBounds(

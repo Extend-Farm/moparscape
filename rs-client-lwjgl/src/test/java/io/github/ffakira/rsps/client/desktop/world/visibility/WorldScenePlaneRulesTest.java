@@ -2,102 +2,68 @@ package io.github.ffakira.rsps.client.desktop.world.visibility;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.github.ffakira.rsps.content.TerrainRegionData;
+import io.github.ffakira.rsps.client.desktop.core.ArgbImage;
+import io.github.ffakira.rsps.client.desktop.world.WorldCameraState;
+import io.github.ffakira.rsps.client.desktop.world.WorldScene;
+import io.github.ffakira.rsps.client.desktop.world.WorldSceneProjection;
 import org.junit.jupiter.api.Test;
 
 class WorldScenePlaneRulesTest {
 
   @Test
-  void lowersPlaneWhenBridgeFlagIsSetOnPlaneOne() {
-    int[][] heights = new int[4][64 * 64];
-    byte[][] underlays = new byte[4][64 * 64];
-    byte[][] overlays = new byte[4][64 * 64];
-    byte[][] overlayShapes = new byte[4][64 * 64];
-    byte[][] overlayRotations = new byte[4][64 * 64];
-    byte[][] tileFlags = new byte[4][64 * 64];
-    tileFlags[1][5 * 64 + 5] = 2;
-    TerrainRegionData regionData = new TerrainRegionData(
-        50,
-        50,
-        heights,
-        underlays,
-        overlays,
-        overlayShapes,
-        overlayRotations,
-        tileFlags
+  void selectsTheScenePlaneWhenRoofFlagsExistOnTheCameraToPlayerPath() {
+    byte[] tileFlags = new byte[128 * 128];
+    tileFlags[32 * 128 + 32] = 4;
+    WorldScene worldScene = testWorldScene(tileFlags);
+
+    int renderPlane = WorldScenePlaneRules.renderPlane(
+        worldScene,
+        new WorldCameraState(26.0f, -45.0f, 20.0f, -1.0f, 33.0f, 34.0f, 0.0f),
+        32,
+        32
     );
 
-    assertThat(WorldScenePlaneRules.effectivePlane(regionData, 2, 5, 5)).isEqualTo(1);
+    assertThat(renderPlane).isEqualTo(worldScene.plane());
   }
 
   @Test
-  void forcesPlaneZeroWhenRoofFlagEightIsSet() {
-    int[][] heights = new int[4][64 * 64];
-    byte[][] underlays = new byte[4][64 * 64];
-    byte[][] overlays = new byte[4][64 * 64];
-    byte[][] overlayShapes = new byte[4][64 * 64];
-    byte[][] overlayRotations = new byte[4][64 * 64];
-    byte[][] tileFlags = new byte[4][64 * 64];
-    tileFlags[2][7 * 64 + 7] = 8;
-    TerrainRegionData regionData = new TerrainRegionData(
-        50,
-        50,
-        heights,
-        underlays,
-        overlays,
-        overlayShapes,
-        overlayRotations,
-        tileFlags
+  void fallsBackToOpenPlaneWhenTheCameraPitchIsAboveTheRoofThreshold() {
+    byte[] tileFlags = new byte[128 * 128];
+    tileFlags[32 * 128 + 32] = 4;
+    WorldScene worldScene = testWorldScene(tileFlags);
+
+    int renderPlane = WorldScenePlaneRules.renderPlane(
+        worldScene,
+        new WorldCameraState(60.0f, -45.0f, 20.0f, -1.0f, 33.0f, 34.0f, 0.0f),
+        32,
+        32
     );
 
-    assertThat(WorldScenePlaneRules.effectivePlane(regionData, 2, 7, 7)).isEqualTo(0);
+    assertThat(renderPlane).isEqualTo(3);
   }
 
-  @Test
-  void usesBridgeSurfacePlaneForGroundScenesWhenPlaneOneCarriesTheDeck() {
-    int[][] heights = new int[4][64 * 64];
-    byte[][] underlays = new byte[4][64 * 64];
-    byte[][] overlays = new byte[4][64 * 64];
-    byte[][] overlayShapes = new byte[4][64 * 64];
-    byte[][] overlayRotations = new byte[4][64 * 64];
-    byte[][] tileFlags = new byte[4][64 * 64];
-    tileFlags[1][9 * 64 + 9] = 2;
-    overlays[1][9 * 64 + 9] = 10;
-    TerrainRegionData regionData = new TerrainRegionData(
-        50,
-        50,
-        heights,
-        underlays,
-        overlays,
-        overlayShapes,
-        overlayRotations,
-        tileFlags
+  private WorldScene testWorldScene(byte[] tileFlags) {
+    return new WorldScene(
+        "plane-rules",
+        3200,
+        3200,
+        0,
+        128,
+        128,
+        new int[128 * 128],
+        new int[128 * 128],
+        new int[128 * 128],
+        new int[128 * 128],
+        new int[128 * 128],
+        new int[128 * 128],
+        new byte[128 * 128],
+        new byte[128 * 128],
+        tileFlags,
+        java.util.List.of(),
+        java.util.List.of(),
+        new ArgbImage(1, 1, new int[]{0xff000000}),
+        new ArgbImage(1, 1, new int[]{0xff000000}),
+        new WorldSceneProjection(5, 3, 0, 0)
     );
-
-    assertThat(WorldScenePlaneRules.surfacePlane(regionData, 0, 9, 9)).isEqualTo(1);
-  }
-
-  @Test
-  void projectsPlaneOneBridgeObjectsIntoGroundScenes() {
-    int[][] heights = new int[4][64 * 64];
-    byte[][] underlays = new byte[4][64 * 64];
-    byte[][] overlays = new byte[4][64 * 64];
-    byte[][] overlayShapes = new byte[4][64 * 64];
-    byte[][] overlayRotations = new byte[4][64 * 64];
-    byte[][] tileFlags = new byte[4][64 * 64];
-    tileFlags[1][11 * 64 + 11] = 2;
-    TerrainRegionData regionData = new TerrainRegionData(
-        50,
-        50,
-        heights,
-        underlays,
-        overlays,
-        overlayShapes,
-        overlayRotations,
-        tileFlags
-    );
-
-    assertThat(WorldScenePlaneRules.objectScenePlane(regionData, 0, 1, 11, 11)).isEqualTo(0);
-    assertThat(WorldScenePlaneRules.objectScenePlane(regionData, 0, 1, 10, 10)).isEqualTo(-1);
   }
 }

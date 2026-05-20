@@ -16,6 +16,8 @@ public record WorldScene(
     int tileWidth,
     int tileHeight,
     int[] elevations,
+    int[] underlayIds,
+    int[] overlayIds,
     int[] tileColors,
     int[] underlayColors,
     int[] overlayColors,
@@ -30,7 +32,9 @@ public record WorldScene(
     ArgbImage image,
     ArgbImage minimapImage,
     WorldSceneProjection projection,
-    BridgeTerrainLayer bridgeTerrainLayer
+    BridgeTerrainLayer bridgeTerrainLayer,
+    byte[] surfacePlanes,
+    int[] terrainOcclusionFlags
 ) implements TerrainLayerSource {
 
   public WorldScene(
@@ -64,6 +68,8 @@ public record WorldScene(
         tileWidth,
         tileHeight,
         elevations,
+        emptyFloorIds(tileWidth, tileHeight),
+        emptyFloorIds(tileWidth, tileHeight),
         tileColors,
         underlayColors,
         overlayColors,
@@ -78,7 +84,64 @@ public record WorldScene(
         image,
         minimapImage,
         projection,
-        bridgeTerrainLayer
+        bridgeTerrainLayer,
+        emptySurfacePlanes(tileWidth, tileHeight),
+        emptyTerrainOcclusionFlags(tileWidth, tileHeight)
+    );
+  }
+
+  public WorldScene(
+      String sceneKey,
+      int originWorldX,
+      int originWorldY,
+      int plane,
+      int tileWidth,
+      int tileHeight,
+      int[] elevations,
+      int[] underlayIds,
+      int[] overlayIds,
+      int[] tileColors,
+      int[] underlayColors,
+      int[] overlayColors,
+      int[] underlayTextureIds,
+      int[] overlayTextureIds,
+      byte[] overlayShapes,
+      byte[] overlayRotations,
+      byte[] tileFlags,
+      List<WorldSceneObject> objects,
+      List<WorldSceneOccluder> occluders,
+      ArgbImage image,
+      ArgbImage minimapImage,
+      WorldSceneProjection projection,
+      BridgeTerrainLayer bridgeTerrainLayer
+  ) {
+    this(
+        sceneKey,
+        originWorldX,
+        originWorldY,
+        plane,
+        tileWidth,
+        tileHeight,
+        elevations,
+        underlayIds,
+        overlayIds,
+        tileColors,
+        underlayColors,
+        overlayColors,
+        underlayTextureIds,
+        overlayTextureIds,
+        overlayShapes,
+        overlayRotations,
+        tileFlags,
+        emptyShadowSamples(tileWidth, tileHeight),
+        objects,
+        occluders,
+        image,
+        minimapImage,
+        projection,
+        bridgeTerrainLayer,
+        emptySurfacePlanes(tileWidth, tileHeight),
+        emptyTerrainOcclusionFlags(tileWidth, tileHeight)
     );
   }
 
@@ -112,6 +175,8 @@ public record WorldScene(
         tileWidth,
         tileHeight,
         elevations,
+        emptyFloorIds(tileWidth, tileHeight),
+        emptyFloorIds(tileWidth, tileHeight),
         tileColors,
         underlayColors,
         overlayColors,
@@ -126,17 +191,79 @@ public record WorldScene(
         image,
         minimapImage,
         projection,
-        BridgeTerrainLayer.empty(tileWidth, tileHeight)
+        BridgeTerrainLayer.empty(tileWidth, tileHeight),
+        emptySurfacePlanes(tileWidth, tileHeight),
+        emptyTerrainOcclusionFlags(tileWidth, tileHeight)
+    );
+  }
+
+  public WorldScene(
+      String sceneKey,
+      int originWorldX,
+      int originWorldY,
+      int plane,
+      int tileWidth,
+      int tileHeight,
+      int[] elevations,
+      int[] tileColors,
+      int[] underlayColors,
+      int[] overlayColors,
+      int[] underlayTextureIds,
+      int[] overlayTextureIds,
+      byte[] overlayShapes,
+      byte[] overlayRotations,
+      byte[] tileFlags,
+      byte[] shadowSamples,
+      List<WorldSceneObject> objects,
+      List<WorldSceneOccluder> occluders,
+      ArgbImage image,
+      ArgbImage minimapImage,
+      WorldSceneProjection projection,
+      BridgeTerrainLayer bridgeTerrainLayer
+  ) {
+    this(
+        sceneKey,
+        originWorldX,
+        originWorldY,
+        plane,
+        tileWidth,
+        tileHeight,
+        elevations,
+        emptyFloorIds(tileWidth, tileHeight),
+        emptyFloorIds(tileWidth, tileHeight),
+        tileColors,
+        underlayColors,
+        overlayColors,
+        underlayTextureIds,
+        overlayTextureIds,
+        overlayShapes,
+        overlayRotations,
+        tileFlags,
+        shadowSamples,
+        objects,
+        occluders,
+        image,
+        minimapImage,
+        projection,
+        bridgeTerrainLayer,
+        emptySurfacePlanes(tileWidth, tileHeight),
+        emptyTerrainOcclusionFlags(tileWidth, tileHeight)
     );
   }
 
   public WorldScene {
     objects = List.copyOf(objects);
     occluders = List.copyOf(occluders);
+    underlayIds = underlayIds == null ? emptyFloorIds(tileWidth, tileHeight) : underlayIds;
+    overlayIds = overlayIds == null ? emptyFloorIds(tileWidth, tileHeight) : overlayIds;
     shadowSamples = shadowSamples == null ? emptyShadowSamples(tileWidth, tileHeight) : shadowSamples;
     bridgeTerrainLayer = bridgeTerrainLayer == null
         ? BridgeTerrainLayer.empty(tileWidth, tileHeight)
         : bridgeTerrainLayer;
+    surfacePlanes = surfacePlanes == null ? emptySurfacePlanes(tileWidth, tileHeight) : surfacePlanes;
+    terrainOcclusionFlags = terrainOcclusionFlags == null
+        ? emptyTerrainOcclusionFlags(tileWidth, tileHeight)
+        : terrainOcclusionFlags;
   }
 
   public boolean contains(WorldPoint worldPoint) {
@@ -184,6 +311,20 @@ public record WorldScene(
     return elevations[localY * tileWidth + localX];
   }
 
+  public int surfacePlaneAt(int localX, int localY) {
+    return surfacePlanes[localY * tileWidth + localX] & 0xff;
+  }
+
+  @Override
+  public int underlayIdAt(int localX, int localY) {
+    return underlayIds[localY * tileWidth + localX];
+  }
+
+  @Override
+  public int overlayIdAt(int localX, int localY) {
+    return overlayIds[localY * tileWidth + localX];
+  }
+
   public int tileColorAt(int localX, int localY) {
     return tileColors[localY * tileWidth + localX];
   }
@@ -221,7 +362,23 @@ public record WorldScene(
     return tileFlags[localY * tileWidth + localX] & 0xff;
   }
 
+  public int terrainOcclusionFlagAt(int localX, int localY) {
+    return terrainOcclusionFlags[localY * tileWidth + localX];
+  }
+
   private static byte[] emptyShadowSamples(int tileWidth, int tileHeight) {
     return new byte[tileWidth * tileHeight];
+  }
+
+  private static int[] emptyFloorIds(int tileWidth, int tileHeight) {
+    return new int[tileWidth * tileHeight];
+  }
+
+  private static byte[] emptySurfacePlanes(int tileWidth, int tileHeight) {
+    return new byte[tileWidth * tileHeight];
+  }
+
+  private static int[] emptyTerrainOcclusionFlags(int tileWidth, int tileHeight) {
+    return new int[tileWidth * tileHeight];
   }
 }

@@ -15,9 +15,10 @@ final class ItemIconModelProjector {
   private static final int LIGHT_VECTOR_Y = -10;
   private static final int LIGHT_VECTOR_Z = -50;
   private static final int LIGHT_VECTOR_LENGTH = 71;
-  private static final double HSL_PALETTE_GAMMA = 0.8D;
+  private static final int TRIG_SCALE = 1 << 16;
   private static final SceneTextureAssets EMPTY_TEXTURE_ASSETS = new SceneTextureAssets(new ArgbImage[0]);
-  private static final int[] SHADED_HSL_PALETTE = buildShadedHslPalette(HSL_PALETTE_GAMMA);
+  private static final int[] SINE = buildTrigTable(true);
+  private static final int[] COSINE = buildTrigTable(false);
 
   private final ItemDefinitionCatalog itemDefinitions;
   private final ItemIconDefinitionResolver definitionResolver;
@@ -35,7 +36,7 @@ final class ItemIconModelProjector {
     this.sceneTextureAssets = sceneTextureAssets == null ? EMPTY_TEXTURE_ASSETS : sceneTextureAssets;
   }
 
-  List<ItemIconRasterizer.ProjectedFace> project(int itemId) {
+  List<ProjectedFace> project(int itemId) {
     ItemDefinition definition = itemDefinitions.find(itemId).orElse(null);
     if (definition == null || !definitionResolver.hasInventoryModel(definition)) {
       return List.of();
@@ -48,7 +49,12 @@ final class ItemIconModelProjector {
     PreparedInventoryModel preparedInventoryModel = prepareInventoryModel(rawModelData, definition.inventoryAppearance());
     ProjectedVertices projectedVertices = projectVertices(preparedInventoryModel, definition.inventoryAppearance());
     NormalSet normalSet = computeNormals(rawModelData, preparedInventoryModel.axes());
-    return projectFaces(rawModelData, definition, projectedVertices.viewSpaceAxes(), normalSet);
+    return projectFaces(
+        rawModelData,
+        definition,
+        projectedVertices.viewSpaceAxes(),
+        normalSet
+    );
   }
 
   private PreparedInventoryModel prepareInventoryModel(
@@ -56,17 +62,14 @@ final class ItemIconModelProjector {
       ItemDefinition.InventoryAppearance inventoryAppearance
   ) {
     int vertexCount = rawModelData.vertexCount();
-    float[] modelX = new float[vertexCount];
-    float[] modelY = new float[vertexCount];
-    float[] modelZ = new float[vertexCount];
-    float scaleX = inventoryAppearance.resizeX() / 128.0f;
-    float scaleY = inventoryAppearance.resizeY() / 128.0f;
-    float scaleZ = inventoryAppearance.resizeZ() / 128.0f;
-    float modelHeight = 0.0f;
+    int[] modelX = new int[vertexCount];
+    int[] modelY = new int[vertexCount];
+    int[] modelZ = new int[vertexCount];
+    int modelHeight = 0;
     for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
-      float x = rawModelData.vertexX()[vertexIndex] * scaleX;
-      float y = rawModelData.vertexY()[vertexIndex] * scaleY;
-      float z = rawModelData.vertexZ()[vertexIndex] * scaleZ;
+      int x = rawModelData.vertexX()[vertexIndex] * inventoryAppearance.resizeX() / 128;
+      int y = rawModelData.vertexY()[vertexIndex] * inventoryAppearance.resizeY() / 128;
+      int z = rawModelData.vertexZ()[vertexIndex] * inventoryAppearance.resizeZ() / 128;
       modelX[vertexIndex] = x;
       modelY[vertexIndex] = y;
       modelZ[vertexIndex] = z;
@@ -82,38 +85,36 @@ final class ItemIconModelProjector {
     float[] viewX = new float[preparedInventoryModel.x().length];
     float[] viewY = new float[preparedInventoryModel.x().length];
     float[] viewZ = new float[preparedInventoryModel.x().length];
-    float pitchRadians = angleRadians(inventoryAppearance.rotationX());
-    float yawRadians = angleRadians(inventoryAppearance.rotationY());
-    float rollRadians = angleRadians(inventoryAppearance.rotationZ());
-    float pitchSin = (float) Math.sin(pitchRadians);
-    float pitchCos = (float) Math.cos(pitchRadians);
-    float yawSin = (float) Math.sin(yawRadians);
-    float yawCos = (float) Math.cos(yawRadians);
-    float rollSin = (float) Math.sin(rollRadians);
-    float rollCos = (float) Math.cos(rollRadians);
-    float cameraY = pitchSin * inventoryAppearance.zoom()
-        + preparedInventoryModel.modelHeight() / 2.0f
+    int pitchSin = SINE[angleIndex(inventoryAppearance.rotationX())];
+    int pitchCos = COSINE[angleIndex(inventoryAppearance.rotationX())];
+    int yawSin = SINE[angleIndex(inventoryAppearance.rotationY())];
+    int yawCos = COSINE[angleIndex(inventoryAppearance.rotationY())];
+    int rollSin = SINE[angleIndex(inventoryAppearance.rotationZ())];
+    int rollCos = COSINE[angleIndex(inventoryAppearance.rotationZ())];
+    // Match the classic item sprite camera math so icon footprints stay aligned with cache-era assets.
+    int cameraY = (pitchSin * inventoryAppearance.zoom() >> 16)
+        + preparedInventoryModel.modelHeight() / 2
         + inventoryAppearance.offsetY();
-    float cameraZ = pitchCos * inventoryAppearance.zoom() + inventoryAppearance.offsetY();
+    int cameraZ = (pitchCos * inventoryAppearance.zoom() >> 16) + inventoryAppearance.offsetY();
     for (int vertexIndex = 0; vertexIndex < preparedInventoryModel.x().length; vertexIndex++) {
-      float x = preparedInventoryModel.x()[vertexIndex];
-      float y = preparedInventoryModel.y()[vertexIndex];
-      float z = preparedInventoryModel.z()[vertexIndex];
+      int x = preparedInventoryModel.x()[vertexIndex];
+      int y = preparedInventoryModel.y()[vertexIndex];
+      int z = preparedInventoryModel.z()[vertexIndex];
       if (inventoryAppearance.rotationZ() != 0) {
-        float rotatedX = y * rollSin + x * rollCos;
-        y = y * rollCos - x * rollSin;
+        int rotatedX = y * rollSin + x * rollCos >> 16;
+        y = y * rollCos - x * rollSin >> 16;
         x = rotatedX;
       }
       if (inventoryAppearance.rotationY() != 0) {
-        float rotatedX = z * yawSin + x * yawCos;
-        z = z * yawCos - x * yawSin;
+        int rotatedX = z * yawSin + x * yawCos >> 16;
+        z = z * yawCos - x * yawSin >> 16;
         x = rotatedX;
       }
       x += inventoryAppearance.offsetX();
       y += cameraY;
       z += cameraZ;
-      float projectedY = y * pitchCos - z * pitchSin;
-      float depth = y * pitchSin + z * pitchCos;
+      int projectedY = y * pitchCos - z * pitchSin >> 16;
+      int depth = y * pitchSin + z * pitchCos >> 16;
       viewX[vertexIndex] = x;
       viewY[vertexIndex] = projectedY;
       viewZ[vertexIndex] = depth;
@@ -121,13 +122,13 @@ final class ItemIconModelProjector {
     return new ProjectedVertices(new float[][]{viewX, viewY, viewZ});
   }
 
-  private List<ItemIconRasterizer.ProjectedFace> projectFaces(
+  private List<ProjectedFace> projectFaces(
       RawModelData rawModelData,
       ItemDefinition definition,
       float[][] viewSpaceVertices,
       NormalSet normalSet
   ) {
-    ArrayList<ItemIconRasterizer.ProjectedFace> projectedFaces = new ArrayList<>(rawModelData.faceCount());
+    ArrayList<ProjectedFace> projectedFaces = new ArrayList<>(rawModelData.faceCount());
     for (int faceIndex = 0; faceIndex < rawModelData.faceCount(); faceIndex++) {
       FaceSurface faceSurface = resolveFaceSurface(rawModelData, definition, viewSpaceVertices, normalSet, faceIndex);
       if (faceSurface == null) {
@@ -136,19 +137,45 @@ final class ItemIconModelProjector {
       int vertexA = rawModelData.faceVertexA()[faceIndex];
       int vertexB = rawModelData.faceVertexB()[faceIndex];
       int vertexC = rawModelData.faceVertexC()[faceIndex];
+      float averageDepth = (viewSpaceVertices[2][vertexA] + viewSpaceVertices[2][vertexB] + viewSpaceVertices[2][vertexC]) / 3.0f;
+      int facePriority = rawModelData.facePriorities().length > faceIndex ? rawModelData.facePriorities()[faceIndex] : 0;
       TextureCoordinates textureCoordinates = faceSurface.textureCoordinates();
-      List<ItemIconRasterizer.ClippedVertex> clippedVertices = ItemIconRasterizer.clipTriangleToNearPlane(
-          viewSpaceVertex(viewSpaceVertices, vertexA, faceSurface.colors().colorA(), textureCoordinates.ua(), textureCoordinates.va()),
-          viewSpaceVertex(viewSpaceVertices, vertexB, faceSurface.colors().colorB(), textureCoordinates.ub(), textureCoordinates.vb()),
-          viewSpaceVertex(viewSpaceVertices, vertexC, faceSurface.colors().colorC(), textureCoordinates.uc(), textureCoordinates.vc())
+      List<ClippedVertex> clippedVertices = ItemIconRasterizer.clipTriangleToNearPlane(
+          viewSpaceVertex(
+              viewSpaceVertices,
+              vertexA,
+              faceSurface.colors().colorA(),
+              textureCoordinates.ua(),
+              textureCoordinates.va(),
+              faceSurface.paletteShaded()
+          ),
+          viewSpaceVertex(
+              viewSpaceVertices,
+              vertexB,
+              faceSurface.colors().colorB(),
+              textureCoordinates.ub(),
+              textureCoordinates.vb(),
+              faceSurface.paletteShaded()
+          ),
+          viewSpaceVertex(
+              viewSpaceVertices,
+              vertexC,
+              faceSurface.colors().colorC(),
+              textureCoordinates.uc(),
+              textureCoordinates.vc(),
+              faceSurface.paletteShaded()
+          )
       );
       for (int clippedIndex = 1; clippedIndex < clippedVertices.size() - 1; clippedIndex++) {
-        ItemIconRasterizer.ProjectedFace projectedFace = ItemIconRasterizer.projectedFace(
+        ProjectedFace projectedFace = ItemIconRasterizer.projectedFace(
             clippedVertices.get(0),
             clippedVertices.get(clippedIndex),
             clippedVertices.get(clippedIndex + 1),
             faceSurface.alpha(),
-            faceSurface.texture()
+            faceSurface.texture(),
+            facePriority,
+            averageDepth,
+            faceIndex
         );
         if (projectedFace != null) {
           projectedFaces.add(projectedFace);
@@ -180,7 +207,7 @@ final class ItemIconModelProjector {
         textureCoordinates = TextureCoordinates.NONE;
       }
     }
-    return new FaceSurface(colors, alpha, texture, textureCoordinates);
+    return new FaceSurface(colors, alpha, texture, textureCoordinates, faceMode < 2);
   }
 
   private FaceColors resolveFaceColors(
@@ -259,20 +286,22 @@ final class ItemIconModelProjector {
     return FaceColors.uniform(shadeTexturedFlatColor(definition.inventoryAppearance(), normalSet, faceIndex));
   }
 
-  private ItemIconRasterizer.ClippedVertex viewSpaceVertex(
+  private ClippedVertex viewSpaceVertex(
       float[][] viewSpaceVertices,
       int vertexIndex,
       int color,
       float textureU,
-      float textureV
+      float textureV,
+      boolean paletteShaded
   ) {
-    return new ItemIconRasterizer.ClippedVertex(
+    return new ClippedVertex(
         viewSpaceVertices[0][vertexIndex],
         viewSpaceVertices[1][vertexIndex],
         viewSpaceVertices[2][vertexIndex],
         color,
         textureU,
-        textureV
+        textureV,
+        paletteShaded
     );
   }
 
@@ -464,7 +493,7 @@ final class ItemIconModelProjector {
       NormalSet normalSet,
       int vertexIndex
   ) {
-    return paletteRgb(shadeHsl(colorHsl, vertexBrightness(inventoryAppearance, normalSet, vertexIndex), 0));
+    return shadeHsl(colorHsl, vertexBrightness(inventoryAppearance, normalSet, vertexIndex), 0);
   }
 
   private int shadeFlatColor(
@@ -474,7 +503,7 @@ final class ItemIconModelProjector {
       NormalSet normalSet,
       int faceIndex
   ) {
-    return paletteRgb(shadeHsl(colorHsl, flatBrightness(inventoryAppearance, normalSet, faceIndex), renderType));
+    return shadeHsl(colorHsl, flatBrightness(inventoryAppearance, normalSet, faceIndex), renderType);
   }
 
   private int shadeTexturedVertexColor(
@@ -482,8 +511,7 @@ final class ItemIconModelProjector {
       NormalSet normalSet,
       int vertexIndex
   ) {
-    int brightness = clamp(vertexBrightness(inventoryAppearance, normalSet, vertexIndex), 0, 255);
-    return (brightness << 16) | (brightness << 8) | brightness;
+    return texturedShadeValue(vertexBrightness(inventoryAppearance, normalSet, vertexIndex));
   }
 
   private int shadeTexturedFlatColor(
@@ -491,8 +519,7 @@ final class ItemIconModelProjector {
       NormalSet normalSet,
       int faceIndex
   ) {
-    int brightness = clamp(flatBrightness(inventoryAppearance, normalSet, faceIndex), 0, 255);
-    return (brightness << 16) | (brightness << 8) | brightness;
+    return texturedShadeValue(flatBrightness(inventoryAppearance, normalSet, faceIndex));
   }
 
   private int vertexBrightness(
@@ -536,73 +563,21 @@ final class ItemIconModelProjector {
     return (colorHsl & 0xff80) + shadedLightness;
   }
 
-  private int paletteRgb(int shadedHsl) {
-    int paletteIndex = clamp(shadedHsl, 0, SHADED_HSL_PALETTE.length - 1);
-    int rgb = SHADED_HSL_PALETTE[paletteIndex];
-    return rgb == 0 ? 1 : rgb;
+  private int texturedShadeValue(int brightness) {
+    return 127 - clamp(brightness, 0, 127);
   }
 
-  private static int[] buildShadedHslPalette(double gamma) {
-    int[] palette = new int[0x10000];
-    int paletteIndex = 0;
-    for (int hueIndex = 0; hueIndex < 512; hueIndex++) {
-      double hue = (hueIndex / 8) / 64.0D + 0.0078125D;
-      double saturation = (hueIndex & 7) / 8.0D + 0.0625D;
-      for (int lightnessIndex = 0; lightnessIndex < 128; lightnessIndex++) {
-        double lightness = lightnessIndex / 128.0D;
-        double red = lightness;
-        double green = lightness;
-        double blue = lightness;
-        if (saturation != 0.0D) {
-          double q = lightness < 0.5D
-              ? lightness * (1.0D + saturation)
-              : (lightness + saturation) - lightness * saturation;
-          double p = 2.0D * lightness - q;
-          red = paletteChannel(p, q, hue + 0.3333333333333333D);
-          green = paletteChannel(p, q, hue);
-          blue = paletteChannel(p, q, hue - 0.3333333333333333D);
-        }
-        int rgb = ((int) (red * 256.0D) << 16)
-            + ((int) (green * 256.0D) << 8)
-            + (int) (blue * 256.0D);
-        rgb = gammaAdjust(rgb, gamma);
-        palette[paletteIndex++] = rgb == 0 ? 1 : rgb;
-      }
+  private static int[] buildTrigTable(boolean sine) {
+    int[] table = new int[2048];
+    for (int index = 0; index < table.length; index++) {
+      double angle = index * (Math.PI * 2.0 / table.length);
+      table[index] = (int) Math.round((sine ? Math.sin(angle) : Math.cos(angle)) * TRIG_SCALE);
     }
-    return palette;
+    return table;
   }
 
-  private static double paletteChannel(double p, double q, double value) {
-    double wrapped = value;
-    if (wrapped > 1.0D) {
-      wrapped--;
-    }
-    if (wrapped < 0.0D) {
-      wrapped++;
-    }
-    if (6.0D * wrapped < 1.0D) {
-      return p + (q - p) * 6.0D * wrapped;
-    }
-    if (2.0D * wrapped < 1.0D) {
-      return q;
-    }
-    if (3.0D * wrapped < 2.0D) {
-      return p + (q - p) * (0.6666666666666666D - wrapped) * 6.0D;
-    }
-    return p;
-  }
-
-  private static int gammaAdjust(int rgb, double gamma) {
-    double red = Math.pow((rgb >>> 16) / 256.0D, gamma);
-    double green = Math.pow(((rgb >>> 8) & 0xff) / 256.0D, gamma);
-    double blue = Math.pow((rgb & 0xff) / 256.0D, gamma);
-    return ((int) (red * 256.0D) << 16)
-        | ((int) (green * 256.0D) << 8)
-        | (int) (blue * 256.0D);
-  }
-
-  private float angleRadians(int angleUnits) {
-    return (float) (angleUnits * (Math.PI * 2.0 / 2048.0));
+  private int angleIndex(int angleUnits) {
+    return angleUnits & 2047;
   }
 
   private int clamp(int value, int minimum, int maximum) {
@@ -613,7 +588,8 @@ final class ItemIconModelProjector {
       FaceColors colors,
       int alpha,
       ArgbImage texture,
-      TextureCoordinates textureCoordinates
+      TextureCoordinates textureCoordinates,
+      boolean paletteShaded
   ) {
   }
 
@@ -629,18 +605,28 @@ final class ItemIconModelProjector {
   }
 
   private record PreparedInventoryModel(
-      float[] x,
-      float[] y,
-      float[] z,
-      float modelHeight
+      int[] x,
+      int[] y,
+      int[] z,
+      int modelHeight
   ) {
 
     private float[][] axes() {
-      return new float[][]{x, y, z};
+      float[] axisX = new float[x.length];
+      float[] axisY = new float[y.length];
+      float[] axisZ = new float[z.length];
+      for (int index = 0; index < x.length; index++) {
+        axisX[index] = x[index];
+        axisY[index] = y[index];
+        axisZ[index] = z[index];
+      }
+      return new float[][]{axisX, axisY, axisZ};
     }
   }
 
-  private record ProjectedVertices(float[][] viewSpaceAxes) {
+  private record ProjectedVertices(
+      float[][] viewSpaceAxes
+  ) {
   }
 
   private record TextureCoordinates(

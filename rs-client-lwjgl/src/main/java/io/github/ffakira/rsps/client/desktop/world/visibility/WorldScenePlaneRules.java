@@ -1,9 +1,12 @@
 package io.github.ffakira.rsps.client.desktop.world.visibility;
 
+import io.github.ffakira.rsps.client.desktop.world.WorldCameraState;
 import io.github.ffakira.rsps.client.desktop.world.WorldScene;
 import io.github.ffakira.rsps.content.TerrainRegionData;
 
 public final class WorldScenePlaneRules {
+
+  private static final float ROOFED_RENDER_PITCH_THRESHOLD_DEGREES = 310.0f * 360.0f / 2048.0f;
 
   private WorldScenePlaneRules() {
   }
@@ -57,6 +60,24 @@ public final class WorldScenePlaneRules {
     return (worldScene.tileFlagAt(localX, localY) & 4) != 0;
   }
 
+  public static int renderPlane(
+      WorldScene worldScene,
+      WorldCameraState cameraState,
+      int focusTileX,
+      int focusTileY
+  ) {
+    if (cameraState.pitchDegrees() >= ROOFED_RENDER_PITCH_THRESHOLD_DEGREES) {
+      return 3;
+    }
+    int[] cameraTile = cameraTile(worldScene, cameraState);
+    if (hasRoofFlag(worldScene, cameraTile[0], cameraTile[1])
+        || roofFlagOnPath(worldScene, cameraTile[0], cameraTile[1], focusTileX, focusTileY)
+        || hasRoofFlag(worldScene, focusTileX, focusTileY)) {
+      return worldScene.plane();
+    }
+    return 3;
+  }
+
   public static boolean roofFlagOnPath(WorldScene worldScene, int startX, int startY, int endX, int endY) {
     int currentX = clamp(startX, 0, worldScene.tileWidth() - 1);
     int currentY = clamp(startY, 0, worldScene.tileHeight() - 1);
@@ -105,6 +126,26 @@ public final class WorldScenePlaneRules {
       }
     }
     return false;
+  }
+
+  static int[] cameraTile(WorldScene worldScene, WorldCameraState cameraState) {
+    float[] cameraPosition = cameraPosition(cameraState);
+    return new int[]{
+        clamp((int) Math.floor(cameraPosition[0]), 0, worldScene.tileWidth() - 2),
+        clamp((int) Math.floor(cameraPosition[2]), 0, worldScene.tileHeight() - 2)
+    };
+  }
+
+  private static float[] cameraPosition(WorldCameraState cameraState) {
+    float pitchRadians = (float) Math.toRadians(cameraState.pitchDegrees());
+    float yawRadians = (float) Math.toRadians(-cameraState.yawDegrees());
+    float offsetY = -cameraState.screenOffsetY();
+    float offsetZ = cameraState.distance();
+    float rotatedY = (float) (offsetY * Math.cos(pitchRadians) + offsetZ * Math.sin(pitchRadians));
+    float rotatedZ = (float) (-offsetY * Math.sin(pitchRadians) + offsetZ * Math.cos(pitchRadians));
+    float rotatedX = (float) (-rotatedZ * Math.sin(yawRadians));
+    float worldZ = (float) (rotatedZ * Math.cos(yawRadians));
+    return new float[]{cameraState.focusX() + rotatedX, rotatedY + cameraState.focusHeight(), cameraState.focusY() + worldZ};
   }
 
   private static int clamp(int value, int minimum, int maximum) {

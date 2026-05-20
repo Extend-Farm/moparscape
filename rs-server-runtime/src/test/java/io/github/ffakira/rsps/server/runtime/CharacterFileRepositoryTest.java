@@ -78,12 +78,12 @@ class CharacterFileRepositoryTest {
     assertThat(snapshot.inventorySlots()).singleElement()
         .satisfies(slot -> {
           assertThat(slot.containerKind()).isEqualTo(ItemContainerKind.INVENTORY);
-          assertThat(slot.itemId()).isEqualTo(555);
+          assertThat(slot.itemId()).isEqualTo(554);
         });
     assertThat(snapshot.equipmentSlots()).singleElement()
         .satisfies(slot -> assertThat(slot.itemId()).isEqualTo(1048));
     assertThat(snapshot.bankSlots()).singleElement()
-        .satisfies(slot -> assertThat(slot.itemId()).isEqualTo(1216));
+        .satisfies(slot -> assertThat(slot.itemId()).isEqualTo(1215));
     assertThat(snapshot.friendLinks()).singleElement()
         .satisfies(link -> assertThat(link.targetValue()).isEqualTo(123456789L));
     assertThat(snapshot.ignoreLinks()).singleElement()

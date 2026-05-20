@@ -19,9 +19,12 @@ class CacheBackedWorldSceneLoaderTest {
     WorldPoint akiraSpawn = new WorldPoint(3250, 3227, 0);
 
     WorldScene worldScene = loader.load(akiraSpawn);
+    int spawnLocalX = akiraSpawn.x() - worldScene.originWorldX();
+    int spawnLocalY = akiraSpawn.y() - worldScene.originWorldY();
 
     assertThat(worldScene.sceneKey()).isEqualTo(CacheBackedWorldSceneLoader.sceneKeyFor(akiraSpawn));
     assertThat(worldScene.contains(akiraSpawn)).isTrue();
+    assertThat(worldScene.underlayIdAt(spawnLocalX, spawnLocalY)).isPositive();
     assertThat(worldScene.image().width()).isGreaterThan(0);
     assertThat(worldScene.image().height()).isGreaterThan(0);
     assertThat(worldScene.minimapPixelWidthPerTile()).isGreaterThan(1);
@@ -76,11 +79,15 @@ class CacheBackedWorldSceneLoaderTest {
     assertThat(worldScene.elevationAt(bridgeLocalX, bridgeLocalY)).isGreaterThan(lowestNearbyWaterElevation);
     assertThat(worldScene.overlayTextureIdAt(bridgeLocalX, bridgeLocalY)).isEqualTo(-1);
     assertThat(worldScene.overlayColorAt(bridgeLocalX, bridgeLocalY)).isNotZero();
+    assertThat(worldScene.surfacePlaneAt(bridgeLocalX, bridgeLocalY)).isEqualTo(1);
     assertThat(worldScene.bridgeTerrainLayer().activeAt(bridgeLocalX, bridgeLocalY)).isTrue();
+    assertThat(worldScene.bridgeTerrainLayer().overlayIdAt(bridgeLocalX, bridgeLocalY)).isPositive();
     assertThat(worldScene.bridgeTerrainLayer().overlayTextureIdAt(bridgeLocalX, bridgeLocalY)).isEqualTo(1);
     int underBridgeRgb = worldScene.bridgeTerrainLayer().overlayColorAt(bridgeLocalX, bridgeLocalY);
     assertThat(underBridgeRgb & 0xff).isGreaterThan((underBridgeRgb >>> 16) & 0xff);
 
+    assertThat(worldScene.overlayIdAt(bridgeLocalX, waterLocalY)).isPositive();
+    assertThat(worldScene.surfacePlaneAt(bridgeLocalX, waterLocalY)).isEqualTo(0);
     assertThat(worldScene.overlayTextureIdAt(bridgeLocalX, waterLocalY)).isEqualTo(1);
     int waterRgb = worldScene.overlayColorAt(bridgeLocalX, waterLocalY);
     assertThat(waterRgb & 0xff).isGreaterThan((waterRgb >>> 16) & 0xff);

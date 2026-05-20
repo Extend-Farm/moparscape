@@ -46,7 +46,7 @@ public final class ItemIconRenderer {
   }
 
   private ArgbImage renderResolvedItemIcon(int itemId) {
-    List<ItemIconRasterizer.ProjectedFace> projectedFaces = modelProjector.project(itemId);
+    List<ProjectedFace> projectedFaces = modelProjector.project(itemId);
     if (projectedFaces.isEmpty()) {
       return null;
     }
@@ -83,22 +83,8 @@ public final class ItemIconRenderer {
       }
       compositedPixels[index] = overlayAlpha >= 255
           ? overlayArgb
-          : blend(compositedPixels[index], overlayArgb, overlayAlpha);
+          : PixelBlender.blend(compositedPixels[index], overlayArgb, overlayAlpha);
     }
     return new ArgbImage(baseIcon.width(), baseIcon.height(), compositedPixels);
-  }
-
-  private int blend(int destinationArgb, int sourceArgb, int sourceAlpha) {
-    int inverseAlpha = 255 - sourceAlpha;
-    int destinationRed = (destinationArgb >>> 16) & 0xff;
-    int destinationGreen = (destinationArgb >>> 8) & 0xff;
-    int destinationBlue = destinationArgb & 0xff;
-    int sourceRed = (sourceArgb >>> 16) & 0xff;
-    int sourceGreen = (sourceArgb >>> 8) & 0xff;
-    int sourceBlue = sourceArgb & 0xff;
-    int red = (sourceRed * sourceAlpha + destinationRed * inverseAlpha) / 255;
-    int green = (sourceGreen * sourceAlpha + destinationGreen * inverseAlpha) / 255;
-    int blue = (sourceBlue * sourceAlpha + destinationBlue * inverseAlpha) / 255;
-    return 0xff000000 | (red << 16) | (green << 8) | blue;
   }
 }

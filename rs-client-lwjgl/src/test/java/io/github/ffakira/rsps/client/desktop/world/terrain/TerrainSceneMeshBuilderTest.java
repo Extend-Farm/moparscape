@@ -86,6 +86,106 @@ class TerrainSceneMeshBuilderTest {
   }
 
   @Test
+  void keepsShapedOverlayMasksWhenOnlyTheRawOverlayIdSurvives() {
+    int width = 2;
+    int height = 2;
+    int[] elevations = new int[width * height];
+    int[] underlayIds = filledInts(width * height, 1);
+    int[] overlayIds = new int[]{4, 0, 0, 0};
+    int[] tileColors = filledInts(width * height, 0x4a6a3c);
+    int[] underlayColors = filledInts(width * height, 0x4a6a3c);
+    int[] overlayColors = new int[width * height];
+    int[] underlayTextureIds = filledInts(width * height, -1);
+    int[] overlayTextureIds = filledInts(width * height, -1);
+    byte[] overlayShapes = new byte[]{1, 0, 0, 0};
+    byte[] overlayRotations = new byte[width * height];
+    byte[] tileFlags = new byte[width * height];
+    WorldScene worldScene = new WorldScene(
+        "raw-overlay-shape-test",
+        3200,
+        3200,
+        0,
+        width,
+        height,
+        elevations,
+        underlayIds,
+        overlayIds,
+        tileColors,
+        underlayColors,
+        overlayColors,
+        underlayTextureIds,
+        overlayTextureIds,
+        overlayShapes,
+        overlayRotations,
+        tileFlags,
+        java.util.List.of(),
+        java.util.List.of(),
+        new ArgbImage(1, 1, new int[]{0xff000000}),
+        new ArgbImage(width, height, filledInts(width * height, 0xff334455)),
+        new WorldSceneProjection(5, 3, 0, 0),
+        null
+    );
+    TerrainSceneMeshBuilder builder = new TerrainSceneMeshBuilder();
+
+    SceneTriangleMesh paintMesh = builder.buildTilePaintMesh(worldScene);
+    SceneTriangleMesh modelMesh = builder.buildTileModelMesh(worldScene);
+
+    assertThat(paintMesh.isEmpty()).isTrue();
+    assertThat(modelMesh.faceVertexA()).hasSize(1);
+    assertThat(hasDominantChannel(modelMesh, 8)).isTrue();
+  }
+
+  @Test
+  void omitsSyntheticUnderlayTrianglesForTexturedShapedOverlayOnlyTiles() {
+    int width = 2;
+    int height = 2;
+    int[] elevations = new int[width * height];
+    int[] underlayIds = new int[width * height];
+    int[] overlayIds = new int[]{4, 0, 0, 0};
+    int[] tileColors = filledInts(width * height, 0x4a6a3c);
+    int[] underlayColors = new int[width * height];
+    int[] overlayColors = new int[]{0x7d9150, 0, 0, 0};
+    int[] underlayTextureIds = filledInts(width * height, -1);
+    int[] overlayTextureIds = new int[]{12, -1, -1, -1};
+    byte[] overlayShapes = new byte[]{1, 0, 0, 0};
+    byte[] overlayRotations = new byte[width * height];
+    byte[] tileFlags = new byte[width * height];
+    WorldScene worldScene = new WorldScene(
+        "textured-overlay-only-shape-test",
+        3200,
+        3200,
+        0,
+        width,
+        height,
+        elevations,
+        underlayIds,
+        overlayIds,
+        tileColors,
+        underlayColors,
+        overlayColors,
+        underlayTextureIds,
+        overlayTextureIds,
+        overlayShapes,
+        overlayRotations,
+        tileFlags,
+        java.util.List.of(),
+        java.util.List.of(),
+        new ArgbImage(1, 1, new int[]{0xff000000}),
+        new ArgbImage(width, height, filledInts(width * height, 0xff334455)),
+        new WorldSceneProjection(5, 3, 0, 0),
+        null
+    );
+    TerrainSceneMeshBuilder builder = new TerrainSceneMeshBuilder();
+
+    SceneTriangleMesh gouraudMesh = builder.buildTileModelMesh(worldScene);
+    SceneTriangleMesh texturedMesh = builder.buildTexturedTileModelMesh(worldScene);
+
+    assertThat(gouraudMesh.isEmpty()).isTrue();
+    assertThat(texturedMesh.faceVertexA()).hasSize(1);
+    assertThat(texturedMesh.faceTextureIds()).containsExactly(12);
+  }
+
+  @Test
   void keepsRotatedCurvedMaskVerticesOnTileCorners() {
     WorldScene worldScene = smallWorldScene((byte) 9, (byte) 1, -1, -1);
     TerrainSceneMeshBuilder builder = new TerrainSceneMeshBuilder();

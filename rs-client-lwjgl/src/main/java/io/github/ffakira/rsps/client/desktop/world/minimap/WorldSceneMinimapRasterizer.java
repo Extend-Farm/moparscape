@@ -4,6 +4,7 @@ import io.github.ffakira.rsps.client.desktop.core.ArgbImage;
 import io.github.ffakira.rsps.client.desktop.world.object.WorldSceneObject;
 import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainLayerSource;
 import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainOverlayShapeResolver;
+import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainTileColorResolver;
 import java.util.List;
 
 public final class WorldSceneMinimapRasterizer {
@@ -124,8 +125,8 @@ public final class WorldSceneMinimapRasterizer {
       fillSolidTile(tileHeight, pixelWidth, pixelHeight, pixels, sceneX, sceneY, paintRgb);
       return;
     }
-    int underlayColor = minimapBaseColor(underlayRgb, tileRgb, overlayRgb, underlayTextureId, -1);
-    int overlayColor = minimapBaseColor(overlayRgb, tileRgb, underlayRgb, -1, overlayTextureId);
+    int underlayColor = shapedUnderlayColor(terrainLayerSource, sceneX, sceneY, tileRgb, underlayRgb, underlayTextureId);
+    int overlayColor = shapedOverlayColor(terrainLayerSource, sceneX, sceneY, tileRgb, overlayRgb, overlayTextureId);
     int[] shapeMask = TILE_SHAPE_MASKS[sceneShape];
     int[] rotationMap = TILE_ROTATION_MAP[overlayRotation];
     int startX = sceneX * TILE_PIXELS;
@@ -135,6 +136,9 @@ public final class WorldSceneMinimapRasterizer {
         int maskIndex = offsetY * TILE_PIXELS + offsetX;
         boolean useOverlay = shapeMask[rotationMap[maskIndex]] != 0;
         int pixelRgb = useOverlay ? overlayColor : underlayColor;
+        if (pixelRgb == 0) {
+          continue;
+        }
         setPixel(pixelWidth, pixelHeight, pixels, startX + offsetX, startY + offsetY, pixelRgb);
       }
     }
@@ -314,6 +318,40 @@ public final class WorldSceneMinimapRasterizer {
     return overlayRgb != 0
         ? minimapBaseColor(overlayRgb, tileRgb, underlayRgb, -1, overlayTextureId)
         : minimapBaseColor(underlayRgb, tileRgb, overlayRgb, underlayTextureId, overlayTextureId);
+  }
+
+  private int shapedUnderlayColor(
+      TerrainLayerSource terrainLayerSource,
+      int tileX,
+      int tileY,
+      int tileRgb,
+      int underlayRgb,
+      int underlayTextureId
+  ) {
+    if (!TerrainTileColorResolver.hasRenderableUnderlaySurface(terrainLayerSource, tileX, tileY)) {
+      return 0;
+    }
+    if (isWaterTexture(underlayTextureId)) {
+      return MINIMAP_WATER_RGB;
+    }
+    return underlayRgb != 0 ? underlayRgb : tileRgb;
+  }
+
+  private int shapedOverlayColor(
+      TerrainLayerSource terrainLayerSource,
+      int tileX,
+      int tileY,
+      int tileRgb,
+      int overlayRgb,
+      int overlayTextureId
+  ) {
+    if (!TerrainOverlayShapeResolver.hasVisibleOverlay(terrainLayerSource, tileX, tileY)) {
+      return 0;
+    }
+    if (isWaterTexture(overlayTextureId)) {
+      return MINIMAP_WATER_RGB;
+    }
+    return overlayRgb != 0 ? overlayRgb : tileRgb;
   }
 
   private int minimapBaseColor(

@@ -17,7 +17,7 @@ class CharacterWalkPoseAnimatorTest {
 
     CharacterWalkPoseAnimator.apply(
         transformedVertices,
-        new CharacterModelAssembler.ActorBounds(-0.30f, 0.0f, -0.15f, 0.30f, 1.80f, 0.15f),
+        new CharacterActorBounds(-0.30f, 0.0f, -0.15f, 0.30f, 1.80f, 0.15f),
         new ActorAnimationState(1.0f, 0.0f, 180.0f)
     );
 
@@ -27,6 +27,33 @@ class CharacterWalkPoseAnimatorTest {
     assertThat(armDisplacement).isGreaterThan(0.025f);
     assertThat(headDisplacement).isLessThan(0.012f);
     assertThat(armDisplacement).isGreaterThan(headDisplacement * 2.5f);
+  }
+
+  @Test
+  void sidestepPoseShiftsLowerBodyLaterallyMoreThanForwardWalk() {
+    float[][] forwardVertices = {
+        {-0.10f, 0.10f},
+        {0.22f, 0.22f},
+        {0.00f, 0.00f}
+    };
+    float[][] sidestepVertices = copyOf(forwardVertices);
+    float[][] baseVertices = copyOf(forwardVertices);
+
+    CharacterWalkPoseAnimator.apply(
+        forwardVertices,
+        new CharacterActorBounds(-0.30f, 0.0f, -0.15f, 0.30f, 1.80f, 0.15f),
+        new ActorAnimationState(1.0f, 0.0f, 0.0f, 0.0f, ActorAnimationState.LocomotionMode.WALK_FORWARD, -1, -1, 0.0f, 0.0f)
+    );
+    CharacterWalkPoseAnimator.apply(
+        sidestepVertices,
+        new CharacterActorBounds(-0.30f, 0.0f, -0.15f, 0.30f, 1.80f, 0.15f),
+        new ActorAnimationState(1.0f, 0.0f, 90.0f, 0.0f, ActorAnimationState.LocomotionMode.STRAFE_LEFT, -1, -1, 0.0f, 0.0f)
+    );
+
+    float forwardXDisplacement = Math.abs(forwardVertices[0][0] - baseVertices[0][0]);
+    float sidestepXDisplacement = Math.abs(sidestepVertices[0][0] - baseVertices[0][0]);
+
+    assertThat(sidestepXDisplacement).isGreaterThan(forwardXDisplacement + 0.01f);
   }
 
   private float[][] copyOf(float[][] vertices) {

@@ -80,6 +80,7 @@ public final class RawModelDecoder {
     int[] vertexX = new int[vertexCount];
     int[] vertexY = new int[vertexCount];
     int[] vertexZ = new int[vertexCount];
+    int[] vertexSkins = vertexSkinOffset >= 0 ? new int[vertexCount] : new int[0];
     int[] faceVertexA = new int[faceCount];
     int[] faceVertexB = new int[faceCount];
     int[] faceVertexC = new int[faceCount];
@@ -87,6 +88,7 @@ public final class RawModelDecoder {
     int[] faceRenderTypes = new int[faceCount];
     int[] facePriorities = new int[faceCount];
     int[] faceAlpha = new int[faceCount];
+    int[] faceSkins = faceSkinOffset >= 0 ? new int[faceCount] : new int[0];
     int[] texturedFaceVertexA = new int[texturedFaceCount];
     int[] texturedFaceVertexB = new int[texturedFaceCount];
     int[] texturedFaceVertexC = new int[texturedFaceCount];
@@ -103,8 +105,7 @@ public final class RawModelDecoder {
       CacheDataReader vertexSkinReader = new CacheDataReader(bytes);
       vertexSkinReader.position(vertexSkinOffset);
       for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
-        // Skin groups are not consumed yet, but the reader must advance to keep parity.
-        vertexSkinReader.readUnsignedByte();
+        vertexSkins[vertexIndex] = vertexSkinReader.readUnsignedByte();
       }
     }
 
@@ -153,7 +154,7 @@ public final class RawModelDecoder {
       CacheDataReader faceSkinReader = new CacheDataReader(bytes);
       faceSkinReader.position(faceSkinOffset);
       for (int faceIndex = 0; faceIndex < faceCount; faceIndex++) {
-        faceSkinReader.readUnsignedByte();
+        faceSkins[faceIndex] = faceSkinReader.readUnsignedByte();
       }
     }
     for (int faceIndex = 0; faceIndex < faceCount; faceIndex++) {
@@ -215,6 +216,7 @@ public final class RawModelDecoder {
         vertexX,
         vertexY,
         vertexZ,
+        vertexSkins,
         faceVertexA,
         faceVertexB,
         faceVertexC,
@@ -222,6 +224,7 @@ public final class RawModelDecoder {
         faceRenderTypes,
         facePriorities,
         faceAlpha,
+        faceSkins,
         texturedFaceVertexA,
         texturedFaceVertexB,
         texturedFaceVertexC
