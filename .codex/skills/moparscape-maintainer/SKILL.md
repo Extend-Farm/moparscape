@@ -1,6 +1,6 @@
 ---
 name: moparscape-maintainer
-description: Use when working in the Moparscape repo on emulator or desktop client startup, login, sidebar tabs, local build or run flows, persistence decisions, Java 21 modernization, or refactors touching GameClientCore, GameShell, GameFrame, client/server.java, client/client.java, or PlayerHandler. Covers repo-specific architecture, legacy remote-config traps, safe modernization workflow, and Java 21 best practices for this codebase.
+description: Use when working in the Moparscape repo on emulator or desktop client startup, login, sidebar tabs, local build or run flows, persistence decisions, Java 21 modernization, or refactors touching GameClientCore, GameShell, GameFrame, client/server.java, client/client.java, or PlayerHandler. Covers repo-specific architecture, remote-config traps, safe modernization workflow, and Java 21 best practices for this codebase.
 ---
 
 # Moparscape Maintainer
@@ -13,7 +13,7 @@ Use this skill for repo-specific work in `moparscape`.
 - For build or launch issues, read `references/build-and-run.md`.
 - For login, startup, or input problems, read `references/startup-and-login.md`.
 - For missing tabs or sidebar issues, read `references/ui-and-tabs.md`.
-- For legacy traps and recurring failures, read `references/known-quirks.md`.
+- For recurring traps and failures, read `references/known-quirks.md`.
 - For storage or migration questions, read `references/persistence.md`.
 - For modernization standards and Java style, read `references/java-21.md`.
 
@@ -26,7 +26,11 @@ Use this skill for repo-specific work in `moparscape`.
 - When touching client startup or input ownership, verify the visible surface and the event surface are the same component.
 - When touching login, tabs, or bootstrap packets, trace both emulator and desktop client before changing semantics.
 - Prefer local defaults over dead remote HybridScape config endpoints.
-- Use the fresh Gradle outputs, not legacy checked-in jars.
+- Use the fresh Gradle outputs, not old checked-in jars.
+- When naming code, use descriptive domain names instead of `Reference` or `Legacy`.
+- When describing behavior from the existing client, call it the reference client or reference behavior, not legacy behavior.
+- In native render/animation/model code, enforce invariants at prepared-model or factory boundaries instead of burying neutral fallbacks in inner loops.
+- In hot geometry assembly paths, prefer pre-sized primitive arrays and direct writes over temporary per-vertex or per-face object graphs when the output shape is already known.
 - When multiple agents or collaborators are active, keep scopes narrow, reread the latest tree before editing shared files, record handoff/status notes in `.cursor/plan/` when the work spans slices, and never revert another contributor's changes.
 
 ## Validation

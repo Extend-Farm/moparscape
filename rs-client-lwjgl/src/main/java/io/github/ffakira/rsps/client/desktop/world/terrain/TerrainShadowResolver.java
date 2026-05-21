@@ -6,7 +6,7 @@ import java.util.List;
 public final class TerrainShadowResolver {
 
   private static final int WALL_SHADOW = 50;
-  private static final int MAX_OBJECT_SHADOW = 30;
+  private static final int MAX_OBJECT_SHADOW = 50;
   private static final float LEGACY_MODEL_UNIT_SCALE = 32.0f;
 
   public byte[] resolve(int sampleWidth, int sampleHeight, List<WorldSceneObject> sceneObjects) {
@@ -20,7 +20,10 @@ public final class TerrainShadowResolver {
       switch (sceneObject.type()) {
         case 0 -> applyStraightWallShadow(shadowSamples, sampleWidth, sampleHeight, sceneObject);
         case 1, 3 -> applyCornerWallShadow(shadowSamples, sampleWidth, sampleHeight, sceneObject);
-        case 10, 11 -> applyLargeObjectShadow(shadowSamples, sampleWidth, sampleHeight, sceneObject);
+        // Type 9 is a diagonal wall; types 10-11 are full interactives (trees, statues, machines);
+        // types 12-17 are wall-attached interactives that nonetheless rest on the ground and cast
+        // visible ground shade (lecterns, signposts, banner stands, market crates, etc).
+        case 9, 10, 11, 12, 13, 14, 15, 16, 17 -> applyLargeObjectShadow(shadowSamples, sampleWidth, sampleHeight, sceneObject);
         default -> {
         }
       }
@@ -91,6 +94,22 @@ public final class TerrainShadowResolver {
     for (int sampleY = sceneObject.localY(); sampleY <= maxSampleY; sampleY++) {
       for (int sampleX = sceneObject.localX(); sampleX <= maxSampleX; sampleX++) {
         setShadow(shadowSamples, sampleWidth, sampleHeight, sampleX, sampleY, shadowStrength);
+      }
+    }
+    // Legacy MapRegion lights from the north-west, so each tall object casts a soft shadow off to
+    // the south-east. Stamp a one-tile penumbra at reduced strength in that direction so the
+    // shadow reads as a real cast shadow rather than a uniform dark blob under the footprint.
+    int penumbraStrength = (shadowStrength * 5) / 8;
+    if (penumbraStrength <= 0) {
+      return;
+    }
+    int penumbraMinX = sceneObject.localX() + 1;
+    int penumbraMaxX = maxSampleX + 1;
+    int penumbraMinY = sceneObject.localY() - 1;
+    int penumbraMaxY = maxSampleY - 1;
+    for (int sampleY = penumbraMinY; sampleY <= penumbraMaxY; sampleY++) {
+      for (int sampleX = penumbraMinX; sampleX <= penumbraMaxX; sampleX++) {
+        setShadow(shadowSamples, sampleWidth, sampleHeight, sampleX, sampleY, penumbraStrength);
       }
     }
   }

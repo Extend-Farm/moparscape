@@ -85,10 +85,83 @@ class FloorSurfaceColorResolverTest {
 
     assertThat(overlayColors[0]).isZero();
     assertThat(overlayTextureIds[0]).isEqualTo(-1);
+    // Purely textured water (rgb=0, hsl16=0, textureId=1) now falls back to the water-surface RGB
+    // for both `overlayColors` and `tileColors`, so the under-bridge layer and shaped overlay
+    // corner colours pick up the blue tint instead of reading as transparent.
     assertThat(overlayColors[1]).isEqualTo(0x5a7ea3);
     assertThat(overlayTextureIds[1]).isEqualTo(1);
-    assertThat(overlayColors[2]).isNotZero();
+    assertThat(tileColors[1]).isEqualTo(0x5a7ea3);
+    assertThat(overlayColors[2]).isZero();
+    assertThat(tileColors[2]).isNotZero();
     assertThat(tileColors[3]).isEqualTo(underlayColors[3]);
+  }
+
+  @Test
+  void usesLegacyTextureAverageColorsForTexturedOverlays() {
+    int[] legacyTextureAverageColors = new int[8];
+    legacyTextureAverageColors[7] = 0x4a6f8c;
+    FloorSurfaceColorResolver resolver = new FloorSurfaceColorResolver(
+        floorCatalog(
+            new FloorEntry(0x3f5f2f, -1, -1),
+            new FloorEntry(0x8a5b2f, 7, -1)
+        ),
+        legacyTextureAverageColors
+    );
+    int[] underlayIds = new int[]{1};
+    int[] overlayIds = new int[]{2};
+    int[] underlayColors = new int[1];
+    int[] overlayColors = new int[1];
+    int[] underlayTextureIds = new int[1];
+    int[] overlayTextureIds = new int[1];
+    int[] tileColors = new int[1];
+
+    resolver.resolveSceneColors(
+        1,
+        1,
+        underlayIds,
+        overlayIds,
+        underlayColors,
+        overlayColors,
+        underlayTextureIds,
+        overlayTextureIds,
+        tileColors
+    );
+
+    assertThat(overlayTextureIds[0]).isEqualTo(7);
+    assertThat(overlayColors[0]).isNotZero();
+    assertThat(overlayColors[0]).isNotEqualTo(0x4a6f8c);
+    assertThat(tileColors[0]).isEqualTo(0x4a6f8c);
+  }
+
+  @Test
+  void keepsPrimaryOverlaySurfaceColorSeparateFromSecondaryBaseTileColor() {
+    FloorSurfaceColorResolver resolver = new FloorSurfaceColorResolver(floorCatalog(
+        new FloorEntry(0x3f5f2f, -1, -1),
+        new FloorEntry(0x8a5b2f, -1, -1),
+        new FloorEntry(0x8a5b2f, -1, 0x4f82c8)
+    ));
+    int[] underlayIds = new int[]{1, 1};
+    int[] overlayIds = new int[]{2, 3};
+    int[] underlayColors = new int[2];
+    int[] overlayColors = new int[2];
+    int[] underlayTextureIds = new int[2];
+    int[] overlayTextureIds = new int[2];
+    int[] tileColors = new int[2];
+
+    resolver.resolveSceneColors(
+        2,
+        1,
+        underlayIds,
+        overlayIds,
+        underlayColors,
+        overlayColors,
+        underlayTextureIds,
+        overlayTextureIds,
+        tileColors
+    );
+
+    assertThat(overlayColors[1]).isEqualTo(overlayColors[0]);
+    assertThat(tileColors[1]).isNotEqualTo(overlayColors[1]);
   }
 
   private static FloorColorCatalog floorCatalog(FloorEntry... entries) {

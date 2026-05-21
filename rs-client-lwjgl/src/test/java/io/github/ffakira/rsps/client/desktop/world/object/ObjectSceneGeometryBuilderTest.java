@@ -41,6 +41,9 @@ class ObjectSceneGeometryBuilderTest {
         "test",
         List.of(),
         List.of(),
+        -1,
+        -1,
+        List.of(),
         List.of(),
         List.of(),
         1,
@@ -63,7 +66,8 @@ class ObjectSceneGeometryBuilderTest {
         128,
         0,
         0,
-        0
+        0,
+        -1
     );
 
     float[][] vertices = ObjectSceneGeometryBuilder.transformVertices(rawModelData, definition, 0);
@@ -101,6 +105,9 @@ class ObjectSceneGeometryBuilderTest {
         "wide-object",
         List.of(),
         List.of(),
+        -1,
+        -1,
+        List.of(),
         List.of(),
         List.of(),
         1,
@@ -123,7 +130,8 @@ class ObjectSceneGeometryBuilderTest {
         128,
         0,
         0,
-        0
+        0,
+        -1
     );
 
     float[][] vertices = ObjectSceneGeometryBuilder.transformVertices(rawModelData, definition, 0);
@@ -160,6 +168,9 @@ class ObjectSceneGeometryBuilderTest {
         "centered-tree",
         List.of(),
         List.of(),
+        -1,
+        -1,
+        List.of(),
         List.of(),
         List.of(),
         1,
@@ -182,7 +193,8 @@ class ObjectSceneGeometryBuilderTest {
         128,
         0,
         0,
-        0
+        0,
+        -1
     );
 
     float[][] vertices = ObjectSceneGeometryBuilder.transformVertices(rawModelData, definition, 0);
@@ -191,6 +203,160 @@ class ObjectSceneGeometryBuilderTest {
     assertThat(vertices[0][1]).isEqualTo(0.5f);
     assertThat(vertices[2][0]).isEqualTo(-0.5f);
     assertThat(vertices[2][2]).isEqualTo(0.5f);
+  }
+
+  @Test
+  void mirrorsStaticObjectsAcrossLegacyZAxisInsteadOfX() {
+    RawModelData rawModelData = new RawModelData(
+        2,
+        1,
+        0,
+        new int[]{64, -64},
+        new int[]{0, 0},
+        new int[]{32, -96},
+        new int[0],
+        new int[]{0},
+        new int[]{1},
+        new int[]{0},
+        new int[]{0},
+        new int[]{0},
+        new int[]{0},
+        new int[0],
+        new int[0],
+        new int[0],
+        new int[0],
+        new int[0]
+    );
+    ObjectDefinition definition = new ObjectDefinition(
+        1,
+        "mirrored-statue",
+        List.of(),
+        List.of(),
+        -1,
+        -1,
+        List.of(),
+        List.of(),
+        List.of(),
+        1,
+        1,
+        true,
+        true,
+        true,
+        false,
+        true,
+        true,
+        false,
+        16,
+        -1,
+        -1,
+        0,
+        0,
+        0,
+        128,
+        128,
+        128,
+        0,
+        0,
+        0,
+        -1
+    );
+
+    float[][] vertices = ObjectSceneGeometryBuilder.transformVertices(rawModelData, definition, 0);
+
+    assertThat(vertices[0][0]).isEqualTo(0.5f);
+    assertThat(vertices[2][0]).isEqualTo(-0.25f);
+    assertThat(vertices[0][1]).isEqualTo(-0.5f);
+    assertThat(vertices[2][1]).isEqualTo(0.75f);
+  }
+
+  @Test
+  void swapsFaceWindingWhenUsingMirroredGeometry() {
+    RawModelData rawModelData = new RawModelData(
+        3,
+        1,
+        0,
+        new int[]{0, 128, 0},
+        new int[]{0, 0, 0},
+        new int[]{0, 0, 128},
+        new int[0],
+        new int[]{0},
+        new int[]{1},
+        new int[]{2},
+        new int[]{0},
+        new int[]{0},
+        new int[]{0},
+        new int[0],
+        new int[0],
+        new int[0],
+        new int[0],
+        new int[0]
+    );
+
+    assertThat(ObjectSceneGeometryBuilder.faceVertexA(rawModelData, 0, true)).isEqualTo(2);
+    assertThat(ObjectSceneGeometryBuilder.faceVertexB(rawModelData, 0)).isEqualTo(1);
+    assertThat(ObjectSceneGeometryBuilder.faceVertexC(rawModelData, 0, true)).isEqualTo(0);
+  }
+
+  @Test
+  void appliesObjectTranslationsAfterOrientationRotationLikeLegacy() {
+    RawModelData rawModelData = new RawModelData(
+        1,
+        0,
+        0,
+        new int[]{128},
+        new int[]{0},
+        new int[]{0},
+        new int[0],
+        new int[0],
+        new int[0],
+        new int[0],
+        new int[0],
+        new int[0],
+        new int[0],
+        new int[0],
+        new int[0],
+        new int[0],
+        new int[0],
+        new int[0]
+    );
+    ObjectDefinition definition = new ObjectDefinition(
+        1,
+        "translated-statue",
+        List.of(),
+        List.of(),
+        -1,
+        -1,
+        List.of(),
+        List.of(),
+        List.of(),
+        1,
+        1,
+        true,
+        true,
+        true,
+        false,
+        false,
+        true,
+        false,
+        16,
+        -1,
+        -1,
+        0,
+        0,
+        0,
+        128,
+        128,
+        128,
+        64,
+        0,
+        0,
+        -1
+    );
+
+    float[][] vertices = ObjectSceneGeometryBuilder.transformVertices(rawModelData, definition, 1);
+
+    assertThat(vertices[0][0]).isEqualTo(0.5f);
+    assertThat(vertices[2][0]).isEqualTo(-1.0f);
   }
 
   @Test

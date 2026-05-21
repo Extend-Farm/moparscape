@@ -6,6 +6,7 @@ import io.github.ffakira.rsps.client.desktop.core.OpenGlTexture;
 import io.github.ffakira.rsps.client.desktop.core.ScreenRect;
 import io.github.ffakira.rsps.client.desktop.world.WorldCameraState;
 import io.github.ffakira.rsps.client.desktop.world.WorldScene;
+import io.github.ffakira.rsps.client.desktop.world.minimap.WorldSceneMapFunctionMarker;
 import io.github.ffakira.rsps.client.desktop.world.minimap.MapBackClipMasks;
 import io.github.ffakira.rsps.client.desktop.world.minimap.MinimapViewport;
 import io.github.ffakira.rsps.client.desktop.world.minimap.MinimapViewportPlanner;
@@ -18,7 +19,14 @@ import static org.lwjgl.opengl.GL11.glColor3f;
 final class GameplayMinimapRenderer {
 
   private static final int MINIMAP_VISIBLE_TILES = 37;
+  private static final int LEGACY_DEFAULT_MINIMAP_SCALE = 251;
   private static final float MINIMAP_SELF_MARKER_SIZE = 3.0f;
+  private static final float MINIMAP_DIRECT_MARKER_RADIUS_SQUARED = 2500.0f;
+  private static final float MINIMAP_VISIBLE_MARKER_RADIUS_SQUARED = 6400.0f;
+  private static final float LEGACY_MINIMAP_MARKER_CENTER_X = 73.0f;
+  private static final float LEGACY_MINIMAP_MARKER_CENTER_Y = 74.0f;
+  private static final float LEGACY_MINIMAP_SELF_MARKER_LEFT = 72.0f;
+  private static final float LEGACY_MINIMAP_SELF_MARKER_TOP = 73.0f;
 
   private final ImmediateModeRenderer2d primitives;
   private final OpenGlTexture compassTexture;
@@ -86,27 +94,59 @@ final class GameplayMinimapRenderer {
   }
 
   static float minimapUiYawDegrees(WorldCameraState cameraState) {
-    return cameraState == null ? 0.0f : -cameraState.yawDegrees();
+    return cameraState == null ? 0.0f : cameraState.yawDegrees();
   }
 
   static int legacyMapFunctionSpriteIndex(int rawMapFunctionId) {
-    if (rawMapFunctionId >= 15 && rawMapFunctionId <= 67) {
-      return rawMapFunctionId - 2;
-    }
-    if (rawMapFunctionId == 13 || (rawMapFunctionId >= 68 && rawMapFunctionId <= 84)) {
-      return rawMapFunctionId - 1;
-    }
+    // In this cache layout the media archive exposes direct mapfunction frames 0..60, so the
+    // ObjectDefinition raw id is already the correct sprite index.
     return rawMapFunctionId;
   }
 
+  static float legacyMinimapSourceScale() {
+    return LEGACY_DEFAULT_MINIMAP_SCALE / 256.0f;
+  }
+
+  static float legacyMinimapMarkerDistanceScale() {
+    return 256.0f / LEGACY_DEFAULT_MINIMAP_SCALE;
+  }
+
   static float[] minimapMarkerOffset(float eastDelta, float northDelta, WorldCameraState cameraState) {
+    float scaledEastDelta = eastDelta * legacyMinimapMarkerDistanceScale();
+    float scaledNorthDelta = northDelta * legacyMinimapMarkerDistanceScale();
     float radians = (float) Math.toRadians(minimapUiYawDegrees(cameraState));
     float sine = (float) Math.sin(radians);
     float cosine = (float) Math.cos(radians);
     return new float[]{
-        eastDelta * cosine + northDelta * sine,
-        eastDelta * sine - northDelta * cosine
+        scaledEastDelta * cosine + scaledNorthDelta * sine,
+        scaledEastDelta * sine - scaledNorthDelta * cosine
     };
+  }
+
+  static MarkerProjection projectMarker(
+      float eastDelta,
+      float northDelta,
+      float markerWidth,
+      float markerHeight,
+      ScreenRect minimapRect,
+      WorldCameraState cameraState
+  ) {
+    float distanceSquared = eastDelta * eastDelta + northDelta * northDelta;
+    if (distanceSquared > MINIMAP_VISIBLE_MARKER_RADIUS_SQUARED) {
+      return null;
+    }
+    float[] markerOffset = minimapMarkerOffset(eastDelta, northDelta, cameraState);
+    float centerX = minimapRect.left() + LEGACY_MINIMAP_MARKER_CENTER_X;
+    float centerY = minimapRect.top() + LEGACY_MINIMAP_MARKER_CENTER_Y;
+    return new MarkerProjection(
+        new ScreenRect(
+            centerX + markerOffset[0] - markerWidth * 0.5f,
+            centerY + markerOffset[1] - markerHeight * 0.5f,
+            markerWidth,
+            markerHeight
+        ),
+        distanceSquared > MINIMAP_DIRECT_MARKER_RADIUS_SQUARED
+    );
   }
 
   private void drawMinimapPlayer(ScreenRect minimapRect, MinimapViewport minimapViewport) {
@@ -132,13 +172,14 @@ final class GameplayMinimapRenderer {
         mapBackClipMasks.minimapRowWidths(),
         minimapUiYawDegrees(cameraState),
         minimapViewport.sourceX() + minimapViewport.markerSourceX(),
-        minimapViewport.sourceY() + minimapViewport.markerSourceY()
+        minimapViewport.sourceY() + minimapViewport.markerSourceY(),
+        legacyMinimapSourceScale()
     );
   }
 
   private void drawCenteredMinimapPlayer(ScreenRect minimapRect) {
-    float markerLeft = minimapRect.left() + minimapRect.width() * 0.5f - MINIMAP_SELF_MARKER_SIZE * 0.5f;
-    float markerTop = minimapRect.top() + minimapRect.height() * 0.5f - MINIMAP_SELF_MARKER_SIZE * 0.5f;
+    float markerLeft = minimapRect.left() + LEGACY_MINIMAP_SELF_MARKER_LEFT;
+    float markerTop = minimapRect.top() + LEGACY_MINIMAP_SELF_MARKER_TOP;
     glColor3f(0.96f, 0.96f, 0.96f);
     primitives.drawQuad(markerLeft, markerTop, MINIMAP_SELF_MARKER_SIZE, MINIMAP_SELF_MARKER_SIZE);
   }
@@ -159,14 +200,9 @@ final class GameplayMinimapRenderer {
     int pixelScaleY = worldScene.minimapPixelHeightPerTile();
     int playerPixelX = worldScene.projectMinimapX(localPlayerPosition);
     int playerPixelY = worldScene.projectMinimapY(localPlayerPosition);
-    float centerX = minimapRect.left() + minimapRect.width() * 0.5f;
-    float centerY = minimapRect.top() + minimapRect.height() * 0.5f;
     Set<Long> drawnMarkers = new HashSet<>();
-    for (var sceneObject : worldScene.objects()) {
-      if (sceneObject.type() != 22) {
-        continue;
-      }
-      int markerSpriteIndex = legacyMapFunctionSpriteIndex(sceneObject.mapFunctionId());
+    for (WorldSceneMapFunctionMarker marker : worldScene.mapFunctionMarkers()) {
+      int markerSpriteIndex = legacyMapFunctionSpriteIndex(marker.mapFunctionId());
       if (markerSpriteIndex < 0 || markerSpriteIndex >= mapFunctionTextures.length) {
         continue;
       }
@@ -175,32 +211,57 @@ final class GameplayMinimapRenderer {
         continue;
       }
       long markerKey = (((long) markerSpriteIndex) << 32)
-          | ((long) sceneObject.localX() << 16)
-          | (sceneObject.localY() & 0xffffL);
+          | ((long) marker.localX() << 16)
+          | (marker.localY() & 0xffffL);
       if (!drawnMarkers.add(markerKey)) {
         continue;
       }
-      float objectPixelX = sceneObject.centerX() * pixelScaleX;
-      float objectPixelY = (worldScene.tileHeight() - sceneObject.centerY()) * pixelScaleY;
-      float eastDelta = objectPixelX - playerPixelX;
-      float northDelta = playerPixelY - objectPixelY;
-      if (eastDelta * eastDelta + northDelta * northDelta > 6400.0f) {
-        continue;
-      }
-      float[] markerOffset = minimapMarkerOffset(eastDelta, northDelta, cameraState);
-      float markerLeft = centerX + markerOffset[0] - markerTexture.width() * 0.5f;
-      float markerTop = centerY + markerOffset[1] - markerTexture.height() * 0.5f;
-      if (markerLeft + markerTexture.width() < minimapRect.left()
-          || markerLeft > minimapRect.left() + minimapRect.width()
-          || markerTop + markerTexture.height() < minimapRect.top()
-          || markerTop > minimapRect.top() + minimapRect.height()) {
-        continue;
-      }
-      primitives.drawTexturedQuad(
-          markerTexture,
-          new ScreenRect(markerLeft, markerTop, markerTexture.width(), markerTexture.height())
+      int markerPixelX = minimapMarkerPixelX(marker, pixelScaleX);
+      int markerPixelY = minimapMarkerPixelY(worldScene, marker, pixelScaleY);
+      float eastDelta = markerPixelX - playerPixelX;
+      float northDelta = playerPixelY - markerPixelY;
+      MarkerProjection markerProjection = projectMarker(
+          eastDelta,
+          northDelta,
+          markerTexture.width(),
+          markerTexture.height(),
+          minimapRect,
+          cameraState
       );
+      if (markerProjection == null) {
+        continue;
+      }
+      if (markerProjection.masked() && mapBackClipMasks != null) {
+        primitives.drawMaskedTexturedQuad(
+            markerTexture,
+            markerProjection.rect(),
+            minimapRect,
+            mapBackClipMasks.minimapRowStarts(),
+            mapBackClipMasks.minimapRowWidths()
+        );
+        continue;
+      }
+      ScreenRect markerRect = markerProjection.rect();
+      if (markerRect.left() + markerRect.width() < minimapRect.left()
+          || markerRect.left() > minimapRect.left() + minimapRect.width()
+          || markerRect.top() + markerRect.height() < minimapRect.top()
+          || markerRect.top() > minimapRect.top() + minimapRect.height()) {
+        continue;
+      }
+      primitives.drawTexturedQuad(markerTexture, markerRect);
     }
+  }
+
+  private static int minimapMarkerPixelX(WorldSceneMapFunctionMarker marker, int pixelScaleX) {
+    return marker.localX() * pixelScaleX + pixelScaleX / 2;
+  }
+
+  private static int minimapMarkerPixelY(
+      WorldScene worldScene,
+      WorldSceneMapFunctionMarker marker,
+      int pixelScaleY
+  ) {
+    return ((worldScene.tileHeight() - 1) - marker.localY()) * pixelScaleY + pixelScaleY / 2;
   }
 
   private void drawCompass(WorldCameraState cameraState) {
@@ -215,7 +276,11 @@ final class GameplayMinimapRenderer {
         mapBackClipMasks.compassRowWidths(),
         minimapUiYawDegrees(cameraState),
         compassTexture.width() / 2.0f,
-        compassTexture.height() / 2.0f
+        compassTexture.height() / 2.0f,
+        1.0f
     );
+  }
+
+  record MarkerProjection(ScreenRect rect, boolean masked) {
   }
 }

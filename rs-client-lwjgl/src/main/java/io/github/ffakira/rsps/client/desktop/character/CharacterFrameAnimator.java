@@ -4,12 +4,14 @@ import io.github.ffakira.rsps.cache.AnimationFrameCatalog;
 import io.github.ffakira.rsps.cache.AnimationFrameDefinition;
 import io.github.ffakira.rsps.cache.AnimationFrameBase;
 import io.github.ffakira.rsps.cache.RawModelData;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.IdentityHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 final class CharacterFrameAnimator {
 
@@ -18,44 +20,24 @@ final class CharacterFrameAnimator {
   private static final int[] EMPTY_SKIN_LABELS = new int[0];
   private static final int[] SINE = buildTrigTable(true);
   private static final int[] COSINE = buildTrigTable(false);
+  private static final ThreadLocal<TransformState> TRANSFORM_STATE =
+      ThreadLocal.withInitial(TransformState::new);
 
   private final AnimationFrameCatalog animationFrames;
   private final Map<RawModelData, SkinGroups> skinGroupsByModel = new ConcurrentHashMap<>();
-  private final Map<List<CharacterModelSourceBuilder.PreparedContribution>, CombinedSkinGroups> combinedSkinGroupsByContributions =
-      Collections.synchronizedMap(new IdentityHashMap<>());
+  private final WeakIdentityCache<List<CharacterModelSourceBuilder.PreparedContribution>, CombinedSkinGroups>
+      combinedSkinGroupsByContributions = new WeakIdentityCache<>();
 
   CharacterFrameAnimator(AnimationFrameCatalog animationFrames) {
     this.animationFrames = animationFrames;
   }
 
   AnimatedContribution apply(CharacterModelSourceBuilder.PreparedContribution contribution, int frameId) {
-    AnimationFrameDefinition frame = animationFrames.find(frameId).orElse(null);
-    if (frame == null) {
-      return null;
-    }
-    SkinGroups skinGroups = skinGroups(contribution);
-    if (skinGroups == null) {
-      return null;
-    }
-    WorkingModel workingModel = newWorkingModel(contribution);
-    TransformState transformState = new TransformState();
-    applyFrame(frame, frame.base(), skinGroups, transformState, workingModel);
-    return toAnimatedContribution(workingModel);
+    return animateContribution(contribution, findFrame(frameId));
   }
 
   List<AnimatedContribution> apply(List<CharacterModelSourceBuilder.PreparedContribution> contributions, int frameId) {
-    AnimationFrameDefinition frame = animationFrames.find(frameId).orElse(null);
-    if (frame == null) {
-      return null;
-    }
-    CombinedSkinGroups skinGroups = combinedSkinGroups(contributions);
-    if (skinGroups == null) {
-      return null;
-    }
-    WorkingContribution[] workingContributions = newWorkingContributions(contributions);
-    TransformState transformState = new TransformState();
-    applyFrame(frame, frame.base(), skinGroups, transformState, workingContributions);
-    return toAnimatedContributions(workingContributions);
+    return animateContributions(contributions, findFrame(frameId));
   }
 
   AnimatedContribution applyInterleaved(
@@ -64,30 +46,15 @@ final class CharacterFrameAnimator {
       int movementFrameId,
       int[] interleaveOrder
   ) {
-    AnimationFrameDefinition actionFrame = animationFrames.find(actionFrameId).orElse(null);
+    AnimationFrameDefinition actionFrame = findFrame(actionFrameId);
     if (actionFrame == null) {
       return null;
     }
-    if (movementFrameId < 0 || interleaveOrder == null) {
-      return apply(contribution, actionFrameId);
-    }
-    AnimationFrameDefinition movementFrame = animationFrames.find(movementFrameId).orElse(null);
+    AnimationFrameDefinition movementFrame = interleavedMovementFrame(movementFrameId, interleaveOrder);
     if (movementFrame == null) {
-      return apply(contribution, actionFrameId);
+      return animateContribution(contribution, actionFrame);
     }
-    SkinGroups skinGroups = skinGroups(contribution);
-    if (skinGroups == null) {
-      return null;
-    }
-    WorkingModel workingModel = newWorkingModel(contribution);
-    AnimationFrameBase actionBase = actionFrame.base();
-    TransformState transformState = new TransformState();
-    // The reference client's method471 uses the primary action frame's base for both passes and
-    // resets the pivot accumulators between them before applying the masked movement transforms.
-    applyInterleavedPass(actionFrame, actionBase, skinGroups, transformState, workingModel, interleaveOrder, false);
-    transformState.reset();
-    applyInterleavedPass(movementFrame, actionBase, skinGroups, transformState, workingModel, interleaveOrder, true);
-    return toAnimatedContribution(workingModel);
+    return animateInterleavedContribution(contribution, actionFrame, movementFrame, interleaveOrder);
   }
 
   List<AnimatedContribution> applyInterleaved(
@@ -96,28 +63,98 @@ final class CharacterFrameAnimator {
       int movementFrameId,
       int[] interleaveOrder
   ) {
-    AnimationFrameDefinition actionFrame = animationFrames.find(actionFrameId).orElse(null);
+    AnimationFrameDefinition actionFrame = findFrame(actionFrameId);
     if (actionFrame == null) {
       return null;
     }
-    if (movementFrameId < 0 || interleaveOrder == null) {
-      return apply(contributions, actionFrameId);
-    }
-    AnimationFrameDefinition movementFrame = animationFrames.find(movementFrameId).orElse(null);
+    AnimationFrameDefinition movementFrame = interleavedMovementFrame(movementFrameId, interleaveOrder);
     if (movementFrame == null) {
-      return apply(contributions, actionFrameId);
+      return animateContributions(contributions, actionFrame);
+    }
+    return animateInterleavedContributions(contributions, actionFrame, movementFrame, interleaveOrder);
+  }
+
+  private AnimationFrameDefinition findFrame(int frameId) {
+    return animationFrames.find(frameId).orElse(null);
+  }
+
+  private AnimationFrameDefinition interleavedMovementFrame(int movementFrameId, int[] interleaveOrder) {
+    if (movementFrameId < 0 || interleaveOrder == null) {
+      return null;
+    }
+    return findFrame(movementFrameId);
+  }
+
+  private AnimatedContribution animateContribution(
+      CharacterModelSourceBuilder.PreparedContribution contribution,
+      AnimationFrameDefinition frame
+  ) {
+    if (frame == null) {
+      return null;
+    }
+    SkinGroups skinGroups = skinGroups(contribution);
+    if (skinGroups == null) {
+      return null;
+    }
+    WorkingModel workingModel = newWorkingModel(contribution);
+    applyFrame(frame, frame.base(), skinGroups, reusableTransformState(), workingModel);
+    return toAnimatedContribution(workingModel);
+  }
+
+  private List<AnimatedContribution> animateContributions(
+      List<CharacterModelSourceBuilder.PreparedContribution> contributions,
+      AnimationFrameDefinition frame
+  ) {
+    if (frame == null) {
+      return null;
     }
     CombinedSkinGroups skinGroups = combinedSkinGroups(contributions);
     if (skinGroups == null) {
       return null;
     }
     WorkingContribution[] workingContributions = newWorkingContributions(contributions);
-    AnimationFrameBase actionBase = actionFrame.base();
-    TransformState transformState = new TransformState();
-    applyInterleavedPass(actionFrame, actionBase, skinGroups, transformState, workingContributions, interleaveOrder, false);
-    transformState.reset();
-    applyInterleavedPass(movementFrame, actionBase, skinGroups, transformState, workingContributions, interleaveOrder, true);
+    applyFrame(frame, frame.base(), skinGroups, reusableTransformState(), workingContributions);
     return toAnimatedContributions(workingContributions);
+  }
+
+  private AnimatedContribution animateInterleavedContribution(
+      CharacterModelSourceBuilder.PreparedContribution contribution,
+      AnimationFrameDefinition actionFrame,
+      AnimationFrameDefinition movementFrame,
+      int[] interleaveOrder
+  ) {
+    SkinGroups skinGroups = skinGroups(contribution);
+    if (skinGroups == null) {
+      return null;
+    }
+    WorkingModel workingModel = newWorkingModel(contribution);
+    AnimationFrameBase actionBase = actionFrame.base();
+    TransformState transformState = reusableTransformState();
+    applyInterleavedFrames(actionFrame, movementFrame, actionBase, skinGroups, transformState, workingModel, interleaveOrder);
+    return toAnimatedContribution(workingModel);
+  }
+
+  private List<AnimatedContribution> animateInterleavedContributions(
+      List<CharacterModelSourceBuilder.PreparedContribution> contributions,
+      AnimationFrameDefinition actionFrame,
+      AnimationFrameDefinition movementFrame,
+      int[] interleaveOrder
+  ) {
+    CombinedSkinGroups skinGroups = combinedSkinGroups(contributions);
+    if (skinGroups == null) {
+      return null;
+    }
+    WorkingContribution[] workingContributions = newWorkingContributions(contributions);
+    AnimationFrameBase actionBase = actionFrame.base();
+    TransformState transformState = reusableTransformState();
+    applyInterleavedFrames(actionFrame, movementFrame, actionBase, skinGroups, transformState, workingContributions, interleaveOrder);
+    return toAnimatedContributions(workingContributions);
+  }
+
+  private TransformState reusableTransformState() {
+    TransformState transformState = TRANSFORM_STATE.get();
+    transformState.reset();
+    return transformState;
   }
 
   private SkinGroups skinGroups(CharacterModelSourceBuilder.PreparedContribution contribution) {
@@ -142,11 +179,13 @@ final class CharacterFrameAnimator {
 
   private WorkingModel newWorkingModel(CharacterModelSourceBuilder.PreparedContribution contribution) {
     RawModelData rawModelData = contribution.contribution().rawModelData();
+    // Frame application mutates the working arrays in place, so each evaluation must clone the
+    // cached prepared-model state before applying any transforms.
     return new WorkingModel(
         contribution.modelX().clone(),
         contribution.modelY().clone(),
         contribution.modelZ().clone(),
-        rawModelData.faceAlpha().clone()
+        rawModelData.faceAlpha()
     );
   }
 
@@ -160,16 +199,17 @@ final class CharacterFrameAnimator {
   }
 
   private List<AnimatedContribution> toAnimatedContributions(WorkingContribution[] workingContributions) {
-    ArrayList<AnimatedContribution> animatedContributions = new ArrayList<>(workingContributions.length);
-    for (WorkingContribution workingContribution : workingContributions) {
-      animatedContributions.add(new AnimatedContribution(
+    AnimatedContribution[] animatedContributions = new AnimatedContribution[workingContributions.length];
+    for (int contributionIndex = 0; contributionIndex < workingContributions.length; contributionIndex++) {
+      WorkingContribution workingContribution = workingContributions[contributionIndex];
+      animatedContributions[contributionIndex] = new AnimatedContribution(
           workingContribution.modelX(),
           workingContribution.modelY(),
           workingContribution.modelZ(),
           workingContribution.faceAlpha()
-      ));
+      );
     }
-    return List.copyOf(animatedContributions);
+    return List.of(animatedContributions);
   }
 
   private void applyFrame(
@@ -185,6 +225,22 @@ final class CharacterFrameAnimator {
     }
   }
 
+  private void applyInterleavedFrames(
+      AnimationFrameDefinition actionFrame,
+      AnimationFrameDefinition movementFrame,
+      AnimationFrameBase actionBase,
+      SkinGroups skinGroups,
+      TransformState transformState,
+      WorkingModel workingModel,
+      int[] interleaveOrder
+  ) {
+    // The reference client's method471 uses the primary action frame's base for both passes and
+    // resets the pivot accumulators between them before applying the masked movement transforms.
+    applyInterleavedPass(actionFrame, actionBase, skinGroups, transformState, workingModel, interleaveOrder, false);
+    transformState.reset();
+    applyInterleavedPass(movementFrame, actionBase, skinGroups, transformState, workingModel, interleaveOrder, true);
+  }
+
   private void applyFrame(
       AnimationFrameDefinition frame,
       AnimationFrameBase base,
@@ -196,6 +252,20 @@ final class CharacterFrameAnimator {
       int transformationIndex = frame.transformationIndices()[index];
       applyFrameTransform(frame, base, index, transformationIndex, skinGroups, transformState, workingContributions);
     }
+  }
+
+  private void applyInterleavedFrames(
+      AnimationFrameDefinition actionFrame,
+      AnimationFrameDefinition movementFrame,
+      AnimationFrameBase actionBase,
+      CombinedSkinGroups skinGroups,
+      TransformState transformState,
+      WorkingContribution[] workingContributions,
+      int[] interleaveOrder
+  ) {
+    applyInterleavedPass(actionFrame, actionBase, skinGroups, transformState, workingContributions, interleaveOrder, false);
+    transformState.reset();
+    applyInterleavedPass(movementFrame, actionBase, skinGroups, transformState, workingContributions, interleaveOrder, true);
   }
 
   private void applyInterleavedPass(
@@ -228,10 +298,7 @@ final class CharacterFrameAnimator {
             frame.transformZ()[index],
             skinGroups,
             transformState,
-            workingModel.modelX(),
-            workingModel.modelY(),
-            workingModel.modelZ(),
-            workingModel.faceAlpha()
+            workingModel
         );
       }
     }
@@ -294,10 +361,7 @@ final class CharacterFrameAnimator {
         frame.transformZ()[frameTransformIndex],
         skinGroups,
         transformState,
-        workingModel.modelX(),
-        workingModel.modelY(),
-        workingModel.modelZ(),
-        workingModel.faceAlpha()
+        workingModel
     );
   }
 
@@ -346,11 +410,11 @@ final class CharacterFrameAnimator {
       int transformZ,
       SkinGroups skinGroups,
       TransformState transformState,
-      int[] modelX,
-      int[] modelY,
-      int[] modelZ,
-      int[] faceAlpha
+      WorkingModel workingModel
   ) {
+    int[] modelX = workingModel.modelX();
+    int[] modelY = workingModel.modelY();
+    int[] modelZ = workingModel.modelZ();
     if (transformationType == 0) {
       int pointCount = 0;
       transformState.pivotX = 0;
@@ -380,71 +444,96 @@ final class CharacterFrameAnimator {
       return;
     }
     if (transformationType == 1) {
-      forEachVertex(skinLabels, skinGroups, vertexIndex -> {
-        modelX[vertexIndex] += transformX;
-        modelY[vertexIndex] += transformY;
-        modelZ[vertexIndex] += transformZ;
-      });
+      int[][] vertexGroups = skinGroups.vertexGroups();
+      for (int skinLabel : skinLabels) {
+        if (skinLabel >= vertexGroups.length) {
+          continue;
+        }
+        for (int vertexIndex : vertexGroups[skinLabel]) {
+          modelX[vertexIndex] += transformX;
+          modelY[vertexIndex] += transformY;
+          modelZ[vertexIndex] += transformZ;
+        }
+      }
       return;
     }
     if (transformationType == 2) {
       int angleX = (transformX & 0xff) * 8;
       int angleY = (transformY & 0xff) * 8;
       int angleZ = (transformZ & 0xff) * 8;
-      forEachVertex(skinLabels, skinGroups, vertexIndex -> {
-        modelX[vertexIndex] -= transformState.pivotX;
-        modelY[vertexIndex] -= transformState.pivotY;
-        modelZ[vertexIndex] -= transformState.pivotZ;
-        if (angleZ != 0) {
-          int sin = SINE[angleZ];
-          int cos = COSINE[angleZ];
-          int rotatedX = modelY[vertexIndex] * sin + modelX[vertexIndex] * cos >> 16;
-          modelY[vertexIndex] = modelY[vertexIndex] * cos - modelX[vertexIndex] * sin >> 16;
-          modelX[vertexIndex] = rotatedX;
+      int[][] vertexGroups = skinGroups.vertexGroups();
+      for (int skinLabel : skinLabels) {
+        if (skinLabel >= vertexGroups.length) {
+          continue;
         }
-        if (angleX != 0) {
-          int sin = SINE[angleX];
-          int cos = COSINE[angleX];
-          int rotatedY = modelY[vertexIndex] * cos - modelZ[vertexIndex] * sin >> 16;
-          modelZ[vertexIndex] = modelY[vertexIndex] * sin + modelZ[vertexIndex] * cos >> 16;
-          modelY[vertexIndex] = rotatedY;
+        for (int vertexIndex : vertexGroups[skinLabel]) {
+          modelX[vertexIndex] -= transformState.pivotX;
+          modelY[vertexIndex] -= transformState.pivotY;
+          modelZ[vertexIndex] -= transformState.pivotZ;
+          if (angleZ != 0) {
+            int sin = SINE[angleZ];
+            int cos = COSINE[angleZ];
+            int rotatedX = modelY[vertexIndex] * sin + modelX[vertexIndex] * cos >> 16;
+            modelY[vertexIndex] = modelY[vertexIndex] * cos - modelX[vertexIndex] * sin >> 16;
+            modelX[vertexIndex] = rotatedX;
+          }
+          if (angleX != 0) {
+            int sin = SINE[angleX];
+            int cos = COSINE[angleX];
+            int rotatedY = modelY[vertexIndex] * cos - modelZ[vertexIndex] * sin >> 16;
+            modelZ[vertexIndex] = modelY[vertexIndex] * sin + modelZ[vertexIndex] * cos >> 16;
+            modelY[vertexIndex] = rotatedY;
+          }
+          if (angleY != 0) {
+            int sin = SINE[angleY];
+            int cos = COSINE[angleY];
+            int rotatedZ = modelZ[vertexIndex] * sin + modelX[vertexIndex] * cos >> 16;
+            modelZ[vertexIndex] = modelZ[vertexIndex] * cos - modelX[vertexIndex] * sin >> 16;
+            modelX[vertexIndex] = rotatedZ;
+          }
+          modelX[vertexIndex] += transformState.pivotX;
+          modelY[vertexIndex] += transformState.pivotY;
+          modelZ[vertexIndex] += transformState.pivotZ;
         }
-        if (angleY != 0) {
-          int sin = SINE[angleY];
-          int cos = COSINE[angleY];
-          int rotatedZ = modelZ[vertexIndex] * sin + modelX[vertexIndex] * cos >> 16;
-          modelZ[vertexIndex] = modelZ[vertexIndex] * cos - modelX[vertexIndex] * sin >> 16;
-          modelX[vertexIndex] = rotatedZ;
-        }
-        modelX[vertexIndex] += transformState.pivotX;
-        modelY[vertexIndex] += transformState.pivotY;
-        modelZ[vertexIndex] += transformState.pivotZ;
-      });
+      }
       return;
     }
     if (transformationType == 3) {
-      forEachVertex(skinLabels, skinGroups, vertexIndex -> {
-        modelX[vertexIndex] -= transformState.pivotX;
-        modelY[vertexIndex] -= transformState.pivotY;
-        modelZ[vertexIndex] -= transformState.pivotZ;
-        modelX[vertexIndex] = modelX[vertexIndex] * transformX / 128;
-        modelY[vertexIndex] = modelY[vertexIndex] * transformY / 128;
-        modelZ[vertexIndex] = modelZ[vertexIndex] * transformZ / 128;
-        modelX[vertexIndex] += transformState.pivotX;
-        modelY[vertexIndex] += transformState.pivotY;
-        modelZ[vertexIndex] += transformState.pivotZ;
-      });
+      int[][] vertexGroups = skinGroups.vertexGroups();
+      for (int skinLabel : skinLabels) {
+        if (skinLabel >= vertexGroups.length) {
+          continue;
+        }
+        for (int vertexIndex : vertexGroups[skinLabel]) {
+          modelX[vertexIndex] -= transformState.pivotX;
+          modelY[vertexIndex] -= transformState.pivotY;
+          modelZ[vertexIndex] -= transformState.pivotZ;
+          modelX[vertexIndex] = modelX[vertexIndex] * transformX / 128;
+          modelY[vertexIndex] = modelY[vertexIndex] * transformY / 128;
+          modelZ[vertexIndex] = modelZ[vertexIndex] * transformZ / 128;
+          modelX[vertexIndex] += transformState.pivotX;
+          modelY[vertexIndex] += transformState.pivotY;
+          modelZ[vertexIndex] += transformState.pivotZ;
+        }
+      }
       return;
     }
     if (transformationType == 5) {
-      forEachFace(skinLabels, skinGroups, faceIndex -> {
-        faceAlpha[faceIndex] += transformX * 8;
-        if (faceAlpha[faceIndex] < 0) {
-          faceAlpha[faceIndex] = 0;
-        } else if (faceAlpha[faceIndex] > 255) {
-          faceAlpha[faceIndex] = 255;
+      int[] faceAlpha = workingModel.writableFaceAlpha();
+      int[][] faceGroups = skinGroups.faceGroups();
+      for (int skinLabel : skinLabels) {
+        if (skinLabel >= faceGroups.length) {
+          continue;
         }
-      });
+        for (int faceIndex : faceGroups[skinLabel]) {
+          faceAlpha[faceIndex] += transformX * 8;
+          if (faceAlpha[faceIndex] < 0) {
+            faceAlpha[faceIndex] = 0;
+          } else if (faceAlpha[faceIndex] > 255) {
+            faceAlpha[faceIndex] = 255;
+          }
+        }
+      }
     }
   }
 
@@ -487,84 +576,108 @@ final class CharacterFrameAnimator {
       return;
     }
     if (transformationType == 1) {
-      forEachVertex(skinLabels, skinGroups, vertexReference -> {
-        WorkingContribution workingContribution = workingContributions[vertexReference.contributionIndex()];
-        workingContribution.modelX()[vertexReference.vertexIndex()] += transformX;
-        workingContribution.modelY()[vertexReference.vertexIndex()] += transformY;
-        workingContribution.modelZ()[vertexReference.vertexIndex()] += transformZ;
-      });
+      VertexReference[][] vertexGroups = skinGroups.vertexGroups();
+      for (int skinLabel : skinLabels) {
+        if (skinLabel >= vertexGroups.length) {
+          continue;
+        }
+        for (VertexReference vertexReference : vertexGroups[skinLabel]) {
+          WorkingContribution workingContribution = workingContributions[vertexReference.contributionIndex()];
+          workingContribution.modelX()[vertexReference.vertexIndex()] += transformX;
+          workingContribution.modelY()[vertexReference.vertexIndex()] += transformY;
+          workingContribution.modelZ()[vertexReference.vertexIndex()] += transformZ;
+        }
+      }
       return;
     }
     if (transformationType == 2) {
       int angleX = (transformX & 0xff) * 8;
       int angleY = (transformY & 0xff) * 8;
       int angleZ = (transformZ & 0xff) * 8;
-      forEachVertex(skinLabels, skinGroups, vertexReference -> {
-        WorkingContribution workingContribution = workingContributions[vertexReference.contributionIndex()];
-        int[] modelX = workingContribution.modelX();
-        int[] modelY = workingContribution.modelY();
-        int[] modelZ = workingContribution.modelZ();
-        int vertexIndex = vertexReference.vertexIndex();
-        modelX[vertexIndex] -= transformState.pivotX;
-        modelY[vertexIndex] -= transformState.pivotY;
-        modelZ[vertexIndex] -= transformState.pivotZ;
-        if (angleZ != 0) {
-          int sin = SINE[angleZ];
-          int cos = COSINE[angleZ];
-          int rotatedX = modelY[vertexIndex] * sin + modelX[vertexIndex] * cos >> 16;
-          modelY[vertexIndex] = modelY[vertexIndex] * cos - modelX[vertexIndex] * sin >> 16;
-          modelX[vertexIndex] = rotatedX;
+      VertexReference[][] vertexGroups = skinGroups.vertexGroups();
+      for (int skinLabel : skinLabels) {
+        if (skinLabel >= vertexGroups.length) {
+          continue;
         }
-        if (angleX != 0) {
-          int sin = SINE[angleX];
-          int cos = COSINE[angleX];
-          int rotatedY = modelY[vertexIndex] * cos - modelZ[vertexIndex] * sin >> 16;
-          modelZ[vertexIndex] = modelY[vertexIndex] * sin + modelZ[vertexIndex] * cos >> 16;
-          modelY[vertexIndex] = rotatedY;
+        for (VertexReference vertexReference : vertexGroups[skinLabel]) {
+          WorkingContribution workingContribution = workingContributions[vertexReference.contributionIndex()];
+          int[] modelX = workingContribution.modelX();
+          int[] modelY = workingContribution.modelY();
+          int[] modelZ = workingContribution.modelZ();
+          int vertexIndex = vertexReference.vertexIndex();
+          modelX[vertexIndex] -= transformState.pivotX;
+          modelY[vertexIndex] -= transformState.pivotY;
+          modelZ[vertexIndex] -= transformState.pivotZ;
+          if (angleZ != 0) {
+            int sin = SINE[angleZ];
+            int cos = COSINE[angleZ];
+            int rotatedX = modelY[vertexIndex] * sin + modelX[vertexIndex] * cos >> 16;
+            modelY[vertexIndex] = modelY[vertexIndex] * cos - modelX[vertexIndex] * sin >> 16;
+            modelX[vertexIndex] = rotatedX;
+          }
+          if (angleX != 0) {
+            int sin = SINE[angleX];
+            int cos = COSINE[angleX];
+            int rotatedY = modelY[vertexIndex] * cos - modelZ[vertexIndex] * sin >> 16;
+            modelZ[vertexIndex] = modelY[vertexIndex] * sin + modelZ[vertexIndex] * cos >> 16;
+            modelY[vertexIndex] = rotatedY;
+          }
+          if (angleY != 0) {
+            int sin = SINE[angleY];
+            int cos = COSINE[angleY];
+            int rotatedZ = modelZ[vertexIndex] * sin + modelX[vertexIndex] * cos >> 16;
+            modelZ[vertexIndex] = modelZ[vertexIndex] * cos - modelX[vertexIndex] * sin >> 16;
+            modelX[vertexIndex] = rotatedZ;
+          }
+          modelX[vertexIndex] += transformState.pivotX;
+          modelY[vertexIndex] += transformState.pivotY;
+          modelZ[vertexIndex] += transformState.pivotZ;
         }
-        if (angleY != 0) {
-          int sin = SINE[angleY];
-          int cos = COSINE[angleY];
-          int rotatedZ = modelZ[vertexIndex] * sin + modelX[vertexIndex] * cos >> 16;
-          modelZ[vertexIndex] = modelZ[vertexIndex] * cos - modelX[vertexIndex] * sin >> 16;
-          modelX[vertexIndex] = rotatedZ;
-        }
-        modelX[vertexIndex] += transformState.pivotX;
-        modelY[vertexIndex] += transformState.pivotY;
-        modelZ[vertexIndex] += transformState.pivotZ;
-      });
+      }
       return;
     }
     if (transformationType == 3) {
-      forEachVertex(skinLabels, skinGroups, vertexReference -> {
-        WorkingContribution workingContribution = workingContributions[vertexReference.contributionIndex()];
-        int[] modelX = workingContribution.modelX();
-        int[] modelY = workingContribution.modelY();
-        int[] modelZ = workingContribution.modelZ();
-        int vertexIndex = vertexReference.vertexIndex();
-        modelX[vertexIndex] -= transformState.pivotX;
-        modelY[vertexIndex] -= transformState.pivotY;
-        modelZ[vertexIndex] -= transformState.pivotZ;
-        modelX[vertexIndex] = modelX[vertexIndex] * transformX / 128;
-        modelY[vertexIndex] = modelY[vertexIndex] * transformY / 128;
-        modelZ[vertexIndex] = modelZ[vertexIndex] * transformZ / 128;
-        modelX[vertexIndex] += transformState.pivotX;
-        modelY[vertexIndex] += transformState.pivotY;
-        modelZ[vertexIndex] += transformState.pivotZ;
-      });
+      VertexReference[][] vertexGroups = skinGroups.vertexGroups();
+      for (int skinLabel : skinLabels) {
+        if (skinLabel >= vertexGroups.length) {
+          continue;
+        }
+        for (VertexReference vertexReference : vertexGroups[skinLabel]) {
+          WorkingContribution workingContribution = workingContributions[vertexReference.contributionIndex()];
+          int[] modelX = workingContribution.modelX();
+          int[] modelY = workingContribution.modelY();
+          int[] modelZ = workingContribution.modelZ();
+          int vertexIndex = vertexReference.vertexIndex();
+          modelX[vertexIndex] -= transformState.pivotX;
+          modelY[vertexIndex] -= transformState.pivotY;
+          modelZ[vertexIndex] -= transformState.pivotZ;
+          modelX[vertexIndex] = modelX[vertexIndex] * transformX / 128;
+          modelY[vertexIndex] = modelY[vertexIndex] * transformY / 128;
+          modelZ[vertexIndex] = modelZ[vertexIndex] * transformZ / 128;
+          modelX[vertexIndex] += transformState.pivotX;
+          modelY[vertexIndex] += transformState.pivotY;
+          modelZ[vertexIndex] += transformState.pivotZ;
+        }
+      }
       return;
     }
     if (transformationType == 5) {
-      forEachFace(skinLabels, skinGroups, faceReference -> {
-        WorkingContribution workingContribution = workingContributions[faceReference.contributionIndex()];
-        int[] faceAlpha = workingContribution.faceAlpha();
-        faceAlpha[faceReference.faceIndex()] += transformX * 8;
-        if (faceAlpha[faceReference.faceIndex()] < 0) {
-          faceAlpha[faceReference.faceIndex()] = 0;
-        } else if (faceAlpha[faceReference.faceIndex()] > 255) {
-          faceAlpha[faceReference.faceIndex()] = 255;
+      FaceReference[][] faceGroups = skinGroups.faceGroups();
+      for (int skinLabel : skinLabels) {
+        if (skinLabel >= faceGroups.length) {
+          continue;
         }
-      });
+        for (FaceReference faceReference : faceGroups[skinLabel]) {
+          WorkingContribution workingContribution = workingContributions[faceReference.contributionIndex()];
+          int[] faceAlpha = workingContribution.writableFaceAlpha();
+          faceAlpha[faceReference.faceIndex()] += transformX * 8;
+          if (faceAlpha[faceReference.faceIndex()] < 0) {
+            faceAlpha[faceReference.faceIndex()] = 0;
+          } else if (faceAlpha[faceReference.faceIndex()] > 255) {
+            faceAlpha[faceReference.faceIndex()] = 255;
+          }
+        }
+      }
     }
   }
 
@@ -616,11 +729,13 @@ final class CharacterFrameAnimator {
     for (int contributionIndex = 0; contributionIndex < contributions.size(); contributionIndex++) {
       CharacterModelSourceBuilder.PreparedContribution contribution = contributions.get(contributionIndex);
       RawModelData rawModelData = contribution.contribution().rawModelData();
+      // Like the single-model path, contribution-local arrays must be cloned before any frame
+      // transform mutates them in place.
       workingContributions[contributionIndex] = new WorkingContribution(
           contribution.modelX().clone(),
           contribution.modelY().clone(),
           contribution.modelZ().clone(),
-          rawModelData.faceAlpha().clone()
+          rawModelData.faceAlpha()
       );
     }
     return workingContributions;
@@ -660,50 +775,6 @@ final class CharacterFrameAnimator {
     return groups;
   }
 
-  private static void forEachVertex(int[] skinLabels, SkinGroups skinGroups, IntConsumer consumer) {
-    for (int skinLabel : skinLabels) {
-      if (skinLabel >= skinGroups.vertexGroups().length) {
-        continue;
-      }
-      for (int vertexIndex : skinGroups.vertexGroups()[skinLabel]) {
-        consumer.accept(vertexIndex);
-      }
-    }
-  }
-
-  private static void forEachFace(int[] skinLabels, SkinGroups skinGroups, IntConsumer consumer) {
-    for (int skinLabel : skinLabels) {
-      if (skinLabel >= skinGroups.faceGroups().length) {
-        continue;
-      }
-      for (int faceIndex : skinGroups.faceGroups()[skinLabel]) {
-        consumer.accept(faceIndex);
-      }
-    }
-  }
-
-  private static void forEachVertex(int[] skinLabels, CombinedSkinGroups skinGroups, VertexReferenceConsumer consumer) {
-    for (int skinLabel : skinLabels) {
-      if (skinLabel >= skinGroups.vertexGroups().length) {
-        continue;
-      }
-      for (VertexReference vertexReference : skinGroups.vertexGroups()[skinLabel]) {
-        consumer.accept(vertexReference);
-      }
-    }
-  }
-
-  private static void forEachFace(int[] skinLabels, CombinedSkinGroups skinGroups, FaceReferenceConsumer consumer) {
-    for (int skinLabel : skinLabels) {
-      if (skinLabel >= skinGroups.faceGroups().length) {
-        continue;
-      }
-      for (FaceReference faceReference : skinGroups.faceGroups()[skinLabel]) {
-        consumer.accept(faceReference);
-      }
-    }
-  }
-
   private static int[] buildTrigTable(boolean sine) {
     int[] values = new int[2048];
     for (int index = 0; index < values.length; index++) {
@@ -716,10 +787,82 @@ final class CharacterFrameAnimator {
   record AnimatedContribution(int[] modelX, int[] modelY, int[] modelZ, int[] faceAlpha) {
   }
 
-  private record WorkingModel(int[] modelX, int[] modelY, int[] modelZ, int[] faceAlpha) {
+  private static final class WorkingModel {
+    private final int[] modelX;
+    private final int[] modelY;
+    private final int[] modelZ;
+    private final int[] sourceFaceAlpha;
+    private int[] faceAlpha;
+
+    private WorkingModel(int[] modelX, int[] modelY, int[] modelZ, int[] sourceFaceAlpha) {
+      this.modelX = modelX;
+      this.modelY = modelY;
+      this.modelZ = modelZ;
+      this.sourceFaceAlpha = sourceFaceAlpha;
+      this.faceAlpha = sourceFaceAlpha;
+    }
+
+    private int[] modelX() {
+      return modelX;
+    }
+
+    private int[] modelY() {
+      return modelY;
+    }
+
+    private int[] modelZ() {
+      return modelZ;
+    }
+
+    private int[] faceAlpha() {
+      return faceAlpha;
+    }
+
+    private int[] writableFaceAlpha() {
+      if (faceAlpha == sourceFaceAlpha) {
+        faceAlpha = sourceFaceAlpha.clone();
+      }
+      return faceAlpha;
+    }
   }
 
-  private record WorkingContribution(int[] modelX, int[] modelY, int[] modelZ, int[] faceAlpha) {
+  private static final class WorkingContribution {
+    private final int[] modelX;
+    private final int[] modelY;
+    private final int[] modelZ;
+    private final int[] sourceFaceAlpha;
+    private int[] faceAlpha;
+
+    private WorkingContribution(int[] modelX, int[] modelY, int[] modelZ, int[] sourceFaceAlpha) {
+      this.modelX = modelX;
+      this.modelY = modelY;
+      this.modelZ = modelZ;
+      this.sourceFaceAlpha = sourceFaceAlpha;
+      this.faceAlpha = sourceFaceAlpha;
+    }
+
+    private int[] modelX() {
+      return modelX;
+    }
+
+    private int[] modelY() {
+      return modelY;
+    }
+
+    private int[] modelZ() {
+      return modelZ;
+    }
+
+    private int[] faceAlpha() {
+      return faceAlpha;
+    }
+
+    private int[] writableFaceAlpha() {
+      if (faceAlpha == sourceFaceAlpha) {
+        faceAlpha = sourceFaceAlpha.clone();
+      }
+      return faceAlpha;
+    }
   }
 
   private record SkinGroups(int[][] vertexGroups, int[][] faceGroups) {
@@ -732,18 +875,6 @@ final class CharacterFrameAnimator {
   }
 
   private record FaceReference(int contributionIndex, int faceIndex) {
-  }
-
-  private interface IntConsumer {
-    void accept(int value);
-  }
-
-  private interface VertexReferenceConsumer {
-    void accept(VertexReference value);
-  }
-
-  private interface FaceReferenceConsumer {
-    void accept(FaceReference value);
   }
 
   private static VertexReference[][] toVertexReferenceArrays(ArrayList<ArrayList<VertexReference>> groups) {
@@ -771,6 +902,96 @@ final class CharacterFrameAnimator {
       pivotX = 0;
       pivotY = 0;
       pivotZ = 0;
+    }
+  }
+
+  private static final class WeakIdentityCache<K, V> {
+    private final ReferenceQueue<K> staleKeys = new ReferenceQueue<>();
+    private final Map<IdentityReference<K>, V> values = new HashMap<>();
+
+    private synchronized V computeIfAbsent(K key, Function<? super K, ? extends V> builder) {
+      expungeStaleEntries();
+      IdentityReference<K> lookup = new StrongIdentityKey<>(key);
+      V existing = values.get(lookup);
+      if (existing != null) {
+        return existing;
+      }
+      V created = builder.apply(key);
+      values.put(new WeakIdentityKey<>(key, staleKeys), created);
+      return created;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void expungeStaleEntries() {
+      WeakIdentityKey<K> staleKey;
+      while ((staleKey = (WeakIdentityKey<K>) staleKeys.poll()) != null) {
+        values.remove(staleKey);
+      }
+    }
+  }
+
+  private sealed interface IdentityReference<K> permits StrongIdentityKey, WeakIdentityKey {
+    K referent();
+
+    int identityHash();
+  }
+
+  private static final class StrongIdentityKey<K> implements IdentityReference<K> {
+    private final K referent;
+    private final int identityHash;
+
+    private StrongIdentityKey(K referent) {
+      this.referent = referent;
+      this.identityHash = System.identityHashCode(referent);
+    }
+
+    @Override
+    public K referent() {
+      return referent;
+    }
+
+    @Override
+    public int identityHash() {
+      return identityHash;
+    }
+
+    @Override
+    public int hashCode() {
+      return identityHash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      return obj instanceof IdentityReference<?> other && referent == other.referent();
+    }
+  }
+
+  private static final class WeakIdentityKey<K> extends WeakReference<K> implements IdentityReference<K> {
+    private final int identityHash;
+
+    private WeakIdentityKey(K referent, ReferenceQueue<K> staleKeys) {
+      super(referent, staleKeys);
+      this.identityHash = System.identityHashCode(referent);
+    }
+
+    @Override
+    public K referent() {
+      return get();
+    }
+
+    @Override
+    public int identityHash() {
+      return identityHash;
+    }
+
+    @Override
+    public int hashCode() {
+      return identityHash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      return obj instanceof IdentityReference<?> other && referent() == other.referent();
     }
   }
 }

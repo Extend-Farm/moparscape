@@ -54,8 +54,10 @@ class TerrainShadowResolverTest {
         )
     );
 
-    assertThat(shadowSamples[index(6, 2, 2)] & 0xff).isEqualTo(30);
-    assertThat(shadowSamples[index(6, 3, 3)] & 0xff).isEqualTo(30);
+    // MAX_OBJECT_SHADOW was raised to 50 to better match legacy north-west sun strength; this
+    // assertion now pins the new upper bound so a future tweak surfaces here.
+    assertThat(shadowSamples[index(6, 2, 2)] & 0xff).isEqualTo(50);
+    assertThat(shadowSamples[index(6, 3, 3)] & 0xff).isEqualTo(50);
     assertThat(shadowSamples[index(6, 0, 0)] & 0xff).isZero();
   }
 

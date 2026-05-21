@@ -8,17 +8,24 @@ public final class ObjectDefinitionCatalog {
 
   private static final String OBJECT_INDEX_ENTRY = "loc.idx";
   private static final String OBJECT_DATA_ENTRY = "loc.dat";
+  private static final int MAX_SCENE_MORPH_DEPTH = 8;
 
   private final ObjectDefinition[] definitionsById;
+  private final ObjectDefinition[] sceneResolvedDefinitionsById;
   private final int definitionCount;
 
-  private ObjectDefinitionCatalog(ObjectDefinition[] definitionsById, int definitionCount) {
+  private ObjectDefinitionCatalog(
+      ObjectDefinition[] definitionsById,
+      ObjectDefinition[] sceneResolvedDefinitionsById,
+      int definitionCount
+  ) {
     this.definitionsById = definitionsById;
+    this.sceneResolvedDefinitionsById = sceneResolvedDefinitionsById;
     this.definitionCount = definitionCount;
   }
 
   public static ObjectDefinitionCatalog empty() {
-    return new ObjectDefinitionCatalog(new ObjectDefinition[0], 0);
+    return new ObjectDefinitionCatalog(new ObjectDefinition[0], new ObjectDefinition[0], 0);
   }
 
   public static ObjectDefinitionCatalog load(ContentManifest manifest) {
@@ -42,7 +49,7 @@ public final class ObjectDefinitionCatalog {
       dataReader.position(offsetsById[objectId]);
       definitionsById[objectId] = MutableObjectDefinition.parse(objectId, dataReader).toDefinition();
     }
-    return new ObjectDefinitionCatalog(definitionsById, objectCount);
+    return new ObjectDefinitionCatalog(definitionsById, new ObjectDefinition[objectCount], objectCount);
   }
 
   public int size() {
@@ -61,10 +68,50 @@ public final class ObjectDefinitionCatalog {
         .orElseThrow(() -> new IllegalArgumentException("Unknown object definition " + objectId));
   }
 
+  public ObjectDefinition resolveSceneDefinition(int objectId) {
+    ObjectDefinition cachedDefinition = sceneResolvedDefinitionsById[objectId];
+    if (cachedDefinition != null) {
+      return cachedDefinition;
+    }
+    ObjectDefinition resolvedDefinition = resolveSceneDefinition(require(objectId), 0);
+    sceneResolvedDefinitionsById[objectId] = resolvedDefinition;
+    return resolvedDefinition;
+  }
+
+  private ObjectDefinition resolveSceneDefinition(ObjectDefinition definition, int depth) {
+    if (depth >= MAX_SCENE_MORPH_DEPTH || definition.morphIds().isEmpty()) {
+      return definition;
+    }
+
+    ObjectDefinition firstResolvedChild = null;
+    for (int morphId : definition.morphIds()) {
+      if (morphId < 0) {
+        continue;
+      }
+      ObjectDefinition resolvedChild = find(morphId)
+          .map(child -> resolveSceneDefinition(child, depth + 1))
+          .orElse(null);
+      if (resolvedChild == null) {
+        continue;
+      }
+      if (firstResolvedChild == null) {
+        firstResolvedChild = resolvedChild;
+      }
+      if (!resolvedChild.modelIds().isEmpty()) {
+        // The native scene path does not have live varbit/varp state yet. For opcode 77 morph
+        // containers, prefer the first child that can actually render so the viewport keeps the
+        // authored prop instead of dropping to a placeholder proxy.
+        return resolvedChild;
+      }
+    }
+    return firstResolvedChild == null ? definition : firstResolvedChild;
+  }
+
   private static final class MutableObjectDefinition {
     private final int id;
     private final List<Integer> modelIds = new ArrayList<>();
     private final List<Integer> modelTypes = new ArrayList<>();
+    private final List<Integer> morphIds = new ArrayList<>();
     private final List<Integer> recolorSources = new ArrayList<>();
     private final List<Integer> recolorTargets = new ArrayList<>();
     private String name = "";
@@ -92,6 +139,9 @@ public final class ObjectDefinitionCatalog {
     private int translateX = 0;
     private int translateY = 0;
     private int translateZ = 0;
+    private int animationId = -1;
+    private int morphVarBitId = -1;
+    private int morphVarpId = -1;
 
     private MutableObjectDefinition(int id) {
       this.id = id;
@@ -137,10 +187,8 @@ public final class ObjectDefinitionCatalog {
             // Current native scene path still ignores delayed shading and occlusion flags.
           }
           case 24 -> {
-            int animationId = reader.readUnsignedShort();
-            if (animationId == 65535) {
-              // ignore sentinel
-            }
+            int rawAnimationId = reader.readUnsignedShort();
+            definition.animationId = rawAnimationId == 65535 ? -1 : rawAnimationId;
           }
           case 28 -> definition.decorDisplacement = reader.readUnsignedByte();
           case 29 -> definition.ambient = reader.readSignedByte();
@@ -193,12 +241,16 @@ public final class ObjectDefinitionCatalog {
             if (varp == 65535) {
               varp = -1;
             }
+            definition.morphVarBitId = varBit;
+            definition.morphVarpId = varp;
+            definition.morphIds.clear();
             int morphCount = reader.readUnsignedByte();
             for (int index = 0; index <= morphCount; index++) {
               int morphId = reader.readUnsignedShort();
               if (morphId == 65535) {
                 morphId = -1;
               }
+              definition.morphIds.add(morphId);
             }
           }
           default -> throw new IllegalStateException("Unsupported object definition opcode " + opcode + " for object " + id);
@@ -219,6 +271,9 @@ public final class ObjectDefinitionCatalog {
           resolvedName,
           modelIds,
           modelTypes,
+          morphVarBitId,
+          morphVarpId,
+          morphIds,
           recolorSources,
           recolorTargets,
           sizeX,
@@ -241,7 +296,8 @@ public final class ObjectDefinitionCatalog {
           scaleZ,
           translateX,
           translateY,
-          translateZ
+          translateZ,
+          animationId
       );
     }
   }

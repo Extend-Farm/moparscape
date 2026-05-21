@@ -26,7 +26,9 @@ public final class WorldSceneObjectAssembler {
   ) {
     int localX = placement.worldX() - originWorldX;
     int localY = placement.worldY() - originWorldY;
-    ObjectDefinition definition = objectDefinitions.find(placement.objectId()).orElse(null);
+    ObjectDefinition definition = objectDefinitions.find(placement.objectId())
+        .map(ignored -> objectDefinitions.resolveSceneDefinition(placement.objectId()))
+        .orElse(null);
     int sizeX = definition == null ? 1 : definition.footprintWidth(placement.orientation());
     int sizeY = definition == null ? 1 : definition.footprintHeight(placement.orientation());
     String name = definition == null ? "object-" + placement.objectId() : definition.name();
@@ -54,6 +56,10 @@ public final class WorldSceneObjectAssembler {
         modelIds,
         allowFallbackProxy,
         definition == null || definition.castsShadow(),
+        definition == null || definition.solid(),
+        definition != null && definition.interactive(),
+        definition == null ? 16 : definition.decorDisplacement(),
+        definition == null ? -1 : definition.animationId(),
         geometry
     );
   }

@@ -26,10 +26,7 @@ public final class TerrainSceneMeshBuilder {
     appendBridgeLowerPaintTiles(builder, worldScene, visibilityWindow);
     for (int tileY = visibilityWindow.minLocalY(); tileY <= visibilityWindow.maxLocalY(); tileY++) {
       for (int tileX = visibilityWindow.minLocalX(); tileX <= visibilityWindow.maxLocalX(); tileX++) {
-        if (TerrainOverlayShapeResolver.sceneShapeId(worldScene, tileX, tileY) > 1) {
-          continue;
-        }
-        if (TerrainTileColorResolver.activePaintTextureId(worldScene, tileX, tileY, ENABLE_TEXTURED_TERRAIN) >= 0) {
+        if (TerrainSceneTileFormResolver.resolve(worldScene, tileX, tileY, ENABLE_TEXTURED_TERRAIN) != TerrainSceneTileForm.FLAT_PAINT) {
           continue;
         }
         TerrainTileColorResolver.FloorColorLayer paintLayer = TerrainTileColorResolver.paintLayer(worldScene, tileX, tileY);
@@ -52,13 +49,10 @@ public final class TerrainSceneMeshBuilder {
     appendBridgeLowerTexturedPaintTiles(builder, worldScene, visibilityWindow);
     for (int tileY = visibilityWindow.minLocalY(); tileY <= visibilityWindow.maxLocalY(); tileY++) {
       for (int tileX = visibilityWindow.minLocalX(); tileX <= visibilityWindow.maxLocalX(); tileX++) {
-        if (TerrainOverlayShapeResolver.sceneShapeId(worldScene, tileX, tileY) > 1) {
+        if (TerrainSceneTileFormResolver.resolve(worldScene, tileX, tileY, ENABLE_TEXTURED_TERRAIN) != TerrainSceneTileForm.TEXTURED_PAINT) {
           continue;
         }
         int textureId = TerrainTileColorResolver.activePaintTextureId(worldScene, tileX, tileY, ENABLE_TEXTURED_TERRAIN);
-        if (textureId < 0) {
-          continue;
-        }
         appendTexturedPaintTile(
             builder,
             tileX,
@@ -81,10 +75,10 @@ public final class TerrainSceneMeshBuilder {
     appendBridgeLowerShapedTiles(builder, worldScene, visibilityWindow, false);
     for (int tileY = visibilityWindow.minLocalY(); tileY <= visibilityWindow.maxLocalY(); tileY++) {
       for (int tileX = visibilityWindow.minLocalX(); tileX <= visibilityWindow.maxLocalX(); tileX++) {
-        int shape = TerrainOverlayShapeResolver.sceneShapeId(worldScene, tileX, tileY);
-        if (!TerrainShapeDefinitions.isSupportedShape(shape)) {
+        if (TerrainSceneTileFormResolver.resolve(worldScene, tileX, tileY, ENABLE_TEXTURED_TERRAIN) != TerrainSceneTileForm.SCENE_TILE_MODEL) {
           continue;
         }
+        int shape = TerrainOverlayShapeResolver.sceneShapeId(worldScene, tileX, tileY);
         appendShapedTile(builder, worldScene, tileX, tileY, shape, worldScene.overlayRotationAt(tileX, tileY), false);
       }
     }
@@ -103,10 +97,10 @@ public final class TerrainSceneMeshBuilder {
     appendBridgeLowerShapedTiles(builder, worldScene, visibilityWindow, true);
     for (int tileY = visibilityWindow.minLocalY(); tileY <= visibilityWindow.maxLocalY(); tileY++) {
       for (int tileX = visibilityWindow.minLocalX(); tileX <= visibilityWindow.maxLocalX(); tileX++) {
-        int shape = TerrainOverlayShapeResolver.sceneShapeId(worldScene, tileX, tileY);
-        if (!TerrainShapeDefinitions.isSupportedShape(shape)) {
+        if (TerrainSceneTileFormResolver.resolve(worldScene, tileX, tileY, ENABLE_TEXTURED_TERRAIN) != TerrainSceneTileForm.SCENE_TILE_MODEL) {
           continue;
         }
+        int shape = TerrainOverlayShapeResolver.sceneShapeId(worldScene, tileX, tileY);
         appendShapedTile(builder, worldScene, tileX, tileY, shape, worldScene.overlayRotationAt(tileX, tileY), true);
       }
     }
@@ -425,10 +419,7 @@ public final class TerrainSceneMeshBuilder {
     for (int tileY = visibilityWindow.minLocalY(); tileY <= visibilityWindow.maxLocalY(); tileY++) {
       for (int tileX = visibilityWindow.minLocalX(); tileX <= visibilityWindow.maxLocalX(); tileX++) {
         if (!bridgeTerrainLayer.activeAt(tileX, tileY)
-            || TerrainOverlayShapeResolver.sceneShapeId(bridgeTerrainLayer, tileX, tileY) > 1) {
-          continue;
-        }
-        if (TerrainTileColorResolver.activePaintTextureId(bridgeTerrainLayer, tileX, tileY, ENABLE_TEXTURED_TERRAIN) >= 0) {
+            || TerrainSceneTileFormResolver.resolve(bridgeTerrainLayer, tileX, tileY, ENABLE_TEXTURED_TERRAIN) != TerrainSceneTileForm.FLAT_PAINT) {
           continue;
         }
         TerrainTileColorResolver.FloorColorLayer paintLayer = TerrainTileColorResolver.paintLayer(bridgeTerrainLayer, tileX, tileY);
@@ -462,13 +453,10 @@ public final class TerrainSceneMeshBuilder {
     for (int tileY = visibilityWindow.minLocalY(); tileY <= visibilityWindow.maxLocalY(); tileY++) {
       for (int tileX = visibilityWindow.minLocalX(); tileX <= visibilityWindow.maxLocalX(); tileX++) {
         if (!bridgeTerrainLayer.activeAt(tileX, tileY)
-            || TerrainOverlayShapeResolver.sceneShapeId(bridgeTerrainLayer, tileX, tileY) > 1) {
+            || TerrainSceneTileFormResolver.resolve(bridgeTerrainLayer, tileX, tileY, ENABLE_TEXTURED_TERRAIN) != TerrainSceneTileForm.TEXTURED_PAINT) {
           continue;
         }
         int textureId = TerrainTileColorResolver.activePaintTextureId(bridgeTerrainLayer, tileX, tileY, ENABLE_TEXTURED_TERRAIN);
-        if (textureId < 0) {
-          continue;
-        }
         appendTexturedPaintTile(
             builder,
             tileX,
@@ -496,21 +484,25 @@ public final class TerrainSceneMeshBuilder {
         if (!bridgeTerrainLayer.activeAt(tileX, tileY)) {
           continue;
         }
-        int shape = TerrainOverlayShapeResolver.sceneShapeId(bridgeTerrainLayer, tileX, tileY);
-        if (!TerrainShapeDefinitions.isSupportedShape(shape)) {
+        if (TerrainSceneTileFormResolver.resolve(bridgeTerrainLayer, tileX, tileY, ENABLE_TEXTURED_TERRAIN) != TerrainSceneTileForm.SCENE_TILE_MODEL) {
           continue;
         }
+        int shape = TerrainOverlayShapeResolver.sceneShapeId(bridgeTerrainLayer, tileX, tileY);
         appendShapedTile(builder, bridgeTerrainLayer, tileX, tileY, shape, bridgeTerrainLayer.overlayRotationAt(tileX, tileY), texturedOnly);
       }
     }
   }
 
   private TerrainCornerHeights cornerHeights(TerrainLayerSource terrainLayerSource, int tileX, int tileY) {
+    // Use the per-tile-plane corner elevation so a bridge tile reads from its plane 1 deck heights
+    // while the adjacent water tile reads from its plane 0 water heights, even at the shared
+    // corner. The previous shared-sample elevation pulled water corners up to bridge height,
+    // which made the river surface appear at land level.
     return new TerrainCornerHeights(
-        terrainLayerSource.elevationAt(tileX, tileY) * WorldSceneScale.HEIGHT_SCALE,
-        terrainLayerSource.elevationAt(tileX + 1, tileY) * WorldSceneScale.HEIGHT_SCALE,
-        terrainLayerSource.elevationAt(tileX + 1, tileY + 1) * WorldSceneScale.HEIGHT_SCALE,
-        terrainLayerSource.elevationAt(tileX, tileY + 1) * WorldSceneScale.HEIGHT_SCALE
+        terrainLayerSource.tileCornerElevationAt(tileX, tileY, 0, 0) * WorldSceneScale.HEIGHT_SCALE,
+        terrainLayerSource.tileCornerElevationAt(tileX, tileY, 1, 0) * WorldSceneScale.HEIGHT_SCALE,
+        terrainLayerSource.tileCornerElevationAt(tileX, tileY, 1, 1) * WorldSceneScale.HEIGHT_SCALE,
+        terrainLayerSource.tileCornerElevationAt(tileX, tileY, 0, 1) * WorldSceneScale.HEIGHT_SCALE
     );
   }
 

@@ -6,6 +6,7 @@ import io.github.ffakira.rsps.protocol.DisconnectNotice;
 import io.github.ffakira.rsps.protocol.HandshakeRequest;
 import io.github.ffakira.rsps.protocol.LoginRequest;
 import io.github.ffakira.rsps.protocol.MoveIntentMessage;
+import io.github.ffakira.rsps.protocol.ActionSequenceIntentMessage;
 import io.github.ffakira.rsps.protocol.ProtocolVersion;
 import io.github.ffakira.rsps.protocol.ServerMessage;
 import java.nio.file.Path;
@@ -86,6 +87,13 @@ public final class GameplayClientSession implements AutoCloseable {
     pendingMovementSteps.addAll(buildMovementPath(remainingDeltaX, remainingDeltaY, movementMode));
     nextMovementDispatchNanos = 0L;
     pumpMovement();
+  }
+
+  public void setActionSequence(int actionSequenceId) {
+    if (!clientCore.viewModel().loggedIn()) {
+      return;
+    }
+    transport.send(new ActionSequenceIntentMessage(actionSequenceId));
   }
 
   public void pumpMovement() {

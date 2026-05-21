@@ -145,7 +145,10 @@ public final class WorldScenePlaneRules {
     float rotatedZ = (float) (-offsetY * Math.sin(pitchRadians) + offsetZ * Math.cos(pitchRadians));
     float rotatedX = (float) (-rotatedZ * Math.sin(yawRadians));
     float worldZ = (float) (rotatedZ * Math.cos(yawRadians));
-    return new float[]{cameraState.focusX() + rotatedX, rotatedY + cameraState.focusHeight(), cameraState.focusY() + worldZ};
+    // Mirror of the glScalef(1, 1, -1) the renderer applies between R_yaw and T_focus. Without
+    // this, the computed camera position would be on the wrong side of the focus along the
+    // north/south axis and visibility checks would cull tiles incorrectly.
+    return new float[]{cameraState.focusX() + rotatedX, rotatedY + cameraState.focusHeight(), cameraState.focusY() - worldZ};
   }
 
   private static int clamp(int value, int minimum, int maximum) {

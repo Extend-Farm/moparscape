@@ -269,7 +269,11 @@ public final class OpenGlSceneRasterBackend implements SceneRasterBackend, AutoC
     for (int textureId = 0; textureId < sourceTextures.length; textureId++) {
       ArgbImage image = sourceTextures[textureId];
       if (image != null) {
-        textures[textureId] = OpenGlTexture.fromArgbImage(image);
+        // Scene textures benefit from mipmaps: terrain and bridge surfaces are sampled at sharp
+        // angles and far distances where nearest-neighbour without mipmaps produces visible
+        // shimmering / pattern collapse. Magnification stays nearest so close-up textures keep the
+        // legacy pixel-art look.
+        textures[textureId] = OpenGlTexture.fromArgbImageWithMipmaps(image);
       }
     }
     return textures;

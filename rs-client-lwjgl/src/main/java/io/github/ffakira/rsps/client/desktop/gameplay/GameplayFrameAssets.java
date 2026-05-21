@@ -32,6 +32,7 @@ public record GameplayFrameAssets(
     ArgbImage[] sideIcons,
     ArgbImage[] mapFunctionIcons,
     ArgbImage[] mapDotIcons,
-    ArgbImage[] clickCrosses
+    ArgbImage[] clickCrosses,
+    GameplayStatsTabAssets statsTabAssets
 ) {
 }

@@ -102,6 +102,20 @@ class ObjectDefinitionCatalogTest {
     assertThat(catalog.require(3007).contouredGround()).isTrue();
   }
 
+  @Test
+  void resolvesMorphBackedSceneObjectsToRenderableChildren() {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    ObjectDefinitionCatalog catalog = ObjectDefinitionCatalog.load(manifest);
+
+    ObjectDefinition baseDefinition = catalog.require(9251);
+    ObjectDefinition resolvedDefinition = catalog.resolveSceneDefinition(9251);
+
+    assertThat(baseDefinition.modelIds()).isEmpty();
+    assertThat(baseDefinition.morphIds()).isNotEmpty();
+    assertThat(resolvedDefinition.id()).isNotEqualTo(baseDefinition.id());
+    assertThat(resolvedDefinition.modelIds()).isNotEmpty();
+  }
+
   private static long countModelBackedDefinitions(ObjectDefinitionCatalog catalog) {
     long count = 0;
     for (int objectId = 0; objectId < catalog.size(); objectId++) {

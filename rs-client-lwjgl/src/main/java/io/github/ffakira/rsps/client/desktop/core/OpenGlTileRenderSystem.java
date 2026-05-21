@@ -107,7 +107,7 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
   public void clearWorldScene() {
     worldScene = null;
     lastWorldSceneSubmission = null;
-    gameplayChromeRenderer.closeContextMenu();
+    gameplayChromeRenderer.clearTransientState();
     closeTexture(worldMinimapTexture);
     worldMinimapTexture = null;
   }
@@ -130,7 +130,7 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
       lastWorldSceneSubmission = null;
       localPlayerAnimationTracker.reset();
       gameplayCameraController.clearInputs();
-      gameplayChromeRenderer.closeContextMenu();
+      gameplayChromeRenderer.clearTransientState();
       titleScreenRenderer.render(viewModel, width, height);
       return;
     }
@@ -223,7 +223,8 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
     BootstrapAppearance appearance = viewModel.bootstrap() == null ? null : viewModel.bootstrap().appearance();
     ActorAnimationState actorAnimationState = localPlayerAnimationTracker.update(
         viewModel.localPlayerPosition(),
-        appearance == null ? null : appearance.animationProfile()
+        appearance == null ? null : appearance.animationProfile(),
+        viewModel.localPlayerActionSequenceId()
     );
     lastWorldSceneSubmission = worldSceneSubmissionBuilder.build(
         worldScene,

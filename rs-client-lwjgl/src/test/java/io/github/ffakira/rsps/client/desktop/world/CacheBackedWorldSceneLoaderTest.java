@@ -41,6 +41,17 @@ class CacheBackedWorldSceneLoaderTest {
       assertThat(worldSceneObject.localY()).isBetween(0, worldScene.tileHeight() - 1);
       assertThat(worldSceneObject.name()).isNotBlank();
     });
+    assertThat(worldScene.mapFunctionMarkers()).isNotEmpty();
+    assertThat(worldScene.mapFunctionMarkers()).allSatisfy(marker -> {
+      assertThat(marker.localX()).isBetween(0, worldScene.tileWidth() - 1);
+      assertThat(marker.localY()).isBetween(0, worldScene.tileHeight() - 1);
+      assertThat(marker.mapFunctionId()).isGreaterThanOrEqualTo(0);
+      assertThat(worldScene.objects()).anyMatch(object ->
+          object.type() == 22
+              && object.mapFunctionId() == marker.mapFunctionId()
+              && Math.abs(object.localX() - marker.localX()) <= 3
+              && Math.abs(object.localY() - marker.localY()) <= 3);
+    });
     assertThat(worldScene.objects().stream().anyMatch(worldSceneObject -> worldSceneObject.geometry() != null)).isTrue();
     Map<String, Long> objectsByTile = worldScene.objects().stream()
         .collect(Collectors.groupingBy(
@@ -91,6 +102,10 @@ class CacheBackedWorldSceneLoaderTest {
     assertThat(worldScene.overlayTextureIdAt(bridgeLocalX, waterLocalY)).isEqualTo(1);
     int waterRgb = worldScene.overlayColorAt(bridgeLocalX, waterLocalY);
     assertThat(waterRgb & 0xff).isGreaterThan((waterRgb >>> 16) & 0xff);
+    int bridgeMinimapPixel = minimapPixelAt(worldScene, new WorldPoint(3244, 3226, 0));
+    int waterMinimapPixel = minimapPixelAt(worldScene, new WorldPoint(3244, 3227, 0));
+    assertThat(bridgeMinimapPixel).isNotEqualTo(waterMinimapPixel);
+    assertThat(bridgeMinimapPixel & 0xff).isLessThan(waterMinimapPixel & 0xff);
     assertThat(worldScene.objects())
         .filteredOn(object -> object.localX() >= bridgeLocalX - 4 && object.localX() <= bridgeLocalX + 4)
         .filteredOn(object -> object.localY() >= bridgeLocalY - 2 && object.localY() <= bridgeLocalY + 2)
@@ -117,5 +132,11 @@ class CacheBackedWorldSceneLoaderTest {
       }
     }
     return false;
+  }
+
+  private static int minimapPixelAt(WorldScene worldScene, WorldPoint worldPoint) {
+    int pixelX = worldScene.projectMinimapX(worldPoint);
+    int pixelY = worldScene.projectMinimapY(worldPoint);
+    return worldScene.minimapImage().pixels()[pixelY * worldScene.minimapImage().width() + pixelX];
   }
 }

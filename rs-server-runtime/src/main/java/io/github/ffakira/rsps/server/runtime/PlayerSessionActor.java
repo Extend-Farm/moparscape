@@ -1,7 +1,9 @@
 package io.github.ffakira.rsps.server.runtime;
 
+import io.github.ffakira.rsps.protocol.ActionSequenceIntentMessage;
 import io.github.ffakira.rsps.protocol.ClientMessage;
 import io.github.ffakira.rsps.protocol.DisconnectNotice;
+import io.github.ffakira.rsps.protocol.EntityActionSequenceMessage;
 import io.github.ffakira.rsps.protocol.EntityPositionMessage;
 import io.github.ffakira.rsps.protocol.HandshakeRequest;
 import io.github.ffakira.rsps.protocol.LoginRejected;
@@ -74,6 +76,7 @@ public final class PlayerSessionActor extends MailboxActor<SessionMessage> {
       case HandshakeRequest handshakeRequest -> handleHandshake(handshakeRequest);
       case LoginRequest loginRequest -> handleLogin(loginRequest);
       case MoveIntentMessage moveIntentMessage -> handleMove(moveIntentMessage);
+      case ActionSequenceIntentMessage actionSequenceIntentMessage -> handleActionSequence(actionSequenceIntentMessage);
       case DisconnectNotice disconnectNotice -> terminate(disconnectNotice.reason());
     }
   }
@@ -127,6 +130,16 @@ public final class PlayerSessionActor extends MailboxActor<SessionMessage> {
       }
       tell(new SessionMessage.WorldCommandAppliedMessage(worldEvents));
     });
+  }
+
+  private void handleActionSequence(ActionSequenceIntentMessage message) {
+    if (phase != SessionPhase.IN_WORLD || worldShardAdmission == null) {
+      return;
+    }
+    protocolSession.send(new EntityActionSequenceMessage(
+        worldShardAdmission.entityId().value(),
+        message.actionSequenceId()
+    ));
   }
 
   private void completeLogin(SessionMessage.LoginSucceededMessage message) {

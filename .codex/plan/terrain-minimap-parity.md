@@ -21,6 +21,9 @@ Terrain already has meaningful native groundwork:
 - tile paint vs tile model split exists
 - paint tiles now use the legacy north-east/south-west diagonal
 - overlay floor textures are split from underlay Gouraud terrain
+- flat paint tiles no longer invent `tileColor` fallback surfaces when the overlay branch resolves hidden
+- palette-derived floor corner lighting now reuses the reference HSL `checkedLight(..., brightness)` path instead of RGB-only relight approximation
+- shared-corner floor colors now stay in reference HSL space when every contributing tile color came from the floor palette
 - bridge-lower terrain is emitted
 - terrain occlusion flags and horizontal roof-plane occluders now come from terrain data instead of object heuristics
 - the visibility planner now uses a first roof-plane rule instead of treating roof flags as a blanket visibility hint
@@ -29,11 +32,25 @@ Minimap already has meaningful native groundwork:
 
 - 4x4 tile block raster exists
 - shaped overlay masks exist
+- flat and shaped hidden-overlay minimap tiles now preserve the legacy "leave untouched" behavior instead of inventing fallback RGB
+- textured overlay floors now use legacy-style texture average colors for tile/minimap base output instead of only the water special-case
+- explicit bridge-above minimap overpaint from `(flags[plane + 1] & 8)` now exists
+- bridge-lowered minimap tiles now paint from the promoted visible surface plane instead of the stored under-bridge water layer, so Lumbridge-style wooden and stone bridge decks no longer collapse back to river blue
 - wall and diagonal wall marks exist
 - `mapscene` sprite stamping exists
-- `mapfunction` markers for type-22 scene objects exist
+- minimap object marks now follow legacy `method50(...)` query order: boundary, interactive, then ground decoration
+- rotated multi-tile `mapscene` sprites now center from raw definition footprint dimensions instead of swapped placement footprint dimensions
+- `mapscene` raster now preserves trimmed sprite bounds plus draw offsets instead of centering on full-canvas decoded images
+- same-tile boundary/interactable/ground-decoration `mapscene` precedence is now regression-covered
+- `mapfunction` markers are now cached scene state from ground-decoration placements instead of being rediscovered from generic object iteration during every radar draw
+- cached `mapfunction` markers now apply the legacy post-collection drift contract for non-excluded ids, using native scene wall/object blockers so water-style icons do not stay pinned to the raw object tile
+- wall / door / diagonal minimap marks now follow legacy `method50(...)` shape rules: type `1` stays invisible, type `3` is a one-pixel corner cap, type `2` keeps both legs at the same color, horizontal wall orientations are no longer flipped, and interactive doors / diagonals render in legacy red
 - compass and minimap both use `mapback`-derived clip masks
 - the minimap image is rotated into the radar instead of shown as a static crop
+- radar and compass rotation now use the legacy yaw sign instead of the earlier viewport-compensation sign
+- `mapfunction` radar markers now mirror legacy `method141(...)` distance bands: direct blit when near, masked `mapback`-clipped blit when farther out, and hidden past the legacy radius cutoff
+- rotated minimap sampling now uses a fixed default zoom baseline near the midpoint of legacy `anInt1170` drift instead of a hardcoded 1:1 source step, and marker projection uses the matching inverse scale so icons stay registered to the terrain
+- minimap and terrain builders now share one scene-tile form contract for flat paint vs textured paint vs shaped tile-model selection
 
 That means the next work is no longer broad cache/bootstrap work. It is parity work against the legacy scene and minimap contracts.
 
@@ -260,6 +277,7 @@ Terrain:
 - preserved raw underlay/overlay ids in scene state
 - promoted raw overlay type `1` into the first curved mask shape
 - kept shaped overlay masks alive even when only raw overlay identity survives
+- stopped flat paint tiles from falling back to visible RGB when the legacy overlay branch should stay hidden
 - split shaped textured overlay triangles away from Gouraud underlay triangles
 - stopped synthesizing missing shaped-tile halves when only one terrain surface is actually renderable
 - extracted terrain occlusion flags from the legacy flat-upper-tile rule
@@ -269,10 +287,14 @@ Minimap:
 
 - rasterizes 4x4 tile blocks
 - preserves shaped tile masks and rotations
+- keeps raw floor ids through minimap rasterization so transparent overlay branches can stay hidden
+- uses texture-derived floor colors for textured overlay minimap and tile-base output
+- paints the current plane first and then explicitly overpaints bridge-above tiles from the next plane flag rule
 - stamps `mapscene` sprites from scene metadata
 - draws wall marks from scene object metadata
 - uses `mapback` scanline masks for both compass and radar
 - rotates the radar around the player instead of drawing a static atlas crop
+- resolves `SceneTilePaint` vs `SceneTileModel` form once and reuses that decision across viewport terrain and minimap base paths
 
 ## Remaining parity gaps
 
@@ -293,10 +315,11 @@ Minimap:
    - `0xbc614e`
    Native code still treats some of those as ordinary fallback RGB instead of explicit "do not render this surface" behavior.
 
-   Specific current hole:
-   - full overlay paint and shaped overlay halves still sometimes fall back to `tileColor` / underlay-style RGB when the legacy client would keep the overlay path but hide its pixels
+  Specific current hole:
+   - viewport-side textured/color fallbacks still need exact sentinel checking beyond the flat-paint and minimap hidden-overlay fixes
 
-3. Shared-corner terrain color and brightness behavior still needs byte-for-byte checking against `anIntArrayArray139`-driven legacy shading.
+3. Shared-corner terrain color and brightness behavior still needs byte-for-byte checking against `anIntArrayArray139`-driven reference shading.
+   Palette-derived stored floor RGB now goes back through the reference HSL lightness path during corner relight, and palette-backed shared corners now average in HSL before lighting, but mixed or non-palette colors still use approximation fallback.
 
 ### Terrain submission
 
@@ -327,31 +350,30 @@ Minimap:
    - `SceneGraph.method309(...)`
    - `GameClientCore.method50(...)`
 
+   Progress:
+   - tile-form selection is now shared with the terrain builders instead of being re-derived separately inside the minimap rasterizer
+
 2. Transparent and special overlay cases on the minimap still need parity checks.
-   The current minimap chooses colors more directly than the legacy client and may still overpaint tiles that should resolve to the underlay, water tint, or hidden base color.
+   The current minimap now preserves hidden flat/shaped overlay paths and uses texture-derived colors for textured overlays, but it may still disagree on some special floor-definition branches and exact scene-tile form reuse.
 
    Specific missing rule:
    - when the legacy `SceneTileModel` has `anInt686 == 0`, only the overlay-mask pixels are written and the rest of the 4x4 tile stays unchanged
-   - the native minimap currently tends to choose two explicit colors instead of preserving untouched pixels
+   - remaining special overlay floor definitions still need direct parity checks against the legacy scene-tile output
 
-3. Bridge-above minimap paint parity is not explicit on the native path yet.
-   The legacy base raster draws the next plane's tile when `(flags[plane + 1] & 8) != 0`.
-   The native minimap path still needs a deliberate bridge-above/base-plane policy check instead of assuming the stitched scene colors already imply the right result.
-
-4. `mapscene` behavior needs exact coverage for:
-   - multi-tile centering
-   - sprite bounds
-   - orientation-insensitive placement
-   - overlap precedence with walls and tile paint
+3. `mapscene` behavior is now covered for:
+   - category query order
+   - rotated raw-footprint centering
+   - trimmed sprite bounds and draw offsets
+   - same-tile overlap precedence across boundary/interactable/ground-decoration passes
 
 ### Minimap radar overlays
 
 1. `mapfunction` support is still partial.
-   The native path only covers a subset of object-driven markers and does not yet prove parity with legacy icon collection rules.
+   The native path now caches markers from the ground-decoration contract, but it does not yet prove parity with the full legacy icon collection rules.
 
    Specific mismatch:
-   - native currently derives markers from visible `WorldSceneObject` entries, mainly type-22 objects
-   - legacy collects them from `method303(...)` scene queries and `ObjectDefinition.anInt746`, with special-case exclusions and position drift for some icons
+   - legacy still applies special-case exclusions and random position drift for some icons after collection
+   - native still does not preserve the exact collision-aware drift rules from the legacy scene rebuild
 
 2. Entity and item radar dots are still outside the native parity plan.
    The full legacy radar also overlays:
@@ -364,7 +386,6 @@ Minimap:
    The current radar rotates the scene crop around the player, but legacy parity still requires checking:
    - rotation sign and anchor
    - icon rotation coupling
-   - clipping at the masked edge
    - fixed visible-radius rules
 
 ## Ordered workstreams
@@ -438,9 +459,8 @@ Tasks:
 - decide whether the native minimap should continue rasterizing from `WorldScene` directly or whether it should preserve a scene-tile intermediate equivalent to `SceneTilePaint` / `SceneTileModel`
 - verify 4x4 tile fill, shaped masks, water tint, and transparent overlay behavior
 - add the explicit "leave pixel untouched" shaped-mask path where the legacy tile model uses `anInt686 == 0`
-- verify bridge-above tile painting from `(flags[plane + 1] & 8) != 0`
 - verify wall and diagonal-wall edge rules against `method50(...)`
-- verify `mapscene` placement, centering, and precedence
+- verify any remaining `mapscene` precedence edge cases beyond placement/centering/bounds
 - add tests for multi-tile objects and overlapping wall/mapscene combinations
 
 Exit condition:
@@ -457,8 +477,8 @@ Files:
 - `gameplay/GameplayFrameAssetLoader.java`
 
 Tasks:
-- audit `mapfunction` collection and sprite index rules against the legacy client
-- mirror the legacy source for icon collection instead of inferring markers only from current visible object types
+- keep `mapfunction` sprite lookup pinned to the real media-archive contract; in this cache layout raw ids map directly to frames `0..60`
+- add the legacy exclusion and collision-aware drift rules for cached `mapfunction` markers
 - add player/NPC/item/hint overlay plan once scene/runtime state is available
 - verify radar clipping and rotation around the masked minimap aperture
 

@@ -20,6 +20,8 @@ import io.github.ffakira.rsps.content.ObjectDefinitionCatalog;
 import io.github.ffakira.rsps.content.TerrainRegionData;
 import io.github.ffakira.rsps.content.TerrainRegionDecoder;
 import io.github.ffakira.rsps.content.TopLevelArchiveId;
+import io.github.ffakira.rsps.client.desktop.world.minimap.WorldSceneMapFunctionMarker;
+import io.github.ffakira.rsps.client.desktop.world.minimap.WorldSceneMapFunctionMarkerCollector;
 import io.github.ffakira.rsps.client.desktop.world.minimap.WorldSceneMinimapRasterizer;
 import io.github.ffakira.rsps.client.desktop.world.object.WorldSceneObject;
 import io.github.ffakira.rsps.client.desktop.world.object.WorldSceneObjectAssembler;
@@ -52,6 +54,7 @@ public final class CacheBackedWorldSceneLoader {
   private static final int TILE_HALF_HEIGHT = 3;
   private static final int IMAGE_PADDING = 12;
   private static final int PLANE_COUNT = 4;
+  private static final int TEXTURE_COUNT = 50;
   private final ContentManifest manifest;
   private final FloorColorCatalog floorColors;
   private final FloorSurfaceColorResolver floorSurfaceColorResolver;
@@ -60,6 +63,7 @@ public final class CacheBackedWorldSceneLoader {
   private final WorldSceneObjectAssembler objectAssembler;
   private final WorldSceneOccluderBuilder occluderBuilder = new WorldSceneOccluderBuilder();
   private final WorldSceneMinimapRasterizer minimapRasterizer;
+  private final WorldSceneMapFunctionMarkerCollector mapFunctionMarkerCollector = new WorldSceneMapFunctionMarkerCollector();
   private final TerrainSurfaceElevationResolver terrainSurfaceElevationResolver = new TerrainSurfaceElevationResolver();
   private final TerrainShadowResolver terrainShadowResolver = new TerrainShadowResolver();
   private final TerrainRegionDecoder terrainRegionDecoder = new TerrainRegionDecoder();
@@ -84,7 +88,7 @@ public final class CacheBackedWorldSceneLoader {
     this.manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(workingDirectory);
     ContentArchiveSnapshot archiveSnapshot = new ContentArchiveCatalog().load(manifest);
     this.floorColors = FloorColorCatalog.parse(archiveSnapshot.readConfigEntry("flo.dat"));
-    this.floorSurfaceColorResolver = new FloorSurfaceColorResolver(floorColors);
+    this.floorSurfaceColorResolver = new FloorSurfaceColorResolver(floorColors, loadLegacyTextureAverageColors(manifest));
     this.terrainOcclusionFlagResolver = new TerrainOcclusionFlagResolver(floorColors);
     this.mapArchiveIndex = MapArchiveIndex.parse(archiveSnapshot.readUpdateListEntry("map_index"));
     ObjectDefinitionCatalog objectDefinitions = ObjectDefinitionCatalog.parse(
@@ -126,6 +130,7 @@ public final class CacheBackedWorldSceneLoader {
     byte[] overlayShapes = new byte[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
     byte[] overlayRotations = new byte[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
     byte[] tileFlags = new byte[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
+    byte[] bridgeAboveMinimapFlags = new byte[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
     int[] bridgeLowerUnderlayIds = new int[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
     int[] bridgeLowerOverlayIds = new int[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
     int[] bridgeLowerTileColors = new int[SCENE_TILE_SIZE * SCENE_TILE_SIZE];
@@ -163,6 +168,7 @@ public final class CacheBackedWorldSceneLoader {
             bridgeLowerActiveTiles,
             heightSamplesByPlane,
             surfacePlanes,
+            bridgeAboveMinimapFlags,
             originWorldX,
             originWorldY
         );
@@ -170,6 +176,11 @@ public final class CacheBackedWorldSceneLoader {
         captureObjects(regionData, objectRegionData, worldPoint.plane(), originWorldX, originWorldY, sceneObjects);
       }
     }
+    List<WorldSceneMapFunctionMarker> mapFunctionMarkers = mapFunctionMarkerCollector.collect(
+        sceneObjects,
+        SCENE_TILE_SIZE,
+        SCENE_TILE_SIZE
+    );
     floorSurfaceColorResolver.resolveSceneColors(
         SCENE_TILE_SIZE,
         SCENE_TILE_SIZE,
@@ -240,6 +251,8 @@ public final class CacheBackedWorldSceneLoader {
     ArgbImage image = renderProjectedScene(tileColors, tileElevations, projection);
     ArgbImage minimapImage = renderMinimap(
         tileElevations,
+        underlayIds,
+        overlayIds,
         tileColors,
         underlayColors,
         overlayColors,
@@ -247,6 +260,9 @@ public final class CacheBackedWorldSceneLoader {
         overlayTextureIds,
         overlayShapes,
         overlayRotations,
+        tileFlags,
+        bridgeAboveMinimapFlags,
+        bridgeTerrainLayer,
         terrainShadows,
         sceneObjects
     );
@@ -271,13 +287,15 @@ public final class CacheBackedWorldSceneLoader {
         tileFlags,
         terrainShadows,
         sceneObjects,
+        mapFunctionMarkers,
         occluders,
         image,
         minimapImage,
         projection,
         bridgeTerrainLayer,
         surfacePlanes,
-        terrainOcclusionFlags
+        terrainOcclusionFlags,
+        heightSamplesByPlane
     );
     scenesByKey.put(sceneKey, worldScene);
     return worldScene;
@@ -357,6 +375,7 @@ public final class CacheBackedWorldSceneLoader {
       byte[] bridgeLowerActiveTiles,
       int[][] heightSamplesByPlane,
       byte[] surfacePlanes,
+      byte[] bridgeAboveMinimapFlags,
       int originWorldX,
       int originWorldY
   ) {
@@ -383,6 +402,7 @@ public final class CacheBackedWorldSceneLoader {
         overlayShapes[sceneIndex] = (byte) regionData.overlayShapeAt(surfacePlane, tileX, tileY);
         overlayRotations[sceneIndex] = (byte) regionData.overlayRotationAt(surfacePlane, tileX, tileY);
         tileFlags[sceneIndex] = (byte) regionData.tileFlagAt(plane, tileX, tileY);
+        bridgeAboveMinimapFlags[sceneIndex] = (byte) bridgeAboveMinimapFlag(regionData, plane, tileX, tileY);
         captureBridgeLowerSurface(
             regionData,
             plane,
@@ -549,6 +569,8 @@ public final class CacheBackedWorldSceneLoader {
 
   private ArgbImage renderMinimap(
       int[] tileElevations,
+      int[] underlayIds,
+      int[] overlayIds,
       int[] tileColors,
       int[] underlayColors,
       int[] overlayColors,
@@ -556,6 +578,9 @@ public final class CacheBackedWorldSceneLoader {
       int[] overlayTextureIds,
       byte[] overlayShapes,
       byte[] overlayRotations,
+      byte[] tileFlags,
+      byte[] bridgeAboveMinimapFlags,
+      BridgeTerrainLayer bridgeTerrainLayer,
       byte[] shadowSamples,
       List<WorldSceneObject> sceneObjects
   ) {
@@ -566,6 +591,8 @@ public final class CacheBackedWorldSceneLoader {
         SCENE_TILE_SIZE,
         SCENE_TILE_SIZE,
         tileElevations,
+        underlayIds,
+        overlayIds,
         tileColors,
         underlayColors,
         overlayColors,
@@ -573,19 +600,49 @@ public final class CacheBackedWorldSceneLoader {
         overlayTextureIds,
         overlayShapes,
         overlayRotations,
+        tileFlags,
+        bridgeAboveMinimapFlags,
+        bridgeTerrainLayer,
         shadowSamples,
         sceneObjects
     );
   }
 
-  private ArgbImage[] loadMapSceneSprites(ContentManifest manifest) {
+  private int bridgeAboveMinimapFlag(TerrainRegionData regionData, int plane, int tileX, int tileY) {
+    if (plane >= PLANE_COUNT - 1) {
+      return 0;
+    }
+    return (regionData.tileFlagAt(plane + 1, tileX, tileY) & 8) != 0 ? 1 : 0;
+  }
+
+  private TitleArchiveSpriteDecoder.IndexedArgbSprite[] loadMapSceneSprites(ContentManifest manifest) {
     try {
       CacheArchiveContainer mediaArchive = new CacheArchiveRepository(manifest.cacheStore())
           .loadArchive(TOP_LEVEL_ARCHIVE_STORE, TopLevelArchiveId.MEDIA.archiveId());
       TitleArchiveSpriteDecoder spriteDecoder = new TitleArchiveSpriteDecoder(mediaArchive);
-      return spriteDecoder.decodeSprites(mediaArchive, "mapscene", false);
+      return spriteDecoder.decodeIndexedSprites(mediaArchive, "mapscene", false);
     } catch (RuntimeException runtimeException) {
-      return new ArgbImage[0];
+      return new TitleArchiveSpriteDecoder.IndexedArgbSprite[0];
+    }
+  }
+
+  private int[] loadLegacyTextureAverageColors(ContentManifest manifest) {
+    try {
+      CacheArchiveContainer textureArchive = new CacheArchiveRepository(manifest.cacheStore())
+          .loadArchive(TOP_LEVEL_ARCHIVE_STORE, TopLevelArchiveId.TEXTURES.archiveId());
+      TitleArchiveSpriteDecoder spriteDecoder = new TitleArchiveSpriteDecoder(textureArchive);
+      int[] textureAverageColors = new int[TEXTURE_COUNT];
+      for (int textureId = 0; textureId < TEXTURE_COUNT; textureId++) {
+        try {
+          int[] palette = spriteDecoder.decodePalette(textureArchive, String.valueOf(textureId), 0, false);
+          textureAverageColors[textureId] = FloorSurfaceColorResolver.legacyTextureAverageColorFromPalette(palette);
+        } catch (RuntimeException ignored) {
+          textureAverageColors[textureId] = 0;
+        }
+      }
+      return textureAverageColors;
+    } catch (RuntimeException runtimeException) {
+      return new int[0];
     }
   }
 

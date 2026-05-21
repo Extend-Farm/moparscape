@@ -135,6 +135,53 @@ class InProcessGameplayFlowTest {
     }
   }
 
+  @Test
+  void updatesLocalActionSequenceFromRuntimePacketsWhileMovementContinues() {
+    AccountRecord accountRecord = new AccountRecord(new AccountId(101L), "akira", "swordfish");
+    CharacterSnapshot characterSnapshot = new CharacterSnapshot(
+        new CharacterId(202L),
+        accountRecord.id(),
+        "Akira",
+        new WorldPoint(3200, 3201, 0),
+        new CharacterProfile((short) 2, true, 100, null, 0L, 0L),
+        new CharacterAppearance(List.of(-1, -1, -1, -1, -1, -1)),
+        List.of(),
+        List.of(),
+        List.of()
+    );
+
+    try (InProcessServerRuntime runtime = new InProcessServerRuntime(
+        new InMemoryAccountRepository(accountRecord),
+        new InMemoryCharacterRepository(characterSnapshot)
+    )) {
+      ClientCore clientCore = new ClientCore();
+      BridgedProtocolSession bridgedSession = new BridgedProtocolSession();
+      GameplayClientSession gameplayClientSession =
+          new GameplayClientSession(clientCore, bridgedSession, "integration-test");
+      bridgedSession.bindInbound(gameplayClientSession::accept);
+      PlayerSessionActor playerSessionActor = runtime.openSession(bridgedSession);
+      bridgedSession.bindOutbound(playerSessionActor::accept);
+
+      gameplayClientSession.bootstrap();
+      gameplayClientSession.connect();
+      gameplayClientSession.login("akira", "swordfish");
+      assertThat(bridgedSession.awaitMessageCount(5, Duration.ofSeconds(2))).isTrue();
+
+      gameplayClientSession.setActionSequence(866);
+      assertThat(bridgedSession.awaitMessageCount(6, Duration.ofSeconds(2))).isTrue();
+      assertThat(gameplayClientSession.viewModel().localPlayerActionSequenceId()).isEqualTo(866);
+
+      gameplayClientSession.move(1, 0, MovementMode.WALK);
+      assertThat(bridgedSession.awaitMessageCount(7, Duration.ofSeconds(2))).isTrue();
+      assertThat(gameplayClientSession.viewModel().localPlayerPosition()).isEqualTo(new WorldPoint(3201, 3201, 0));
+      assertThat(gameplayClientSession.viewModel().localPlayerActionSequenceId()).isEqualTo(866);
+
+      gameplayClientSession.setActionSequence(-1);
+      assertThat(bridgedSession.awaitMessageCount(8, Duration.ofSeconds(2))).isTrue();
+      assertThat(gameplayClientSession.viewModel().localPlayerActionSequenceId()).isEqualTo(-1);
+    }
+  }
+
   private static final class BridgedProtocolSession implements ProtocolSession, ClientTransport {
 
     private final UUID sessionId = UUID.randomUUID();

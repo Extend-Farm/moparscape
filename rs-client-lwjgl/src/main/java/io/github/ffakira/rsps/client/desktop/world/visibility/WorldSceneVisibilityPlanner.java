@@ -23,9 +23,14 @@ public final class WorldSceneVisibilityPlanner {
     int halfWidth = LEGACY_HALF_WINDOW;
     int halfDepth = LEGACY_HALF_WINDOW;
     int renderPlane = WorldScenePlaneRules.renderPlane(worldScene, cameraState, focusTileX, focusTileY);
-    int[] cameraTile = WorldScenePlaneRules.cameraTile(worldScene, cameraState);
-    int centerX = cameraTile[0];
-    int centerY = cameraTile[1];
+    // Anchor the visibility window on the player (focus), not on the camera tile. The camera
+    // sits ~14 tiles away from focus and orbits as the user changes yaw, so a camera-anchored
+    // window slides off the player as the view rotates and tiles "disappear" on the opposite
+    // side of the orbit. Legacy SceneGraph also does additional per-tile visibility masks that
+    // we don't replicate; without those, the raw 51x51 window must be focus-centred to keep the
+    // played area in view consistently.
+    int centerX = clamp(focusTileX, 0, worldScene.tileWidth() - 2);
+    int centerY = clamp(focusTileY, 0, worldScene.tileHeight() - 2);
     // Legacy SceneGraph traversal works from the camera tile and always considers a 51x51 tile
     // neighborhood around that tile before the deeper visibility tests trim it down. The native
     // client still lacks those per-tile visibility masks, but keeping the same camera-anchored

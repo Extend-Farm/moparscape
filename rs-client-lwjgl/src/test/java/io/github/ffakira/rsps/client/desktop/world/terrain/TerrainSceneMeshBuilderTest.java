@@ -335,6 +335,55 @@ class TerrainSceneMeshBuilderTest {
     assertThat(mesh.faceTextureIds()).contains(1);
   }
 
+  @Test
+  void omitsFlatPaintTilesWhenAnOverlayBranchResolvesHidden() {
+    int width = 2;
+    int height = 2;
+    int[] elevations = new int[width * height];
+    int[] underlayIds = filledInts(width * height, 1);
+    int[] overlayIds = new int[]{4, 0, 0, 0};
+    int[] tileColors = filledInts(width * height, 0x4a6a3c);
+    int[] underlayColors = filledInts(width * height, 0x4a6a3c);
+    int[] overlayColors = new int[width * height];
+    int[] underlayTextureIds = filledInts(width * height, -1);
+    int[] overlayTextureIds = filledInts(width * height, -1);
+    byte[] overlayShapes = new byte[width * height];
+    byte[] overlayRotations = new byte[width * height];
+    byte[] tileFlags = new byte[width * height];
+    WorldScene worldScene = new WorldScene(
+        "hidden-overlay-paint-test",
+        3200,
+        3200,
+        0,
+        width,
+        height,
+        elevations,
+        underlayIds,
+        overlayIds,
+        tileColors,
+        underlayColors,
+        overlayColors,
+        underlayTextureIds,
+        overlayTextureIds,
+        overlayShapes,
+        overlayRotations,
+        tileFlags,
+        java.util.List.of(),
+        java.util.List.of(),
+        new ArgbImage(1, 1, new int[]{0xff000000}),
+        new ArgbImage(width, height, filledInts(width * height, 0xff334455)),
+        new WorldSceneProjection(5, 3, 0, 0),
+        null
+    );
+    TerrainSceneMeshBuilder builder = new TerrainSceneMeshBuilder();
+
+    SceneTriangleMesh gouraudMesh = builder.buildTilePaintMesh(worldScene);
+    SceneTriangleMesh texturedMesh = builder.buildTexturedTilePaintMesh(worldScene);
+
+    assertThat(gouraudMesh.isEmpty()).isTrue();
+    assertThat(texturedMesh.isEmpty()).isTrue();
+  }
+
   private static java.util.List<String> trianglePoints(SceneTriangleMesh mesh, int faceIndex) {
     return java.util.List.of(
         point(mesh, mesh.faceVertexA()[faceIndex]),

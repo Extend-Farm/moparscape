@@ -55,16 +55,16 @@ class WorldSceneSubmissionBuilderTest {
             "TILE_PAINT:TEXTURED",
             "TILE_MODEL:GOURAUD",
             "TILE_MODEL:TEXTURED",
-            "ACTOR:FLAT"
+            "ACTOR:GOURAUD"
         );
 
     SceneRenderBatch tilePaintBatch = batchOf(submission, SceneSubmissionKind.TILE_PAINT, SceneRasterMode.TEXTURED);
     SceneRenderBatch tileModelGouraudBatch = batchOf(submission, SceneSubmissionKind.TILE_MODEL, SceneRasterMode.GOURAUD);
     SceneRenderBatch tileModelTexturedBatch = batchOf(submission, SceneSubmissionKind.TILE_MODEL, SceneRasterMode.TEXTURED);
-    SceneRenderBatch actorBatch = batchOf(submission, SceneSubmissionKind.ACTOR, SceneRasterMode.FLAT);
+    SceneRenderBatch actorBatch = batchOf(submission, SceneSubmissionKind.ACTOR, SceneRasterMode.GOURAUD);
 
     assertThat(tilePaintBatch.rasterMode()).isEqualTo(SceneRasterMode.TEXTURED);
-    assertThat(actorBatch.rasterMode()).isEqualTo(SceneRasterMode.FLAT);
+    assertThat(actorBatch.rasterMode()).isEqualTo(SceneRasterMode.GOURAUD);
     assertThat(tilePaintBatch.isEmpty()).isFalse();
     assertThat(tileModelGouraudBatch.isEmpty()).isFalse();
     assertThat(tileModelTexturedBatch.isEmpty()).isFalse();
@@ -75,7 +75,7 @@ class WorldSceneSubmissionBuilderTest {
   }
 
   @Test
-  void submitsNativeActorGeometryUsingActorFaceRasterModes() {
+  void submitsNativeActorGeometryAsASingleOrderedGouraudBatch() {
     ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
     CharacterModelAssembler assembler = new CharacterModelAssembler(
         ItemDefinitionCatalog.load(manifest),
@@ -97,9 +97,66 @@ class WorldSceneSubmissionBuilderTest {
         .filter(batch -> batch.kind() == SceneSubmissionKind.ACTOR)
         .toList();
 
-    assertThat(actorBatches).isNotEmpty();
-    assertThat(actorBatches).extracting(SceneRenderBatch::rasterMode).contains(SceneRasterMode.GOURAUD);
+    assertThat(actorBatches).hasSize(1);
+    assertThat(actorBatches).extracting(SceneRenderBatch::rasterMode).containsExactly(SceneRasterMode.GOURAUD);
     assertThat(actorBatches).allMatch(batch -> !batch.isEmpty());
+  }
+
+  @Test
+  void sortsActorFacesByPriorityBeforeSubmission() {
+    SceneTriangleMesh mesh = new SceneTriangleMesh(
+        new float[]{0.0f, 1.0f, 0.0f, 2.0f, 3.0f, 2.0f},
+        new float[]{0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f},
+        new float[]{3.0f, 3.0f, 3.0f, 2.0f, 2.0f, 2.0f},
+        new int[]{0, 3},
+        new int[]{1, 4},
+        new int[]{2, 5},
+        new int[]{0xaa5500, 0x0055aa},
+        new int[]{0xaa5500, 0x0055aa},
+        new int[]{0xaa5500, 0x0055aa},
+        new int[]{255, 255},
+        new int[]{-1, -1},
+        new int[]{-1, -1},
+        new int[]{-1, -1},
+        new int[]{-1, -1},
+        new int[]{10, 5}
+    );
+
+    SceneTriangleMesh sortedMesh = WorldSceneSubmissionBuilder.sortActorMeshForSubmission(
+        mesh,
+        new WorldCameraState(22.5f, 0.0f, 9.0f, 0.0f, 0.0f, 0.0f, 0.0f)
+    );
+
+    assertThat(sortedMesh.facePriorities()).containsExactly(5, 10);
+    assertThat(sortedMesh.faceColorA()).containsExactly(0x0055aa, 0xaa5500);
+  }
+
+  @Test
+  void sortsSamePriorityActorFacesBackToFrontByCameraDepth() {
+    SceneTriangleMesh mesh = new SceneTriangleMesh(
+        new float[]{0.0f, 1.0f, 0.0f, 2.0f, 3.0f, 2.0f},
+        new float[]{0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f},
+        new float[]{4.0f, 4.0f, 4.0f, 1.0f, 1.0f, 1.0f},
+        new int[]{0, 3},
+        new int[]{1, 4},
+        new int[]{2, 5},
+        new int[]{0x884400, 0x448800},
+        new int[]{0x884400, 0x448800},
+        new int[]{0x884400, 0x448800},
+        new int[]{255, 255},
+        new int[]{-1, -1},
+        new int[]{-1, -1},
+        new int[]{-1, -1},
+        new int[]{-1, -1},
+        new int[]{0, 0}
+    );
+
+    SceneTriangleMesh sortedMesh = WorldSceneSubmissionBuilder.sortActorMeshForSubmission(
+        mesh,
+        new WorldCameraState(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f)
+    );
+
+    assertThat(sortedMesh.faceColorA()).containsExactly(0x884400, 0x448800);
   }
 
   @Test
@@ -134,9 +191,9 @@ class WorldSceneSubmissionBuilderTest {
     SceneTriangleMesh northMesh = batchOf(northFacingSubmission, SceneSubmissionKind.ACTOR, SceneRasterMode.GOURAUD).mesh();
     SceneTriangleMesh eastMesh = batchOf(eastFacingSubmission, SceneSubmissionKind.ACTOR, SceneRasterMode.GOURAUD).mesh();
 
-    assertThat(northMesh.faceVertexA()).containsExactly(eastMesh.faceVertexA());
-    assertThat(northMesh.faceVertexB()).containsExactly(eastMesh.faceVertexB());
-    assertThat(northMesh.faceVertexC()).containsExactly(eastMesh.faceVertexC());
+    assertThat(northMesh.faceVertexA()).hasSameSizeAs(eastMesh.faceVertexA());
+    assertThat(northMesh.faceVertexB()).hasSameSizeAs(eastMesh.faceVertexB());
+    assertThat(northMesh.faceVertexC()).hasSameSizeAs(eastMesh.faceVertexC());
     assertThat(Arrays.equals(northMesh.vertexX(), eastMesh.vertexX())).isFalse();
     assertThat(Arrays.equals(northMesh.vertexZ(), eastMesh.vertexZ())).isFalse();
   }
@@ -164,8 +221,8 @@ class WorldSceneSubmissionBuilderTest {
         318
     );
 
-    SceneTriangleMesh centeredMesh = batchOf(centeredSubmission, SceneSubmissionKind.ACTOR, SceneRasterMode.FLAT).mesh();
-    SceneTriangleMesh offsetMesh = batchOf(offsetSubmission, SceneSubmissionKind.ACTOR, SceneRasterMode.FLAT).mesh();
+    SceneTriangleMesh centeredMesh = batchOf(centeredSubmission, SceneSubmissionKind.ACTOR, SceneRasterMode.GOURAUD).mesh();
+    SceneTriangleMesh offsetMesh = batchOf(offsetSubmission, SceneSubmissionKind.ACTOR, SceneRasterMode.GOURAUD).mesh();
 
     assertThat(offsetMesh.vertexX()[0]).isLessThan(centeredMesh.vertexX()[0]);
     assertThat(offsetMesh.vertexZ()[0]).isGreaterThan(centeredMesh.vertexZ()[0]);
@@ -274,7 +331,9 @@ class WorldSceneSubmissionBuilderTest {
         new byte[64],
         new byte[64],
         new byte[64],
-        List.of(new WorldSceneObject(85, "Bridge wall stub", 3, 3, 0, 0, 0, 1, 1, false, 22, -1, List.of(2214, 2215), true, null)),
+        // "Bridge wall stub" does not begin with the anonymous-object-name prefix, so the
+        // production fallback-proxy auto-deny does not apply and the proxy path fires.
+        List.of(new WorldSceneObject(4001, "Bridge wall stub", 3, 3, 0, 0, 0, 1, 1, false, 22, -1, List.of(2214, 2215), true, null)),
         List.of(),
         new ArgbImage(1, 1, new int[]{0xff000000}),
         new ArgbImage(8, 8, filledInts(64, 0xff334455)),
@@ -580,6 +639,59 @@ class WorldSceneSubmissionBuilderTest {
     SceneTriangleMesh staticObjectMesh = batchOf(submission, SceneSubmissionKind.STATIC_OBJECT, SceneRasterMode.GOURAUD).mesh();
 
     assertThat(staticObjectMesh.vertexY()).containsExactly(0.0f, 0.0f, 1.0f, 1.0f);
+  }
+
+  @Test
+  void ignoresOffSceneFootprintTilesWhenCheckingBridgeLowerSurface() {
+    byte[] bridgeActiveTiles = new byte[64];
+    bridgeActiveTiles[7 * 8 + 7] = 1;
+    WorldScene worldScene = new WorldScene(
+        "bridge-edge",
+        3200,
+        3200,
+        0,
+        8,
+        8,
+        filledInts(64, 20),
+        filledInts(64, 0x4a6a3c),
+        filledInts(64, 0x4a6a3c),
+        filledInts(64, 0),
+        filledInts(64, -1),
+        filledInts(64, -1),
+        new byte[64],
+        new byte[64],
+        new byte[64],
+        List.of(new WorldSceneObject(3010, "Edge bridge support", 7, 7, 0, 10, 0, 2, 2, false, -1, -1, List.of(), true, null)),
+        List.of(),
+        new ArgbImage(1, 1, new int[]{0xff000000}),
+        new ArgbImage(8, 8, filledInts(64, 0xff334455)),
+        new WorldSceneProjection(5, 3, 0, 0),
+        new BridgeTerrainLayer(
+            8,
+            8,
+            new int[64],
+            filledInts(64, 0x4a6a3c),
+            filledInts(64, 0x4a6a3c),
+            filledInts(64, 0),
+            filledInts(64, -1),
+            filledInts(64, -1),
+            new byte[64],
+            new byte[64],
+            bridgeActiveTiles
+        )
+    );
+
+    WorldSceneRenderSubmission submission = new WorldSceneSubmissionBuilder(null).build(
+        worldScene,
+        new WorldPoint(3207, 3207, 0),
+        null,
+        List.of(),
+        ActorAnimationState.idle(),
+        496,
+        318
+    );
+
+    assertThat(submission.renderQueue()).isNotNull();
   }
 
   private static WorldScene testWorldScene() {

@@ -22,12 +22,13 @@ class WorldSceneCameraPlannerTest {
         318
     );
 
-    assertThat(cameraState.pitchDegrees()).isEqualTo(30.9375f);
-    assertThat(cameraState.distance()).isEqualTo(14.1f);
+    assertThat(cameraState.pitchDegrees()).isEqualTo(22.5f);
+    assertThat(cameraState.distance()).isEqualTo(9.0f);
     assertThat(cameraState.focusX()).isEqualTo(8.5f);
     assertThat(cameraState.focusY()).isEqualTo(8.5f);
-    assertThat(cameraState.screenOffsetY()).isEqualTo(-0.65f);
-    assertThat(cameraState.yawDegrees()).isEqualTo(-135.0f);
+    assertThat(cameraState.focusHeight()).isEqualTo(3.59375f);
+    assertThat(cameraState.screenOffsetY()).isZero();
+    assertThat(cameraState.yawDegrees()).isEqualTo(0.0f);
   }
 
   @Test
@@ -64,7 +65,7 @@ class WorldSceneCameraPlannerTest {
     );
 
     assertThat(cameraState.pitchDegrees()).isGreaterThan(22.5f);
-    assertThat(cameraState.distance()).isGreaterThan(7.6875f);
+    assertThat(cameraState.distance()).isGreaterThan(9.0f);
   }
 
   @Test

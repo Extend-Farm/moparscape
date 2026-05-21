@@ -3,17 +3,23 @@ package io.github.ffakira.rsps.client.desktop.world;
 final class WorldViewportProjection {
 
   static final float NEAR_PLANE = 1.2f;
-  static final float FAR_PLANE = 96.0f;
-  static final float HALF_VERTICAL_FOV_DEGREES = 12.0f;
+  static final float FAR_PLANE = 128.0f;
+  static final float LEGACY_FOCAL_LENGTH_PIXELS = 512.0f;
 
   private WorldViewportProjection() {
   }
 
-  static float frustumTop() {
-    return (float) (Math.tan(Math.toRadians(HALF_VERTICAL_FOV_DEGREES)) * NEAR_PLANE);
+  static float frustumTop(float viewportHeight) {
+    return NEAR_PLANE * (Math.max(1.0f, viewportHeight) * 0.5f) / LEGACY_FOCAL_LENGTH_PIXELS;
   }
 
-  static float frustumRight(float aspectRatio) {
-    return frustumTop() * aspectRatio;
+  static float frustumRight(float viewportWidth) {
+    return NEAR_PLANE * (Math.max(1.0f, viewportWidth) * 0.5f) / LEGACY_FOCAL_LENGTH_PIXELS;
+  }
+
+  static float halfVerticalFovDegrees(float viewportHeight) {
+    return (float) Math.toDegrees(
+        Math.atan((Math.max(1.0f, viewportHeight) * 0.5f) / LEGACY_FOCAL_LENGTH_PIXELS)
+    );
   }
 }

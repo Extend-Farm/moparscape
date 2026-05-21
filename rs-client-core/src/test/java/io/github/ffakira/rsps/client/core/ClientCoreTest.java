@@ -12,6 +12,7 @@ import io.github.ffakira.rsps.protocol.BootstrapProfile;
 import io.github.ffakira.rsps.protocol.BootstrapSkill;
 import io.github.ffakira.rsps.protocol.CharacterBootstrapMessage;
 import io.github.ffakira.rsps.protocol.CharacterBootstrapPayload;
+import io.github.ffakira.rsps.protocol.EntityActionSequenceMessage;
 import io.github.ffakira.rsps.protocol.LoginAccepted;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -104,5 +105,32 @@ class ClientCoreTest {
     assertThat(clientCore.viewModel().skillPresentation().getFirst()).isEqualTo(
         new BootstrapSkillPresentation(0, "Attack", 99, 14_000_000)
     );
+  }
+
+  @Test
+  void tracksLocalPlayerActionSequenceFromRuntimeMessages() {
+    ClientCore clientCore = new ClientCore();
+    CharacterBootstrapPayload bootstrap = new CharacterBootstrapPayload(
+        1L,
+        2L,
+        "Akira",
+        "lumbridge",
+        new WorldPoint(3200, 3201, 0),
+        new BootstrapProfile((short) 2, true, 100),
+        new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1)),
+        List.of(),
+        List.of(),
+        List.of()
+    );
+
+    clientCore.accept(new LoginAccepted(1L, 2L, bootstrap.worldPoint()));
+    clientCore.accept(new CharacterBootstrapMessage(bootstrap));
+    clientCore.accept(new EntityActionSequenceMessage(1, 866));
+
+    assertThat(clientCore.viewModel().localPlayerActionSequenceId()).isEqualTo(866);
+
+    clientCore.accept(new EntityActionSequenceMessage(1, -1));
+
+    assertThat(clientCore.viewModel().localPlayerActionSequenceId()).isEqualTo(-1);
   }
 }

@@ -133,6 +133,28 @@ class LocalPlayerAnimationTrackerTest {
     assertThat(secondWalkingState.activeFrameId()).isNotEqualTo(firstWalkingState.activeFrameId());
   }
 
+  @Test
+  void keepsConcurrentMovementAndRuntimeActionFramesWhenActionSequenceIsSupplied() {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    AnimationFrameCatalog animationFrames = AnimationFrameCatalog.load(manifest.cacheStore());
+    AnimationSequenceCatalog animationSequences = AnimationSequenceCatalog.load(manifest, animationFrames);
+    TestNanoClock clock = new TestNanoClock();
+    LocalPlayerAnimationTracker tracker = new LocalPlayerAnimationTracker(clock::now, animationSequences);
+
+    tracker.update(new WorldPoint(3200, 3200, 0));
+    clock.advanceNanos(100_000_000L);
+    ActorAnimationState concurrentState = tracker.update(
+        new WorldPoint(3201, 3200, 0),
+        REFERENCE_PROFILE,
+        REFERENCE_PROFILE.standSequenceId()
+    );
+
+    assertThat(concurrentState.hasMovementFrame()).isTrue();
+    assertThat(concurrentState.hasActionFrame()).isTrue();
+    assertThat(concurrentState.actionSequenceId()).isEqualTo(REFERENCE_PROFILE.standSequenceId());
+    assertThat(concurrentState.activeSequenceId()).isEqualTo(REFERENCE_PROFILE.standSequenceId());
+  }
+
   private static final class TestNanoClock {
 
     private long now;

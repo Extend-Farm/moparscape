@@ -7,10 +7,10 @@ public final class GameplayCameraController {
 
   private static final float DEGREES_PER_CAMERA_UNIT = 360.0f / 2048.0f;
   private static final int FULL_CAMERA_CIRCLE_UNITS = 2048;
-  private static final int DEFAULT_YAW_UNITS = 1280;
-  private static final int DEFAULT_PITCH_UNITS = 176;
+  private static final int DEFAULT_YAW_UNITS = 0;
   private static final int MIN_PITCH_UNITS = 128;
   private static final int MAX_PITCH_UNITS = 383;
+  private static final int DEFAULT_PITCH_UNITS = MIN_PITCH_UNITS;
   private static final long LEGACY_TICK_NANOS = 20_000_000L;
   private static final long MAX_ACCUMULATED_NANOS = LEGACY_TICK_NANOS * 12L;
   private static final int LEFT_YAW_TARGET_VELOCITY_UNITS = -24;

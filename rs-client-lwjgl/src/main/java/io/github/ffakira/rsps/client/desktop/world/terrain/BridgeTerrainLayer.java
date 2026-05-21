@@ -115,7 +115,7 @@ public final class BridgeTerrainLayer implements TerrainLayerSource {
   }
 
   public boolean activeAt(int localX, int localY) {
-    return activeTiles[localY * tileWidth + localX] != 0;
+    return contains(localX, localY) && activeTiles[tileIndex(localX, localY)] != 0;
   }
 
   @Override
@@ -130,51 +130,59 @@ public final class BridgeTerrainLayer implements TerrainLayerSource {
 
   @Override
   public int elevationAt(int localX, int localY) {
-    return elevations[localY * tileWidth + localX];
+    return elevations[tileIndex(localX, localY)];
   }
 
   @Override
   public int underlayIdAt(int localX, int localY) {
-    return underlayIds[localY * tileWidth + localX];
+    return underlayIds[tileIndex(localX, localY)];
   }
 
   @Override
   public int overlayIdAt(int localX, int localY) {
-    return overlayIds[localY * tileWidth + localX];
+    return overlayIds[tileIndex(localX, localY)];
   }
 
   @Override
   public int tileColorAt(int localX, int localY) {
-    return tileColors[localY * tileWidth + localX];
+    return tileColors[tileIndex(localX, localY)];
   }
 
   @Override
   public int underlayColorAt(int localX, int localY) {
-    return underlayColors[localY * tileWidth + localX];
+    return underlayColors[tileIndex(localX, localY)];
   }
 
   @Override
   public int overlayColorAt(int localX, int localY) {
-    return overlayColors[localY * tileWidth + localX];
+    return overlayColors[tileIndex(localX, localY)];
   }
 
   @Override
   public int underlayTextureIdAt(int localX, int localY) {
-    return underlayTextureIds[localY * tileWidth + localX];
+    return underlayTextureIds[tileIndex(localX, localY)];
   }
 
   @Override
   public int overlayTextureIdAt(int localX, int localY) {
-    return overlayTextureIds[localY * tileWidth + localX];
+    return overlayTextureIds[tileIndex(localX, localY)];
   }
 
   @Override
   public int overlayShapeAt(int localX, int localY) {
-    return overlayShapes[localY * tileWidth + localX] & 0xff;
+    return overlayShapes[tileIndex(localX, localY)] & 0xff;
   }
 
   @Override
   public int overlayRotationAt(int localX, int localY) {
-    return overlayRotations[localY * tileWidth + localX] & 0xff;
+    return overlayRotations[tileIndex(localX, localY)] & 0xff;
+  }
+
+  private boolean contains(int localX, int localY) {
+    return localX >= 0 && localY >= 0 && localX < tileWidth && localY < tileHeight;
+  }
+
+  private int tileIndex(int localX, int localY) {
+    return localY * tileWidth + localX;
   }
 }

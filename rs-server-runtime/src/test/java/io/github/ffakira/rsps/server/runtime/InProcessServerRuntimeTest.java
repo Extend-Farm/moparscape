@@ -15,9 +15,11 @@ import io.github.ffakira.rsps.persistence.CharacterRepository;
 import io.github.ffakira.rsps.persistence.CharacterSkill;
 import io.github.ffakira.rsps.persistence.CharacterSnapshot;
 import io.github.ffakira.rsps.persistence.ItemContainerKind;
+import io.github.ffakira.rsps.protocol.ActionSequenceIntentMessage;
+import io.github.ffakira.rsps.protocol.BootstrapAnimationProfile;
 import io.github.ffakira.rsps.protocol.CharacterBootstrapMessage;
 import io.github.ffakira.rsps.protocol.ClientMessage;
-import io.github.ffakira.rsps.protocol.BootstrapAnimationProfile;
+import io.github.ffakira.rsps.protocol.EntityActionSequenceMessage;
 import io.github.ffakira.rsps.protocol.EntityPositionMessage;
 import io.github.ffakira.rsps.protocol.HandshakeAccepted;
 import io.github.ffakira.rsps.protocol.HandshakeRequest;
@@ -171,6 +173,41 @@ class InProcessServerRuntimeTest {
               characterSnapshot.worldPoint(),
               characterSnapshot.worldPoint().translate(1, 0)
           ));
+    }
+  }
+
+  @Test
+  void forwardsLocalActionSequenceChangesToTheProtocolSession() {
+    AccountRecord accountRecord = new AccountRecord(new AccountId(101L), "akira", "swordfish");
+    CharacterSnapshot characterSnapshot = new CharacterSnapshot(
+        new CharacterId(202L),
+        accountRecord.id(),
+        "Akira",
+        new WorldPoint(3200, 3201, 0),
+        new CharacterProfile((short) 2, true, 100, null, 0L, 0L),
+        new CharacterAppearance(List.of(-1, -1, -1, -1, -1, -1)),
+        List.of(),
+        List.of(),
+        List.of()
+    );
+
+    try (InProcessServerRuntime runtime = new InProcessServerRuntime(
+        new InMemoryAccountRepository(accountRecord),
+        new InMemoryCharacterRepository(characterSnapshot)
+    )) {
+      RecordingProtocolSession protocolSession = new RecordingProtocolSession();
+      PlayerSessionActor playerSessionActor = runtime.openSession(protocolSession);
+
+      playerSessionActor.accept(new HandshakeRequest(ProtocolVersion.current(), "integration-test"));
+      playerSessionActor.accept(new LoginRequest("akira", "swordfish"));
+      assertThat(protocolSession.awaitMessageCount(5, Duration.ofSeconds(2))).isTrue();
+
+      playerSessionActor.accept(new ActionSequenceIntentMessage(866));
+      assertThat(protocolSession.awaitMessageCount(6, Duration.ofSeconds(2))).isTrue();
+      assertThat(protocolSession.sentMessages()).last().isEqualTo(new EntityActionSequenceMessage(
+          playerSessionActor.worldShardAdmission().entityId().value(),
+          866
+      ));
     }
   }
 

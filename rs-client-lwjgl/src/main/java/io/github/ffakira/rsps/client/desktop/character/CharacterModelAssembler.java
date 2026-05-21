@@ -15,17 +15,12 @@ import java.util.Map;
 
 public final class CharacterModelAssembler {
 
-  private static final float ACTOR_FOOTPRINT = 0.66f;
-  private static final float ACTOR_HEIGHT = 1.74f;
-
   private final CharacterModelSourceBuilder sourceBuilder;
   private final AnimationSequenceCatalog animationSequenceCatalog;
   private final CharacterLightingResolver lightingResolver;
   private final CharacterGeometryBuilder geometryBuilder;
   private final Map<String, CharacterPreparedModel> preparedModelByAppearanceKey = new HashMap<>();
   private final Map<String, WorldSceneObjectGeometry> geometryByAppearanceKey = new HashMap<>();
-  private Float cachedMaleReferenceScale;
-  private Float cachedFemaleReferenceScale;
 
   // This assembler mirrors the legacy appearance contract without importing legacy runtime code:
   // persisted look values are sex + palette choices, while the visible body comes from default
@@ -92,7 +87,6 @@ public final class CharacterModelAssembler {
       CharacterModelSourceBuilder.SequenceEquipmentOverrides equipmentOverrides
   ) {
     int[] lookValues = sourceBuilder.normalizedLookValues(appearance);
-    boolean female = lookValues[0] == 1;
     CharacterModelSourceBuilder.PreparedCharacterSource preparedCharacterSource =
         sourceBuilder.prepareSourceModel(lookValues, equipment, equipmentOverrides);
     if (preparedCharacterSource == null) {
@@ -102,7 +96,7 @@ public final class CharacterModelAssembler {
         preparedCharacterSource.preparedContributions(),
         lookValues
     );
-    CharacterActorTransform actorTransform = resolveActorTransform(preparedCharacterSource.sourceBounds(), female);
+    CharacterActorTransform actorTransform = resolveActorTransform(preparedCharacterSource.sourceBounds());
     CharacterModelSourceBuilder.SourceBounds sourceBounds = preparedCharacterSource.sourceBounds();
     return new CharacterPreparedModel(
         preparedCharacterSource.preparedContributions(),
@@ -139,43 +133,10 @@ public final class CharacterModelAssembler {
     return builder.toString();
   }
 
-  private CharacterActorTransform resolveActorTransform(CharacterModelSourceBuilder.SourceBounds sourceBounds, boolean female) {
-    float scale = referenceActorScale(female);
-    float offsetX = -sourceBounds.centerX() * scale;
-    float offsetZ = -sourceBounds.centerZ() * scale;
-    float offsetY = -sourceBounds.minY() * scale;
-    return new CharacterActorTransform(scale, offsetX, offsetY, offsetZ);
-  }
-
-  private float referenceActorScale(boolean female) {
-    if (female) {
-      if (cachedFemaleReferenceScale == null) {
-        cachedFemaleReferenceScale = computeReferenceActorScale(true);
-      }
-      return cachedFemaleReferenceScale;
-    }
-    if (cachedMaleReferenceScale == null) {
-      cachedMaleReferenceScale = computeReferenceActorScale(false);
-    }
-    return cachedMaleReferenceScale;
-  }
-
-  private float computeReferenceActorScale(boolean female) {
-    int[] referenceLookValues = sourceBuilder.normalizedLookValues(null);
-    referenceLookValues[0] = female ? 1 : 0;
-    CharacterModelSourceBuilder.PreparedCharacterSource referenceSource = sourceBuilder.prepareSourceModel(
-        referenceLookValues,
-        List.of(),
-        CharacterModelSourceBuilder.SequenceEquipmentOverrides.none()
-    );
-    if (referenceSource == null) {
-      return 1.0f;
-    }
-    CharacterModelSourceBuilder.SourceBounds sourceBounds = referenceSource.sourceBounds();
-    float sourceWidth = Math.max(0.01f, sourceBounds.maxX() - sourceBounds.minX());
-    float sourceDepth = Math.max(0.01f, sourceBounds.maxZ() - sourceBounds.minZ());
-    float sourceHeight = Math.max(0.01f, sourceBounds.maxY() - sourceBounds.minY());
-    return Math.min(ACTOR_FOOTPRINT / Math.max(sourceWidth, sourceDepth), ACTOR_HEIGHT / sourceHeight);
+  private CharacterActorTransform resolveActorTransform(CharacterModelSourceBuilder.SourceBounds sourceBounds) {
+    // The reference player merge keeps the authored model-space origin, including the slight
+    // below-origin sole overhang some equipped bodies retain after the merged cache model is lit.
+    return new CharacterActorTransform(1.0f, 0.0f, 0.0f, 0.0f);
   }
 
   private CharacterModelSourceBuilder.SequenceEquipmentOverrides resolveSequenceEquipmentOverrides(

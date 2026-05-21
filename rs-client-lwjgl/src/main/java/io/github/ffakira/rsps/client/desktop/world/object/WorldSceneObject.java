@@ -18,6 +18,10 @@ public record WorldSceneObject(
     List<Integer> modelIds,
     boolean allowFallbackProxy,
     boolean castsShadow,
+    boolean solid,
+    boolean interactive,
+    int wallDecorDisplacement,
+    int animationId,
     WorldSceneObjectGeometry geometry
 ) {
 
@@ -43,22 +47,59 @@ public record WorldSceneObject(
       WorldSceneObjectGeometry geometry
   ) {
     this(
-        objectId,
-        name,
-        localX,
-        localY,
-        plane,
-        type,
-        orientation,
-        sizeX,
-        sizeY,
-        contouredGround,
-        mapSceneId,
-        mapFunctionId,
-        modelIds,
-        allowFallbackProxy,
-        true,
-        geometry
+        objectId, name, localX, localY, plane, type, orientation, sizeX, sizeY,
+        contouredGround, mapSceneId, mapFunctionId, modelIds, allowFallbackProxy, true, true, false, 16, -1, geometry
+    );
+  }
+
+  public WorldSceneObject(
+      int objectId,
+      String name,
+      int localX,
+      int localY,
+      int plane,
+      int type,
+      int orientation,
+      int sizeX,
+      int sizeY,
+      boolean contouredGround,
+      int mapSceneId,
+      int mapFunctionId,
+      List<Integer> modelIds,
+      boolean allowFallbackProxy,
+      boolean castsShadow,
+      WorldSceneObjectGeometry geometry
+  ) {
+    this(
+        objectId, name, localX, localY, plane, type, orientation, sizeX, sizeY,
+        contouredGround, mapSceneId, mapFunctionId, modelIds, allowFallbackProxy, castsShadow, true, false, 16, -1, geometry
+    );
+  }
+
+  public WorldSceneObject(
+      int objectId,
+      String name,
+      int localX,
+      int localY,
+      int plane,
+      int type,
+      int orientation,
+      int sizeX,
+      int sizeY,
+      boolean contouredGround,
+      int mapSceneId,
+      int mapFunctionId,
+      List<Integer> modelIds,
+      boolean allowFallbackProxy,
+      boolean castsShadow,
+      boolean solid,
+      boolean interactive,
+      WorldSceneObjectGeometry geometry
+  ) {
+    this(
+        objectId, name, localX, localY, plane, type, orientation, sizeX, sizeY,
+        contouredGround, mapSceneId, mapFunctionId, modelIds, allowFallbackProxy,
+        castsShadow, solid, interactive, 16, -1, geometry
     );
   }
 

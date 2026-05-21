@@ -21,6 +21,7 @@ public final class SceneTriangleMeshBuilder {
   private int[] textureVertexA = new int[256];
   private int[] textureVertexB = new int[256];
   private int[] textureVertexC = new int[256];
+  private int[] facePriorities = new int[256];
   private int faceCount;
 
   public int addVertex(float x, float y, float z) {
@@ -62,11 +63,11 @@ public final class SceneTriangleMeshBuilder {
   }
 
   public void addTriangle(int a, int b, int c, int rgb) {
-    addTriangle(a, b, c, rgb, rgb, rgb, 255, -1, -1, -1, -1);
+    addTriangle(a, b, c, rgb, rgb, rgb, 255, -1, -1, -1, -1, 0);
   }
 
   public void addTriangle(int a, int b, int c, int rgbA, int rgbB, int rgbC) {
-    addTriangle(a, b, c, rgbA, rgbB, rgbC, 255, -1, -1, -1, -1);
+    addTriangle(a, b, c, rgbA, rgbB, rgbC, 255, -1, -1, -1, -1, 0);
   }
 
   public void addTriangle(
@@ -82,6 +83,23 @@ public final class SceneTriangleMeshBuilder {
       int textureB,
       int textureC
   ) {
+    addTriangle(a, b, c, rgbA, rgbB, rgbC, alpha, textureId, textureA, textureB, textureC, 0);
+  }
+
+  public void addTriangle(
+      int a,
+      int b,
+      int c,
+      int rgbA,
+      int rgbB,
+      int rgbC,
+      int alpha,
+      int textureId,
+      int textureA,
+      int textureB,
+      int textureC,
+      int facePriority
+  ) {
     ensureFaceCapacity(faceCount + 1);
     faceVertexA[faceCount] = a;
     faceVertexB[faceCount] = b;
@@ -94,6 +112,7 @@ public final class SceneTriangleMeshBuilder {
     textureVertexA[faceCount] = textureA;
     textureVertexB[faceCount] = textureB;
     textureVertexC[faceCount] = textureC;
+    facePriorities[faceCount] = facePriority;
     faceCount++;
   }
 
@@ -150,6 +169,7 @@ public final class SceneTriangleMeshBuilder {
       textureVertexA[faceCount] = mesh.textureVertexA()[index] < 0 ? -1 : baseVertexIndex + mesh.textureVertexA()[index];
       textureVertexB[faceCount] = mesh.textureVertexB()[index] < 0 ? -1 : baseVertexIndex + mesh.textureVertexB()[index];
       textureVertexC[faceCount] = mesh.textureVertexC()[index] < 0 ? -1 : baseVertexIndex + mesh.textureVertexC()[index];
+      facePriorities[faceCount] = mesh.facePriorities()[index];
       faceCount++;
     }
   }
@@ -198,6 +218,7 @@ public final class SceneTriangleMeshBuilder {
       textureVertexA[faceCount] = geometry.textureVertexA()[index] < 0 ? -1 : baseVertexIndex + geometry.textureVertexA()[index];
       textureVertexB[faceCount] = geometry.textureVertexB()[index] < 0 ? -1 : baseVertexIndex + geometry.textureVertexB()[index];
       textureVertexC[faceCount] = geometry.textureVertexC()[index] < 0 ? -1 : baseVertexIndex + geometry.textureVertexC()[index];
+      facePriorities[faceCount] = geometry.facePriorities()[index];
       faceCount++;
     }
   }
@@ -236,6 +257,7 @@ public final class SceneTriangleMeshBuilder {
       textureVertexA[faceCount] = geometry.textureVertexA()[index] < 0 ? -1 : baseVertexIndex + geometry.textureVertexA()[index];
       textureVertexB[faceCount] = geometry.textureVertexB()[index] < 0 ? -1 : baseVertexIndex + geometry.textureVertexB()[index];
       textureVertexC[faceCount] = geometry.textureVertexC()[index] < 0 ? -1 : baseVertexIndex + geometry.textureVertexC()[index];
+      facePriorities[faceCount] = geometry.facePriorities()[index];
       faceCount++;
     }
   }
@@ -258,7 +280,8 @@ public final class SceneTriangleMeshBuilder {
         Arrays.copyOf(faceTextureIds, faceCount),
         Arrays.copyOf(textureVertexA, faceCount),
         Arrays.copyOf(textureVertexB, faceCount),
-        Arrays.copyOf(textureVertexC, faceCount)
+        Arrays.copyOf(textureVertexC, faceCount),
+        Arrays.copyOf(facePriorities, faceCount)
     );
   }
 
@@ -288,6 +311,7 @@ public final class SceneTriangleMeshBuilder {
     textureVertexA = Arrays.copyOf(textureVertexA, newCapacity);
     textureVertexB = Arrays.copyOf(textureVertexB, newCapacity);
     textureVertexC = Arrays.copyOf(textureVertexC, newCapacity);
+    facePriorities = Arrays.copyOf(facePriorities, newCapacity);
   }
 
   private float midpoint(float first, float second) {

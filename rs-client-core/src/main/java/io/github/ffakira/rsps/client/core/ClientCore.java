@@ -2,6 +2,7 @@ package io.github.ffakira.rsps.client.core;
 
 import io.github.ffakira.rsps.protocol.CharacterBootstrapMessage;
 import io.github.ffakira.rsps.protocol.CharacterBootstrapPayload;
+import io.github.ffakira.rsps.protocol.EntityActionSequenceMessage;
 import io.github.ffakira.rsps.model.WorldPoint;
 import io.github.ffakira.rsps.protocol.EntityPositionMessage;
 import io.github.ffakira.rsps.protocol.HandshakeAccepted;
@@ -48,6 +49,7 @@ public class ClientCore {
             "Loading world...",
             true,
             null,
+            -1,
             loginAccepted.accountId(),
             loginAccepted.characterId(),
             null,
@@ -63,6 +65,7 @@ public class ClientCore {
             "In world",
             true,
             bootstrap.worldPoint(),
+            -1,
             bootstrap.accountId(),
             bootstrap.characterId(),
             bootstrap.regionKey(),
@@ -82,6 +85,7 @@ public class ClientCore {
             "In world",
             true,
             worldSnapshotMessage.localPlayerPosition(),
+            viewModel.localPlayerActionSequenceId(),
             viewModel.accountId(),
             viewModel.characterId(),
             worldSnapshotMessage.regionKey(),
@@ -90,24 +94,39 @@ public class ClientCore {
         );
         events.add(new WorldLoadedEvent(worldSnapshotMessage.regionKey()));
       }
-      case EntityPositionMessage entityPositionMessage ->
-          {
-            CharacterBootstrapPayload bootstrap = withWorldPosition(
-                viewModel.bootstrap(),
-                viewModel.regionKey(),
-                entityPositionMessage.worldPoint()
-            );
+      case EntityPositionMessage entityPositionMessage -> {
+        CharacterBootstrapPayload bootstrap = withWorldPosition(
+            viewModel.bootstrap(),
+            viewModel.regionKey(),
+            entityPositionMessage.worldPoint()
+        );
+        viewModel = new ClientViewModel(
+            viewModel.statusText(),
+            viewModel.loggedIn(),
+            entityPositionMessage.worldPoint(),
+            viewModel.localPlayerActionSequenceId(),
+            viewModel.accountId(),
+            viewModel.characterId(),
+            viewModel.regionKey(),
+            bootstrap,
+            preservePresentation(bootstrap)
+        );
+      }
+      case EntityActionSequenceMessage entityActionSequenceMessage -> {
+        if (viewModel.characterId() != null && viewModel.bootstrap() != null) {
           viewModel = new ClientViewModel(
               viewModel.statusText(),
               viewModel.loggedIn(),
-              entityPositionMessage.worldPoint(),
+              viewModel.localPlayerPosition(),
+              entityActionSequenceMessage.actionSequenceId(),
               viewModel.accountId(),
               viewModel.characterId(),
               viewModel.regionKey(),
-              bootstrap,
-              preservePresentation(bootstrap)
+              viewModel.bootstrap(),
+              viewModel.bootstrapPresentation()
           );
-          }
+        }
+      }
       case LoginRejected loginRejected -> {
         viewModel = new ClientViewModel(loginRejected.reason(), false, null);
         events.add(new ClientDisconnectedEvent(loginRejected.reason()));

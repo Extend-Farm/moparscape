@@ -8,6 +8,7 @@ public record ClientViewModel(
     String statusText,
     boolean loggedIn,
     WorldPoint localPlayerPosition,
+    int localPlayerActionSequenceId,
     Long accountId,
     Long characterId,
     String regionKey,
@@ -16,7 +17,24 @@ public record ClientViewModel(
 ) {
 
   public ClientViewModel(String statusText, boolean loggedIn, WorldPoint localPlayerPosition) {
-    this(statusText, loggedIn, localPlayerPosition, null, null, null, null, null);
+    this(statusText, loggedIn, localPlayerPosition, -1, null, null, null, null, null);
+  }
+
+  public ClientViewModel(
+      String statusText,
+      boolean loggedIn,
+      WorldPoint localPlayerPosition,
+      Long accountId,
+      Long characterId,
+      String regionKey,
+      CharacterBootstrapPayload bootstrap,
+      BootstrapCharacterPresentation bootstrapPresentation
+  ) {
+    this(statusText, loggedIn, localPlayerPosition, -1, accountId, characterId, regionKey, bootstrap, bootstrapPresentation);
+  }
+
+  public ClientViewModel {
+    localPlayerActionSequenceId = Math.max(-1, localPlayerActionSequenceId);
   }
 
   public List<io.github.ffakira.rsps.protocol.BootstrapItemSlot> inventory() {

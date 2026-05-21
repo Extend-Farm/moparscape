@@ -8,10 +8,9 @@ import io.github.ffakira.rsps.content.ItemDefinition;
 import io.github.ffakira.rsps.content.ItemDefinitionCatalog;
 import io.github.ffakira.rsps.protocol.BootstrapAppearance;
 import io.github.ffakira.rsps.protocol.BootstrapItemSlot;
+import java.util.Arrays;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 final class CharacterModelSourceBuilder {
 
@@ -84,7 +83,7 @@ final class CharacterModelSourceBuilder {
     boolean female = lookValues[0] == 1;
     int[] appearanceEntries = resolveAppearanceEntries(lookValues, equipment, equipmentOverrides);
 
-    ArrayList<ModelContribution> contributions = new ArrayList<>();
+    ArrayList<ModelContribution> contributions = new ArrayList<>(appearanceEntries.length);
     for (int appearanceEntry : appearanceEntries) {
       addAppearanceContribution(contributions, appearanceEntry, female);
     }
@@ -93,37 +92,49 @@ final class CharacterModelSourceBuilder {
       return null;
     }
 
-    ArrayList<PreparedContribution> preparedContributions = new ArrayList<>();
-    float minX = Float.POSITIVE_INFINITY;
-    float minY = Float.POSITIVE_INFINITY;
-    float minZ = Float.POSITIVE_INFINITY;
-    float maxX = Float.NEGATIVE_INFINITY;
-    float maxY = Float.NEGATIVE_INFINITY;
-    float maxZ = Float.NEGATIVE_INFINITY;
+    ArrayList<PreparedContribution> preparedContributions = new ArrayList<>(contributions.size());
+    int minSourceX = Integer.MAX_VALUE;
+    int minSourceY = Integer.MAX_VALUE;
+    int minSourceZ = Integer.MAX_VALUE;
+    int maxSourceX = Integer.MIN_VALUE;
+    int maxSourceY = Integer.MIN_VALUE;
+    int maxSourceZ = Integer.MIN_VALUE;
     for (ModelContribution contribution : contributions) {
       RawModelData rawModelData = contribution.rawModelData();
-      int[][] modelVertices = extractContributionVertices(rawModelData, contribution.translateY());
+      int[] modelX = rawModelData.vertexX().clone();
+      int[] modelY = rawModelData.vertexY().clone();
+      int[] modelZ = rawModelData.vertexZ().clone();
+      int translateY = contribution.translateY();
+      if (translateY != 0) {
+        for (int vertexIndex = 0; vertexIndex < modelY.length; vertexIndex++) {
+          modelY[vertexIndex] += translateY;
+        }
+      }
       preparedContributions.add(new PreparedContribution(
           contribution,
-          modelVertices[0],
-          modelVertices[1],
-          modelVertices[2]
+          modelX,
+          modelY,
+          modelZ
       ));
       for (int vertexIndex = 0; vertexIndex < rawModelData.vertexCount(); vertexIndex++) {
-        float sourceX = modelVertices[0][vertexIndex] / 128.0f;
-        float sourceY = -modelVertices[1][vertexIndex] / 128.0f;
-        float sourceZ = modelVertices[2][vertexIndex] / 128.0f;
-        minX = Math.min(minX, sourceX);
-        minY = Math.min(minY, sourceY);
-        minZ = Math.min(minZ, sourceZ);
-        maxX = Math.max(maxX, sourceX);
-        maxY = Math.max(maxY, sourceY);
-        maxZ = Math.max(maxZ, sourceZ);
+        minSourceX = Math.min(minSourceX, modelX[vertexIndex]);
+        minSourceY = Math.min(minSourceY, -modelY[vertexIndex]);
+        minSourceZ = Math.min(minSourceZ, modelZ[vertexIndex]);
+        maxSourceX = Math.max(maxSourceX, modelX[vertexIndex]);
+        maxSourceY = Math.max(maxSourceY, -modelY[vertexIndex]);
+        maxSourceZ = Math.max(maxSourceZ, modelZ[vertexIndex]);
       }
     }
     return new PreparedCharacterSource(
         preparedContributions,
-        new SourceBounds(minX, minY, minZ, maxX, maxY, maxZ)
+        new SourceBounds(
+            toSourceCoordinate(minSourceX),
+            toSourceCoordinate(minSourceY),
+            toSourceCoordinate(minSourceZ),
+            toSourceCoordinate(maxSourceX),
+            toSourceCoordinate(maxSourceY),
+            toSourceCoordinate(maxSourceZ)
+        )
     );
   }
 
@@ -133,22 +144,22 @@ final class CharacterModelSourceBuilder {
       SequenceEquipmentOverrides equipmentOverrides
   ) {
     boolean female = lookValues[0] == 1;
-    Map<Integer, Integer> equipmentBySlot = equipmentBySlot(equipment);
+    int[] equipmentItemIdsBySlot = equipmentItemIdsBySlot(equipment);
     int[] bodyKitIds = female ? FEMALE_DEFAULT_BODY_KIT_IDS : MALE_DEFAULT_BODY_KIT_IDS;
     int[] appearanceEntries = new int[12];
-    int hatItemId = equipmentBySlot.getOrDefault(SLOT_HAT, -1);
-    int chestItemId = equipmentBySlot.getOrDefault(SLOT_CHEST, -1);
+    int hatItemId = equipmentItemIdsBySlot[SLOT_HAT];
+    int chestItemId = equipmentItemIdsBySlot[SLOT_CHEST];
     appearanceEntries[SLOT_HAT] = itemAppearanceEntry(hatItemId);
-    appearanceEntries[SLOT_CAPE] = itemAppearanceEntry(equipmentBySlot.getOrDefault(SLOT_CAPE, -1));
-    appearanceEntries[SLOT_AMULET] = itemAppearanceEntry(equipmentBySlot.getOrDefault(SLOT_AMULET, -1));
-    appearanceEntries[SLOT_WEAPON] = itemAppearanceEntry(equipmentBySlot.getOrDefault(SLOT_WEAPON, -1));
+    appearanceEntries[SLOT_CAPE] = itemAppearanceEntry(equipmentItemIdsBySlot[SLOT_CAPE]);
+    appearanceEntries[SLOT_AMULET] = itemAppearanceEntry(equipmentItemIdsBySlot[SLOT_AMULET]);
+    appearanceEntries[SLOT_WEAPON] = itemAppearanceEntry(equipmentItemIdsBySlot[SLOT_WEAPON]);
     appearanceEntries[SLOT_CHEST] = itemOrKitAppearanceEntry(chestItemId, bodyKitIds[BODY_PART_TORSO]);
-    appearanceEntries[SLOT_SHIELD] = itemAppearanceEntry(equipmentBySlot.getOrDefault(SLOT_SHIELD, -1));
+    appearanceEntries[SLOT_SHIELD] = itemAppearanceEntry(equipmentItemIdsBySlot[SLOT_SHIELD]);
     appearanceEntries[SLOT_ARMS] = EquipmentVisibilityRules.isPlateBody(chestItemId)
         ? 0
         : identityKitAppearanceEntry(bodyKitIds[BODY_PART_ARMS]);
     appearanceEntries[SLOT_LEGS] = itemOrKitAppearanceEntry(
-        equipmentBySlot.getOrDefault(SLOT_LEGS, -1),
+        equipmentItemIdsBySlot[SLOT_LEGS],
         bodyKitIds[BODY_PART_LEGS]
     );
     appearanceEntries[SLOT_HEAD] = EquipmentVisibilityRules.isFullHelm(hatItemId)
@@ -156,11 +167,11 @@ final class CharacterModelSourceBuilder {
         ? 0
         : identityKitAppearanceEntry(bodyKitIds[BODY_PART_HEAD]);
     appearanceEntries[SLOT_HANDS] = itemOrKitAppearanceEntry(
-        equipmentBySlot.getOrDefault(SLOT_HANDS, -1),
+        equipmentItemIdsBySlot[SLOT_HANDS],
         bodyKitIds[BODY_PART_HANDS]
     );
     appearanceEntries[SLOT_FEET] = itemOrKitAppearanceEntry(
-        equipmentBySlot.getOrDefault(SLOT_FEET, -1),
+        equipmentItemIdsBySlot[SLOT_FEET],
         bodyKitIds[BODY_PART_FEET]
     );
     appearanceEntries[SLOT_JAW] = 0;
@@ -195,8 +206,8 @@ final class CharacterModelSourceBuilder {
     return bodyKitId < 0 ? 0 : IDENTITY_KIT_APPEARANCE_BASE + bodyKitId;
   }
 
-  private boolean addEquipmentContribution(List<ModelContribution> contributions, Integer itemId, boolean female) {
-    if (itemId == null || itemId < 0) {
+  private boolean addEquipmentContribution(List<ModelContribution> contributions, int itemId, boolean female) {
+    if (itemId < 0) {
       return false;
     }
     ItemDefinition definition = itemDefinitions.find(itemId).orElse(null);
@@ -233,27 +244,20 @@ final class CharacterModelSourceBuilder {
     }
   }
 
-  private Map<Integer, Integer> equipmentBySlot(List<BootstrapItemSlot> equipment) {
-    HashMap<Integer, Integer> equipmentBySlot = new HashMap<>();
+  private int[] equipmentItemIdsBySlot(List<BootstrapItemSlot> equipment) {
+    int[] equipmentItemIdsBySlot = new int[12];
+    Arrays.fill(equipmentItemIdsBySlot, -1);
     for (BootstrapItemSlot equipmentSlot : equipment) {
-      if (equipmentSlot.itemId() >= 0) {
-        equipmentBySlot.put(equipmentSlot.slotIndex(), equipmentSlot.itemId());
+      int slotIndex = equipmentSlot.slotIndex();
+      if (slotIndex >= 0 && slotIndex < equipmentItemIdsBySlot.length && equipmentSlot.itemId() >= 0) {
+        equipmentItemIdsBySlot[slotIndex] = equipmentSlot.itemId();
       }
     }
-    return equipmentBySlot;
+    return equipmentItemIdsBySlot;
   }
 
-  private int[][] extractContributionVertices(RawModelData rawModelData, int translateY) {
-    int vertexCount = rawModelData.vertexCount();
-    int[] modelX = new int[vertexCount];
-    int[] modelY = new int[vertexCount];
-    int[] modelZ = new int[vertexCount];
-    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
-      modelX[vertexIndex] = rawModelData.vertexX()[vertexIndex];
-      modelY[vertexIndex] = rawModelData.vertexY()[vertexIndex] + translateY;
-      modelZ[vertexIndex] = rawModelData.vertexZ()[vertexIndex];
-    }
-    return new int[][]{modelX, modelY, modelZ};
+  private float toSourceCoordinate(int value) {
+    return value / 128.0f;
   }
 
   record ModelContribution(

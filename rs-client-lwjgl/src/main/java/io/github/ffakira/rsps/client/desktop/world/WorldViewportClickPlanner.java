@@ -24,9 +24,8 @@ public final class WorldViewportClickPlanner {
     float viewportHeight = Math.max(1.0f, viewportRect.height());
     float ndcX = (float) (((screenX - viewportRect.left()) / viewportWidth) * 2.0 - 1.0);
     float ndcY = (float) (1.0 - ((screenY - viewportRect.top()) / viewportHeight) * 2.0);
-    float aspectRatio = viewportWidth / viewportHeight;
-    float frustumTop = WorldViewportProjection.frustumTop();
-    float frustumRight = WorldViewportProjection.frustumRight(aspectRatio);
+    float frustumTop = WorldViewportProjection.frustumTop(viewportHeight);
+    float frustumRight = WorldViewportProjection.frustumRight(viewportWidth);
 
     float[] viewRay = normalize(ndcX * frustumRight, ndcY * frustumTop, -WorldViewportProjection.NEAR_PLANE);
     float[] worldOrigin = cameraOrigin(cameraState);
@@ -110,6 +109,10 @@ public final class WorldViewportClickPlanner {
     float[] translatedOrigin = new float[]{0.0f, -cameraState.screenOffsetY(), cameraState.distance()};
     float[] pitchAdjusted = rotateAroundX(translatedOrigin, -cameraState.pitchDegrees());
     float[] yawAdjusted = rotateAroundY(pitchAdjusted, cameraState.yawDegrees());
+    // Mirror of the glScalef(1, 1, -1) the renderer applies between R_yaw and T_focus. Its inverse
+    // is itself, so to recover world coords we negate Z after the rotation inverses and before
+    // re-adding the focus translate.
+    yawAdjusted[2] = -yawAdjusted[2];
     yawAdjusted[0] += cameraState.focusX();
     yawAdjusted[1] += cameraState.focusHeight();
     yawAdjusted[2] += cameraState.focusY();
@@ -118,7 +121,11 @@ public final class WorldViewportClickPlanner {
 
   private float[] viewToWorldDirection(float[] viewDirection, WorldCameraState cameraState) {
     float[] pitchAdjusted = rotateAroundX(viewDirection, -cameraState.pitchDegrees());
-    return normalize(rotateAroundY(pitchAdjusted, cameraState.yawDegrees()));
+    float[] yawAdjusted = rotateAroundY(pitchAdjusted, cameraState.yawDegrees());
+    // Same Z flip as in cameraOrigin: undo the renderer's glScalef(1, 1, -1) so the ray direction
+    // is expressed in the same world space as the mesh vertices.
+    yawAdjusted[2] = -yawAdjusted[2];
+    return normalize(yawAdjusted);
   }
 
   private float[] rotateAroundX(float[] vector, float degrees) {

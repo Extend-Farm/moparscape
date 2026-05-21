@@ -23,6 +23,7 @@ public final class GameplayFrameAssetLoader {
       CacheArchiveContainer mediaArchive = new CacheArchiveRepository(manifest.cacheStore())
           .loadArchive(TOP_LEVEL_ARCHIVE_STORE, TopLevelArchiveId.MEDIA.archiveId());
       TitleArchiveSpriteDecoder spriteDecoder = new TitleArchiveSpriteDecoder(mediaArchive);
+      GameplayStatsTabAssets statsTabAssets = loadStatsTabAssets(spriteDecoder, mediaArchive);
 
       ArgbImage[] sideIcons = new ArgbImage[13];
       for (int iconIndex = 0; iconIndex < sideIcons.length; iconIndex++) {
@@ -73,11 +74,49 @@ public final class GameplayFrameAssetLoader {
           sideIcons,
           mapFunctionIcons,
           mapDotIcons,
-          clickCrosses
+          clickCrosses,
+          statsTabAssets
       );
     } catch (Exception exception) {
       throw new IllegalStateException("Failed to load gameplay frame assets from media archive", exception);
     }
+  }
+
+  private static GameplayStatsTabAssets loadStatsTabAssets(
+      TitleArchiveSpriteDecoder spriteDecoder,
+      CacheArchiveContainer mediaArchive
+  ) {
+    ArgbImage[] skillIconsBySkillId = new ArgbImage[21];
+    ArgbImage[] primaryIcons = spriteDecoder.decodeSprites(mediaArchive, "staticons", false);
+    ArgbImage[] extendedIcons = spriteDecoder.decodeSprites(mediaArchive, "staticons2", false);
+
+    skillIconsBySkillId[0] = primaryIcons[0];
+    skillIconsBySkillId[1] = primaryIcons[2];
+    skillIconsBySkillId[2] = primaryIcons[1];
+    skillIconsBySkillId[3] = primaryIcons[6];
+    skillIconsBySkillId[4] = primaryIcons[3];
+    skillIconsBySkillId[5] = primaryIcons[4];
+    skillIconsBySkillId[6] = primaryIcons[5];
+    skillIconsBySkillId[7] = primaryIcons[15];
+    skillIconsBySkillId[8] = primaryIcons[17];
+    skillIconsBySkillId[9] = primaryIcons[11];
+    skillIconsBySkillId[10] = primaryIcons[14];
+    skillIconsBySkillId[11] = primaryIcons[16];
+    skillIconsBySkillId[12] = primaryIcons[10];
+    skillIconsBySkillId[13] = primaryIcons[13];
+    skillIconsBySkillId[14] = primaryIcons[12];
+    skillIconsBySkillId[15] = primaryIcons[8];
+    skillIconsBySkillId[16] = primaryIcons[7];
+    skillIconsBySkillId[17] = primaryIcons[9];
+    skillIconsBySkillId[18] = extendedIcons[1];
+    skillIconsBySkillId[19] = extendedIcons[2];
+    skillIconsBySkillId[20] = extendedIcons[0];
+
+    return new GameplayStatsTabAssets(
+        spriteDecoder.decodeSprite(mediaArchive, "miscgraphics", 4, false),
+        spriteDecoder.decodeSprite(mediaArchive, "miscgraphics", 5, false),
+        skillIconsBySkillId
+    );
   }
 
   private static ArgbImage[] optionalSprites(

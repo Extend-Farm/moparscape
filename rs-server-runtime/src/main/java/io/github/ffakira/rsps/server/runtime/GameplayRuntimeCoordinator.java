@@ -6,6 +6,8 @@ import io.github.ffakira.rsps.persistence.AccountRecord;
 import io.github.ffakira.rsps.persistence.AccountRepository;
 import io.github.ffakira.rsps.persistence.CharacterRepository;
 import io.github.ffakira.rsps.persistence.CharacterSnapshot;
+import io.github.ffakira.rsps.protocol.ActionSequenceIntentMessage;
+import io.github.ffakira.rsps.protocol.EntityActionSequenceMessage;
 import io.github.ffakira.rsps.protocol.HandshakeAccepted;
 import io.github.ffakira.rsps.protocol.HandshakeRequest;
 import io.github.ffakira.rsps.protocol.LoginRejected;
@@ -80,7 +82,7 @@ public class GameplayRuntimeCoordinator {
         )
     );
     PlayerSpawnedEvent spawnedEvent = awaitSpawn(character.id());
-    SessionState sessionState = new SessionState(session.sessionId(), account, character, spawnedEvent.entityId());
+    SessionState sessionState = new SessionState(session.sessionId(), account, character, spawnedEvent.entityId(), -1);
     sessionsById.put(session.sessionId(), sessionState);
     session.sendAll(BootstrapMessageBatch.create(new WorldShardAdmission(
         character,
@@ -109,6 +111,16 @@ public class GameplayRuntimeCoordinator {
     worldShardActor.tell(new WorldShardMessage.TickWorldMessage());
     EntityMovedEvent movedEvent = awaitMovement(sessionState.entityId());
     session.send(new io.github.ffakira.rsps.protocol.EntityPositionMessage(sessionState.entityId().value(), movedEvent.to()));
+  }
+
+  public void handleActionSequence(ProtocolSession session, ActionSequenceIntentMessage request) {
+    SessionState sessionState = sessionsById.get(session.sessionId());
+    if (sessionState == null) {
+      session.send(new LoginRejected("Session not authenticated"));
+      return;
+    }
+    sessionsById.put(session.sessionId(), sessionState.withActionSequenceId(request.actionSequenceId()));
+    session.send(new EntityActionSequenceMessage(sessionState.entityId().value(), request.actionSequenceId()));
   }
 
   public void handleDemoMove(ProtocolSession session) {

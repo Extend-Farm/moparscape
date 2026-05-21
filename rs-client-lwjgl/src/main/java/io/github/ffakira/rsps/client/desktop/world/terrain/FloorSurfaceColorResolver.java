@@ -11,12 +11,19 @@ public final class FloorSurfaceColorResolver {
   private static final int WATER_SURFACE_RGB = 0x5a7ea3;
   private static final int UNDERLAY_BLEND_RADIUS = 5;
   private static final double LEGACY_RASTER_BRIGHTNESS = 0.8D;
+  private static final double LEGACY_TEXTURE_AVERAGE_BRIGHTNESS = 1.4D;
   private static final int[] LEGACY_HSL_TO_RGB = buildLegacyHslToRgb();
 
   private final FloorColorCatalog floorColors;
+  private final int[] legacyTextureAverageColors;
 
   public FloorSurfaceColorResolver(FloorColorCatalog floorColors) {
+    this(floorColors, new int[0]);
+  }
+
+  public FloorSurfaceColorResolver(FloorColorCatalog floorColors, int[] legacyTextureAverageColors) {
     this.floorColors = Objects.requireNonNull(floorColors, "floorColors");
+    this.legacyTextureAverageColors = legacyTextureAverageColors.clone();
   }
 
   public void resolveSceneColors(
@@ -31,10 +38,18 @@ public final class FloorSurfaceColorResolver {
       int[] tileColors
   ) {
     resolveUnderlayColors(tileWidth, tileHeight, underlayIds, underlayColors);
-    resolveOverlayLayer(tileWidth, tileHeight, overlayIds, overlayColors, overlayTextureIds);
     for (int index = 0; index < tileWidth * tileHeight; index++) {
+      FloorColorDefinition overlayDefinition = floorColors.definitionFor(overlayIds[index]);
+      overlayTextureIds[index] = normalizedOverlayTextureId(overlayDefinition);
+      // Legacy terrain keeps two overlay color products: the visible overlay surface color used by
+      // SceneTilePaint/SceneTileModel corners, and the tile-level base color used for minimap/base
+      // paint selection. Textured and opcode-7 overlays diverge here, so keep them separate.
+      overlayColors[index] = overlaySurfaceColor(overlayDefinition);
       underlayTextureIds[index] = floorColors.definitionFor(underlayIds[index]).textureId();
-      tileColors[index] = activeTileColor(underlayColors[index], overlayColors[index]);
+      tileColors[index] = activeTileColor(
+          underlayColors[index],
+          overlayBaseColor(overlayDefinition, overlayTextureIds[index])
+      );
     }
   }
 
@@ -85,20 +100,6 @@ public final class FloorSurfaceColorResolver {
         int sceneIndex = tileY * tileWidth + tileX;
         underlayColors[sceneIndex] = blendedUnderlayColor(underlayIds[sceneIndex], hueSum, saturationSum, luminanceSum, chromaSum, countSum);
       }
-    }
-  }
-
-  private void resolveOverlayLayer(
-      int tileWidth,
-      int tileHeight,
-      int[] overlayIds,
-      int[] overlayColors,
-      int[] overlayTextureIds
-  ) {
-    for (int index = 0; index < tileWidth * tileHeight; index++) {
-      FloorColorDefinition definition = floorColors.definitionFor(overlayIds[index]);
-      overlayTextureIds[index] = normalizedOverlayTextureId(definition);
-      overlayColors[index] = overlayBaseColor(definition, overlayTextureIds[index]);
     }
   }
 
@@ -153,20 +154,57 @@ public final class FloorSurfaceColorResolver {
     return definition.textureId();
   }
 
-  private int overlayBaseColor(FloorColorDefinition definition, int textureId) {
+  private int overlaySurfaceColor(FloorColorDefinition definition) {
     if (definition.rgb() == 0xff00ff) {
       return 0;
-    }
-    if (definition.rgb() == 0 && textureId == WATER_TEXTURE_ID) {
-      return WATER_SURFACE_RGB;
     }
     if (definition.hsl16() != 0) {
       return hslToRgb(checkedLight(definition.hsl16(), 96));
     }
+    // Purely textured floors (water, dirt textures) have hsl16 == 0 in the cache because their
+    // tint is derived from the sprite, not an explicit colour byte. Fall through to the texture
+    // average so the bridge layer / minimap / shaped overlay corner colour can still pick up the
+    // right blue tint for water instead of reading as transparent.
+    int textureId = normalizedOverlayTextureId(definition);
+    if (textureId >= 0) {
+      int textureAverageColor = legacyTextureAverageColor(textureId);
+      if (textureAverageColor != 0) {
+        return textureAverageColor;
+      }
+      if (definition.rgb() == 0 && textureId == WATER_TEXTURE_ID) {
+        return WATER_SURFACE_RGB;
+      }
+    }
+    return 0;
+  }
+
+  private int overlayBaseColor(FloorColorDefinition definition, int textureId) {
+    if (definition.rgb() == 0xff00ff) {
+      return 0;
+    }
+    if (textureId >= 0) {
+      int textureAverageColor = legacyTextureAverageColor(textureId);
+      if (textureAverageColor != 0) {
+        return textureAverageColor;
+      }
+      if (definition.rgb() == 0 && textureId == WATER_TEXTURE_ID) {
+        return WATER_SURFACE_RGB;
+      }
+    }
     if (definition.secondaryHsl16() != -1) {
       return hslToRgb(checkedLight(definition.secondaryHsl16(), 96));
     }
+    if (definition.hsl16() != 0) {
+      return hslToRgb(checkedLight(definition.hsl16(), 96));
+    }
     return 0;
+  }
+
+  private int legacyTextureAverageColor(int textureId) {
+    if (textureId < 0 || textureId >= legacyTextureAverageColors.length) {
+      return 0;
+    }
+    return legacyTextureAverageColors[textureId];
   }
 
   private int activeTileColor(int underlayColor, int overlayColor) {
@@ -264,6 +302,29 @@ public final class FloorSurfaceColorResolver {
     double green = Math.pow(((rgb >> 8) & 0xff) / 256.0D, intensity);
     double blue = Math.pow((rgb & 0xff) / 256.0D, intensity);
     return ((int) (red * 256.0D) << 16) | ((int) (green * 256.0D) << 8) | (int) (blue * 256.0D);
+  }
+
+  public static int legacyTextureAverageColorFromPalette(int[] palette) {
+    if (palette.length == 0) {
+      return 0;
+    }
+    long red = 0;
+    long green = 0;
+    long blue = 0;
+    for (int paletteIndex = 0; paletteIndex < palette.length; paletteIndex++) {
+      int adjustedColor = adjustBrightness(palette[paletteIndex], LEGACY_RASTER_BRIGHTNESS);
+      if ((adjustedColor & 0xf8f8ff) == 0 && paletteIndex != 0) {
+        adjustedColor = 1;
+      }
+      red += (adjustedColor >>> 16) & 0xff;
+      green += (adjustedColor >>> 8) & 0xff;
+      blue += adjustedColor & 0xff;
+    }
+    int averageColor = ((int) (red / palette.length) << 16)
+        | ((int) (green / palette.length) << 8)
+        | (int) (blue / palette.length);
+    int brightenedAverage = adjustBrightness(averageColor, LEGACY_TEXTURE_AVERAGE_BRIGHTNESS);
+    return brightenedAverage == 0 ? 1 : brightenedAverage;
   }
 
   private int clamp(int value, int minimum, int maximum) {

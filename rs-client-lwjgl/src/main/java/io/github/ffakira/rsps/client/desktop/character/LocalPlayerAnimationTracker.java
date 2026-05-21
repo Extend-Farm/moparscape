@@ -73,56 +73,20 @@ public final class LocalPlayerAnimationTracker {
   ) {
     long now = nanoClock.getAsLong();
     if (worldPoint == null) {
-      reset();
-      return ActorAnimationState.idle();
+      return resetAndIdle();
     }
     if (lastWorldPoint == null) {
-      snapDisplayedPosition(worldPoint);
-      lastWorldPoint = worldPoint;
-      lastUpdateNanos = now;
-      return buildAnimationState(0.0f, animationProfile, 0L, actionSequenceId, ActorAnimationState.LocomotionMode.IDLE, 0.0f, 0.0f);
+      return initializeAt(worldPoint, now, animationProfile, actionSequenceId);
     }
     long updateElapsedNanos = lastUpdateNanos == Long.MIN_VALUE ? 0L : Math.max(0L, now - lastUpdateNanos);
     float elapsedSeconds = elapsedSeconds(now);
-    if (hasMoved(lastWorldPoint, worldPoint)) {
-      int deltaX = worldPoint.x() - lastWorldPoint.x();
-      int deltaY = worldPoint.y() - lastWorldPoint.y();
-      if (requiresPositionSnap(lastWorldPoint, worldPoint)) {
-        snapDisplayedPosition(lastWorldPoint);
-      }
-      targetHeadingDegrees = headingDegrees(deltaX, deltaY);
-      travelHeadingDegrees = targetHeadingDegrees;
-      if (lastMovementNanos == Long.MIN_VALUE) {
-        displayedHeadingDegrees = targetHeadingDegrees;
-      }
-      lastStepDistance = Math.min(MAX_STEP_DISTANCE, (float) Math.hypot(deltaX, deltaY));
-      lastMovementNanos = now;
-    }
-    displayedHeadingDegrees = approachAngle(
-        displayedHeadingDegrees,
-        targetHeadingDegrees,
-        HEADING_TURN_DEGREES_PER_SECOND * elapsedSeconds
-    );
-    moveDisplayedPositionToward(worldPoint, elapsedSeconds);
-    lastWorldPoint = worldPoint;
-    lastUpdateNanos = now;
+    updateMovementTarget(worldPoint, now);
+    updateDisplayedPose(worldPoint, elapsedSeconds, now);
     if (lastMovementNanos == Long.MIN_VALUE) {
-      return buildAnimationState(
-          displayedHeadingDegrees,
-          animationProfile,
-          updateElapsedNanos,
-          actionSequenceId,
-          ActorAnimationState.LocomotionMode.IDLE,
-          0.0f,
-          0.0f
-      );
+      return idleAnimationState(animationProfile, updateElapsedNanos, actionSequenceId);
     }
-    float distanceRemaining = (float) Math.hypot(worldPoint.x() - displayedWorldX, worldPoint.y() - displayedWorldY);
-    boolean stillInterpolating = distanceRemaining > POSITION_EPSILON;
-    long movementAgeNanos = now - lastMovementNanos;
-    float normalizedTail = movementAgeNanos >= MOVEMENT_POSE_TAIL_NANOS
-        ? 0.0f
-        : 1.0f - movementAgeNanos / (float) MOVEMENT_POSE_TAIL_NANOS;
+    boolean stillInterpolating = distanceRemaining(worldPoint) > POSITION_EPSILON;
+    float normalizedTail = normalizedMovementTail(now);
     float stepWeight = clamp(lastStepDistance / MAX_STEP_DISTANCE, 0.48f, 1.0f);
     ActorAnimationState.LocomotionMode locomotionMode = resolveLocomotionMode(
         displayedHeadingDegrees,
@@ -130,24 +94,9 @@ public final class LocalPlayerAnimationTracker {
         lastStepDistance,
         stillInterpolating || normalizedTail > 0.0f
     );
-    float targetStrideWeight = (stillInterpolating ? 1.0f : smoothstep(normalizedTail)) * stepWeight;
-    strideWeight = approach(strideWeight, targetStrideWeight, STRIDE_BLEND_PER_SECOND * elapsedSeconds);
-    if (strideWeight <= 0.001f && normalizedTail <= 0.0f) {
-      strideWeight = 0.0f;
-      return buildAnimationState(
-          displayedHeadingDegrees,
-          animationProfile,
-          updateElapsedNanos,
-          actionSequenceId,
-          ActorAnimationState.LocomotionMode.IDLE,
-          0.0f,
-          0.0f
-      );
+    if (!advanceStrideAndCycle(stillInterpolating, normalizedTail, stepWeight, locomotionMode, elapsedSeconds)) {
+      return idleAnimationState(animationProfile, updateElapsedNanos, actionSequenceId);
     }
-    float cadence = locomotionMode == ActorAnimationState.LocomotionMode.RUN_FORWARD
-        ? RUN_CYCLES_PER_SECOND
-        : BASE_WALK_CYCLES_PER_SECOND + EXTRA_WALK_CYCLES_PER_SECOND * stepWeight;
-    walkCycleRadians = wrapRadians(walkCycleRadians + elapsedSeconds * cadence * TAU * Math.max(0.20f, strideWeight));
     return buildAnimationState(
         displayedHeadingDegrees,
         animationProfile,
@@ -175,6 +124,31 @@ public final class LocalPlayerAnimationTracker {
     actionTimeline.reset();
   }
 
+  private ActorAnimationState resetAndIdle() {
+    reset();
+    return ActorAnimationState.idle();
+  }
+
+  private ActorAnimationState initializeAt(
+      WorldPoint worldPoint,
+      long now,
+      BootstrapAnimationProfile animationProfile,
+      int actionSequenceId
+  ) {
+    snapDisplayedPosition(worldPoint);
+    lastWorldPoint = worldPoint;
+    lastUpdateNanos = now;
+    return buildAnimationState(
+        0.0f,
+        animationProfile,
+        0L,
+        actionSequenceId,
+        ActorAnimationState.LocomotionMode.IDLE,
+        0.0f,
+        0.0f
+    );
+  }
+
   private boolean hasMoved(WorldPoint previousWorldPoint, WorldPoint currentWorldPoint) {
     return previousWorldPoint.x() != currentWorldPoint.x()
         || previousWorldPoint.y() != currentWorldPoint.y()
@@ -186,6 +160,35 @@ public final class LocalPlayerAnimationTracker {
       return true;
     }
     return Math.hypot(currentWorldPoint.x() - previousWorldPoint.x(), currentWorldPoint.y() - previousWorldPoint.y()) > MAX_RENDER_LAG;
+  }
+
+  private void updateMovementTarget(WorldPoint worldPoint, long now) {
+    if (!hasMoved(lastWorldPoint, worldPoint)) {
+      return;
+    }
+    int deltaX = worldPoint.x() - lastWorldPoint.x();
+    int deltaY = worldPoint.y() - lastWorldPoint.y();
+    if (requiresPositionSnap(lastWorldPoint, worldPoint)) {
+      snapDisplayedPosition(lastWorldPoint);
+    }
+    targetHeadingDegrees = headingDegrees(deltaX, deltaY);
+    travelHeadingDegrees = targetHeadingDegrees;
+    if (lastMovementNanos == Long.MIN_VALUE) {
+      displayedHeadingDegrees = targetHeadingDegrees;
+    }
+    lastStepDistance = Math.min(MAX_STEP_DISTANCE, (float) Math.hypot(deltaX, deltaY));
+    lastMovementNanos = now;
+  }
+
+  private void updateDisplayedPose(WorldPoint worldPoint, float elapsedSeconds, long now) {
+    displayedHeadingDegrees = approachAngle(
+        displayedHeadingDegrees,
+        targetHeadingDegrees,
+        HEADING_TURN_DEGREES_PER_SECOND * elapsedSeconds
+    );
+    moveDisplayedPositionToward(worldPoint, elapsedSeconds);
+    lastWorldPoint = worldPoint;
+    lastUpdateNanos = now;
   }
 
   private void moveDisplayedPositionToward(WorldPoint worldPoint, float elapsedSeconds) {
@@ -217,6 +220,51 @@ public final class LocalPlayerAnimationTracker {
   private void snapDisplayedPosition(WorldPoint worldPoint) {
     displayedWorldX = worldPoint.x();
     displayedWorldY = worldPoint.y();
+  }
+
+  private boolean advanceStrideAndCycle(
+      boolean stillInterpolating,
+      float normalizedTail,
+      float stepWeight,
+      ActorAnimationState.LocomotionMode locomotionMode,
+      float elapsedSeconds
+  ) {
+    float targetStrideWeight = (stillInterpolating ? 1.0f : smoothstep(normalizedTail)) * stepWeight;
+    strideWeight = approach(strideWeight, targetStrideWeight, STRIDE_BLEND_PER_SECOND * elapsedSeconds);
+    if (strideWeight <= 0.001f && normalizedTail <= 0.0f) {
+      strideWeight = 0.0f;
+      return false;
+    }
+    float cadence = locomotionCadence(locomotionMode, stepWeight);
+    walkCycleRadians = wrapRadians(walkCycleRadians + elapsedSeconds * cadence * TAU * Math.max(0.20f, strideWeight));
+    return true;
+  }
+
+  private ActorAnimationState idleAnimationState(
+      BootstrapAnimationProfile animationProfile,
+      long elapsedNanos,
+      int actionSequenceId
+  ) {
+    return buildAnimationState(
+        displayedHeadingDegrees,
+        animationProfile,
+        elapsedNanos,
+        actionSequenceId,
+        ActorAnimationState.LocomotionMode.IDLE,
+        0.0f,
+        0.0f
+    );
+  }
+
+  private float distanceRemaining(WorldPoint worldPoint) {
+    return (float) Math.hypot(worldPoint.x() - displayedWorldX, worldPoint.y() - displayedWorldY);
+  }
+
+  private float normalizedMovementTail(long now) {
+    long movementAgeNanos = now - lastMovementNanos;
+    return movementAgeNanos >= MOVEMENT_POSE_TAIL_NANOS
+        ? 0.0f
+        : 1.0f - movementAgeNanos / (float) MOVEMENT_POSE_TAIL_NANOS;
   }
 
   private float smoothstep(float value) {
@@ -251,6 +299,12 @@ public final class LocalPlayerAnimationTracker {
 
   private float headingDegrees(int deltaX, int deltaY) {
     return (float) Math.toDegrees(Math.atan2(deltaX, deltaY));
+  }
+
+  private float locomotionCadence(ActorAnimationState.LocomotionMode locomotionMode, float stepWeight) {
+    return locomotionMode == ActorAnimationState.LocomotionMode.RUN_FORWARD
+        ? RUN_CYCLES_PER_SECOND
+        : BASE_WALK_CYCLES_PER_SECOND + EXTRA_WALK_CYCLES_PER_SECOND * stepWeight;
   }
 
   private ActorAnimationState.LocomotionMode resolveLocomotionMode(
@@ -317,9 +371,9 @@ public final class LocalPlayerAnimationTracker {
     int movementSequenceId = locomotionMode == ActorAnimationState.LocomotionMode.IDLE
         ? standSequenceId(animationProfile)
         : resolveActiveSequenceId(animationProfile, locomotionMode);
-    int movementFrameId = sequenceFrameId(movementTimeline, movementSequenceId, elapsedNanos, SequencePlaybackMode.MOVEMENT);
-    int resolvedActionFrameId = sequenceFrameId(actionTimeline, actionSequenceId, elapsedNanos, SequencePlaybackMode.ACTION);
-    int resolvedActionSequenceId = resolvedActionFrameId >= 0 ? actionSequenceId : -1;
+    int movementFrameId = movementFrameId(movementSequenceId, elapsedNanos);
+    int actionFrameId = sequenceFrameId(actionTimeline, actionSequenceId, elapsedNanos, SequencePlaybackMode.ACTION);
+    int activeActionSequenceId = actionFrameId >= 0 ? actionSequenceId : -1;
     return new ActorAnimationState(
         strideWeight,
         locomotionMode == ActorAnimationState.LocomotionMode.IDLE ? 0.0f : walkCycleRadians,
@@ -328,11 +382,15 @@ public final class LocalPlayerAnimationTracker {
         locomotionMode,
         movementSequenceId,
         movementFrameId,
-        resolvedActionSequenceId,
-        resolvedActionFrameId,
+        activeActionSequenceId,
+        actionFrameId,
         positionOffsetX,
         positionOffsetY
     );
+  }
+
+  private int movementFrameId(int movementSequenceId, long elapsedNanos) {
+    return sequenceFrameId(movementTimeline, movementSequenceId, elapsedNanos, SequencePlaybackMode.MOVEMENT);
   }
 
   private int sequenceFrameId(

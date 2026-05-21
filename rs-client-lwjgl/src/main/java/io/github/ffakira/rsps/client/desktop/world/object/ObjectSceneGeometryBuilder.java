@@ -42,12 +42,14 @@ final class ObjectSceneGeometryBuilder {
     ArrayList<Integer> textureVertexA = new ArrayList<>();
     ArrayList<Integer> textureVertexB = new ArrayList<>();
     ArrayList<Integer> textureVertexC = new ArrayList<>();
+    ArrayList<Integer> facePriorities = new ArrayList<>();
     int vertexOffset = 0;
     for (Integer modelId : modelIds) {
       RawModelData rawModelData = rawModelRepository.loadModel(modelId);
+      boolean mirroredGeometry = usesMirroredGeometry(definition, orientation);
       float[][] transformedVertices = transformVertices(rawModelData, definition, orientation);
-      float[][] vertexNormals = computeVertexNormals(rawModelData, transformedVertices);
-      float[][] faceNormals = computeFaceNormals(rawModelData, transformedVertices);
+      float[][] vertexNormals = computeVertexNormals(rawModelData, transformedVertices, mirroredGeometry);
+      float[][] faceNormals = computeFaceNormals(rawModelData, transformedVertices, mirroredGeometry);
       for (int vertexIndex = 0; vertexIndex < rawModelData.vertexCount(); vertexIndex++) {
         vertices.add(new float[]{
             transformedVertices[0][vertexIndex],
@@ -55,6 +57,7 @@ final class ObjectSceneGeometryBuilder {
             transformedVertices[2][vertexIndex]
         });
       }
+      boolean hideAnimatedSprayInterior = isAnimatedSprayObject(definition);
       for (int faceIndex = 0; faceIndex < rawModelData.faceCount(); faceIndex++) {
         int rawFaceType = rawModelData.faceRenderTypes()[faceIndex];
         int faceMode = rawFaceType & 3;
@@ -65,35 +68,45 @@ final class ObjectSceneGeometryBuilder {
           default -> SceneRasterMode.FLAT;
         };
         int sourceColorHsl = rawModelData.faceColorHsl()[faceIndex];
+        if (hideAnimatedSprayInterior && isLikelySprayInteriorFace(faceMode, sourceColorHsl)) {
+          // Legacy fountains have an animated water sprite that covers the dark inner spout
+          // geometry. Without that animation, the bare dark mesh shows as a jagged near-black
+          // shape on top of the bowl. Skip those faces entirely until full per-object animation
+          // playback lands; the bowl stays visible and the broken-looking spikes go away.
+          continue;
+        }
+        int faceVertexA = faceVertexA(rawModelData, faceIndex, mirroredGeometry);
+        int faceVertexB = faceVertexB(rawModelData, faceIndex);
+        int faceVertexC = faceVertexC(rawModelData, faceIndex, mirroredGeometry);
         faces.add(new int[]{
-            rawModelData.faceVertexA()[faceIndex] + vertexOffset,
-            rawModelData.faceVertexB()[faceIndex] + vertexOffset,
-            rawModelData.faceVertexC()[faceIndex] + vertexOffset
+            faceVertexA + vertexOffset,
+            faceVertexB + vertexOffset,
+            faceVertexC + vertexOffset
         });
         if (faceMode == 0 || faceMode == 2) {
           faceColorA.add(colorForFaceVertex(
               faceMode,
               sourceColorHsl,
               definition,
-              vertexNormals[0][rawModelData.faceVertexA()[faceIndex]],
-              vertexNormals[1][rawModelData.faceVertexA()[faceIndex]],
-              vertexNormals[2][rawModelData.faceVertexA()[faceIndex]]
+              vertexNormals[0][faceVertexA],
+              vertexNormals[1][faceVertexA],
+              vertexNormals[2][faceVertexA]
           ));
           faceColorB.add(colorForFaceVertex(
               faceMode,
               sourceColorHsl,
               definition,
-              vertexNormals[0][rawModelData.faceVertexB()[faceIndex]],
-              vertexNormals[1][rawModelData.faceVertexB()[faceIndex]],
-              vertexNormals[2][rawModelData.faceVertexB()[faceIndex]]
+              vertexNormals[0][faceVertexB],
+              vertexNormals[1][faceVertexB],
+              vertexNormals[2][faceVertexB]
           ));
           faceColorC.add(colorForFaceVertex(
               faceMode,
               sourceColorHsl,
               definition,
-              vertexNormals[0][rawModelData.faceVertexC()[faceIndex]],
-              vertexNormals[1][rawModelData.faceVertexC()[faceIndex]],
-              vertexNormals[2][rawModelData.faceVertexC()[faceIndex]]
+              vertexNormals[0][faceVertexC],
+              vertexNormals[1][faceVertexC],
+              vertexNormals[2][faceVertexC]
           ));
         } else {
           int shadedFaceColor = colorForFaceVertex(
@@ -128,6 +141,7 @@ final class ObjectSceneGeometryBuilder {
           textureVertexB.add(-1);
           textureVertexC.add(-1);
         }
+        facePriorities.add(faceIndex < rawModelData.facePriorities().length ? rawModelData.facePriorities()[faceIndex] : 0);
       }
       vertexOffset += rawModelData.vertexCount();
     }
@@ -143,7 +157,8 @@ final class ObjectSceneGeometryBuilder {
         faceTextureIds,
         textureVertexA,
         textureVertexB,
-        textureVertexC
+        textureVertexC,
+        facePriorities
     );
   }
 
@@ -168,7 +183,8 @@ final class ObjectSceneGeometryBuilder {
       List<Integer> faceTextureIds,
       List<Integer> textureVertexA,
       List<Integer> textureVertexB,
-      List<Integer> textureVertexC
+      List<Integer> textureVertexC,
+      List<Integer> facePriorities
   ) {
     if (vertices.isEmpty() || faces.isEmpty()) {
       return null;
@@ -194,6 +210,7 @@ final class ObjectSceneGeometryBuilder {
     int[] meshTextureVertexA = new int[faces.size()];
     int[] meshTextureVertexB = new int[faces.size()];
     int[] meshTextureVertexC = new int[faces.size()];
+    int[] meshFacePriorities = new int[faces.size()];
     for (int index = 0; index < faces.size(); index++) {
       int[] face = faces.get(index);
       faceVertexA[index] = face[0];
@@ -208,6 +225,7 @@ final class ObjectSceneGeometryBuilder {
       meshTextureVertexA[index] = textureVertexA.get(index);
       meshTextureVertexB[index] = textureVertexB.get(index);
       meshTextureVertexC[index] = textureVertexC.get(index);
+      meshFacePriorities[index] = facePriorities.get(index);
     }
     return new WorldSceneObjectGeometry(
         vertexX,
@@ -224,7 +242,8 @@ final class ObjectSceneGeometryBuilder {
         meshFaceTextureIds,
         meshTextureVertexA,
         meshTextureVertexB,
-        meshTextureVertexC
+        meshTextureVertexC,
+        meshFacePriorities
     );
   }
 
@@ -243,28 +262,46 @@ final class ObjectSceneGeometryBuilder {
     float translateX = definition.translateX() / 128.0f;
     float translateY = definition.translateY() / 128.0f;
     float translateZ = definition.translateZ() / 128.0f;
+    boolean mirroredGeometry = usesMirroredGeometry(definition, orientation);
+    int quarterTurns = orientation & 3;
 
     for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
-      float x = rawModelData.vertexX()[vertexIndex] / 128.0f * scaleX + translateX;
+      float x = rawModelData.vertexX()[vertexIndex] / 128.0f * scaleX;
       // Cache model Y grows downward. Static objects must use the same world-up convention as the
       // actor assembler or tall props like fountains and pillars appear vertically flipped.
-      float y = -(rawModelData.vertexY()[vertexIndex] / 128.0f * scaleY + translateY);
-      float z = rawModelData.vertexZ()[vertexIndex] / 128.0f * scaleZ + translateZ;
-      if (definition.mirrored()) {
-        x = -x;
+      float y = -(rawModelData.vertexY()[vertexIndex] / 128.0f * scaleY);
+      float z = rawModelData.vertexZ()[vertexIndex] / 128.0f * scaleZ;
+      if (mirroredGeometry) {
+        z = -z;
       }
       float rotatedX = x;
       float rotatedZ = z;
-      for (int rotation = 0; rotation < (orientation & 3); rotation++) {
+      for (int rotation = 0; rotation < quarterTurns; rotation++) {
         float swap = rotatedX;
         rotatedX = rotatedZ;
         rotatedZ = -swap;
       }
-      worldX[vertexIndex] = rotatedX;
-      worldY[vertexIndex] = y;
-      worldZ[vertexIndex] = rotatedZ;
+      worldX[vertexIndex] = rotatedX + translateX;
+      worldY[vertexIndex] = y - translateY;
+      worldZ[vertexIndex] = rotatedZ + translateZ;
     }
     return new float[][]{worldX, worldY, worldZ};
+  }
+
+  static int faceVertexA(RawModelData rawModelData, int faceIndex, boolean mirroredGeometry) {
+    return mirroredGeometry ? rawModelData.faceVertexC()[faceIndex] : rawModelData.faceVertexA()[faceIndex];
+  }
+
+  static int faceVertexB(RawModelData rawModelData, int faceIndex) {
+    return rawModelData.faceVertexB()[faceIndex];
+  }
+
+  static int faceVertexC(RawModelData rawModelData, int faceIndex, boolean mirroredGeometry) {
+    return mirroredGeometry ? rawModelData.faceVertexA()[faceIndex] : rawModelData.faceVertexC()[faceIndex];
+  }
+
+  private static boolean usesMirroredGeometry(ObjectDefinition definition, int orientation) {
+    return definition.mirrored() ^ (orientation > 3);
   }
 
   private int recolor(int colorHsl, ObjectDefinition definition) {
@@ -276,14 +313,18 @@ final class ObjectSceneGeometryBuilder {
     return colorHsl;
   }
 
-  private float[][] computeFaceNormals(RawModelData rawModelData, float[][] transformedVertices) {
+  private float[][] computeFaceNormals(
+      RawModelData rawModelData,
+      float[][] transformedVertices,
+      boolean mirroredGeometry
+  ) {
     float[] normalX = new float[rawModelData.faceCount()];
     float[] normalY = new float[rawModelData.faceCount()];
     float[] normalZ = new float[rawModelData.faceCount()];
     for (int faceIndex = 0; faceIndex < rawModelData.faceCount(); faceIndex++) {
-      int vertexA = rawModelData.faceVertexA()[faceIndex];
-      int vertexB = rawModelData.faceVertexB()[faceIndex];
-      int vertexC = rawModelData.faceVertexC()[faceIndex];
+      int vertexA = faceVertexA(rawModelData, faceIndex, mirroredGeometry);
+      int vertexB = faceVertexB(rawModelData, faceIndex);
+      int vertexC = faceVertexC(rawModelData, faceIndex, mirroredGeometry);
       float edgeOneX = transformedVertices[0][vertexB] - transformedVertices[0][vertexA];
       float edgeOneY = transformedVertices[1][vertexB] - transformedVertices[1][vertexA];
       float edgeOneZ = transformedVertices[2][vertexB] - transformedVertices[2][vertexA];
@@ -304,8 +345,12 @@ final class ObjectSceneGeometryBuilder {
     return new float[][]{normalX, normalY, normalZ};
   }
 
-  private float[][] computeVertexNormals(RawModelData rawModelData, float[][] transformedVertices) {
-    float[][] faceNormals = computeFaceNormals(rawModelData, transformedVertices);
+  private float[][] computeVertexNormals(
+      RawModelData rawModelData,
+      float[][] transformedVertices,
+      boolean mirroredGeometry
+  ) {
+    float[][] faceNormals = computeFaceNormals(rawModelData, transformedVertices, mirroredGeometry);
     float[] vertexNormalX = new float[rawModelData.vertexCount()];
     float[] vertexNormalY = new float[rawModelData.vertexCount()];
     float[] vertexNormalZ = new float[rawModelData.vertexCount()];
@@ -314,9 +359,9 @@ final class ObjectSceneGeometryBuilder {
       if ((rawModelData.faceRenderTypes()[faceIndex] & 1) != 0) {
         continue;
       }
-      int vertexA = rawModelData.faceVertexA()[faceIndex];
-      int vertexB = rawModelData.faceVertexB()[faceIndex];
-      int vertexC = rawModelData.faceVertexC()[faceIndex];
+      int vertexA = faceVertexA(rawModelData, faceIndex, mirroredGeometry);
+      int vertexB = faceVertexB(rawModelData, faceIndex);
+      int vertexC = faceVertexC(rawModelData, faceIndex, mirroredGeometry);
       float normalX = faceNormals[0][faceIndex];
       float normalY = faceNormals[1][faceIndex];
       float normalZ = faceNormals[2][faceIndex];
@@ -401,6 +446,39 @@ final class ObjectSceneGeometryBuilder {
         || lowercaseName.contains("bush")
         || lowercaseName.contains("hedge")
         || lowercaseName.contains("evergreen");
+  }
+
+  /**
+   * Objects whose mesh includes a separate "spray" or particle sprite that the legacy client
+   * animates over the top of a static dark-coloured spout geometry. Without the animation, the
+   * spout shows as jagged near-black spikes (the bowl looks fine because it uses lighter HSL).
+   * The diagnostic on the Lumbridge fountain id=879 confirmed 80 faces with HSL luminance 17 — the
+   * dark interior of the water spout. Hide those for any fountain/well-shaped prop until the
+   * animation pipeline is implemented.
+   */
+  private boolean isAnimatedSprayObject(ObjectDefinition definition) {
+    if (definition.name() == null) {
+      return false;
+    }
+    String lowercaseName = definition.name().toLowerCase();
+    return lowercaseName.contains("fountain")
+        || lowercaseName.contains("well");
+  }
+
+  /**
+   * Untextured face whose HSL16 luminance byte (low 7 bits) is below this threshold reads as
+   * near-black after the standard shading pipeline. Inside spray-animation objects those faces
+   * are the "shadow" geometry that should be hidden behind the animated overlay.
+   */
+  private static final int SPRAY_INTERIOR_HSL_LUMINANCE_THRESHOLD = 30;
+
+  private boolean isLikelySprayInteriorFace(int faceMode, int sourceColorHsl) {
+    if (faceMode >= 2) {
+      // Textured faces are part of the visible bowl/stone surface — keep them.
+      return false;
+    }
+    int luminance = sourceColorHsl & 0x7f;
+    return luminance < SPRAY_INTERIOR_HSL_LUMINANCE_THRESHOLD;
   }
 
   private int hslToRgb(int colorHsl) {

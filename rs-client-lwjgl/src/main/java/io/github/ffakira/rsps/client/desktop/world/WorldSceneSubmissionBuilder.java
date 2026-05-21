@@ -6,10 +6,6 @@ import io.github.ffakira.rsps.client.desktop.world.raster.SceneRasterMode;
 import io.github.ffakira.rsps.client.desktop.world.raster.SceneRenderQueueBuilder;
 import io.github.ffakira.rsps.client.desktop.world.raster.SceneSubmissionKind;
 import io.github.ffakira.rsps.client.desktop.world.raster.SceneTriangleMesh;
-import io.github.ffakira.rsps.client.desktop.world.raster.SceneTriangleMeshBuilder;
-import io.github.ffakira.rsps.client.desktop.world.object.WorldSceneObject;
-import io.github.ffakira.rsps.client.desktop.world.object.WorldSceneObjectGeometry;
-import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainLayerSource;
 import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainSceneMeshBuilder;
 import io.github.ffakira.rsps.client.desktop.world.visibility.WorldSceneOcclusionContext;
 import io.github.ffakira.rsps.client.desktop.world.visibility.WorldSceneOcclusionPlanner;
@@ -23,21 +19,21 @@ import java.util.List;
 
 public final class WorldSceneSubmissionBuilder {
 
-  private final CharacterModelAssembler characterModelAssembler;
   private final TerrainSceneMeshBuilder terrainSceneMeshBuilder;
   private final WorldSceneCameraPlanner worldSceneCameraPlanner;
+  private final WorldSceneObjectBatchBuilder objectBatchBuilder;
+  private final WorldSceneActorBatchBuilder actorBatchBuilder;
 
   public WorldSceneSubmissionBuilder(CharacterModelAssembler characterModelAssembler) {
-    this.characterModelAssembler = characterModelAssembler;
     this.terrainSceneMeshBuilder = new TerrainSceneMeshBuilder();
     this.worldSceneCameraPlanner = new WorldSceneCameraPlanner();
+    this.objectBatchBuilder = new WorldSceneObjectBatchBuilder();
+    this.actorBatchBuilder = new WorldSceneActorBatchBuilder(characterModelAssembler);
   }
 
   // This is the first native scene-submission boundary for the rewrite. It does not attempt full
-  // legacy raster parity yet, but it does turn terrain, static objects, and the local player into
-  // one coherent queued submission payload instead of rendering them through disconnected helper
-  // passes. The queue keeps primitive ownership explicit so the raster layer can grow without
-  // pushing tile/object/actor loops back into the viewport renderer.
+  // parity yet, but it does turn terrain, static objects, and the local player into one coherent
+  // queued submission payload instead of rendering them through disconnected helper passes.
   public WorldSceneRenderSubmission build(
       WorldScene worldScene,
       WorldPoint worldPoint,
@@ -73,12 +69,12 @@ public final class WorldSceneSubmissionBuilder {
   ) {
     int playerLocalX = worldPoint.x() - worldScene.originWorldX();
     int playerLocalY = worldPoint.y() - worldScene.originWorldY();
-    float actorLocalX = renderedLocalAxis(
+    float actorLocalX = WorldSceneActorBatchBuilder.renderedLocalAxis(
         playerLocalX,
         actorAnimationState == null ? 0.0f : actorAnimationState.positionOffsetX(),
         worldScene.tileWidth()
     );
-    float actorLocalY = renderedLocalAxis(
+    float actorLocalY = WorldSceneActorBatchBuilder.renderedLocalAxis(
         playerLocalY,
         actorAnimationState == null ? 0.0f : actorAnimationState.positionOffsetY(),
         worldScene.tileHeight()
@@ -109,15 +105,36 @@ public final class WorldSceneSubmissionBuilder {
         visibilityWindow,
         cameraState
     );
-    // The native client still lacks legacy SceneGraph visibility traversal, so submission owns the
-    // first coarse camera-centered culling boundary instead of pushing whole-region meshes into
-    // the raster layer.
     SceneRenderQueueBuilder renderQueueBuilder = new SceneRenderQueueBuilder();
-    // Terrain now stays on the full stitched scene window for correctness. The earlier
-    // camera-centered terrain cull was creating obvious black voids because the native client
-    // still lacks the legacy scene graph's visible-tile traversal. Objects and actors remain on
-    // the narrower submission window so the rewrite does not regress straight back to uncapped
-    // full-scene submission everywhere.
+    addTerrainBatches(renderQueueBuilder, worldScene);
+    objectBatchBuilder.addBatches(renderQueueBuilder, worldScene, visibilityWindow, occlusionContext);
+    actorBatchBuilder.addBatches(
+        renderQueueBuilder,
+        worldScene,
+        visibilityWindow,
+        occlusionContext,
+        cameraState,
+        actorLocalX,
+        actorLocalY,
+        appearance,
+        equipment,
+        actorAnimationState
+    );
+    return new WorldSceneRenderSubmission(renderPlane, cameraState, renderQueueBuilder.build());
+  }
+
+  static float actorYawDegrees(ActorAnimationState actorAnimationState) {
+    return WorldSceneActorBatchBuilder.actorYawDegrees(actorAnimationState);
+  }
+
+  static SceneTriangleMesh sortActorMeshForSubmission(SceneTriangleMesh mesh, WorldCameraState cameraState) {
+    return WorldSceneActorBatchBuilder.sortActorMeshForSubmission(mesh, cameraState);
+  }
+
+  private void addTerrainBatches(SceneRenderQueueBuilder renderQueueBuilder, WorldScene worldScene) {
+    // Terrain stays on the full stitched scene window for correctness. The client still lacks the
+    // scene graph's visible-tile traversal, so a narrower terrain cull would reopen black voids
+    // at the viewport edge while objects and actors remain bounded by the visibility window.
     renderQueueBuilder.add(
         SceneSubmissionKind.TILE_PAINT,
         SceneRasterMode.GOURAUD,
@@ -138,562 +155,9 @@ public final class WorldSceneSubmissionBuilder {
         SceneRasterMode.TEXTURED,
         terrainSceneMeshBuilder.buildTexturedTileModelMesh(worldScene)
     );
-    addObjectBatches(renderQueueBuilder, worldScene, visibilityWindow, occlusionContext);
-    addActorBatches(
-        renderQueueBuilder,
-        worldScene,
-        visibilityWindow,
-        occlusionContext,
-        actorLocalX,
-        actorLocalY,
-        appearance,
-        equipment,
-        actorAnimationState
-    );
-    return new WorldSceneRenderSubmission(renderPlane, cameraState, renderQueueBuilder.build());
-  }
-
-  private void addObjectBatches(
-      SceneRenderQueueBuilder renderQueueBuilder,
-      WorldScene worldScene,
-      WorldSceneVisibilityWindow visibilityWindow,
-      WorldSceneOcclusionContext occlusionContext
-  ) {
-    SceneTriangleMeshBuilder flatBuilder = new SceneTriangleMeshBuilder();
-    SceneTriangleMeshBuilder gouraudBuilder = new SceneTriangleMeshBuilder();
-    SceneTriangleMeshBuilder texturedBuilder = new SceneTriangleMeshBuilder();
-    for (WorldSceneObject worldSceneObject : worldScene.objects()) {
-      float maxX = worldSceneObject.localX() + Math.max(1, worldSceneObject.sizeX());
-      float maxY = worldSceneObject.localY() + Math.max(1, worldSceneObject.sizeY());
-      if (!visibilityWindow.intersectsArea(worldSceneObject.localX(), worldSceneObject.localY(), maxX, maxY)) {
-        continue;
-      }
-      float baseHeight = sampleObjectBaseHeight(worldScene, worldSceneObject, maxX, maxY);
-      if (WorldSceneOcclusionPlanner.isOccluded(
-          occlusionContext,
-          (worldSceneObject.localX() + maxX) * 0.5f,
-          occlusionTargetHeight(worldSceneObject, baseHeight),
-          (worldSceneObject.localY() + maxY) * 0.5f
-      )) {
-        continue;
-      }
-      if (worldSceneObject.geometry() != null) {
-        WorldSceneObjectGeometry geometry = terrainContouredGeometry(worldScene, worldSceneObject, baseHeight);
-        float objectCenterX = worldSceneObject.centerX();
-        float objectCenterZ = worldSceneObject.centerY();
-        flatBuilder.addGeometry(geometry, objectCenterX, baseHeight, objectCenterZ, SceneRasterMode.FLAT);
-        gouraudBuilder.addGeometry(geometry, objectCenterX, baseHeight, objectCenterZ, SceneRasterMode.GOURAUD);
-        texturedBuilder.addGeometry(geometry, objectCenterX, baseHeight, objectCenterZ, SceneRasterMode.TEXTURED);
-        continue;
-      }
-      if (worldSceneObject.allowFallbackProxy()) {
-        appendFallbackObject(flatBuilder, worldScene, worldSceneObject);
-      }
-    }
-    renderQueueBuilder.add(SceneSubmissionKind.STATIC_OBJECT, SceneRasterMode.FLAT, flatBuilder.build());
-    renderQueueBuilder.add(SceneSubmissionKind.STATIC_OBJECT, SceneRasterMode.GOURAUD, gouraudBuilder.build());
-    renderQueueBuilder.add(SceneSubmissionKind.STATIC_OBJECT, SceneRasterMode.TEXTURED, texturedBuilder.build());
-  }
-
-  private void addActorBatches(
-      SceneRenderQueueBuilder renderQueueBuilder,
-      WorldScene worldScene,
-      WorldSceneVisibilityWindow visibilityWindow,
-      WorldSceneOcclusionContext occlusionContext,
-      float actorLocalX,
-      float actorLocalY,
-      BootstrapAppearance appearance,
-      List<BootstrapItemSlot> equipment,
-      ActorAnimationState actorAnimationState
-  ) {
-    if (actorLocalX < 0.0f || actorLocalY < 0.0f || actorLocalX >= worldScene.tileWidth() || actorLocalY >= worldScene.tileHeight()) {
-      return;
-    }
-    int actorTileX = clampTile((int) Math.floor(actorLocalX), worldScene.tileWidth());
-    int actorTileY = clampTile((int) Math.floor(actorLocalY), worldScene.tileHeight());
-    if (!visibilityWindow.containsTile(actorTileX, actorTileY)) {
-      return;
-    }
-    float baseHeight = sampleTerrainHeight(worldScene, actorLocalX, actorLocalY);
-    if (WorldSceneOcclusionPlanner.isOccluded(
-        occlusionContext,
-        actorLocalX,
-        baseHeight + 1.1f,
-        actorLocalY
-    )) {
-      return;
-    }
-    if (characterModelAssembler != null) {
-      WorldSceneObjectGeometry geometry = characterModelAssembler.assemble(appearance, equipment, actorAnimationState);
-      if (geometry != null) {
-        float actorX = actorLocalX;
-        float actorZ = actorLocalY;
-        float actorYawDegrees = actorYawDegrees(actorAnimationState);
-        SceneTriangleMeshBuilder flatBuilder = new SceneTriangleMeshBuilder();
-        SceneTriangleMeshBuilder gouraudBuilder = new SceneTriangleMeshBuilder();
-        SceneTriangleMeshBuilder texturedBuilder = new SceneTriangleMeshBuilder();
-        flatBuilder.addGeometry(geometry, actorX, baseHeight, actorZ, actorYawDegrees, SceneRasterMode.FLAT);
-        gouraudBuilder.addGeometry(geometry, actorX, baseHeight, actorZ, actorYawDegrees, SceneRasterMode.GOURAUD);
-        texturedBuilder.addGeometry(geometry, actorX, baseHeight, actorZ, actorYawDegrees, SceneRasterMode.TEXTURED);
-        renderQueueBuilder.add(SceneSubmissionKind.ACTOR, SceneRasterMode.FLAT, flatBuilder.build());
-        renderQueueBuilder.add(SceneSubmissionKind.ACTOR, SceneRasterMode.GOURAUD, gouraudBuilder.build());
-        renderQueueBuilder.add(SceneSubmissionKind.ACTOR, SceneRasterMode.TEXTURED, texturedBuilder.build());
-        return;
-      }
-    }
-    renderQueueBuilder.add(
-        SceneSubmissionKind.ACTOR,
-        SceneRasterMode.FLAT,
-        buildFallbackActorMesh(actorLocalX, actorLocalY, baseHeight, appearance, equipment)
-    );
-  }
-
-  private void appendFallbackObject(SceneTriangleMeshBuilder builder, WorldScene worldScene, WorldSceneObject worldSceneObject) {
-    float minX = worldSceneObject.localX();
-    float minZ = worldSceneObject.localY();
-    float maxX = minX + Math.max(0.25f, worldSceneObject.sizeX());
-    float maxZ = minZ + Math.max(0.25f, worldSceneObject.sizeY());
-    float baseHeight = sampleObjectBaseHeight(worldScene, worldSceneObject, maxX, maxZ);
-    float objectHeight = fallbackObjectHeight(worldSceneObject);
-    float topHeight = baseHeight + objectHeight;
-    int objectColor = fallbackObjectColor(worldSceneObject);
-    if (isStraightWallType(worldSceneObject.type())) {
-      appendEdgeWallFallback(
-          builder,
-          minX,
-          maxX,
-          minZ,
-          maxZ,
-          baseHeight,
-          topHeight,
-          worldSceneObject.orientation(),
-          fallbackWallThickness(worldSceneObject),
-          objectColor
-      );
-      return;
-    }
-    if (worldSceneObject.type() == 2) {
-      float wallThickness = fallbackWallThickness(worldSceneObject);
-      appendEdgeWallFallback(
-          builder,
-          minX,
-          maxX,
-          minZ,
-          maxZ,
-          baseHeight,
-          topHeight,
-          worldSceneObject.orientation(),
-          wallThickness,
-          objectColor
-      );
-      appendEdgeWallFallback(
-          builder,
-          minX,
-          maxX,
-          minZ,
-          maxZ,
-          baseHeight,
-          topHeight,
-          worldSceneObject.orientation() + 1,
-          wallThickness,
-          objectColor
-      );
-      return;
-    }
-    if (isCornerWallType(worldSceneObject.type())) {
-      appendCornerPostFallback(
-          builder,
-          minX,
-          maxX,
-          minZ,
-          maxZ,
-          baseHeight,
-          topHeight,
-          worldSceneObject.orientation(),
-          fallbackWallThickness(worldSceneObject),
-          objectColor
-      );
-      return;
-    }
-    if (isLargeStructureType(worldSceneObject.type())
-        && (worldSceneObject.sizeX() > 1 || worldSceneObject.sizeY() > 1)) {
-      appendPerimeterFallback(builder, minX, maxX, minZ, maxZ, baseHeight, topHeight, objectColor);
-      return;
-    }
-    appendCuboid(builder, minX, maxX, minZ, maxZ, baseHeight, topHeight, objectColor);
-  }
-
-  private SceneTriangleMesh buildFallbackActorMesh(
-      float playerLocalX,
-      float playerLocalY,
-      float baseHeight,
-      BootstrapAppearance appearance,
-      List<BootstrapItemSlot> equipment
-  ) {
-    int appearanceSeed = 0;
-    if (appearance != null) {
-      for (Integer lookValue : appearance.lookValues()) {
-        appearanceSeed = appearanceSeed * 31 + (lookValue == null ? -1 : lookValue);
-      }
-    }
-    int equipmentSeed = 0;
-    for (BootstrapItemSlot equipmentSlot : equipment) {
-      equipmentSeed = equipmentSeed * 17 + equipmentSlot.itemId();
-    }
-
-    int bodyRgb = hashedColor(appearanceSeed, 0x6b6f7c, 0xc2c6d2);
-    int accentRgb = hashedColor(equipmentSeed == 0 ? appearanceSeed + 7 : equipmentSeed, 0x8b7342, 0xe2d39c);
-    float centerX = playerLocalX;
-    float centerZ = playerLocalY;
-
-    SceneTriangleMeshBuilder builder = new SceneTriangleMeshBuilder();
-    appendCuboid(builder, centerX - 0.16f, centerX - 0.05f, centerZ - 0.05f, centerZ + 0.06f, baseHeight, baseHeight + 0.82f, bodyRgb);
-    appendCuboid(builder, centerX + 0.05f, centerX + 0.16f, centerZ - 0.05f, centerZ + 0.06f, baseHeight, baseHeight + 0.82f, bodyRgb);
-    appendCuboid(builder, centerX - 0.19f, centerX - 0.11f, centerZ - 0.03f, centerZ + 0.05f, baseHeight + 0.68f, baseHeight + 1.35f, accentRgb);
-    appendCuboid(builder, centerX + 0.11f, centerX + 0.19f, centerZ - 0.03f, centerZ + 0.05f, baseHeight + 0.68f, baseHeight + 1.35f, accentRgb);
-    appendCuboid(builder, centerX - 0.14f, centerX + 0.14f, centerZ - 0.12f, centerZ + 0.12f, baseHeight + 0.74f, baseHeight + 1.42f, bodyRgb);
-    appendCuboid(builder, centerX - 0.09f, centerX + 0.09f, centerZ - 0.09f, centerZ + 0.09f, baseHeight + 1.42f, baseHeight + 1.76f, accentRgb);
-    if (equipment.stream().anyMatch(slot -> slot.slotIndex() == 3)) {
-      appendCuboid(builder, centerX + 0.17f, centerX + 0.23f, centerZ - 0.02f, centerZ + 0.04f, baseHeight + 0.62f, baseHeight + 1.52f, 0x9f8350);
-    }
-    return builder.build();
-  }
-
-  static float actorYawDegrees(ActorAnimationState actorAnimationState) {
-    if (actorAnimationState == null) {
-      return 180.0f;
-    }
-    // The assembled player model's authored forward axis is opposite the world-space heading
-    // convention used by movement deltas. Apply the 317-style forward correction here so the
-    // actor faces and walks into the path instead of moonwalking backward.
-    return normalizeDegrees(actorAnimationState.headingDegrees() + 180.0f);
-  }
-
-  private void appendCuboid(
-      SceneTriangleMeshBuilder builder,
-      float minX,
-      float maxX,
-      float minZ,
-      float maxZ,
-      float baseHeight,
-      float topHeight,
-      int rgb
-  ) {
-    int topRgb = rgb;
-    int northRgb = shade(rgb, 0.84f);
-    int eastRgb = shade(rgb, 0.76f);
-    int southRgb = shade(rgb, 0.70f);
-    int westRgb = shade(rgb, 0.78f);
-
-    builder.addQuad(minX, topHeight, minZ, maxX, topHeight, minZ, maxX, topHeight, maxZ, minX, topHeight, maxZ, topRgb);
-    builder.addQuad(minX, baseHeight, minZ, maxX, baseHeight, minZ, maxX, topHeight, minZ, minX, topHeight, minZ, northRgb);
-    builder.addQuad(maxX, baseHeight, minZ, maxX, baseHeight, maxZ, maxX, topHeight, maxZ, maxX, topHeight, minZ, eastRgb);
-    builder.addQuad(maxX, baseHeight, maxZ, minX, baseHeight, maxZ, minX, topHeight, maxZ, maxX, topHeight, maxZ, southRgb);
-    builder.addQuad(minX, baseHeight, maxZ, minX, baseHeight, minZ, minX, topHeight, minZ, minX, topHeight, maxZ, westRgb);
-  }
-
-  private float sampleObjectBaseHeight(
-      WorldScene worldScene,
-      WorldSceneObject worldSceneObject,
-      float maxX,
-      float maxZ
-  ) {
-    TerrainLayerSource terrainSource = shouldUseBridgeLowerSurface(worldScene, worldSceneObject)
-        ? worldScene.bridgeTerrainLayer()
-        : worldScene;
-    return sampleBaseHeight(terrainSource, worldScene.tileWidth(), worldScene.tileHeight(), worldSceneObject.localX(), worldSceneObject.localY(), maxX, maxZ);
-  }
-
-  private float sampleBaseHeight(
-      TerrainLayerSource terrainSource,
-      int tileWidth,
-      int tileHeight,
-      float minX,
-      float minZ,
-      float maxX,
-      float maxZ
-  ) {
-    int startX = clampTile((int) Math.floor(minX), tileWidth);
-    int startY = clampTile((int) Math.floor(minZ), tileHeight);
-    int endX = clampTile((int) Math.floor(maxX), tileWidth);
-    int endY = clampTile((int) Math.floor(maxZ), tileHeight);
-    float total = 0.0f;
-    int samples = 0;
-    for (int x = startX; x <= endX; x++) {
-      for (int y = startY; y <= endY; y++) {
-        total += terrainSource.elevationAt(x, y) * WorldSceneScale.HEIGHT_SCALE;
-        samples++;
-      }
-    }
-    return samples == 0 ? 0.0f : total / samples;
-  }
-
-  private boolean shouldUseBridgeLowerSurface(WorldScene worldScene, WorldSceneObject worldSceneObject) {
-    if (worldSceneObject.plane() != 0 || (worldSceneObject.type() != 10 && worldSceneObject.type() != 11)) {
-      return false;
-    }
-    for (int tileX = worldSceneObject.localX(); tileX < worldSceneObject.localX() + Math.max(1, worldSceneObject.sizeX()); tileX++) {
-      for (int tileY = worldSceneObject.localY(); tileY < worldSceneObject.localY() + Math.max(1, worldSceneObject.sizeY()); tileY++) {
-        if (worldScene.bridgeTerrainLayer().activeAt(tileX, tileY)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  private WorldSceneObjectGeometry terrainContouredGeometry(
-      WorldScene worldScene,
-      WorldSceneObject worldSceneObject,
-      float baseHeight
-  ) {
-    WorldSceneObjectGeometry geometry = worldSceneObject.geometry();
-    if (geometry == null || !worldSceneObject.contouredGround() || geometry.vertexY().length == 0) {
-      return geometry;
-    }
-    // 317 object defs with opcode 21 are reprojected against the tile corner heights at submit
-    // time. Fence and bridge-side trim pieces rely on this instead of staying as rigid meshes.
-    GroundHeightProfile heightProfile = sampleGroundHeightProfile(worldScene, worldSceneObject);
-    float footprintWidth = Math.max(1, worldSceneObject.sizeX());
-    float footprintDepth = Math.max(1, worldSceneObject.sizeY());
-    float[] contouredVertexY = new float[geometry.vertexY().length];
-    for (int index = 0; index < geometry.vertexY().length; index++) {
-      float xBlend = (geometry.vertexX()[index] + footprintWidth * 0.5f) / footprintWidth;
-      float zBlend = (geometry.vertexZ()[index] + footprintDepth * 0.5f) / footprintDepth;
-      float southHeight = interpolate(heightProfile.southWest(), heightProfile.southEast(), xBlend);
-      float northHeight = interpolate(heightProfile.northWest(), heightProfile.northEast(), xBlend);
-      float terrainHeight = interpolate(southHeight, northHeight, zBlend);
-      contouredVertexY[index] = geometry.vertexY()[index] + (terrainHeight - baseHeight);
-    }
-    return new WorldSceneObjectGeometry(
-        geometry.vertexX(),
-        contouredVertexY,
-        geometry.vertexZ(),
-        geometry.faceVertexA(),
-        geometry.faceVertexB(),
-        geometry.faceVertexC(),
-        geometry.faceColorA(),
-        geometry.faceColorB(),
-        geometry.faceColorC(),
-        geometry.faceAlpha(),
-        geometry.faceRasterModes(),
-        geometry.faceTextureIds(),
-        geometry.textureVertexA(),
-        geometry.textureVertexB(),
-        geometry.textureVertexC()
-    );
-  }
-
-  private GroundHeightProfile sampleGroundHeightProfile(WorldScene worldScene, WorldSceneObject worldSceneObject) {
-    int localX = worldSceneObject.localX();
-    int localY = worldSceneObject.localY();
-    int eastX = localX + Math.max(1, worldSceneObject.sizeX());
-    int northY = localY + Math.max(1, worldSceneObject.sizeY());
-    float southWest = sampleTerrainCornerHeight(worldScene, localX, localY);
-    float southEast = sampleTerrainCornerHeight(worldScene, eastX, localY);
-    float northEast = sampleTerrainCornerHeight(worldScene, eastX, northY);
-    float northWest = sampleTerrainCornerHeight(worldScene, localX, northY);
-    return new GroundHeightProfile(southWest, southEast, northEast, northWest);
-  }
-
-  private float sampleTerrainCornerHeight(WorldScene worldScene, int tileX, int tileY) {
-    int clampedX = clampTile(tileX, worldScene.tileWidth());
-    int clampedY = clampTile(tileY, worldScene.tileHeight());
-    return worldScene.elevationAt(clampedX, clampedY) * WorldSceneScale.HEIGHT_SCALE;
-  }
-
-  private void appendPerimeterFallback(
-      SceneTriangleMeshBuilder builder,
-      float minX,
-      float maxX,
-      float minZ,
-      float maxZ,
-      float baseHeight,
-      float topHeight,
-      int rgb
-  ) {
-    float thickness = Math.min(0.18f, Math.min((maxX - minX) * 0.25f, (maxZ - minZ) * 0.25f));
-    appendCuboid(builder, minX, minX + thickness, minZ, maxZ, baseHeight, topHeight, rgb);
-    appendCuboid(builder, maxX - thickness, maxX, minZ, maxZ, baseHeight, topHeight, rgb);
-    appendCuboid(builder, minX + thickness, maxX - thickness, minZ, minZ + thickness, baseHeight, topHeight, rgb);
-    appendCuboid(builder, minX + thickness, maxX - thickness, maxZ - thickness, maxZ, baseHeight, topHeight, rgb);
-  }
-
-  private void appendEdgeWallFallback(
-      SceneTriangleMeshBuilder builder,
-      float minX,
-      float maxX,
-      float minZ,
-      float maxZ,
-      float baseHeight,
-      float topHeight,
-      int orientation,
-      float thickness,
-      int rgb
-  ) {
-    switch (orientation & 3) {
-      case 0 -> appendCuboid(builder, minX, minX + thickness, minZ, maxZ, baseHeight, topHeight, rgb);
-      case 1 -> appendCuboid(builder, minX, maxX, maxZ - thickness, maxZ, baseHeight, topHeight, rgb);
-      case 2 -> appendCuboid(builder, maxX - thickness, maxX, minZ, maxZ, baseHeight, topHeight, rgb);
-      default -> appendCuboid(builder, minX, maxX, minZ, minZ + thickness, baseHeight, topHeight, rgb);
-    }
-  }
-
-  private void appendCornerPostFallback(
-      SceneTriangleMeshBuilder builder,
-      float minX,
-      float maxX,
-      float minZ,
-      float maxZ,
-      float baseHeight,
-      float topHeight,
-      int orientation,
-      float thickness,
-      int rgb
-  ) {
-    switch (orientation & 3) {
-      case 0 -> appendCuboid(builder, minX, minX + thickness, maxZ - thickness, maxZ, baseHeight, topHeight, rgb);
-      case 1 -> appendCuboid(builder, maxX - thickness, maxX, maxZ - thickness, maxZ, baseHeight, topHeight, rgb);
-      case 2 -> appendCuboid(builder, maxX - thickness, maxX, minZ, minZ + thickness, baseHeight, topHeight, rgb);
-      default -> appendCuboid(builder, minX, minX + thickness, minZ, minZ + thickness, baseHeight, topHeight, rgb);
-    }
-  }
-
-  private float fallbackObjectHeight(WorldSceneObject worldSceneObject) {
-    return switch (worldSceneObject.type()) {
-      case 0, 1, 2, 3 -> 1.9f;
-      case 10, 11 -> 2.4f;
-      case 12, 13, 14, 15, 16, 17 -> 2.0f;
-      case 22 -> 0.25f;
-      default -> 1.0f;
-    };
-  }
-
-  private float occlusionTargetHeight(WorldSceneObject worldSceneObject, float baseHeight) {
-    if (worldSceneObject.geometry() == null || worldSceneObject.geometry().vertexY().length == 0) {
-      return baseHeight + fallbackObjectHeight(worldSceneObject) * 0.55f;
-    }
-    float minY = Float.POSITIVE_INFINITY;
-    float maxY = Float.NEGATIVE_INFINITY;
-    for (float vertexY : worldSceneObject.geometry().vertexY()) {
-      minY = Math.min(minY, vertexY);
-      maxY = Math.max(maxY, vertexY);
-    }
-    return baseHeight + minY + (maxY - minY) * 0.58f;
-  }
-
-  private int fallbackObjectColor(WorldSceneObject worldSceneObject) {
-    String lowercaseName = worldSceneObject.name().toLowerCase();
-    if (lowercaseName.contains("tree") || lowercaseName.contains("bush")) {
-      return 0x557c39;
-    }
-    if (lowercaseName.contains("rock") || lowercaseName.contains("stone") || lowercaseName.contains("altar")) {
-      return 0x7b7b77;
-    }
-    if (lowercaseName.contains("fence") || lowercaseName.contains("gate") || lowercaseName.contains("door")) {
-      return 0x7b5b33;
-    }
-    if (lowercaseName.contains("wall")) {
-      return 0x6f665d;
-    }
-    return hashedColor(worldSceneObject.objectId(), 0x5e4f39, 0xa88d63);
-  }
-
-  private boolean isStraightWallType(int objectType) {
-    return objectType == 0;
-  }
-
-  private boolean isCornerWallType(int objectType) {
-    return objectType == 1 || objectType == 3;
-  }
-
-  private boolean isLargeStructureType(int objectType) {
-    return switch (objectType) {
-      case 9, 10, 11, 12, 13, 14, 15, 16, 17 -> true;
-      default -> false;
-    };
-  }
-
-  private float fallbackWallThickness(WorldSceneObject worldSceneObject) {
-    String lowercaseName = worldSceneObject.name().toLowerCase();
-    if (lowercaseName.contains("door") || lowercaseName.contains("gate")) {
-      return 0.12f;
-    }
-    if (lowercaseName.contains("fence")) {
-      return 0.10f;
-    }
-    return 0.18f;
-  }
-
-  private int shade(int rgb, float factor) {
-    int red = Math.max(0, Math.min(255, Math.round(((rgb >>> 16) & 0xff) * factor)));
-    int green = Math.max(0, Math.min(255, Math.round(((rgb >>> 8) & 0xff) * factor)));
-    int blue = Math.max(0, Math.min(255, Math.round((rgb & 0xff) * factor)));
-    return (red << 16) | (green << 8) | blue;
-  }
-
-  private int hashedColor(int seed, int darkRgb, int lightRgb) {
-    int mixed = Integer.rotateLeft(seed * 0x45d9f3b, 11);
-    float blend = ((mixed >>> 16) & 0xff) / 255.0f;
-    int darkRed = (darkRgb >>> 16) & 0xff;
-    int darkGreen = (darkRgb >>> 8) & 0xff;
-    int darkBlue = darkRgb & 0xff;
-    int lightRed = (lightRgb >>> 16) & 0xff;
-    int lightGreen = (lightRgb >>> 8) & 0xff;
-    int lightBlue = lightRgb & 0xff;
-    int red = (int) (darkRed + (lightRed - darkRed) * blend);
-    int green = (int) (darkGreen + (lightGreen - darkGreen) * blend);
-    int blue = (int) (darkBlue + (lightBlue - darkBlue) * blend);
-    return (red << 16) | (green << 8) | blue;
-  }
-
-  private float sampleTerrainHeight(WorldScene worldScene, float localX, float localY) {
-    int tileX = clampTile((int) Math.floor(localX), worldScene.tileWidth());
-    int tileY = clampTile((int) Math.floor(localY), worldScene.tileHeight());
-    int eastTileX = Math.min(worldScene.tileWidth() - 1, tileX + 1);
-    int southTileY = Math.min(worldScene.tileHeight() - 1, tileY + 1);
-    float offsetX = clamp(localX - tileX, 0.0f, 1.0f);
-    float offsetY = clamp(localY - tileY, 0.0f, 1.0f);
-    float northWest = worldScene.elevationAt(tileX, tileY) * WorldSceneScale.HEIGHT_SCALE;
-    float northEast = worldScene.elevationAt(eastTileX, tileY) * WorldSceneScale.HEIGHT_SCALE;
-    float southEast = worldScene.elevationAt(eastTileX, southTileY) * WorldSceneScale.HEIGHT_SCALE;
-    float southWest = worldScene.elevationAt(tileX, southTileY) * WorldSceneScale.HEIGHT_SCALE;
-    float northBlend = northWest + (northEast - northWest) * offsetX;
-    float southBlend = southWest + (southEast - southWest) * offsetX;
-    return northBlend + (southBlend - northBlend) * offsetY;
-  }
-
-  private float renderedLocalAxis(int rawTile, float positionOffset, int sceneSize) {
-    return clamp(rawTile + 0.5f + positionOffset, 0.5f, sceneSize - 0.5f);
   }
 
   private int clampTile(int value, int tileBound) {
     return Math.max(0, Math.min(tileBound - 1, value));
-  }
-
-  private float clamp(float value, float minimum, float maximum) {
-    return Math.max(minimum, Math.min(maximum, value));
-  }
-
-  private float interpolate(float start, float end, float blend) {
-    return start + (end - start) * blend;
-  }
-
-  private static float normalizeDegrees(float degrees) {
-    float normalized = degrees % 360.0f;
-    if (normalized > 180.0f) {
-      normalized -= 360.0f;
-    } else if (normalized <= -180.0f) {
-      normalized += 360.0f;
-    }
-    return normalized;
-  }
-
-  private record GroundHeightProfile(
-      float southWest,
-      float southEast,
-      float northEast,
-      float northWest
-  ) {
   }
 }

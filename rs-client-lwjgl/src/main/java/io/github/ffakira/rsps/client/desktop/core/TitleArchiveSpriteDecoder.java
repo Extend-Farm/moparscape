@@ -20,6 +20,10 @@ public final class TitleArchiveSpriteDecoder {
     return decodedSprite.toArgbImage();
   }
 
+  public int[] decodePalette(CacheArchiveContainer archive, String entryName, int frameIndex, boolean normalizeZeroPaletteEntries) {
+    return decode(archive, entryName, frameIndex, normalizeZeroPaletteEntries).palette().clone();
+  }
+
   public ArgbImage[] decodeSprites(CacheArchiveContainer archive, String entryName, boolean normalizeZeroPaletteEntries) {
     byte[] dataBytes = archive.readEntry(entryName + ".dat");
     ByteCursor dataCursor = new ByteCursor(dataBytes);
@@ -30,6 +34,22 @@ public final class TitleArchiveSpriteDecoder {
       frames.add(readFrame(dataCursor, indexCursor, header, entryName).toArgbImage());
     }
     return frames.toArray(ArgbImage[]::new);
+  }
+
+  public IndexedArgbSprite[] decodeIndexedSprites(
+      CacheArchiveContainer archive,
+      String entryName,
+      boolean normalizeZeroPaletteEntries
+  ) {
+    byte[] dataBytes = archive.readEntry(entryName + ".dat");
+    ByteCursor dataCursor = new ByteCursor(dataBytes);
+    ByteCursor indexCursor = new ByteCursor(indexBytes, dataCursor.readUnsignedShort());
+    SpriteSheetHeader header = readHeader(indexCursor, normalizeZeroPaletteEntries);
+    List<IndexedArgbSprite> frames = new ArrayList<>();
+    while (dataCursor.hasRemaining() && indexCursor.remaining() >= 7) {
+      frames.add(readFrame(dataCursor, indexCursor, header, entryName).toIndexedArgbSprite());
+    }
+    return frames.toArray(IndexedArgbSprite[]::new);
   }
 
   public TitleScreenRuneMask decodeRuneMask(CacheArchiveContainer archive, String entryName, int frameIndex) {
@@ -125,6 +145,18 @@ public final class TitleArchiveSpriteDecoder {
       byte[] pixelIndices
   ) {
 
+    private IndexedArgbSprite toIndexedArgbSprite() {
+      int[] pixels = new int[width * height];
+      for (int pixelIndex = 0; pixelIndex < pixelIndices.length; pixelIndex++) {
+        int paletteIndex = pixelIndices[pixelIndex] & 0xff;
+        if (paletteIndex == 0) {
+          continue;
+        }
+        pixels[pixelIndex] = 0xff000000 | palette[paletteIndex];
+      }
+      return new IndexedArgbSprite(offsetX, offsetY, width, height, pixels);
+    }
+
     private ArgbImage toArgbImage() {
       int[] pixels = new int[canvasWidth * canvasHeight];
       for (int y = 0; y < height; y++) {
@@ -161,6 +193,23 @@ public final class TitleArchiveSpriteDecoder {
         }
       }
       return maskPixels;
+    }
+  }
+
+  public record IndexedArgbSprite(
+      int offsetX,
+      int offsetY,
+      int width,
+      int height,
+      int[] pixels
+  ) {
+
+    public IndexedArgbSprite {
+      pixels = pixels.clone();
+    }
+
+    public static IndexedArgbSprite fromArgbImage(ArgbImage image) {
+      return new IndexedArgbSprite(0, 0, image.width(), image.height(), image.pixels());
     }
   }
 

@@ -18,4 +18,5 @@ class TextureArchiveAssetLoaderTest {
     assertThat(assets.texture(0).height()).isGreaterThan(0);
     assertThat(assets.textures()).anySatisfy(texture -> assertThat(texture).isNotNull());
   }
+
 }

@@ -17,12 +17,32 @@ final class CharacterWalkPoseAnimator {
   private static final float[] WALK_FRAME_COUNTER_SWING = {0.0f, 1.0f, 0.0f, -1.0f, 0.0f};
   private static final float[] WALK_FRAME_BOB = {0.20f, 1.0f, 0.20f, 1.0f, 0.20f};
   private static final float[] WALK_FRAME_FORWARD_LEAN = {0.72f, 1.0f, 0.72f, 1.0f, 0.72f};
+  private static final LocomotionProfile RUN_FORWARD_PROFILE =
+      new LocomotionProfile(1.55f, 1.38f, 1.30f, 0.95f, 1.35f, 1.25f, 1.0f, 0.0f);
+  private static final LocomotionProfile WALK_BACKWARD_PROFILE =
+      new LocomotionProfile(-0.72f, -0.72f, 0.72f, -0.85f, 0.75f, 0.85f, 1.0f, 0.0f);
+  private static final LocomotionProfile STRAFE_LEFT_PROFILE =
+      new LocomotionProfile(0.62f, 0.78f, 0.18f, 0.12f, 0.78f, 0.70f, 1.0f, -1.0f);
+  private static final LocomotionProfile STRAFE_RIGHT_PROFILE =
+      new LocomotionProfile(0.62f, 0.78f, -0.18f, 0.12f, 0.78f, 0.70f, 1.0f, 1.0f);
+  private static final LocomotionProfile WALK_FORWARD_PROFILE =
+      new LocomotionProfile(1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f);
 
   private CharacterWalkPoseAnimator() {
   }
 
   static void apply(
       float[][] transformedVertices,
+      CharacterActorBounds actorBounds,
+      ActorAnimationState animationState
+  ) {
+    apply(transformedVertices[0], transformedVertices[1], transformedVertices[2], actorBounds, animationState);
+  }
+
+  static void apply(
+      float[] transformedX,
+      float[] transformedY,
+      float[] transformedZ,
       CharacterActorBounds actorBounds,
       ActorAnimationState animationState
   ) {
@@ -39,12 +59,30 @@ final class CharacterWalkPoseAnimator {
         * WALK_BODY_BOB
         * locomotionProfile.bodyBobScale()
         * strideWeight;
+    float legSwingDegrees = swing * WALK_LEG_SWING_DEGREES * locomotionProfile.legSwingScale() * strideWeight;
+    float legSwingCosine = cosDegrees(legSwingDegrees);
+    float legSwingSine = sinDegrees(legSwingDegrees);
+    float armSwingDegrees = swing * WALK_ARM_SWING_DEGREES * locomotionProfile.armSwingScale() * strideWeight;
+    float armSwingCosine = cosDegrees(armSwingDegrees);
+    float armSwingSine = sinDegrees(armSwingDegrees);
     float torsoTwist = swing * WALK_TORSO_TWIST_DEGREES * locomotionProfile.torsoTwistScale() * strideWeight;
+    float torsoTwistCosine = cosDegrees(torsoTwist);
+    float torsoTwistSine = sinDegrees(torsoTwist);
     float pelvisSway = counterSwing * WALK_PELVIS_SWAY * locomotionProfile.pelvisSwayScale() * strideWeight;
     float forwardLean = interpolateWalkFrame(WALK_FRAME_FORWARD_LEAN, walkFrameIndex, walkFrameProgress)
         * WALK_FORWARD_LEAN_DEGREES
         * locomotionProfile.forwardLeanScale()
         * strideWeight;
+    float forwardLeanCosine = cosDegrees(forwardLean);
+    float forwardLeanSine = sinDegrees(forwardLean);
+    float sideStepDirection = locomotionProfile.sideStepDirection();
+    boolean hasSideStep = sideStepDirection != 0.0f;
+    float sideStepArmTiltDegrees = sideStepDirection * swing * SIDE_STEP_TILT_DEGREES * strideWeight;
+    float sideStepArmTiltCosine = cosDegrees(sideStepArmTiltDegrees);
+    float sideStepArmTiltSine = sinDegrees(sideStepArmTiltDegrees);
+    float torsoSideTiltDegrees = sideStepDirection * counterSwing * SIDE_STEP_TILT_DEGREES * strideWeight;
+    float torsoSideTiltCosine = cosDegrees(torsoSideTiltDegrees);
+    float torsoSideTiltSine = sinDegrees(torsoSideTiltDegrees);
     float centerX = actorBounds.centerX();
     float centerZ = actorBounds.centerZ();
     float width = Math.max(0.001f, actorBounds.maxX() - actorBounds.minX());
@@ -56,31 +94,29 @@ final class CharacterWalkPoseAnimator {
     float torsoTwistTopY = actorBounds.minY() + height * TORSO_TWIST_TOP_PORTION;
     float armBlendStart = width * 0.14f;
     float armBlendRange = Math.max(0.001f, width * 0.20f);
-    for (int vertexIndex = 0; vertexIndex < transformedVertices[0].length; vertexIndex++) {
-      float x = transformedVertices[0][vertexIndex];
-      float y = transformedVertices[1][vertexIndex] - bob;
-      float z = transformedVertices[2][vertexIndex];
+    for (int vertexIndex = 0; vertexIndex < transformedX.length; vertexIndex++) {
+      float x = transformedX[vertexIndex];
+      float y = transformedY[vertexIndex] - bob;
+      float z = transformedZ[vertexIndex];
       float xOffset = x - centerX;
       float side = xOffset < 0.0f ? -1.0f : 1.0f;
 
       if (y < hipY) {
         float legBlend = smoothstep((hipY - y) / Math.max(0.001f, hipY - actorBounds.minY()));
-        float[] rotated = rotateAroundX(
-            y,
-            z,
-            hipY,
-            centerZ,
-            side * swing * WALK_LEG_SWING_DEGREES * locomotionProfile.legSwingScale() * strideWeight
-        );
-        y = lerp(y, rotated[0], legBlend);
-        z = lerp(z, rotated[1], legBlend);
+        float signedLegSwingSine = side * legSwingSine;
+        float legShiftedY = y - hipY;
+        float legShiftedZ = z - centerZ;
+        float rotatedLegY = legShiftedY * legSwingCosine - legShiftedZ * signedLegSwingSine;
+        float rotatedLegZ = legShiftedY * signedLegSwingSine + legShiftedZ * legSwingCosine;
+        y = lerp(y, rotatedLegY + hipY, legBlend);
+        z = lerp(z, rotatedLegZ + centerZ, legBlend);
         if (y < kneeY) {
           float liftBlend = smoothstep((kneeY - y) / Math.max(0.001f, kneeY - actorBounds.minY()));
           y += Math.max(0.0f, -side * swing * locomotionProfile.stepSign()) * WALK_FOOT_LIFT * liftBlend * strideWeight;
           x += side * pelvisSway * liftBlend;
-          if (locomotionProfile.sideStepDirection() != 0.0f) {
+          if (hasSideStep) {
             x += side
-                * locomotionProfile.sideStepDirection()
+                * sideStepDirection
                 * swing
                 * SIDE_STEP_LATERAL_SHIFT
                 * liftBlend
@@ -91,47 +127,46 @@ final class CharacterWalkPoseAnimator {
         float armBlend = smoothstep((Math.abs(xOffset) - armBlendStart) / armBlendRange)
             * verticalBandBlend(y, hipY, shoulderY, armSwingTopY, actorBounds.maxY());
         if (armBlend > 0.0f) {
-          float[] rotated = rotateAroundX(
-              y,
-              z,
-              shoulderY,
-              centerZ,
-              -side * swing * WALK_ARM_SWING_DEGREES * locomotionProfile.armSwingScale() * strideWeight
-          );
-          y = lerp(y, rotated[0], armBlend);
-          z = lerp(z, rotated[1], armBlend);
-          if (locomotionProfile.sideStepDirection() != 0.0f) {
-            float[] tilted = rotateAroundZ(
-                x,
-                y,
-                centerX,
-                shoulderY,
-                side * locomotionProfile.sideStepDirection() * swing * SIDE_STEP_TILT_DEGREES * strideWeight
-            );
-            x = lerp(x, tilted[0], armBlend * 0.42f);
-            y = lerp(y, tilted[1], armBlend * 0.42f);
+          float signedArmSwingSine = -side * armSwingSine;
+          float armShiftedY = y - shoulderY;
+          float armShiftedZ = z - centerZ;
+          float rotatedArmY = armShiftedY * armSwingCosine - armShiftedZ * signedArmSwingSine;
+          float rotatedArmZ = armShiftedY * signedArmSwingSine + armShiftedZ * armSwingCosine;
+          y = lerp(y, rotatedArmY + shoulderY, armBlend);
+          z = lerp(z, rotatedArmZ + centerZ, armBlend);
+          if (hasSideStep) {
+            float signedSideStepArmTiltSine = side * sideStepArmTiltSine;
+            float armTiltShiftedX = x - centerX;
+            float armTiltShiftedY = y - shoulderY;
+            float tiltedArmX = armTiltShiftedX * sideStepArmTiltCosine - armTiltShiftedY * signedSideStepArmTiltSine;
+            float tiltedArmY = armTiltShiftedX * signedSideStepArmTiltSine + armTiltShiftedY * sideStepArmTiltCosine;
+            x = lerp(x, tiltedArmX + centerX, armBlend * 0.42f);
+            y = lerp(y, tiltedArmY + shoulderY, armBlend * 0.42f);
           }
         }
       }
 
       float torsoBlend = verticalBandBlend(y, hipY, shoulderY, torsoTwistTopY, actorBounds.maxY());
       if (torsoBlend > 0.0f) {
-        float[] twisted = rotateAroundY(x, z, centerX, centerZ, torsoTwist);
-        x = lerp(x, twisted[0], torsoBlend * 0.55f);
-        z = lerp(z, twisted[1], torsoBlend * 0.55f);
-        float[] leaned = rotateAroundX(y, z, hipY, centerZ, forwardLean);
-        y = lerp(y, leaned[0], torsoBlend * 0.38f);
-        z = lerp(z, leaned[1], torsoBlend * 0.38f);
-        if (locomotionProfile.sideStepDirection() != 0.0f) {
-          float[] sideTilted = rotateAroundZ(
-              x,
-              y,
-              centerX,
-              hipY,
-              locomotionProfile.sideStepDirection() * counterSwing * SIDE_STEP_TILT_DEGREES * strideWeight
-          );
-          x = lerp(x, sideTilted[0], torsoBlend * 0.22f);
-          y = lerp(y, sideTilted[1], torsoBlend * 0.22f);
+        float torsoShiftedX = x - centerX;
+        float torsoShiftedZ = z - centerZ;
+        float twistedX = torsoShiftedX * torsoTwistCosine + torsoShiftedZ * torsoTwistSine;
+        float twistedZ = torsoShiftedZ * torsoTwistCosine - torsoShiftedX * torsoTwistSine;
+        x = lerp(x, twistedX + centerX, torsoBlend * 0.55f);
+        z = lerp(z, twistedZ + centerZ, torsoBlend * 0.55f);
+        float leanShiftedY = y - hipY;
+        float leanShiftedZ = z - centerZ;
+        float leanedY = leanShiftedY * forwardLeanCosine - leanShiftedZ * forwardLeanSine;
+        float leanedZ = leanShiftedY * forwardLeanSine + leanShiftedZ * forwardLeanCosine;
+        y = lerp(y, leanedY + hipY, torsoBlend * 0.38f);
+        z = lerp(z, leanedZ + centerZ, torsoBlend * 0.38f);
+        if (hasSideStep) {
+          float torsoTiltShiftedX = x - centerX;
+          float torsoTiltShiftedY = y - hipY;
+          float sideTiltedX = torsoTiltShiftedX * torsoSideTiltCosine - torsoTiltShiftedY * torsoSideTiltSine;
+          float sideTiltedY = torsoTiltShiftedX * torsoSideTiltSine + torsoTiltShiftedY * torsoSideTiltCosine;
+          x = lerp(x, sideTiltedX + centerX, torsoBlend * 0.22f);
+          y = lerp(y, sideTiltedY + hipY, torsoBlend * 0.22f);
         }
       }
 
@@ -140,9 +175,9 @@ final class CharacterWalkPoseAnimator {
         x += pelvisSway * leanBlend * 0.35f;
       }
 
-      transformedVertices[0][vertexIndex] = x;
-      transformedVertices[1][vertexIndex] = y;
-      transformedVertices[2][vertexIndex] = z;
+      transformedX[vertexIndex] = x;
+      transformedY[vertexIndex] = y;
+      transformedZ[vertexIndex] = z;
     }
   }
 
@@ -166,46 +201,21 @@ final class CharacterWalkPoseAnimator {
     return rise * fall;
   }
 
-  private static float[] rotateAroundX(float y, float z, float pivotY, float pivotZ, float degrees) {
-    float radians = (float) Math.toRadians(degrees);
-    float cosine = (float) Math.cos(radians);
-    float sine = (float) Math.sin(radians);
-    float shiftedY = y - pivotY;
-    float shiftedZ = z - pivotZ;
-    float rotatedY = shiftedY * cosine - shiftedZ * sine;
-    float rotatedZ = shiftedY * sine + shiftedZ * cosine;
-    return new float[]{rotatedY + pivotY, rotatedZ + pivotZ};
+  private static float cosDegrees(float degrees) {
+    return (float) Math.cos(Math.toRadians(degrees));
   }
 
-  private static float[] rotateAroundY(float x, float z, float pivotX, float pivotZ, float degrees) {
-    float radians = (float) Math.toRadians(degrees);
-    float cosine = (float) Math.cos(radians);
-    float sine = (float) Math.sin(radians);
-    float shiftedX = x - pivotX;
-    float shiftedZ = z - pivotZ;
-    float rotatedX = shiftedX * cosine + shiftedZ * sine;
-    float rotatedZ = shiftedZ * cosine - shiftedX * sine;
-    return new float[]{rotatedX + pivotX, rotatedZ + pivotZ};
-  }
-
-  private static float[] rotateAroundZ(float x, float y, float pivotX, float pivotY, float degrees) {
-    float radians = (float) Math.toRadians(degrees);
-    float cosine = (float) Math.cos(radians);
-    float sine = (float) Math.sin(radians);
-    float shiftedX = x - pivotX;
-    float shiftedY = y - pivotY;
-    float rotatedX = shiftedX * cosine - shiftedY * sine;
-    float rotatedY = shiftedX * sine + shiftedY * cosine;
-    return new float[]{rotatedX + pivotX, rotatedY + pivotY};
+  private static float sinDegrees(float degrees) {
+    return (float) Math.sin(Math.toRadians(degrees));
   }
 
   private static LocomotionProfile locomotionProfile(ActorAnimationState.LocomotionMode locomotionMode) {
     return switch (locomotionMode) {
-      case RUN_FORWARD -> new LocomotionProfile(1.55f, 1.38f, 1.30f, 0.95f, 1.35f, 1.25f, 1.0f, 0.0f);
-      case WALK_BACKWARD -> new LocomotionProfile(-0.72f, -0.72f, 0.72f, -0.85f, 0.75f, 0.85f, 1.0f, 0.0f);
-      case STRAFE_LEFT -> new LocomotionProfile(0.62f, 0.78f, 0.18f, 0.12f, 0.78f, 0.70f, 1.0f, -1.0f);
-      case STRAFE_RIGHT -> new LocomotionProfile(0.62f, 0.78f, -0.18f, 0.12f, 0.78f, 0.70f, 1.0f, 1.0f);
-      case WALK_FORWARD, IDLE -> new LocomotionProfile(1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f);
+      case RUN_FORWARD -> RUN_FORWARD_PROFILE;
+      case WALK_BACKWARD -> WALK_BACKWARD_PROFILE;
+      case STRAFE_LEFT -> STRAFE_LEFT_PROFILE;
+      case STRAFE_RIGHT -> STRAFE_RIGHT_PROFILE;
+      case WALK_FORWARD, IDLE -> WALK_FORWARD_PROFILE;
     };
   }
 

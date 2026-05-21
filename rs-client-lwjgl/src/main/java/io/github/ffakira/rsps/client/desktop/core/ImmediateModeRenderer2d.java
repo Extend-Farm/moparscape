@@ -108,7 +108,8 @@ public final class ImmediateModeRenderer2d {
       int[] clipWidths,
       float angleDegrees,
       float sourceCenterX,
-      float sourceCenterY
+      float sourceCenterY,
+      float sourceScale
   ) {
     if (texture == null || clipStarts.length == 0 || clipStarts.length != clipWidths.length) {
       return;
@@ -145,6 +146,7 @@ public final class ImmediateModeRenderer2d {
           sine,
           sourceCenterX,
           sourceCenterY,
+          sourceScale,
           texture.width(),
           texture.height()
       );
@@ -157,6 +159,7 @@ public final class ImmediateModeRenderer2d {
           sine,
           sourceCenterX,
           sourceCenterY,
+          sourceScale,
           texture.width(),
           texture.height()
       );
@@ -169,6 +172,7 @@ public final class ImmediateModeRenderer2d {
           sine,
           sourceCenterX,
           sourceCenterY,
+          sourceScale,
           texture.width(),
           texture.height()
       );
@@ -181,6 +185,7 @@ public final class ImmediateModeRenderer2d {
           sine,
           sourceCenterX,
           sourceCenterY,
+          sourceScale,
           texture.width(),
           texture.height()
       );
@@ -200,6 +205,65 @@ public final class ImmediateModeRenderer2d {
       glVertex2f(bottomRightX, bottomY);
       glTexCoord2f(bottomLeftUv[0], bottomLeftUv[1]);
       glVertex2f(bottomLeftX, bottomY);
+    }
+    glEnd();
+    endTexturedAlpha();
+  }
+
+  public void drawMaskedTexturedQuad(
+      OpenGlTexture texture,
+      ScreenRect rect,
+      ScreenRect maskRect,
+      int[] clipStarts,
+      int[] clipWidths
+  ) {
+    if (texture == null
+        || rect.width() <= 0.0f
+        || rect.height() <= 0.0f
+        || clipStarts.length == 0
+        || clipStarts.length != clipWidths.length) {
+      return;
+    }
+    int startRow = Math.max(0, (int) Math.floor(rect.top() - maskRect.top()));
+    int endRow = Math.min(clipStarts.length, (int) Math.ceil(rect.top() + rect.height() - maskRect.top()));
+    if (startRow >= endRow) {
+      return;
+    }
+    beginTexturedAlpha();
+    glBindTexture(GL_TEXTURE_2D, texture.id());
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glBegin(GL_QUADS);
+    for (int row = startRow; row < endRow; row++) {
+      int clipWidth = clipWidths[row];
+      if (clipWidth <= 0) {
+        continue;
+      }
+      float rowTop = maskRect.top() + row;
+      float rowBottom = rowTop + 1.0f;
+      float visibleTop = Math.max(rect.top(), rowTop);
+      float visibleBottom = Math.min(rect.top() + rect.height(), rowBottom);
+      if (visibleBottom <= visibleTop) {
+        continue;
+      }
+      float clipLeft = maskRect.left() + clipStarts[row];
+      float clipRight = clipLeft + clipWidth;
+      float visibleLeft = Math.max(rect.left(), clipLeft);
+      float visibleRight = Math.min(rect.left() + rect.width(), clipRight);
+      if (visibleRight <= visibleLeft) {
+        continue;
+      }
+      float u0 = (visibleLeft - rect.left()) / rect.width();
+      float u1 = (visibleRight - rect.left()) / rect.width();
+      float v0 = (visibleTop - rect.top()) / rect.height();
+      float v1 = (visibleBottom - rect.top()) / rect.height();
+      glTexCoord2f(u0, v0);
+      glVertex2f(visibleLeft, visibleTop);
+      glTexCoord2f(u1, v0);
+      glVertex2f(visibleRight, visibleTop);
+      glTexCoord2f(u1, v1);
+      glVertex2f(visibleRight, visibleBottom);
+      glTexCoord2f(u0, v1);
+      glVertex2f(visibleLeft, visibleBottom);
     }
     glEnd();
     endTexturedAlpha();
@@ -300,11 +364,12 @@ public final class ImmediateModeRenderer2d {
       float sine,
       float sourceCenterX,
       float sourceCenterY,
+      float sourceScale,
       int textureWidth,
       int textureHeight
   ) {
-    float centeredX = sampleX + 0.5f - logicalWidth / 2.0f;
-    float centeredY = sampleY + 0.5f - logicalHeight / 2.0f;
+    float centeredX = (sampleX + 0.5f - logicalWidth / 2.0f) * sourceScale;
+    float centeredY = (sampleY + 0.5f - logicalHeight / 2.0f) * sourceScale;
     float sourceX = sourceCenterX + centeredY * sine + centeredX * cosine;
     float sourceY = sourceCenterY + centeredY * cosine - centeredX * sine;
     float clampedX = clamp(sourceX, 0.5f, textureWidth - 0.5f);

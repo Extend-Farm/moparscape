@@ -39,8 +39,10 @@ class WorldViewportClickPlannerTest {
 
   @Test
   void mapsNearAndFarViewportRowsToDifferentTerrainDepths() {
+    // At yaw=0 the camera sits south of focus looking north. The bottom of the viewport is the
+    // tile right in front of the player; the top is further north (larger localY).
     WorldScene worldScene = testWorldScene(24, 24);
-    WorldCameraState cameraState = new WorldCameraState(50.0f, 180.0f, 14.0f, 0.0f, 12.5f, 12.5f, 0.0f);
+    WorldCameraState cameraState = new WorldCameraState(50.0f, 0.0f, 14.0f, 0.0f, 12.5f, 12.5f, 0.0f);
     ScreenRect viewport = new ScreenRect(0.0f, 0.0f, 496.0f, 318.0f);
     WorldViewportClickPlanner planner = new WorldViewportClickPlanner();
 
@@ -54,8 +56,9 @@ class WorldViewportClickPlannerTest {
 
   @Test
   void mapsLeftAndRightViewportColumnsAcrossTerrainWidth() {
+    // At yaw=0 the camera looks north; left of viewport = west (smaller localX), right = east.
     WorldScene worldScene = testWorldScene(24, 24);
-    WorldCameraState cameraState = new WorldCameraState(38.0f, 180.0f, 10.5f, 0.0f, 12.5f, 12.5f, 0.0f);
+    WorldCameraState cameraState = new WorldCameraState(38.0f, 0.0f, 10.5f, 0.0f, 12.5f, 12.5f, 0.0f);
     ScreenRect viewport = new ScreenRect(0.0f, 0.0f, 496.0f, 318.0f);
     WorldViewportClickPlanner planner = new WorldViewportClickPlanner();
 
@@ -64,7 +67,7 @@ class WorldViewportClickPlannerTest {
 
     assertThat(leftTarget).isNotNull();
     assertThat(rightTarget).isNotNull();
-    assertThat(leftTarget.localX()).isNotEqualTo(rightTarget.localX());
+    assertThat(leftTarget.localX()).isLessThan(rightTarget.localX());
   }
 
   private static WorldScene testWorldScene(int width, int height) {

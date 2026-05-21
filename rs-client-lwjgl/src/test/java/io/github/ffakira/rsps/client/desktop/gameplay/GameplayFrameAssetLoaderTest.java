@@ -37,6 +37,12 @@ class GameplayFrameAssetLoaderTest {
     assertThat(assets.mapDotIcons()).isNotEmpty();
     assertThat(assets.mapDotIcons()).hasSizeGreaterThanOrEqualTo(4);
     assertThat(assets.mapDotIcons()).anySatisfy(icon -> assertThat(icon).isNotNull());
+    assertThat(assets.statsTabAssets()).isNotNull();
+    assertThat(assets.statsTabAssets().buttonLeft().width()).isGreaterThan(0);
+    assertThat(assets.statsTabAssets().buttonRight().height()).isGreaterThan(0);
+    for (int skillId = 0; skillId <= 20; skillId++) {
+      assertThat(assets.statsTabAssets().iconForSkill(skillId)).isNotNull();
+    }
     assertThat(assets.redstone1Flipped().pixels())
         .containsExactly(ArgbImageTransforms.flipHorizontally(assets.redstone1()).pixels());
     assertThat(assets.redstone2Flipped().pixels())

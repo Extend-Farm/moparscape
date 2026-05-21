@@ -11,10 +11,14 @@ final class WorldSceneCameraPlanner {
   private static final int PITCH_CLAMP_SAMPLE_RADIUS = 4;
   private static final float FOCUS_SNAP_DISTANCE_TILES = 500.0f / 128.0f;
   private static final float ORBIT_FOCUS_SMOOTHING = 16.0f;
-  private static final float DEFAULT_YAW_DEGREES = 225.0f;
-  private static final float DEFAULT_PITCH_DEGREES = 31.0f;
-  private static final float COMPATIBILITY_DISTANCE_DIVISOR = 80.0f;
-  private static final float COMPATIBILITY_SCREEN_OFFSET_Y = -0.65f;
+  private static final float DEFAULT_YAW_DEGREES = 0.0f;
+  private static final float DEFAULT_PITCH_DEGREES = MIN_CAMERA_PITCH_UNITS * DEGREES_PER_CAMERA_UNIT;
+  private static final float LEGACY_CAMERA_DISTANCE_UNITS_PER_TILE = 128.0f;
+  private static final float PARITY_CAMERA_BASE_DISTANCE_UNITS = 768.0f;
+  // The 317 camera targets a point 50 legacy height units below the actor. Native world height
+  // now uses the same tile-relative scaling as models (`128` legacy units per tile).
+  private static final float LEGACY_CAMERA_TARGET_HEIGHT_OFFSET = 50.0f / 128.0f;
+  private static final float LEGACY_SCREEN_OFFSET_Y = 0.0f;
 
   private String lastSceneKey;
   private float smoothedFocusX;
@@ -80,12 +84,13 @@ final class WorldSceneCameraPlanner {
     int requestedPitchUnits = clamp(Math.round(cameraPitchDegrees * CAMERA_UNITS_PER_DEGREE), MIN_CAMERA_PITCH_UNITS, MAX_CAMERA_PITCH_UNITS);
     int finalPitchUnits = Math.max(requestedPitchUnits, cameraPitchClamp / 256);
     int yawUnits = normalizeUnits(Math.round(cameraYawDegrees * CAMERA_UNITS_PER_DEGREE));
-    float focusHeight = sampleHeight(worldScene, smoothedFocusX, smoothedFocusY) * worldHeightScale;
+    float focusHeight = sampleHeight(worldScene, smoothedFocusX, smoothedFocusY) * worldHeightScale
+        - LEGACY_CAMERA_TARGET_HEIGHT_OFFSET;
     return new WorldCameraState(
         degreesFromUnits(finalPitchUnits),
         normalizeDegrees(degreesFromUnits(yawUnits)),
-        (finalPitchUnits * 3.0f + 600.0f) / COMPATIBILITY_DISTANCE_DIVISOR,
-        COMPATIBILITY_SCREEN_OFFSET_Y,
+        orbitDistanceForPitchUnits(finalPitchUnits),
+        LEGACY_SCREEN_OFFSET_Y,
         smoothedFocusX,
         smoothedFocusY,
         focusHeight
@@ -131,6 +136,10 @@ final class WorldSceneCameraPlanner {
       return currentClamp + (targetClamp - currentClamp) / 80;
     }
     return currentClamp;
+  }
+
+  static float orbitDistanceForPitchUnits(int pitchUnits) {
+    return (pitchUnits * 3.0f + PARITY_CAMERA_BASE_DISTANCE_UNITS) / LEGACY_CAMERA_DISTANCE_UNITS_PER_TILE;
   }
 
   private static int normalizeUnits(int units) {

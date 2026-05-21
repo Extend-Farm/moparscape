@@ -15,6 +15,7 @@ import static org.lwjgl.opengl.GL11.glFrustum;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glRotatef;
+import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
@@ -40,9 +41,8 @@ public final class WorldViewportRenderer implements AutoCloseable {
     glEnable(GL_MULTISAMPLE);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    float aspectRatio = viewportWidth / (float) viewportHeight;
-    float frustumTop = WorldViewportProjection.frustumTop();
-    float frustumRight = WorldViewportProjection.frustumRight(aspectRatio);
+    float frustumTop = WorldViewportProjection.frustumTop(viewportHeight);
+    float frustumRight = WorldViewportProjection.frustumRight(viewportWidth);
     glFrustum(
         -frustumRight,
         frustumRight,
@@ -57,10 +57,15 @@ public final class WorldViewportRenderer implements AutoCloseable {
     WorldCameraState cameraState = submission.cameraState();
     glTranslatef(0.0f, cameraState.screenOffsetY(), -cameraState.distance());
     glRotatef(cameraState.pitchDegrees(), 1.0f, 0.0f, 0.0f);
-    // Gameplay/minimap space already treats positive world-east as the minimap's left edge at the
-    // default orbit. The viewport was rotating yaw in the opposite direction, which mirrored the
-    // whole 3D scene relative to the rest of the client.
+    // Legacy software rendering and the minimap both consume the same camera yaw. Reusing that
+    // angle here keeps the 3D scene, compass, and minimap markers in the same orientation.
     glRotatef(-cameraState.yawDegrees(), 0.0f, 1.0f, 0.0f);
+    // The mesh stores +localY (OSRS north) as +meshZ. OpenGL's default camera looks toward -Z, so
+    // without this flip the camera would sit on the +Z (north) side of the focus and render the
+    // scene mirrored along the north/south axis. Flipping Z here puts the camera south of the
+    // focus looking north, matching the legacy software camera at yaw=0. See
+    // `.codex/plan/world-frame-parity.md` and `WorldFrameParityProbeTest` for the derivation.
+    glScalef(1.0f, 1.0f, -1.0f);
     glTranslatef(-cameraState.focusX(), -cameraState.focusHeight(), -cameraState.focusY());
 
     // The native renderer is not yet at legacy triangle-submission parity. Until terrain, tile

@@ -32,12 +32,18 @@ public final class GameplayLayout {
   private static final float BOTTOM_TAB_TOP = 466.0f;
   private static final float BOTTOM_TAB_WIDTH = 269.0f;
   private static final float BOTTOM_TAB_HEIGHT = 37.0f;
+  private static final float FRAME_WIDTH = 765.0f;
+  private static final float FRAME_HEIGHT = 503.0f;
 
   private GameplayLayout() {
   }
 
   public static ScreenRect worldViewportRect() {
     return new ScreenRect(WORLD_VIEW_LEFT, WORLD_VIEW_TOP, WORLD_VIEW_WIDTH, WORLD_VIEW_HEIGHT);
+  }
+
+  public static ScreenRect frameRect() {
+    return new ScreenRect(0.0f, 0.0f, FRAME_WIDTH, FRAME_HEIGHT);
   }
 
   public static ScreenRect worldViewportInnerRect() {

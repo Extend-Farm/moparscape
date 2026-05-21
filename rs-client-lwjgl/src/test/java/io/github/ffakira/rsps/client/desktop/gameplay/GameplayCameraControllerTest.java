@@ -12,14 +12,14 @@ class GameplayCameraControllerTest {
     TestNanoClock clock = new TestNanoClock();
     GameplayCameraController controller = new GameplayCameraController(clock::now);
 
-    assertThat(controller.update().yawDegrees()).isCloseTo(-135.0f, within(0.0001f));
+    assertThat(controller.update().yawDegrees()).isCloseTo(0.0f, within(0.0001f));
 
     controller.setHeldInputs(true, false, false, false);
     GameplayCameraController.CameraOrbitAngles firstTick = advanceTick(controller, clock);
     GameplayCameraController.CameraOrbitAngles fourthTick = advanceTicks(controller, clock, 3);
 
-    assertThat(firstTick.yawDegrees()).isCloseTo(-136.05469f, within(0.0001f));
-    assertThat(fourthTick.yawDegrees()).isCloseTo(-141.32812f, within(0.0001f));
+    assertThat(firstTick.yawDegrees()).isCloseTo(-1.05469f, within(0.0001f));
+    assertThat(fourthTick.yawDegrees()).isCloseTo(-6.32812f, within(0.0001f));
   }
 
   @Test
@@ -36,7 +36,7 @@ class GameplayCameraControllerTest {
     GameplayCameraController.CameraOrbitAngles settledPose = advanceTicks(controller, clock, 4);
 
     assertThat(releasedPose.yawDegrees()).isLessThan(heldPose.yawDegrees());
-    assertThat(settledPose.yawDegrees()).isCloseTo(-142.73438f, within(0.0001f));
+    assertThat(settledPose.yawDegrees()).isCloseTo(-7.73438f, within(0.0001f));
   }
 
   @Test
@@ -76,7 +76,7 @@ class GameplayCameraControllerTest {
     controller.adjust(220.0f, 80.0f);
     GameplayCameraController.CameraOrbitAngles adjusted = controller.update();
 
-    assertThat(adjusted.yawDegrees()).isCloseTo(85.078125f, within(0.0001f));
+    assertThat(adjusted.yawDegrees()).isCloseTo(-139.921875f, within(0.0001f));
     assertThat(adjusted.pitchDegrees()).isEqualTo(GameplayCameraController.MAX_PITCH_DEGREES);
   }
 

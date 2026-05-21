@@ -7,6 +7,9 @@ public record ObjectDefinition(
     String name,
     List<Integer> modelIds,
     List<Integer> modelTypes,
+    int morphVarBitId,
+    int morphVarpId,
+    List<Integer> morphIds,
     List<Integer> recolorSources,
     List<Integer> recolorTargets,
     int sizeX,
@@ -29,12 +32,14 @@ public record ObjectDefinition(
     int scaleZ,
     int translateX,
     int translateY,
-    int translateZ
+    int translateZ,
+    int animationId
 ) {
 
   public ObjectDefinition {
     modelIds = List.copyOf(modelIds);
     modelTypes = List.copyOf(modelTypes);
+    morphIds = List.copyOf(morphIds);
     recolorSources = List.copyOf(recolorSources);
     recolorTargets = List.copyOf(recolorTargets);
   }

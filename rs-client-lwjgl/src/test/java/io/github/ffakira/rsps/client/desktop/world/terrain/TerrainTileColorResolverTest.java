@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 class TerrainTileColorResolverTest {
 
   @Test
-  void keepsFlatTerrainWithinLegacyBrightnessRange() {
+  void keepsFlatTerrainWithinReferenceBrightnessRange() {
     WorldScene worldScene = testWorldScene(
         3,
         3,
@@ -28,7 +28,7 @@ class TerrainTileColorResolverTest {
   }
 
   @Test
-  void differentiatesOpposingSlopeDirectionsAgainstTheLegacyLightVector() {
+  void differentiatesOpposingSlopeDirectionsAgainstTheReferenceLightVector() {
     WorldScene eastRisingScene = testWorldScene(
         3,
         3,
@@ -105,7 +105,7 @@ class TerrainTileColorResolverTest {
   }
 
   @Test
-  void treatsStoredFloorRgbAsLegacyNinetySixBaselineLight() {
+  void treatsStoredFloorRgbAsReferenceBaselineLight() {
     WorldScene worldScene = testWorldScene(
         3,
         3,
@@ -129,6 +129,103 @@ class TerrainTileColorResolverTest {
 
     assertThat(channel(cornerColor, 8)).isGreaterThan(45);
     assertThat(channel(cornerColor, 8)).isGreaterThan(channel(cornerColor, 16));
+  }
+
+  @Test
+  void relightsPaletteDerivedFloorRgbThroughTheReferenceHslPath() {
+    int floorHsl16 = encodeHsl16(84, 160, 92);
+    int storedFloorRgb = FloorColorShadePalette.hslToRgb(
+        FloorColorShadePalette.checkedLight(floorHsl16, FloorColorShadePalette.BASELINE_LIGHT)
+    );
+    WorldScene worldScene = testWorldScene(
+        3,
+        3,
+        new int[]{
+            0, 24, 48,
+            0, 24, 48,
+            0, 24, 48
+        },
+        filledInts(9, storedFloorRgb),
+        filledInts(9, 0),
+        filledInts(9, storedFloorRgb)
+    );
+
+    int brightness = TerrainTileColorResolver.terrainLightBrightness(worldScene, 1, 1);
+    int cornerColor = TerrainTileColorResolver.cornerColor(
+        worldScene,
+        1,
+        1,
+        TerrainTileColorResolver.FloorColorLayer.UNDERLAY,
+        storedFloorRgb
+    );
+
+    assertThat(brightness).isNotEqualTo(FloorColorShadePalette.BASELINE_LIGHT);
+    assertThat(cornerColor).isEqualTo(
+        FloorColorShadePalette.hslToRgb(
+            FloorColorShadePalette.checkedLight(floorHsl16, brightness)
+        )
+    );
+  }
+
+  @Test
+  void averagesSharedCornerPaletteContributorsInReferenceHslSpace() {
+    int northWestHsl16 = encodeHsl16(12, 160, 88);
+    int northEastHsl16 = encodeHsl16(52, 192, 112);
+    int southWestHsl16 = encodeHsl16(104, 128, 72);
+    int southEastHsl16 = encodeHsl16(156, 224, 136);
+    int[] underlayColors = new int[]{
+        referenceFloorRgb(northWestHsl16),
+        referenceFloorRgb(northEastHsl16),
+        referenceFloorRgb(southWestHsl16),
+        referenceFloorRgb(southEastHsl16)
+    };
+    WorldScene worldScene = testWorldScene(
+        2,
+        2,
+        new int[]{
+            0, 16,
+            8, 24
+        },
+        underlayColors,
+        filledInts(4, 0),
+        underlayColors
+    );
+
+    int brightness = TerrainTileColorResolver.terrainLightBrightness(worldScene, 1, 1);
+    int cornerColor = TerrainTileColorResolver.cornerColor(
+        worldScene,
+        1,
+        1,
+        TerrainTileColorResolver.FloorColorLayer.UNDERLAY,
+        underlayColors[0]
+    );
+
+    int expectedCornerHsl16 = FloorColorShadePalette.encodeHsl16(
+        average(
+            FloorColorShadePalette.hueComponent(northWestHsl16),
+            FloorColorShadePalette.hueComponent(northEastHsl16),
+            FloorColorShadePalette.hueComponent(southWestHsl16),
+            FloorColorShadePalette.hueComponent(southEastHsl16)
+        ),
+        average(
+            FloorColorShadePalette.saturationComponent(northWestHsl16),
+            FloorColorShadePalette.saturationComponent(northEastHsl16),
+            FloorColorShadePalette.saturationComponent(southWestHsl16),
+            FloorColorShadePalette.saturationComponent(southEastHsl16)
+        ),
+        average(
+            FloorColorShadePalette.luminanceComponent(northWestHsl16),
+            FloorColorShadePalette.luminanceComponent(northEastHsl16),
+            FloorColorShadePalette.luminanceComponent(southWestHsl16),
+            FloorColorShadePalette.luminanceComponent(southEastHsl16)
+        )
+    );
+
+    assertThat(cornerColor).isEqualTo(
+        FloorColorShadePalette.hslToRgb(
+            FloorColorShadePalette.checkedLight(expectedCornerHsl16, brightness)
+        )
+    );
   }
 
   @Test
@@ -164,6 +261,39 @@ class TerrainTileColorResolverTest {
     int shadowedBrightness = TerrainTileColorResolver.terrainLightBrightness(shadowedScene, 1, 1);
 
     assertThat(shadowedBrightness).isLessThan(unshadowedBrightness);
+  }
+
+  @Test
+  void doesNotRenderFlatPaintWhenTheOverlayBranchIsPresentButHidden() {
+    WorldScene worldScene = new WorldScene(
+        "hidden-overlay-paint-decision",
+        3200,
+        3200,
+        0,
+        1,
+        1,
+        new int[]{0},
+        new int[]{1},
+        new int[]{4},
+        new int[]{0x4a6a3c},
+        new int[]{0x4a6a3c},
+        new int[]{0},
+        new int[]{-1},
+        new int[]{-1},
+        new byte[]{0},
+        new byte[]{0},
+        new byte[]{0},
+        List.of(),
+        List.of(),
+        new ArgbImage(1, 1, new int[]{0xff000000}),
+        new ArgbImage(1, 1, new int[]{0xff334455}),
+        new WorldSceneProjection(5, 3, 0, 0),
+        null
+    );
+
+    assertThat(TerrainTileColorResolver.paintLayer(worldScene, 0, 0))
+        .isEqualTo(TerrainTileColorResolver.FloorColorLayer.OVERLAY);
+    assertThat(TerrainTileColorResolver.shouldRenderPaintTile(worldScene, 0, 0)).isFalse();
   }
 
   private static WorldScene testWorldScene(int width, int height, int[] elevations) {
@@ -240,5 +370,23 @@ class TerrainTileColorResolverTest {
 
   private static int channel(int rgb, int shift) {
     return (rgb >>> shift) & 0xff;
+  }
+
+  private static int referenceFloorRgb(int hsl16) {
+    return FloorColorShadePalette.hslToRgb(
+        FloorColorShadePalette.checkedLight(hsl16, FloorColorShadePalette.BASELINE_LIGHT)
+    );
+  }
+
+  private static int average(int... values) {
+    int sum = 0;
+    for (int value : values) {
+      sum += value;
+    }
+    return sum / values.length;
+  }
+
+  private static int encodeHsl16(int hue, int saturation, int luminance) {
+    return FloorColorShadePalette.encodeHsl16(hue, saturation, luminance);
   }
 }

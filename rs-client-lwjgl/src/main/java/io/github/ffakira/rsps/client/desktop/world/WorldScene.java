@@ -1,6 +1,7 @@
 package io.github.ffakira.rsps.client.desktop.world;
 
 import io.github.ffakira.rsps.client.desktop.core.ArgbImage;
+import io.github.ffakira.rsps.client.desktop.world.minimap.WorldSceneMapFunctionMarker;
 import io.github.ffakira.rsps.client.desktop.world.object.WorldSceneObject;
 import io.github.ffakira.rsps.client.desktop.world.terrain.BridgeTerrainLayer;
 import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainLayerSource;
@@ -28,13 +29,15 @@ public record WorldScene(
     byte[] tileFlags,
     byte[] shadowSamples,
     List<WorldSceneObject> objects,
+    List<WorldSceneMapFunctionMarker> mapFunctionMarkers,
     List<WorldSceneOccluder> occluders,
     ArgbImage image,
     ArgbImage minimapImage,
     WorldSceneProjection projection,
     BridgeTerrainLayer bridgeTerrainLayer,
     byte[] surfacePlanes,
-    int[] terrainOcclusionFlags
+    int[] terrainOcclusionFlags,
+    int[][] heightSamplesByPlane
 ) implements TerrainLayerSource {
 
   public WorldScene(
@@ -80,13 +83,15 @@ public record WorldScene(
         tileFlags,
         emptyShadowSamples(tileWidth, tileHeight),
         objects,
+        List.of(),
         occluders,
         image,
         minimapImage,
         projection,
         bridgeTerrainLayer,
         emptySurfacePlanes(tileWidth, tileHeight),
-        emptyTerrainOcclusionFlags(tileWidth, tileHeight)
+        emptyTerrainOcclusionFlags(tileWidth, tileHeight),
+        null
     );
   }
 
@@ -135,13 +140,15 @@ public record WorldScene(
         tileFlags,
         emptyShadowSamples(tileWidth, tileHeight),
         objects,
+        List.of(),
         occluders,
         image,
         minimapImage,
         projection,
         bridgeTerrainLayer,
         emptySurfacePlanes(tileWidth, tileHeight),
-        emptyTerrainOcclusionFlags(tileWidth, tileHeight)
+        emptyTerrainOcclusionFlags(tileWidth, tileHeight),
+        null
     );
   }
 
@@ -187,13 +194,15 @@ public record WorldScene(
         tileFlags,
         emptyShadowSamples(tileWidth, tileHeight),
         objects,
+        List.of(),
         occluders,
         image,
         minimapImage,
         projection,
         BridgeTerrainLayer.empty(tileWidth, tileHeight),
         emptySurfacePlanes(tileWidth, tileHeight),
-        emptyTerrainOcclusionFlags(tileWidth, tileHeight)
+        emptyTerrainOcclusionFlags(tileWidth, tileHeight),
+        null
     );
   }
 
@@ -241,18 +250,21 @@ public record WorldScene(
         tileFlags,
         shadowSamples,
         objects,
+        List.of(),
         occluders,
         image,
         minimapImage,
         projection,
         bridgeTerrainLayer,
         emptySurfacePlanes(tileWidth, tileHeight),
-        emptyTerrainOcclusionFlags(tileWidth, tileHeight)
+        emptyTerrainOcclusionFlags(tileWidth, tileHeight),
+        null
     );
   }
 
   public WorldScene {
     objects = List.copyOf(objects);
+    mapFunctionMarkers = mapFunctionMarkers == null ? List.of() : List.copyOf(mapFunctionMarkers);
     occluders = List.copyOf(occluders);
     underlayIds = underlayIds == null ? emptyFloorIds(tileWidth, tileHeight) : underlayIds;
     overlayIds = overlayIds == null ? emptyFloorIds(tileWidth, tileHeight) : overlayIds;
@@ -264,6 +276,13 @@ public record WorldScene(
     terrainOcclusionFlags = terrainOcclusionFlags == null
         ? emptyTerrainOcclusionFlags(tileWidth, tileHeight)
         : terrainOcclusionFlags;
+    // Default to one-plane samples derived from the flattened elevations array. Production scenes
+    // populate per-plane heights to support per-tile-per-corner mesh elevations (bridges); tests
+    // and legacy callers fall through to a single plane = current elevations, which preserves
+    // their existing shared-corner behaviour.
+    if (heightSamplesByPlane == null) {
+      heightSamplesByPlane = new int[][]{elevations};
+    }
   }
 
   public boolean contains(WorldPoint worldPoint) {
@@ -313,6 +332,31 @@ public record WorldScene(
 
   public int surfacePlaneAt(int localX, int localY) {
     return surfacePlanes[localY * tileWidth + localX] & 0xff;
+  }
+
+  /**
+   * Returns the elevation sample on a given plane at scene-local tile coordinates. Used by the
+   * terrain mesh builder to produce per-tile-per-corner heights so a bridge deck and the water
+   * tile beside it can render with different vertex positions at the shared corner — matching the
+   * legacy `MapRegion` behaviour where each tile uses its own plane's height.
+   */
+  @Override
+  public int tileCornerElevationAt(int tileX, int tileY, int cornerOffsetX, int cornerOffsetY) {
+    int clampedTileX = Math.max(0, Math.min(tileWidth - 1, tileX));
+    int clampedTileY = Math.max(0, Math.min(tileHeight - 1, tileY));
+    int surfacePlane = surfacePlanes[clampedTileY * tileWidth + clampedTileX] & 0xff;
+    return planeElevationAt(surfacePlane, tileX + cornerOffsetX, tileY + cornerOffsetY);
+  }
+
+  public int planeElevationAt(int plane, int localX, int localY) {
+    int clampedX = Math.max(0, Math.min(tileWidth - 1, localX));
+    int clampedY = Math.max(0, Math.min(tileHeight - 1, localY));
+    int safePlane = plane >= 0 && plane < heightSamplesByPlane.length ? plane : 0;
+    int[] samples = heightSamplesByPlane[safePlane];
+    if (samples == null) {
+      samples = elevations;
+    }
+    return samples[clampedY * tileWidth + clampedX];
   }
 
   @Override

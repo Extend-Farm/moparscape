@@ -9,6 +9,11 @@ public record SessionState(
     UUID sessionId,
     AccountRecord account,
     CharacterSnapshot character,
-    EntityId entityId
+    EntityId entityId,
+    int actionSequenceId
 ) {
+
+  public SessionState withActionSequenceId(int actionSequenceId) {
+    return new SessionState(sessionId, account, character, entityId, Math.max(-1, actionSequenceId));
+  }
 }

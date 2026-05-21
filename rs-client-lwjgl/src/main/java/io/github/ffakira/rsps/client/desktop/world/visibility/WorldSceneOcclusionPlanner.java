@@ -186,7 +186,10 @@ public final class WorldSceneOcclusionPlanner {
     float rotatedZ = (float) (-offsetY * Math.sin(pitchRadians) + offsetZ * Math.cos(pitchRadians));
     float rotatedX = (float) (-rotatedZ * Math.sin(yawRadians));
     float worldZ = (float) (rotatedZ * Math.cos(yawRadians));
-    return new float[]{focusX + rotatedX, focusHeight + rotatedY, focusY + worldZ};
+    // Mirror of the glScalef(1, 1, -1) the renderer applies between R_yaw and T_focus. Without
+    // this, the recovered camera world position would be on the wrong side of the focus along
+    // north/south and the occluder ray would cull tiles incorrectly.
+    return new float[]{focusX + rotatedX, focusHeight + rotatedY, focusY - worldZ};
   }
 
   private static float lerp(float start, float end, float t) {

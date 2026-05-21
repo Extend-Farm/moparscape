@@ -19,8 +19,11 @@ final class SceneTextureAnimationPlanner {
   }
 
   private boolean isAnimatedTexture(int textureId) {
+    // Legacy moparscape scrolls these textures by rotating sprite rows each frame. Texture id 1 is
+    // water — without animation it appears as flat blue, which is the symptom the user reports
+    // when comparing the native client side-by-side with the legacy reference at Lumbridge bridge.
     return switch (textureId) {
-      case 17, 24, 34 -> true;
+      case 1, 17, 24, 34 -> true;
       default -> false;
     };
   }

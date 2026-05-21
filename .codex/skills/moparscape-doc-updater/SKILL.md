@@ -36,6 +36,8 @@ Use this skill when the task is to update documentation after code or workflow c
 - Update commands, paths, module names, and known limitations when they change.
 - Remove stale instructions when superseded.
 - When a refactor changes architecture, ownership, or workflow, update the relevant doc in the same change.
+- When a refactor changes repo-local engineering guidance, update the relevant `SKILL.md` files in the same slice instead of leaving the new standard implicit in code review history.
+- Prefer `reference client` / `reference behavior` terminology over `legacy` when documenting the existing client as a behavior target.
 - In multi-agent work, prefer additive updates over rewrites, preserve other contributors' notes unless replacing them with newer confirmed state, and make task ownership/status explicit.
 
 ## Validation

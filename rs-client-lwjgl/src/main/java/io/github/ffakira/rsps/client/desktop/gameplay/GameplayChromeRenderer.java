@@ -49,7 +49,8 @@ public final class GameplayChromeRenderer implements AutoCloseable {
     sidebarRenderer = new GameplaySidebarRenderer(
         itemDefinitionCatalog,
         itemIconRenderer,
-        titleScreenFonts == null ? null : titleScreenFonts.plainSmall(),
+        gameplayFrameAssets == null ? null : gameplayFrameAssets.statsTabAssets(),
+        titleScreenFonts,
         primitives
     );
   }
@@ -58,14 +59,18 @@ public final class GameplayChromeRenderer implements AutoCloseable {
     for (GameplayTab gameplayTab : GameplayTab.values()) {
       if (GameplayLayout.gameplayTabRect(gameplayTab).contains(x, y)) {
         activeGameplayTab = gameplayTab;
+        if (gameplayTab != GameplayTab.STATS) {
+          sidebarRenderer.clearTransientState();
+        }
         return true;
       }
     }
-    return false;
+    return sidebarRenderer.handleSidebarClick(activeGameplayTab, x, y);
   }
 
   public void resetToInventoryTab() {
     activeGameplayTab = GameplayTab.INVENTORY;
+    sidebarRenderer.clearTransientState();
   }
 
   public void activateCursorMarker(GameplayMouseButton button, double x, double y) {
@@ -101,6 +106,11 @@ public final class GameplayChromeRenderer implements AutoCloseable {
     contextMenu = null;
   }
 
+  public void clearTransientState() {
+    contextMenu = null;
+    sidebarRenderer.clearTransientState();
+  }
+
   public void setPointerPosition(double x, double y) {
     pointerX = x;
     pointerY = y;
@@ -127,7 +137,7 @@ public final class GameplayChromeRenderer implements AutoCloseable {
     chromeTextures.drawActiveGameplayTabHighlight(primitives, activeGameplayTab);
     chromeTextures.drawSideIcons(primitives);
     minimapRenderer.drawMinimap(viewModel, worldScene, worldMinimapTexture, cameraState);
-    sidebarRenderer.drawSidebar(viewModel, activeGameplayTab);
+    sidebarRenderer.drawSidebar(viewModel, activeGameplayTab, pointerX, pointerY);
     sidebarRenderer.drawChatbox(viewModel, activeGameplayTab);
     drawCursorMarker();
     drawContextMenu();
@@ -211,6 +221,10 @@ public final class GameplayChromeRenderer implements AutoCloseable {
       GameplayContextMenu.Entry entry = contextMenu.entries().get(index);
       drawMenuEntry(entry, contextMenu.entryLeft(), contextMenu.entryBaselineY(index), hoveredEntryIndex == index);
     }
+  }
+
+  GameplayTab activeGameplayTab() {
+    return activeGameplayTab;
   }
 
   @Override
