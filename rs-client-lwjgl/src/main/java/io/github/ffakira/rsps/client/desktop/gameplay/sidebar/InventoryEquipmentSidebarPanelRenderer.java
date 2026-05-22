@@ -7,7 +7,7 @@ import io.github.ffakira.rsps.client.core.EquipmentLoadout;
 import io.github.ffakira.rsps.client.desktop.core.OpenGlTexture;
 import io.github.ffakira.rsps.client.desktop.core.ScreenRect;
 import io.github.ffakira.rsps.client.desktop.gameplay.GameplayTab;
-import io.github.ffakira.rsps.protocol.BootstrapItemSlot;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapItemSlot;
 import java.util.List;
 
 final class InventoryEquipmentSidebarPanelRenderer {

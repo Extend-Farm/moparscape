@@ -2,11 +2,11 @@ package io.github.ffakira.rsps.client.core;
 
 import io.github.ffakira.rsps.model.MovementMode;
 import io.github.ffakira.rsps.model.WorldPoint;
-import io.github.ffakira.rsps.protocol.DisconnectNotice;
-import io.github.ffakira.rsps.protocol.HandshakeRequest;
-import io.github.ffakira.rsps.protocol.LoginRequest;
-import io.github.ffakira.rsps.protocol.MoveIntentMessage;
-import io.github.ffakira.rsps.protocol.ActionSequenceIntentMessage;
+import io.github.ffakira.rsps.protocol.session.DisconnectNotice;
+import io.github.ffakira.rsps.protocol.session.HandshakeRequest;
+import io.github.ffakira.rsps.protocol.session.LoginRequest;
+import io.github.ffakira.rsps.protocol.input.MoveIntentMessage;
+import io.github.ffakira.rsps.protocol.input.ActionSequenceIntentMessage;
 import io.github.ffakira.rsps.protocol.ProtocolVersion;
 import io.github.ffakira.rsps.protocol.ServerMessage;
 import java.nio.file.Path;

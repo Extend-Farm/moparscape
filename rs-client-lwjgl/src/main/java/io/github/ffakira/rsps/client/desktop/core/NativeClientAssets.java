@@ -1,6 +1,7 @@
 package io.github.ffakira.rsps.client.desktop.core;
 
 import io.github.ffakira.rsps.client.desktop.character.CharacterModelAssembler;
+import io.github.ffakira.rsps.client.desktop.character.NpcModelAssembler;
 import io.github.ffakira.rsps.client.desktop.gameplay.GameplayFrameAssets;
 import io.github.ffakira.rsps.client.desktop.itemicon.ItemIconRenderer;
 import io.github.ffakira.rsps.client.desktop.login.TitleScreenAssets;
@@ -15,6 +16,7 @@ record NativeClientAssets(
     ItemDefinitionCatalog itemDefinitionCatalog,
     ItemIconRenderer itemIconRenderer,
     CharacterModelAssembler characterModelAssembler,
+    NpcModelAssembler npcModelAssembler,
     CacheBackedWorldSceneLoader worldSceneLoader
 ) {
 
@@ -27,7 +29,8 @@ record NativeClientAssets(
         sceneTextureAssets,
         itemDefinitionCatalog,
         itemIconRenderer,
-        characterModelAssembler
+        characterModelAssembler,
+        npcModelAssembler
     );
   }
 }

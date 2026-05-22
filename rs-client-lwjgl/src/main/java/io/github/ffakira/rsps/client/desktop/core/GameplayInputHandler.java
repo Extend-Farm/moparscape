@@ -4,6 +4,7 @@ import io.github.ffakira.rsps.client.core.GameplayClientSession;
 import io.github.ffakira.rsps.client.desktop.gameplay.GameplayClickResult;
 import io.github.ffakira.rsps.client.desktop.gameplay.GameplayMouseButton;
 import io.github.ffakira.rsps.model.MovementMode;
+import java.util.function.Supplier;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
@@ -23,17 +24,29 @@ final class GameplayInputHandler {
 
   private final GameplayInputPort inputPort;
   private final MovementPort movementPort;
+  private final WindowClosePort windowClosePort;
+  private final LogoutPort logoutPort;
   private boolean rotateLeftPressed;
   private boolean rotateRightPressed;
   private boolean pitchUpPressed;
   private boolean pitchDownPressed;
   private boolean runModifierPressed;
+  private boolean leftMouseButtonPressed;
 
-  GameplayInputHandler(OpenGlTileRenderSystem renderSystem, GameplayClientSession gameplayClientSession) {
+  GameplayInputHandler(
+      OpenGlTileRenderSystem renderSystem,
+      Supplier<GameplayClientSession> gameplayClientSessionSupplier,
+      LogoutPort logoutPort
+  ) {
     this(
         renderSystem::handleGameplayClick,
+        renderSystem::handleGameplayScroll,
+        renderSystem::handleGameplayPointerMove,
+        renderSystem::endGameplayPointerDrag,
         renderSystem::setGameplayCameraInputs,
-        gameplayClientSession::move
+        (deltaX, deltaY, movementMode) -> gameplayClientSessionSupplier.get().move(deltaX, deltaY, movementMode),
+        windowHandle -> glfwSetWindowShouldClose(windowHandle, true),
+        logoutPort
     );
   }
 
@@ -42,16 +55,108 @@ final class GameplayInputHandler {
       GameplayCameraInputPort gameplayCameraInputPort,
       MovementPort movementPort
   ) {
-    this.inputPort = new GameplayInputPort(gameplayClickPort, gameplayCameraInputPort);
-    this.movementPort = movementPort;
+    this(
+        gameplayClickPort,
+        (mouseX, mouseY, yOffset) -> false,
+        (mouseX, mouseY) -> false,
+        () -> {
+        },
+        gameplayCameraInputPort,
+        movementPort,
+        windowHandle -> glfwSetWindowShouldClose(windowHandle, true),
+        () -> {
+        }
+    );
   }
 
-  void handleMouseButton(int button, int action, double mouseX, double mouseY) {
+  GameplayInputHandler(
+      GameplayClickPort gameplayClickPort,
+      GameplayCameraInputPort gameplayCameraInputPort,
+      MovementPort movementPort,
+      WindowClosePort windowClosePort
+  ) {
+    this(
+        gameplayClickPort,
+        (mouseX, mouseY, yOffset) -> false,
+        (mouseX, mouseY) -> false,
+        () -> {
+        },
+        gameplayCameraInputPort,
+        movementPort,
+        windowClosePort,
+        () -> {
+        }
+    );
+  }
+
+  GameplayInputHandler(
+      GameplayClickPort gameplayClickPort,
+      GameplayScrollPort gameplayScrollPort,
+      GameplayPointerMovePort gameplayPointerMovePort,
+      PointerDragEndPort pointerDragEndPort,
+      GameplayCameraInputPort gameplayCameraInputPort,
+      MovementPort movementPort,
+      WindowClosePort windowClosePort,
+      LogoutPort logoutPort
+  ) {
+    this.inputPort = new GameplayInputPort(
+        gameplayClickPort,
+        gameplayScrollPort,
+        gameplayPointerMovePort,
+        pointerDragEndPort,
+        gameplayCameraInputPort
+    );
+    this.movementPort = movementPort;
+    this.windowClosePort = windowClosePort;
+    this.logoutPort = logoutPort;
+  }
+
+  GameplayInputHandler(
+      GameplayClickPort gameplayClickPort,
+      GameplayCameraInputPort gameplayCameraInputPort,
+      MovementPort movementPort,
+      WindowClosePort windowClosePort,
+      LogoutPort logoutPort
+  ) {
+    this(
+        gameplayClickPort,
+        (mouseX, mouseY, yOffset) -> false,
+        (mouseX, mouseY) -> false,
+        () -> {
+        },
+        gameplayCameraInputPort,
+        movementPort,
+        windowClosePort,
+        logoutPort
+    );
+  }
+
+  void handleMouseButton(long windowHandle, int button, int action, double mouseX, double mouseY) {
     GameplayMouseButton gameplayMouseButton = gameplayMouseButton(button);
-    if (gameplayMouseButton == null || action != GLFW_PRESS) {
+    if (gameplayMouseButton == null) {
+      return;
+    }
+    if (gameplayMouseButton == GameplayMouseButton.LEFT) {
+      if (action == GLFW_PRESS) {
+        leftMouseButtonPressed = true;
+      } else if (action == GLFW_RELEASE) {
+        leftMouseButtonPressed = false;
+        inputPort.endPointerDrag();
+      }
+    }
+    if (action != GLFW_PRESS) {
       return;
     }
     GameplayClickResult clickResult = inputPort.handleGameplayClick(mouseX, mouseY, gameplayMouseButton);
+    if (clickResult.requestsLogout()) {
+      clearCameraInputs();
+      logoutPort.requestLogout();
+      return;
+    }
+    if (clickResult.requestsClientClose()) {
+      windowClosePort.requestClose(windowHandle);
+      return;
+    }
     if (!clickResult.hasMovementDelta()) {
       return;
     }
@@ -65,7 +170,7 @@ final class GameplayInputHandler {
 
   void handleKey(long windowHandle, int key, int action) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-      glfwSetWindowShouldClose(windowHandle, true);
+      windowClosePort.requestClose(windowHandle);
       return;
     }
     if (action != GLFW_PRESS && action != GLFW_REPEAT && action != GLFW_RELEASE) {
@@ -100,7 +205,20 @@ final class GameplayInputHandler {
     pitchUpPressed = false;
     pitchDownPressed = false;
     runModifierPressed = false;
+    leftMouseButtonPressed = false;
+    inputPort.endPointerDrag();
     applyCameraInputs();
+  }
+
+  void handleScroll(double mouseX, double mouseY, double yOffset) {
+    inputPort.handleGameplayScroll(mouseX, mouseY, yOffset);
+  }
+
+  void handlePointerMove(double mouseX, double mouseY) {
+    if (!leftMouseButtonPressed) {
+      return;
+    }
+    inputPort.handleGameplayPointerMove(mouseX, mouseY);
   }
 
   private void applyCameraInputs() {
@@ -131,12 +249,40 @@ final class GameplayInputHandler {
   }
 
   @FunctionalInterface
+  interface GameplayScrollPort {
+    boolean handleGameplayScroll(double mouseX, double mouseY, double yOffset);
+  }
+
+  @FunctionalInterface
+  interface GameplayPointerMovePort {
+    boolean handleGameplayPointerMove(double mouseX, double mouseY);
+  }
+
+  @FunctionalInterface
+  interface PointerDragEndPort {
+    void endPointerDrag();
+  }
+
+  @FunctionalInterface
   interface MovementPort {
     void move(int deltaX, int deltaY, MovementMode movementMode);
   }
 
+  @FunctionalInterface
+  interface WindowClosePort {
+    void requestClose(long windowHandle);
+  }
+
+  @FunctionalInterface
+  interface LogoutPort {
+    void requestLogout();
+  }
+
   private record GameplayInputPort(
       GameplayClickPort clickPort,
+      GameplayScrollPort scrollPort,
+      GameplayPointerMovePort pointerMovePort,
+      PointerDragEndPort pointerDragEndPort,
       GameplayCameraInputPort cameraInputPort
   ) {
 
@@ -151,6 +297,18 @@ final class GameplayInputHandler {
         boolean pitchDownPressed
     ) {
       cameraInputPort.setGameplayCameraInputs(rotateLeftPressed, rotateRightPressed, pitchUpPressed, pitchDownPressed);
+    }
+
+    private boolean handleGameplayScroll(double mouseX, double mouseY, double yOffset) {
+      return scrollPort.handleGameplayScroll(mouseX, mouseY, yOffset);
+    }
+
+    private boolean handleGameplayPointerMove(double mouseX, double mouseY) {
+      return pointerMovePort.handleGameplayPointerMove(mouseX, mouseY);
+    }
+
+    private void endPointerDrag() {
+      pointerDragEndPort.endPointerDrag();
     }
   }
 }

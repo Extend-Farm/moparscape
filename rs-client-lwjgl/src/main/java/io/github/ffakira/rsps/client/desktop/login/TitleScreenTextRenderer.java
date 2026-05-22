@@ -33,12 +33,10 @@ public final class TitleScreenTextRenderer {
   private static final int LOADING_BORDER_RGB = 0x8c1111;
   private static final int LOADING_FILL_RGB = 0x7d0000;
 
-  private final TitleScreenBitmapFont plainSmallFont;
   private final TitleScreenBitmapFont plainFont;
   private final TitleScreenBitmapFont boldFont;
 
   public TitleScreenTextRenderer(TitleScreenFonts fonts) {
-    this.plainSmallFont = fonts.plainSmall();
     this.plainFont = fonts.plain();
     this.boldFont = fonts.bold();
   }
@@ -222,19 +220,6 @@ public final class TitleScreenTextRenderer {
 
   private void drawBold(int[] pixels, String text, int left, int baselineY, int rgb) {
     boldFont.drawText(pixels, CANVAS_WIDTH, CANVAS_HEIGHT, text, left, baselineY, rgb, true);
-  }
-
-  private void drawCenteredPlain(int[] pixels, String text, int centerX, int baselineY, int rgb) {
-    plainFont.drawText(
-        pixels,
-        CANVAS_WIDTH,
-        CANVAS_HEIGHT,
-        text,
-        centerX - plainFont.measureVisibleWidth(text) / 2 - plainFont.visibleLeftOffset(text),
-        baselineY,
-        rgb,
-        true
-    );
   }
 
   private void drawCenteredBoldInButton(int[] pixels, String text, int centerX, int centerY, int rgb) {

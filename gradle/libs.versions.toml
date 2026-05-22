@@ -6,6 +6,8 @@ postgres = "42.7.3"
 testcontainers = "1.19.8"
 lwjgl = "3.3.3"
 commons-compress = "1.26.2"
+netty = "4.2.11.Final"
+bouncycastle = "1.84"
 
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
@@ -22,3 +24,12 @@ lwjgl-glfw = { module = "org.lwjgl:lwjgl-glfw" }
 lwjgl-opengl = { module = "org.lwjgl:lwjgl-opengl" }
 lwjgl-stb = { module = "org.lwjgl:lwjgl-stb" }
 commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "commons-compress" }
+netty-bom = { module = "io.netty:netty-bom", version.ref = "netty" }
+netty-codec = { module = "io.netty:netty-codec" }
+netty-codec-classes-quic = { module = "io.netty:netty-codec-classes-quic" }
+netty-codec-native-quic = { module = "io.netty:netty-codec-native-quic", version.ref = "netty" }
+netty-handler = { module = "io.netty:netty-handler" }
+netty-transport = { module = "io.netty:netty-transport" }
+bouncycastle-bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bouncycastle" }
+bouncycastle-bcprov = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
+bouncycastle-bctls = { module = "org.bouncycastle:bctls-jdk18on", version.ref = "bouncycastle" }

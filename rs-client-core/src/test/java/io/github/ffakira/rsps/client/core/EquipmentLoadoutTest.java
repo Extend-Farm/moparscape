@@ -2,7 +2,7 @@ package io.github.ffakira.rsps.client.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.github.ffakira.rsps.protocol.BootstrapItemSlot;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapItemSlot;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

@@ -56,10 +56,10 @@ class GameplayChromeRendererTest {
   }
 
   @Test
-  void insetsSceneActionHintFromTheViewportEdge() {
+  void anchorsSceneActionHintToTheReferenceViewportOrigin() {
     ScreenRect worldViewport = GameplayLayout.worldViewportInnerRect();
 
-    assertThat(GameplayChromeRenderer.sceneActionHintLeft(worldViewport)).isEqualTo(worldViewport.left() + 4.0f);
+    assertThat(GameplayChromeRenderer.sceneActionHintLeft(worldViewport)).isEqualTo(worldViewport.left());
     assertThat(GameplayChromeRenderer.sceneActionHintBaselineY(worldViewport)).isEqualTo(worldViewport.top() + 11.0f);
   }
 

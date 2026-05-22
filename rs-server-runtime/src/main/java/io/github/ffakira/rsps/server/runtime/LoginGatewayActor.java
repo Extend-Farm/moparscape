@@ -2,7 +2,7 @@ package io.github.ffakira.rsps.server.runtime;
 
 import io.github.ffakira.rsps.persistence.AccountRepository;
 import io.github.ffakira.rsps.persistence.CharacterRepository;
-import io.github.ffakira.rsps.protocol.HandshakeAccepted;
+import io.github.ffakira.rsps.protocol.session.HandshakeAccepted;
 import io.github.ffakira.rsps.protocol.ProtocolVersion;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;

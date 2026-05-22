@@ -3,7 +3,7 @@ package io.github.ffakira.rsps.client.desktop.gameplay.sidebar;
 import io.github.ffakira.rsps.client.core.EquipmentLoadout;
 import io.github.ffakira.rsps.content.ItemDefinition;
 import io.github.ffakira.rsps.content.ItemDefinitionCatalog;
-import io.github.ffakira.rsps.protocol.BootstrapItemSlot;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapItemSlot;
 import java.util.List;
 import java.util.Locale;
 

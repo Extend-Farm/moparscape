@@ -2,7 +2,7 @@ package io.github.ffakira.rsps.client.desktop.gameplay.sidebar;
 
 import io.github.ffakira.rsps.client.core.BootstrapSkillPresentation;
 import io.github.ffakira.rsps.client.core.ClientViewModel;
-import io.github.ffakira.rsps.protocol.BootstrapSkill;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapSkill;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

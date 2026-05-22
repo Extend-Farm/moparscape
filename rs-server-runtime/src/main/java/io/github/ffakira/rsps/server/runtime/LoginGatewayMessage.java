@@ -1,7 +1,7 @@
 package io.github.ffakira.rsps.server.runtime;
 
-import io.github.ffakira.rsps.protocol.HandshakeRequest;
-import io.github.ffakira.rsps.protocol.LoginRequest;
+import io.github.ffakira.rsps.protocol.session.HandshakeRequest;
+import io.github.ffakira.rsps.protocol.session.LoginRequest;
 
 public sealed interface LoginGatewayMessage extends ActorMessage {
 

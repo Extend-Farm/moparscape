@@ -1,15 +1,15 @@
 package io.github.ffakira.rsps.client.core;
 
-import io.github.ffakira.rsps.protocol.CharacterBootstrapMessage;
-import io.github.ffakira.rsps.protocol.CharacterBootstrapPayload;
-import io.github.ffakira.rsps.protocol.EntityActionSequenceMessage;
+import io.github.ffakira.rsps.protocol.bootstrap.CharacterBootstrapMessage;
+import io.github.ffakira.rsps.protocol.bootstrap.CharacterBootstrapPayload;
+import io.github.ffakira.rsps.protocol.world.EntityActionSequenceMessage;
 import io.github.ffakira.rsps.model.WorldPoint;
-import io.github.ffakira.rsps.protocol.EntityPositionMessage;
-import io.github.ffakira.rsps.protocol.HandshakeAccepted;
-import io.github.ffakira.rsps.protocol.LoginAccepted;
-import io.github.ffakira.rsps.protocol.LoginRejected;
+import io.github.ffakira.rsps.protocol.world.EntityPositionMessage;
+import io.github.ffakira.rsps.protocol.session.HandshakeAccepted;
+import io.github.ffakira.rsps.protocol.session.LoginAccepted;
+import io.github.ffakira.rsps.protocol.session.LoginRejected;
 import io.github.ffakira.rsps.protocol.ServerMessage;
-import io.github.ffakira.rsps.protocol.WorldSnapshotMessage;
+import io.github.ffakira.rsps.protocol.world.WorldSnapshotMessage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -131,6 +131,7 @@ public class ClientCore {
         viewModel = new ClientViewModel(loginRejected.reason(), false, null);
         events.add(new ClientDisconnectedEvent(loginRejected.reason()));
       }
+      default -> throw new IllegalArgumentException("Unsupported server message: " + message.getClass().getName());
     }
     return List.copyOf(events);
   }

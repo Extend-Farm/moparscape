@@ -1,7 +1,7 @@
 package io.github.ffakira.rsps.client.core;
 
 import io.github.ffakira.rsps.model.WorldPoint;
-import io.github.ffakira.rsps.protocol.CharacterBootstrapPayload;
+import io.github.ffakira.rsps.protocol.bootstrap.CharacterBootstrapPayload;
 import java.util.List;
 
 public record ClientViewModel(
@@ -37,11 +37,11 @@ public record ClientViewModel(
     localPlayerActionSequenceId = Math.max(-1, localPlayerActionSequenceId);
   }
 
-  public List<io.github.ffakira.rsps.protocol.BootstrapItemSlot> inventory() {
+  public List<io.github.ffakira.rsps.protocol.bootstrap.BootstrapItemSlot> inventory() {
     return bootstrap == null ? List.of() : bootstrap.inventory();
   }
 
-  public List<io.github.ffakira.rsps.protocol.BootstrapItemSlot> equipment() {
+  public List<io.github.ffakira.rsps.protocol.bootstrap.BootstrapItemSlot> equipment() {
     return bootstrap == null ? List.of() : bootstrap.equipment();
   }
 
@@ -49,7 +49,7 @@ public record ClientViewModel(
     return EquipmentLoadout.from(equipment());
   }
 
-  public List<io.github.ffakira.rsps.protocol.BootstrapSkill> skills() {
+  public List<io.github.ffakira.rsps.protocol.bootstrap.BootstrapSkill> skills() {
     return bootstrap == null ? List.of() : bootstrap.skills();
   }
 

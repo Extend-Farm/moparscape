@@ -5,24 +5,46 @@ import java.util.Arrays;
 
 public final class SceneTriangleMeshBuilder {
 
-  private float[] vertexX = new float[256];
-  private float[] vertexY = new float[256];
-  private float[] vertexZ = new float[256];
+  private static final int DEFAULT_VERTEX_CAPACITY = 256;
+  private static final int DEFAULT_FACE_CAPACITY = 256;
+  private static final int NO_VERTEX_REMAP = -1;
+  private static final int MAX_REFERENCED_VERTICES_PER_FACE = 6;
+  private static final boolean VALIDATE_VERTEX_INDICES =
+      Boolean.getBoolean("rsps.validateSceneTriangleMeshBuilderIndices");
+
+  private float[] vertexX;
+  private float[] vertexY;
+  private float[] vertexZ;
   private int vertexCount;
 
-  private int[] faceVertexA = new int[256];
-  private int[] faceVertexB = new int[256];
-  private int[] faceVertexC = new int[256];
-  private int[] faceColorA = new int[256];
-  private int[] faceColorB = new int[256];
-  private int[] faceColorC = new int[256];
-  private int[] faceAlpha = new int[256];
-  private int[] faceTextureIds = new int[256];
-  private int[] textureVertexA = new int[256];
-  private int[] textureVertexB = new int[256];
-  private int[] textureVertexC = new int[256];
-  private int[] facePriorities = new int[256];
+  private int[] faceVertexA;
+  private int[] faceVertexB;
+  private int[] faceVertexC;
+  private int[] faceColorA;
+  private int[] faceColorB;
+  private int[] faceColorC;
+  private int[] faceAlpha;
+  private int[] faceTextureIds;
+  private int[] textureVertexA;
+  private int[] textureVertexB;
+  private int[] textureVertexC;
+  private int[] facePriorities;
   private int faceCount;
+
+  private int[] filteredVertexRemap = new int[0];
+  private int[] filteredVertexMarks = new int[0];
+  private int filteredVertexMark = 1;
+
+  public SceneTriangleMeshBuilder() {
+    this(DEFAULT_VERTEX_CAPACITY, DEFAULT_FACE_CAPACITY);
+  }
+
+  public SceneTriangleMeshBuilder(int initialVertexCapacity, int initialFaceCapacity) {
+    reinitializeStorage(
+        Math.max(0, initialVertexCapacity),
+        Math.max(0, initialFaceCapacity)
+    );
+  }
 
   public int addVertex(float x, float y, float z) {
     ensureVertexCapacity(vertexCount + 1);
@@ -41,6 +63,16 @@ public final class SceneTriangleMeshBuilder {
       float heightSouthEast,
       float heightSouthWest
   ) {
+    // Terrain shape points use the 317 tile-model layout:
+    //
+    //   1 --- 2 --- 3
+    //   | \  9  10 / |
+    //   8  13  | 14  4
+    //   | 12 \ | /11 |
+    //   7  16  | 15  5
+    //   | /    6    \|
+    //
+    // The default path uses the shared midpoint for irregular overlay fallbacks.
     return switch (pointCode) {
       case 1 -> addVertex(tileX, heightNorthWest, tileY);
       case 2 -> addVertex(tileX + 0.5f, midpoint(heightNorthWest, heightNorthEast), tileY);
@@ -100,6 +132,7 @@ public final class SceneTriangleMeshBuilder {
       int textureC,
       int facePriority
   ) {
+    validateVertexIndices(a, b, c);
     ensureFaceCapacity(faceCount + 1);
     faceVertexA[faceCount] = a;
     faceVertexB[faceCount] = b;
@@ -158,19 +191,16 @@ public final class SceneTriangleMeshBuilder {
     }
     ensureFaceCapacity(faceCount + mesh.faceVertexA().length);
     for (int index = 0; index < mesh.faceVertexA().length; index++) {
-      faceVertexA[faceCount] = baseVertexIndex + mesh.faceVertexA()[index];
-      faceVertexB[faceCount] = baseVertexIndex + mesh.faceVertexB()[index];
-      faceVertexC[faceCount] = baseVertexIndex + mesh.faceVertexC()[index];
-      faceColorA[faceCount] = mesh.faceColorA()[index];
-      faceColorB[faceCount] = mesh.faceColorB()[index];
-      faceColorC[faceCount] = mesh.faceColorC()[index];
-      faceAlpha[faceCount] = mesh.faceAlpha()[index];
-      faceTextureIds[faceCount] = mesh.faceTextureIds()[index];
-      textureVertexA[faceCount] = mesh.textureVertexA()[index] < 0 ? -1 : baseVertexIndex + mesh.textureVertexA()[index];
-      textureVertexB[faceCount] = mesh.textureVertexB()[index] < 0 ? -1 : baseVertexIndex + mesh.textureVertexB()[index];
-      textureVertexC[faceCount] = mesh.textureVertexC()[index] < 0 ? -1 : baseVertexIndex + mesh.textureVertexC()[index];
-      facePriorities[faceCount] = mesh.facePriorities()[index];
-      faceCount++;
+      appendMeshFace(
+          mesh,
+          index,
+          baseVertexIndex + mesh.faceVertexA()[index],
+          baseVertexIndex + mesh.faceVertexB()[index],
+          baseVertexIndex + mesh.faceVertexC()[index],
+          remapTextureVertex(mesh.textureVertexA()[index], baseVertexIndex),
+          remapTextureVertex(mesh.textureVertexB()[index], baseVertexIndex),
+          remapTextureVertex(mesh.textureVertexC()[index], baseVertexIndex)
+      );
     }
   }
 
@@ -189,38 +219,11 @@ public final class SceneTriangleMeshBuilder {
     if (geometry == null || geometry.faceVertexA().length == 0) {
       return;
     }
-    int baseVertexIndex = vertexCount;
-    ensureVertexCapacity(vertexCount + geometry.vertexX().length);
-    float radians = (float) Math.toRadians(yawDegrees);
-    float sine = (float) Math.sin(radians);
-    float cosine = (float) Math.cos(radians);
-    for (int index = 0; index < geometry.vertexX().length; index++) {
-      float localX = geometry.vertexX()[index];
-      float localZ = geometry.vertexZ()[index];
-      vertexX[vertexCount] = localX * cosine + localZ * sine + offsetX;
-      vertexY[vertexCount] = geometry.vertexY()[index] + offsetY;
-      vertexZ[vertexCount] = localZ * cosine - localX * sine + offsetZ;
-      vertexCount++;
+    if (rasterModeFilter != null) {
+      addFilteredRotatedGeometry(geometry, offsetX, offsetY, offsetZ, yawDegrees, rasterModeFilter);
+      return;
     }
-    ensureFaceCapacity(faceCount + geometry.faceVertexA().length);
-    for (int index = 0; index < geometry.faceVertexA().length; index++) {
-      if (rasterModeFilter != null && geometry.faceRasterModes()[index] != rasterModeFilter) {
-        continue;
-      }
-      faceVertexA[faceCount] = baseVertexIndex + geometry.faceVertexA()[index];
-      faceVertexB[faceCount] = baseVertexIndex + geometry.faceVertexB()[index];
-      faceVertexC[faceCount] = baseVertexIndex + geometry.faceVertexC()[index];
-      faceColorA[faceCount] = geometry.faceColorA()[index];
-      faceColorB[faceCount] = geometry.faceColorB()[index];
-      faceColorC[faceCount] = geometry.faceColorC()[index];
-      faceAlpha[faceCount] = geometry.faceAlpha()[index];
-      faceTextureIds[faceCount] = geometry.faceTextureIds()[index];
-      textureVertexA[faceCount] = geometry.textureVertexA()[index] < 0 ? -1 : baseVertexIndex + geometry.textureVertexA()[index];
-      textureVertexB[faceCount] = geometry.textureVertexB()[index] < 0 ? -1 : baseVertexIndex + geometry.textureVertexB()[index];
-      textureVertexC[faceCount] = geometry.textureVertexC()[index] < 0 ? -1 : baseVertexIndex + geometry.textureVertexC()[index];
-      facePriorities[faceCount] = geometry.facePriorities()[index];
-      faceCount++;
-    }
+    appendRotatedGeometry(geometry, offsetX, offsetY, offsetZ, yawDegrees);
   }
 
   public void addGeometry(
@@ -233,33 +236,11 @@ public final class SceneTriangleMeshBuilder {
     if (geometry == null || geometry.faceVertexA().length == 0) {
       return;
     }
-    int baseVertexIndex = vertexCount;
-    ensureVertexCapacity(vertexCount + geometry.vertexX().length);
-    for (int index = 0; index < geometry.vertexX().length; index++) {
-      vertexX[vertexCount] = geometry.vertexX()[index] + offsetX;
-      vertexY[vertexCount] = geometry.vertexY()[index] + offsetY;
-      vertexZ[vertexCount] = geometry.vertexZ()[index] + offsetZ;
-      vertexCount++;
+    if (rasterModeFilter != null) {
+      addFilteredGeometry(geometry, offsetX, offsetY, offsetZ, rasterModeFilter);
+      return;
     }
-    ensureFaceCapacity(faceCount + geometry.faceVertexA().length);
-    for (int index = 0; index < geometry.faceVertexA().length; index++) {
-      if (rasterModeFilter != null && geometry.faceRasterModes()[index] != rasterModeFilter) {
-        continue;
-      }
-      faceVertexA[faceCount] = baseVertexIndex + geometry.faceVertexA()[index];
-      faceVertexB[faceCount] = baseVertexIndex + geometry.faceVertexB()[index];
-      faceVertexC[faceCount] = baseVertexIndex + geometry.faceVertexC()[index];
-      faceColorA[faceCount] = geometry.faceColorA()[index];
-      faceColorB[faceCount] = geometry.faceColorB()[index];
-      faceColorC[faceCount] = geometry.faceColorC()[index];
-      faceAlpha[faceCount] = geometry.faceAlpha()[index];
-      faceTextureIds[faceCount] = geometry.faceTextureIds()[index];
-      textureVertexA[faceCount] = geometry.textureVertexA()[index] < 0 ? -1 : baseVertexIndex + geometry.textureVertexA()[index];
-      textureVertexB[faceCount] = geometry.textureVertexB()[index] < 0 ? -1 : baseVertexIndex + geometry.textureVertexB()[index];
-      textureVertexC[faceCount] = geometry.textureVertexC()[index] < 0 ? -1 : baseVertexIndex + geometry.textureVertexC()[index];
-      facePriorities[faceCount] = geometry.facePriorities()[index];
-      faceCount++;
-    }
+    appendGeometry(geometry, offsetX, offsetY, offsetZ);
   }
 
   public SceneTriangleMesh build() {
@@ -285,11 +266,173 @@ public final class SceneTriangleMeshBuilder {
     );
   }
 
+  public SceneTriangleMesh buildDetached() {
+    if (faceCount == 0) {
+      return SceneTriangleMesh.EMPTY;
+    }
+    int nextVertexCapacity = Math.max(DEFAULT_VERTEX_CAPACITY, vertexX.length);
+    int nextFaceCapacity = Math.max(DEFAULT_FACE_CAPACITY, faceVertexA.length);
+    SceneTriangleMesh mesh = new SceneTriangleMesh(
+        detachFloats(vertexX, vertexCount),
+        detachFloats(vertexY, vertexCount),
+        detachFloats(vertexZ, vertexCount),
+        detachInts(faceVertexA, faceCount),
+        detachInts(faceVertexB, faceCount),
+        detachInts(faceVertexC, faceCount),
+        detachInts(faceColorA, faceCount),
+        detachInts(faceColorB, faceCount),
+        detachInts(faceColorC, faceCount),
+        detachInts(faceAlpha, faceCount),
+        detachInts(faceTextureIds, faceCount),
+        detachInts(textureVertexA, faceCount),
+        detachInts(textureVertexB, faceCount),
+        detachInts(textureVertexC, faceCount),
+        detachInts(facePriorities, faceCount)
+    );
+    reinitializeStorage(nextVertexCapacity, nextFaceCapacity);
+    return mesh;
+  }
+
+  public void reset() {
+    vertexCount = 0;
+    faceCount = 0;
+  }
+
+  private void appendRotatedGeometry(
+      WorldSceneObjectGeometry geometry,
+      float offsetX,
+      float offsetY,
+      float offsetZ,
+      float yawDegrees
+  ) {
+    int baseVertexIndex = vertexCount;
+    ensureVertexCapacity(vertexCount + geometry.vertexX().length);
+    float radians = (float) Math.toRadians(yawDegrees);
+    float sine = (float) Math.sin(radians);
+    float cosine = (float) Math.cos(radians);
+    for (int index = 0; index < geometry.vertexX().length; index++) {
+      float localX = geometry.vertexX()[index];
+      float localZ = geometry.vertexZ()[index];
+      vertexX[vertexCount] = localX * cosine + localZ * sine + offsetX;
+      vertexY[vertexCount] = geometry.vertexY()[index] + offsetY;
+      vertexZ[vertexCount] = localZ * cosine - localX * sine + offsetZ;
+      vertexCount++;
+    }
+    ensureFaceCapacity(faceCount + geometry.faceVertexA().length);
+    for (int index = 0; index < geometry.faceVertexA().length; index++) {
+      appendGeometryFace(
+          geometry,
+          index,
+          baseVertexIndex + geometry.faceVertexA()[index],
+          baseVertexIndex + geometry.faceVertexB()[index],
+          baseVertexIndex + geometry.faceVertexC()[index],
+          remapTextureVertex(geometry.textureVertexA()[index], baseVertexIndex),
+          remapTextureVertex(geometry.textureVertexB()[index], baseVertexIndex),
+          remapTextureVertex(geometry.textureVertexC()[index], baseVertexIndex)
+      );
+    }
+  }
+
+  private void addFilteredRotatedGeometry(
+      WorldSceneObjectGeometry geometry,
+      float offsetX,
+      float offsetY,
+      float offsetZ,
+      float yawDegrees,
+      SceneRasterMode rasterModeFilter
+  ) {
+    int matchingFaceCount = countMatchingFaces(geometry.faceRasterModes(), rasterModeFilter);
+    if (matchingFaceCount == 0) {
+      return;
+    }
+    ensureVertexCapacity(vertexCount + initialFilteredVertexCapacity(geometry, matchingFaceCount));
+    ensureFaceCapacity(faceCount + matchingFaceCount);
+    int mark = prepareFilteredVertexScratch(geometry.vertexX().length);
+    float radians = (float) Math.toRadians(yawDegrees);
+    float sine = (float) Math.sin(radians);
+    float cosine = (float) Math.cos(radians);
+    for (int index = 0; index < geometry.faceVertexA().length; index++) {
+      if (geometry.faceRasterModes()[index] != rasterModeFilter) {
+        continue;
+      }
+      appendGeometryFace(
+          geometry,
+          index,
+          copyRotatedFilteredVertex(geometry, geometry.faceVertexA()[index], offsetX, offsetY, offsetZ, sine, cosine, mark),
+          copyRotatedFilteredVertex(geometry, geometry.faceVertexB()[index], offsetX, offsetY, offsetZ, sine, cosine, mark),
+          copyRotatedFilteredVertex(geometry, geometry.faceVertexC()[index], offsetX, offsetY, offsetZ, sine, cosine, mark),
+          copyRotatedFilteredTextureVertex(geometry, geometry.textureVertexA()[index], offsetX, offsetY, offsetZ, sine, cosine, mark),
+          copyRotatedFilteredTextureVertex(geometry, geometry.textureVertexB()[index], offsetX, offsetY, offsetZ, sine, cosine, mark),
+          copyRotatedFilteredTextureVertex(geometry, geometry.textureVertexC()[index], offsetX, offsetY, offsetZ, sine, cosine, mark)
+      );
+    }
+  }
+
+  private void appendGeometry(
+      WorldSceneObjectGeometry geometry,
+      float offsetX,
+      float offsetY,
+      float offsetZ
+  ) {
+    int baseVertexIndex = vertexCount;
+    ensureVertexCapacity(vertexCount + geometry.vertexX().length);
+    for (int index = 0; index < geometry.vertexX().length; index++) {
+      vertexX[vertexCount] = geometry.vertexX()[index] + offsetX;
+      vertexY[vertexCount] = geometry.vertexY()[index] + offsetY;
+      vertexZ[vertexCount] = geometry.vertexZ()[index] + offsetZ;
+      vertexCount++;
+    }
+    ensureFaceCapacity(faceCount + geometry.faceVertexA().length);
+    for (int index = 0; index < geometry.faceVertexA().length; index++) {
+      appendGeometryFace(
+          geometry,
+          index,
+          baseVertexIndex + geometry.faceVertexA()[index],
+          baseVertexIndex + geometry.faceVertexB()[index],
+          baseVertexIndex + geometry.faceVertexC()[index],
+          remapTextureVertex(geometry.textureVertexA()[index], baseVertexIndex),
+          remapTextureVertex(geometry.textureVertexB()[index], baseVertexIndex),
+          remapTextureVertex(geometry.textureVertexC()[index], baseVertexIndex)
+      );
+    }
+  }
+
+  private void addFilteredGeometry(
+      WorldSceneObjectGeometry geometry,
+      float offsetX,
+      float offsetY,
+      float offsetZ,
+      SceneRasterMode rasterModeFilter
+  ) {
+    int matchingFaceCount = countMatchingFaces(geometry.faceRasterModes(), rasterModeFilter);
+    if (matchingFaceCount == 0) {
+      return;
+    }
+    ensureVertexCapacity(vertexCount + initialFilteredVertexCapacity(geometry, matchingFaceCount));
+    ensureFaceCapacity(faceCount + matchingFaceCount);
+    int mark = prepareFilteredVertexScratch(geometry.vertexX().length);
+    for (int index = 0; index < geometry.faceVertexA().length; index++) {
+      if (geometry.faceRasterModes()[index] != rasterModeFilter) {
+        continue;
+      }
+      appendGeometryFace(
+          geometry,
+          index,
+          copyFilteredVertex(geometry, geometry.faceVertexA()[index], offsetX, offsetY, offsetZ, mark),
+          copyFilteredVertex(geometry, geometry.faceVertexB()[index], offsetX, offsetY, offsetZ, mark),
+          copyFilteredVertex(geometry, geometry.faceVertexC()[index], offsetX, offsetY, offsetZ, mark),
+          copyFilteredTextureVertex(geometry, geometry.textureVertexA()[index], offsetX, offsetY, offsetZ, mark),
+          copyFilteredTextureVertex(geometry, geometry.textureVertexB()[index], offsetX, offsetY, offsetZ, mark),
+          copyFilteredTextureVertex(geometry, geometry.textureVertexC()[index], offsetX, offsetY, offsetZ, mark)
+      );
+    }
+  }
+
   private void ensureVertexCapacity(int requiredCapacity) {
     if (requiredCapacity <= vertexX.length) {
       return;
     }
-    int newCapacity = Math.max(requiredCapacity, vertexX.length * 2);
+    int newCapacity = Math.max(requiredCapacity, Math.max(1, vertexX.length) * 2);
     vertexX = Arrays.copyOf(vertexX, newCapacity);
     vertexY = Arrays.copyOf(vertexY, newCapacity);
     vertexZ = Arrays.copyOf(vertexZ, newCapacity);
@@ -299,7 +442,7 @@ public final class SceneTriangleMeshBuilder {
     if (requiredCapacity <= faceVertexA.length) {
       return;
     }
-    int newCapacity = Math.max(requiredCapacity, faceVertexA.length * 2);
+    int newCapacity = Math.max(requiredCapacity, Math.max(1, faceVertexA.length) * 2);
     faceVertexA = Arrays.copyOf(faceVertexA, newCapacity);
     faceVertexB = Arrays.copyOf(faceVertexB, newCapacity);
     faceVertexC = Arrays.copyOf(faceVertexC, newCapacity);
@@ -312,6 +455,205 @@ public final class SceneTriangleMeshBuilder {
     textureVertexB = Arrays.copyOf(textureVertexB, newCapacity);
     textureVertexC = Arrays.copyOf(textureVertexC, newCapacity);
     facePriorities = Arrays.copyOf(facePriorities, newCapacity);
+  }
+
+  private int countMatchingFaces(SceneRasterMode[] faceRasterModes, SceneRasterMode rasterModeFilter) {
+    int matchingFaceCount = 0;
+    for (SceneRasterMode faceRasterMode : faceRasterModes) {
+      if (faceRasterMode == rasterModeFilter) {
+        matchingFaceCount++;
+      }
+    }
+    return matchingFaceCount;
+  }
+
+  private int initialFilteredVertexCapacity(WorldSceneObjectGeometry geometry, int matchingFaceCount) {
+    return Math.min(geometry.vertexX().length, matchingFaceCount * MAX_REFERENCED_VERTICES_PER_FACE);
+  }
+
+  private int prepareFilteredVertexScratch(int requiredCapacity) {
+    if (filteredVertexRemap.length < requiredCapacity) {
+      filteredVertexRemap = new int[requiredCapacity];
+      filteredVertexMarks = new int[requiredCapacity];
+      filteredVertexMark = 1;
+    } else if (filteredVertexMark == Integer.MAX_VALUE) {
+      Arrays.fill(filteredVertexMarks, 0);
+      filteredVertexMark = 1;
+    }
+    return filteredVertexMark++;
+  }
+
+  private int copyFilteredTextureVertex(
+      WorldSceneObjectGeometry geometry,
+      int vertexIndex,
+      float offsetX,
+      float offsetY,
+      float offsetZ,
+      int mark
+  ) {
+    if (vertexIndex < 0) {
+      return NO_VERTEX_REMAP;
+    }
+    return copyFilteredVertex(geometry, vertexIndex, offsetX, offsetY, offsetZ, mark);
+  }
+
+  private int copyRotatedFilteredTextureVertex(
+      WorldSceneObjectGeometry geometry,
+      int vertexIndex,
+      float offsetX,
+      float offsetY,
+      float offsetZ,
+      float sine,
+      float cosine,
+      int mark
+  ) {
+    if (vertexIndex < 0) {
+      return NO_VERTEX_REMAP;
+    }
+    return copyRotatedFilteredVertex(geometry, vertexIndex, offsetX, offsetY, offsetZ, sine, cosine, mark);
+  }
+
+  private int copyFilteredVertex(
+      WorldSceneObjectGeometry geometry,
+      int vertexIndex,
+      float offsetX,
+      float offsetY,
+      float offsetZ,
+      int mark
+  ) {
+    if (filteredVertexMarks[vertexIndex] == mark) {
+      return filteredVertexRemap[vertexIndex];
+    }
+    ensureVertexCapacity(vertexCount + 1);
+    vertexX[vertexCount] = geometry.vertexX()[vertexIndex] + offsetX;
+    vertexY[vertexCount] = geometry.vertexY()[vertexIndex] + offsetY;
+    vertexZ[vertexCount] = geometry.vertexZ()[vertexIndex] + offsetZ;
+    filteredVertexMarks[vertexIndex] = mark;
+    filteredVertexRemap[vertexIndex] = vertexCount;
+    return vertexCount++;
+  }
+
+  private int copyRotatedFilteredVertex(
+      WorldSceneObjectGeometry geometry,
+      int vertexIndex,
+      float offsetX,
+      float offsetY,
+      float offsetZ,
+      float sine,
+      float cosine,
+      int mark
+  ) {
+    if (filteredVertexMarks[vertexIndex] == mark) {
+      return filteredVertexRemap[vertexIndex];
+    }
+    ensureVertexCapacity(vertexCount + 1);
+    float localX = geometry.vertexX()[vertexIndex];
+    float localZ = geometry.vertexZ()[vertexIndex];
+    vertexX[vertexCount] = localX * cosine + localZ * sine + offsetX;
+    vertexY[vertexCount] = geometry.vertexY()[vertexIndex] + offsetY;
+    vertexZ[vertexCount] = localZ * cosine - localX * sine + offsetZ;
+    filteredVertexMarks[vertexIndex] = mark;
+    filteredVertexRemap[vertexIndex] = vertexCount;
+    return vertexCount++;
+  }
+
+  private int remapTextureVertex(int textureVertexIndex, int baseVertexIndex) {
+    return textureVertexIndex < 0 ? NO_VERTEX_REMAP : baseVertexIndex + textureVertexIndex;
+  }
+
+  private void appendMeshFace(
+      SceneTriangleMesh mesh,
+      int faceIndex,
+      int vertexA,
+      int vertexB,
+      int vertexC,
+      int textureA,
+      int textureB,
+      int textureC
+  ) {
+    faceVertexA[faceCount] = vertexA;
+    faceVertexB[faceCount] = vertexB;
+    faceVertexC[faceCount] = vertexC;
+    faceColorA[faceCount] = mesh.faceColorA()[faceIndex];
+    faceColorB[faceCount] = mesh.faceColorB()[faceIndex];
+    faceColorC[faceCount] = mesh.faceColorC()[faceIndex];
+    faceAlpha[faceCount] = mesh.faceAlpha()[faceIndex];
+    faceTextureIds[faceCount] = mesh.faceTextureIds()[faceIndex];
+    textureVertexA[faceCount] = textureA;
+    textureVertexB[faceCount] = textureB;
+    textureVertexC[faceCount] = textureC;
+    facePriorities[faceCount] = mesh.facePriorities()[faceIndex];
+    faceCount++;
+  }
+
+  private void appendGeometryFace(
+      WorldSceneObjectGeometry geometry,
+      int faceIndex,
+      int vertexA,
+      int vertexB,
+      int vertexC,
+      int textureA,
+      int textureB,
+      int textureC
+  ) {
+    faceVertexA[faceCount] = vertexA;
+    faceVertexB[faceCount] = vertexB;
+    faceVertexC[faceCount] = vertexC;
+    faceColorA[faceCount] = geometry.faceColorA()[faceIndex];
+    faceColorB[faceCount] = geometry.faceColorB()[faceIndex];
+    faceColorC[faceCount] = geometry.faceColorC()[faceIndex];
+    faceAlpha[faceCount] = geometry.faceAlpha()[faceIndex];
+    faceTextureIds[faceCount] = geometry.faceTextureIds()[faceIndex];
+    textureVertexA[faceCount] = textureA;
+    textureVertexB[faceCount] = textureB;
+    textureVertexC[faceCount] = textureC;
+    facePriorities[faceCount] = geometry.facePriorities()[faceIndex];
+    faceCount++;
+  }
+
+  private float[] detachFloats(float[] values, int usedLength) {
+    return values.length == usedLength ? values : Arrays.copyOf(values, usedLength);
+  }
+
+  private int[] detachInts(int[] values, int usedLength) {
+    return values.length == usedLength ? values : Arrays.copyOf(values, usedLength);
+  }
+
+  private void reinitializeStorage(int vertexCapacity, int faceCapacity) {
+    vertexX = new float[vertexCapacity];
+    vertexY = new float[vertexCapacity];
+    vertexZ = new float[vertexCapacity];
+    faceVertexA = new int[faceCapacity];
+    faceVertexB = new int[faceCapacity];
+    faceVertexC = new int[faceCapacity];
+    faceColorA = new int[faceCapacity];
+    faceColorB = new int[faceCapacity];
+    faceColorC = new int[faceCapacity];
+    faceAlpha = new int[faceCapacity];
+    faceTextureIds = new int[faceCapacity];
+    textureVertexA = new int[faceCapacity];
+    textureVertexB = new int[faceCapacity];
+    textureVertexC = new int[faceCapacity];
+    facePriorities = new int[faceCapacity];
+    reset();
+  }
+
+  private void validateVertexIndices(int a, int b, int c) {
+    if (!VALIDATE_VERTEX_INDICES) {
+      return;
+    }
+    validateVertexIndex(a, "a");
+    validateVertexIndex(b, "b");
+    validateVertexIndex(c, "c");
+  }
+
+  private void validateVertexIndex(int vertexIndex, String label) {
+    if (vertexIndex >= 0 && vertexIndex < vertexCount) {
+      return;
+    }
+    throw new IllegalArgumentException(
+        "Triangle vertex " + label + " index " + vertexIndex + " is outside 0.." + (vertexCount - 1)
+    );
   }
 
   private float midpoint(float first, float second) {

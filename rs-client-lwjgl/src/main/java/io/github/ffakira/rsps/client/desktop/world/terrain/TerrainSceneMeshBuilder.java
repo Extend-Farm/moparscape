@@ -34,7 +34,7 @@ public final class TerrainSceneMeshBuilder {
         appendPaintTile(builder, tileX, tileY, cornerHeights(worldScene, tileX, tileY), cornerColors(worldScene, tileX, tileY, paintLayer, rgb));
       }
     }
-    return builder.build();
+    return builder.buildDetached();
   }
 
   public SceneTriangleMesh buildTexturedTilePaintMesh(WorldScene worldScene) {
@@ -63,7 +63,7 @@ public final class TerrainSceneMeshBuilder {
         );
       }
     }
-    return builder.build();
+    return builder.buildDetached();
   }
 
   public SceneTriangleMesh buildTileModelMesh(WorldScene worldScene) {
@@ -82,7 +82,7 @@ public final class TerrainSceneMeshBuilder {
         appendShapedTile(builder, worldScene, tileX, tileY, shape, worldScene.overlayRotationAt(tileX, tileY), false);
       }
     }
-    return builder.build();
+    return builder.buildDetached();
   }
 
   public SceneTriangleMesh buildTexturedTileModelMesh(WorldScene worldScene) {
@@ -104,7 +104,7 @@ public final class TerrainSceneMeshBuilder {
         appendShapedTile(builder, worldScene, tileX, tileY, shape, worldScene.overlayRotationAt(tileX, tileY), true);
       }
     }
-    return builder.build();
+    return builder.buildDetached();
   }
 
   private void appendShapedTile(

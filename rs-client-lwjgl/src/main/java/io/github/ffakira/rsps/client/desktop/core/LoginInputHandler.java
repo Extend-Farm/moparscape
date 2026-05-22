@@ -6,6 +6,7 @@ import io.github.ffakira.rsps.client.desktop.login.LoginScreenController;
 import io.github.ffakira.rsps.client.desktop.login.LoginScreenState;
 import io.github.ffakira.rsps.client.desktop.login.TitleScreenLayout;
 import io.github.ffakira.rsps.client.desktop.login.TitleScreenStage;
+import java.util.function.Supplier;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_BACKSPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER;
@@ -21,7 +22,7 @@ final class LoginInputHandler implements DesktopInputRouter.LoginInputPort {
 
   private final OpenGlTileRenderSystem renderSystem;
   private final LoginScreenController loginScreenController;
-  private final GameplayClientSession gameplayClientSession;
+  private final Supplier<GameplayClientSession> gameplayClientSessionSupplier;
   private final DesktopClientState state;
   private final String welcomeStatus;
   private final String credentialsStatus;
@@ -30,7 +31,7 @@ final class LoginInputHandler implements DesktopInputRouter.LoginInputPort {
   LoginInputHandler(
       OpenGlTileRenderSystem renderSystem,
       LoginScreenController loginScreenController,
-      GameplayClientSession gameplayClientSession,
+      Supplier<GameplayClientSession> gameplayClientSessionSupplier,
       DesktopClientState state,
       String welcomeStatus,
       String credentialsStatus,
@@ -38,7 +39,7 @@ final class LoginInputHandler implements DesktopInputRouter.LoginInputPort {
   ) {
     this.renderSystem = renderSystem;
     this.loginScreenController = loginScreenController;
-    this.gameplayClientSession = gameplayClientSession;
+    this.gameplayClientSessionSupplier = gameplayClientSessionSupplier;
     this.state = state;
     this.welcomeStatus = welcomeStatus;
     this.credentialsStatus = credentialsStatus;
@@ -167,7 +168,7 @@ final class LoginInputHandler implements DesktopInputRouter.LoginInputPort {
   }
 
   private void submitNativeLogin(LoginScreenState loginScreenState) {
-    gameplayClientSession.login(loginScreenState.username(), loginScreenState.password());
+    gameplayClientSessionSupplier.get().login(loginScreenState.username(), loginScreenState.password());
     state.setTitleScreenStatus(authenticatingStatus);
   }
 

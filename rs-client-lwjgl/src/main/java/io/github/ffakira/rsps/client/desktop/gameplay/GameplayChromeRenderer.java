@@ -19,7 +19,7 @@ import static org.lwjgl.opengl.GL11.glColor3f;
 
 public final class GameplayChromeRenderer implements AutoCloseable {
 
-  private static final float SCENE_ACTION_HINT_LEFT_PADDING = 4.0f;
+  private static final float SCENE_ACTION_HINT_LEFT_PADDING = 0.0f;
   private static final float SCENE_ACTION_HINT_BASELINE_OFFSET = 11.0f;
 
   private final ImmediateModeRenderer2d primitives;
@@ -29,6 +29,7 @@ public final class GameplayChromeRenderer implements AutoCloseable {
   private final TitleScreenBitmapFont menuFont;
   private final GameplayCursorMarker cursorMarker = new GameplayCursorMarker();
   private final Map<String, OpenGlTexture> menuTextTextures = new HashMap<>();
+  private long renderFrameCounter;
   private GameplayContextMenu contextMenu;
   private SceneActionHint sceneActionHint;
   private GameplayTab activeGameplayTab = GameplayTab.INVENTORY;
@@ -60,17 +61,29 @@ public final class GameplayChromeRenderer implements AutoCloseable {
     );
   }
 
-  public boolean handleClick(double x, double y) {
+  public GameplayClickResult handleClick(double x, double y) {
     for (GameplayTab gameplayTab : GameplayTab.values()) {
       if (GameplayLayout.gameplayTabRect(gameplayTab).contains(x, y)) {
         activeGameplayTab = gameplayTab;
         if (gameplayTab != GameplayTab.STATS) {
           sidebarRenderer.clearTransientState();
         }
-        return true;
+        return GameplayClickResult.handledClick();
       }
     }
     return sidebarRenderer.handleSidebarClick(activeGameplayTab, x, y);
+  }
+
+  public boolean handleScroll(double x, double y, double yOffset) {
+    return sidebarRenderer.handleSidebarScroll(activeGameplayTab, x, y, yOffset);
+  }
+
+  public boolean handlePointerMove(double x, double y) {
+    return sidebarRenderer.handleSidebarPointerMove(activeGameplayTab, x, y);
+  }
+
+  public void endPointerDrag() {
+    sidebarRenderer.endSidebarPointerDrag();
   }
 
   public void resetToInventoryTab() {
@@ -140,6 +153,7 @@ public final class GameplayChromeRenderer implements AutoCloseable {
       OpenGlTexture worldMinimapTexture,
       WorldCameraState cameraState
   ) {
+    renderFrameCounter++;
     // Chrome is a deliberate mix today:
     // - authentic cache-backed frame art when media assets are available
     // - a native scene-state minimap inside that frame
@@ -270,7 +284,7 @@ public final class GameplayChromeRenderer implements AutoCloseable {
       return;
     }
     ScreenRect worldViewport = GameplayLayout.worldViewportInnerRect();
-    drawMenuText(
+    drawAnimatedMenuText(
         hintText,
         GameplayContextMenu.ACTION_RGB,
         true,
@@ -321,6 +335,21 @@ public final class GameplayChromeRenderer implements AutoCloseable {
     );
   }
 
+  private void drawAnimatedMenuText(String text, int rgb, boolean shadow, float left, float baselineY) {
+    if (menuFont == null) {
+      drawMenuText(text, rgb, shadow, left, baselineY);
+      return;
+    }
+    OpenGlTexture menuTextTexture = animatedMenuTextTexture(text, rgb, shadow, sceneActionHintSeed());
+    if (menuTextTexture == null) {
+      return;
+    }
+    primitives.drawTexturedQuad(
+        menuTextTexture,
+        new ScreenRect(left, baselineY - menuFont.maxGlyphHeight(), menuTextTexture.width(), menuTextTexture.height())
+    );
+  }
+
   private void drawMenuEntry(GameplayContextMenu.Entry entry, float left, float baselineY, boolean hovered) {
     float cursorX = left;
     for (GameplayContextMenu.TextRun textRun : entry.textRuns()) {
@@ -338,12 +367,36 @@ public final class GameplayChromeRenderer implements AutoCloseable {
     return menuTextTextures.computeIfAbsent(cacheKey, ignored -> createMenuTextTexture(text, rgb, shadow));
   }
 
+  private OpenGlTexture animatedMenuTextTexture(String text, int rgb, boolean shadow, int seed) {
+    if (menuFont == null || text == null || text.isEmpty()) {
+      return null;
+    }
+    String cacheKey = "animated|" + seed + "|" + rgb + "|" + shadow + "|" + text;
+    return menuTextTextures.computeIfAbsent(cacheKey, ignored -> createAnimatedMenuTextTexture(text, rgb, shadow, seed));
+  }
+
   private OpenGlTexture createMenuTextTexture(String text, int rgb, boolean shadow) {
-    int width = Math.max(1, menuFont.measureText(text) + (shadow ? 1 : 0));
+    int visibleWidth = menuFont.measureVisibleWidth(text);
+    int advanceWidth = menuFont.measureText(text);
+    int canvasRight = Math.max(advanceWidth, visibleWidth);
+    int shadowPadding = shadow ? 1 : 0;
+    int width = Math.max(1, canvasRight + shadowPadding);
     int height = Math.max(1, menuFont.maxGlyphHeight() + (shadow ? 1 : 0));
     int[] pixels = new int[width * height];
     menuFont.drawText(pixels, width, height, text, 0, menuFont.maxGlyphHeight(), rgb, shadow);
     return OpenGlTexture.fromArgbImage(new io.github.ffakira.rsps.client.desktop.core.ArgbImage(width, height, pixels));
+  }
+
+  private OpenGlTexture createAnimatedMenuTextTexture(String text, int rgb, boolean shadow, int seed) {
+    int width = Math.max(1, menuFont.measureAnimatedMenuText(text, seed) + 2);
+    int height = Math.max(1, menuFont.maxGlyphHeight() + (shadow ? 1 : 0));
+    int[] pixels = new int[width * height];
+    menuFont.drawAnimatedMenuText(pixels, width, height, text, 0, menuFont.maxGlyphHeight(), rgb, seed, shadow);
+    return OpenGlTexture.fromArgbImage(new io.github.ffakira.rsps.client.desktop.core.ArgbImage(width, height, pixels));
+  }
+
+  private int sceneActionHintSeed() {
+    return (int) (renderFrameCounter / 1000L);
   }
 
   private static float rgbUnit(int rgb, int shift) {

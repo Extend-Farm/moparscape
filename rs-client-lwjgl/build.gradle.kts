@@ -12,6 +12,7 @@ dependencies {
   implementation(project(":rs-persistence-sql"))
   implementation(project(":rs-protocol"))
   implementation(project(":rs-server-runtime"))
+  implementation(project(":rs-transport-quic"))
   implementation(libs.slf4j.api)
   runtimeOnly(libs.logback.classic)
 

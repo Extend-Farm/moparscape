@@ -2,7 +2,7 @@ package io.github.ffakira.rsps.server.runtime;
 
 import io.github.ffakira.rsps.persistence.AccountRecord;
 import io.github.ffakira.rsps.protocol.ClientMessage;
-import io.github.ffakira.rsps.protocol.HandshakeAccepted;
+import io.github.ffakira.rsps.protocol.session.HandshakeAccepted;
 import io.github.ffakira.rsps.sim.WorldEvent;
 import java.util.List;
 

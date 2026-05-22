@@ -11,8 +11,8 @@ import io.github.ffakira.rsps.client.desktop.world.raster.SceneTriangleMeshBuild
 import io.github.ffakira.rsps.client.desktop.world.visibility.WorldSceneOcclusionContext;
 import io.github.ffakira.rsps.client.desktop.world.visibility.WorldSceneOcclusionPlanner;
 import io.github.ffakira.rsps.client.desktop.world.visibility.WorldSceneVisibilityWindow;
-import io.github.ffakira.rsps.protocol.BootstrapAppearance;
-import io.github.ffakira.rsps.protocol.BootstrapItemSlot;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapAppearance;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapItemSlot;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -59,7 +59,10 @@ final class WorldSceneActorBatchBuilder {
       WorldSceneObjectGeometry geometry = characterModelAssembler.assemble(appearance, equipment, actorAnimationState);
       if (geometry != null) {
         float actorYawDegrees = actorYawDegrees(actorAnimationState);
-        SceneTriangleMeshBuilder actorBuilder = new SceneTriangleMeshBuilder();
+        SceneTriangleMeshBuilder actorBuilder = new SceneTriangleMeshBuilder(
+            geometry.vertexX().length,
+            geometry.faceVertexA().length
+        );
         // The player model has to stay as one ordered face stream. Splitting it across raster-mode
         // buckets changes cross-face order and can bury worn items like the amulet behind torso
         // faces that submit later.
@@ -67,7 +70,7 @@ final class WorldSceneActorBatchBuilder {
         renderQueueBuilder.add(
             SceneSubmissionKind.ACTOR,
             SceneRasterMode.GOURAUD,
-            sortActorMeshForSubmission(actorBuilder.build(), cameraState)
+            sortActorMeshForSubmission(actorBuilder.buildDetached(), cameraState)
         );
         return;
       }
@@ -189,17 +192,22 @@ final class WorldSceneActorBatchBuilder {
     float centerX = playerLocalX;
     float centerZ = playerLocalY;
 
-    SceneTriangleMeshBuilder builder = new SceneTriangleMeshBuilder();
+    boolean hasWeapon = equipment.stream().anyMatch(slot -> slot.slotIndex() == 3);
+    int cuboidCount = hasWeapon ? 7 : 6;
+    SceneTriangleMeshBuilder builder = new SceneTriangleMeshBuilder(
+        cuboidCount * 20,
+        cuboidCount * 10
+    );
     appendCuboid(builder, centerX - 0.16f, centerX - 0.05f, centerZ - 0.05f, centerZ + 0.06f, baseHeight, baseHeight + 0.82f, bodyRgb);
     appendCuboid(builder, centerX + 0.05f, centerX + 0.16f, centerZ - 0.05f, centerZ + 0.06f, baseHeight, baseHeight + 0.82f, bodyRgb);
     appendCuboid(builder, centerX - 0.19f, centerX - 0.11f, centerZ - 0.03f, centerZ + 0.05f, baseHeight + 0.68f, baseHeight + 1.35f, accentRgb);
     appendCuboid(builder, centerX + 0.11f, centerX + 0.19f, centerZ - 0.03f, centerZ + 0.05f, baseHeight + 0.68f, baseHeight + 1.35f, accentRgb);
     appendCuboid(builder, centerX - 0.14f, centerX + 0.14f, centerZ - 0.12f, centerZ + 0.12f, baseHeight + 0.74f, baseHeight + 1.42f, bodyRgb);
     appendCuboid(builder, centerX - 0.09f, centerX + 0.09f, centerZ - 0.09f, centerZ + 0.09f, baseHeight + 1.42f, baseHeight + 1.76f, accentRgb);
-    if (equipment.stream().anyMatch(slot -> slot.slotIndex() == 3)) {
+    if (hasWeapon) {
       appendCuboid(builder, centerX + 0.17f, centerX + 0.23f, centerZ - 0.02f, centerZ + 0.04f, baseHeight + 0.62f, baseHeight + 1.52f, 0x9f8350);
     }
-    return builder.build();
+    return builder.buildDetached();
   }
 
   private void appendCuboid(
@@ -458,7 +466,7 @@ final class WorldSceneActorBatchBuilder {
     }
   }
 
-  private static float sampleTerrainHeight(WorldScene worldScene, float localX, float localY) {
+  static float sampleTerrainHeight(WorldScene worldScene, float localX, float localY) {
     int tileX = clampTile((int) Math.floor(localX), worldScene.tileWidth());
     int tileY = clampTile((int) Math.floor(localY), worldScene.tileHeight());
     int eastTileX = Math.min(worldScene.tileWidth() - 1, tileX + 1);
@@ -474,7 +482,7 @@ final class WorldSceneActorBatchBuilder {
     return northBlend + (southBlend - northBlend) * offsetY;
   }
 
-  private static int clampTile(int value, int tileBound) {
+  static int clampTile(int value, int tileBound) {
     return Math.max(0, Math.min(tileBound - 1, value));
   }
 

@@ -2,7 +2,6 @@ package io.github.ffakira.rsps.client.desktop.gameplay.sidebar;
 
 import io.github.ffakira.rsps.client.core.ClientViewModel;
 import io.github.ffakira.rsps.client.desktop.core.ScreenRect;
-import io.github.ffakira.rsps.client.desktop.login.TitleScreenBitmapFont;
 import java.util.List;
 
 final class StatsSidebarPanelRenderer {

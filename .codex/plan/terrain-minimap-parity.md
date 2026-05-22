@@ -24,6 +24,7 @@ Terrain already has meaningful native groundwork:
 - flat paint tiles no longer invent `tileColor` fallback surfaces when the overlay branch resolves hidden
 - palette-derived floor corner lighting now reuses the reference HSL `checkedLight(..., brightness)` path instead of RGB-only relight approximation
 - shared-corner floor colors now stay in reference HSL space when every contributing tile color came from the floor palette
+- static object shadow stamping now follows the reference `MapRegion` contract again: only type `10/11` interactives contribute footprint shade, the old synthetic penumbra is gone, and ground-decoration meshes get a small native depth bias so farming patches stop z-fighting against the terrain plane
 - bridge-lower terrain is emitted
 - terrain occlusion flags and horizontal roof-plane occluders now come from terrain data instead of object heuristics
 - the visibility planner now uses a first roof-plane rule instead of treating roof flags as a blanket visibility hint

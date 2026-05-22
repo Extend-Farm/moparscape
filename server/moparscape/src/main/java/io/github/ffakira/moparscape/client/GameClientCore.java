@@ -26,6 +26,12 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
     private static final int LOGIN_SCREEN_PRIVATE_SERVER_INFO = 3;
     private static final int LOGIN_INPUT_USERNAME = 0;
     private static final int LOGIN_INPUT_PASSWORD = 1;
+    private static final int DEBUG_COMPARISON_GOBLIN_NPC_ID = 100;
+    private static final int DEBUG_COMPARISON_GOBLIN_TILE_OFFSET_X = 1;
+    private static final int DEBUG_COMPARISON_GOBLIN_TILE_OFFSET_Y = 0;
+    private static final int DEBUG_COMPARISON_GOBLIN_YAW = 1024;
+    private static final boolean DEBUG_COMPARISON_GOBLIN_ENABLED =
+        Boolean.parseBoolean(System.getProperty("rsps.debugComparisonGoblinEnabled", "true"));
 	public static int cameratoggle;
 	public static int zoom;
 	public static int lftrit;
@@ -840,8 +846,62 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
                 k += 0x80000000;
             aClass25_946.method285(anInt918, ((Actor) (class30_sub2_sub4_sub1_sub1)).anInt1552, (byte)6, method42(anInt918, ((Actor) (class30_sub2_sub4_sub1_sub1)).anInt1551, true, ((Actor) (class30_sub2_sub4_sub1_sub1)).anInt1550), k, ((Actor) (class30_sub2_sub4_sub1_sub1)).anInt1551, (((Actor) (class30_sub2_sub4_sub1_sub1)).anInt1540 - 1) * 64 + 60, ((Actor) (class30_sub2_sub4_sub1_sub1)).anInt1550, class30_sub2_sub4_sub1_sub1, ((Actor) (class30_sub2_sub4_sub1_sub1)).aBoolean1541);
         }
+        renderComparisonGoblin(flag);
 
         if(i == -30815);
+    }
+
+    private void renderComparisonGoblin(boolean visiblePriorityPass)
+    {
+        if(!DEBUG_COMPARISON_GOBLIN_ENABLED || aClass25_946 == null || aClass30_Sub2_Sub4_Sub1_Sub2_1126 == null)
+            return;
+        Npc comparisonGoblin = ensureComparisonGoblin();
+        if(comparisonGoblin == null || !comparisonGoblin.method449(aBoolean1224) || comparisonGoblin.aClass5_1696.aBoolean93 != visiblePriorityPass)
+            return;
+        int localTileX = ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1500[0] + DEBUG_COMPARISON_GOBLIN_TILE_OFFSET_X;
+        int localTileY = ((Actor) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).anIntArray1501[0] + DEBUG_COMPARISON_GOBLIN_TILE_OFFSET_Y;
+        comparisonGoblin.method445(localTileX, localTileY, true, false);
+        comparisonGoblin.anInt1526 = -1;
+        comparisonGoblin.anInt1517 = comparisonGoblin.anInt1511;
+        comparisonGoblin.anInt1518 = 0;
+        comparisonGoblin.anInt1519 = 0;
+        comparisonGoblin.anInt1510 = DEBUG_COMPARISON_GOBLIN_YAW;
+        comparisonGoblin.anInt1552 = DEBUG_COMPARISON_GOBLIN_YAW;
+        int tileX = ((Actor) (comparisonGoblin)).anInt1550 >> 7;
+        int tileY = ((Actor) (comparisonGoblin)).anInt1551 >> 7;
+        if(tileX < 0 || tileX >= 104 || tileY < 0 || tileY >= 104)
+            return;
+        if(((Actor) (comparisonGoblin)).anInt1540 == 1 && (((Actor) (comparisonGoblin)).anInt1550 & 0x7f) == 64 && (((Actor) (comparisonGoblin)).anInt1551 & 0x7f) == 64)
+        {
+            if(anIntArrayArray929[tileX][tileY] == anInt1265)
+                return;
+            anIntArrayArray929[tileX][tileY] = anInt1265;
+        }
+        aClass25_946.method285(anInt918, ((Actor) (comparisonGoblin)).anInt1552, (byte)6, method42(anInt918, ((Actor) (comparisonGoblin)).anInt1551, true, ((Actor) (comparisonGoblin)).anInt1550), -1, ((Actor) (comparisonGoblin)).anInt1551, (((Actor) (comparisonGoblin)).anInt1540 - 1) * 64 + 60, ((Actor) (comparisonGoblin)).anInt1550, comparisonGoblin, ((Actor) (comparisonGoblin)).aBoolean1541);
+    }
+
+    private Npc ensureComparisonGoblin()
+    {
+        if(debugComparisonGoblin == null)
+        {
+            NpcDefinition definition = NpcDefinition.method159(DEBUG_COMPARISON_GOBLIN_NPC_ID);
+            if(definition == null)
+                return null;
+            Npc npc = new Npc();
+            npc.aClass5_1696 = definition;
+            npc.anInt1540 = definition.aByte68;
+            npc.anInt1504 = definition.anInt79;
+            npc.anInt1554 = definition.anInt67;
+            npc.anInt1555 = definition.anInt58;
+            npc.anInt1556 = definition.anInt83;
+            npc.anInt1557 = definition.anInt55;
+            npc.anInt1511 = definition.anInt77;
+            npc.anInt1517 = definition.anInt77;
+            npc.anInt1510 = DEBUG_COMPARISON_GOBLIN_YAW;
+            npc.anInt1552 = DEBUG_COMPARISON_GOBLIN_YAW;
+            debugComparisonGoblin = npc;
+        }
+        return debugComparisonGoblin;
     }
 
     public final boolean method27(int i)
@@ -10447,6 +10507,7 @@ class GameClientCore extends GameShell implements SocialOutputPort, WidgetCondit
     private int loginScreenState;
     private PacketBuffer aClass30_Sub2_Sub2_834;
     private Npc aClass30_Sub2_Sub4_Sub1_Sub1Array835[];
+    private Npc debugComparisonGoblin;
     private int anInt836;
     int anIntArray837[];
     private int anInt838;

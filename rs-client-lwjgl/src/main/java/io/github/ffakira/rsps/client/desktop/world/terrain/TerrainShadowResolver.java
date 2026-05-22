@@ -6,8 +6,8 @@ import java.util.List;
 public final class TerrainShadowResolver {
 
   private static final int WALL_SHADOW = 50;
-  private static final int MAX_OBJECT_SHADOW = 50;
-  private static final float LEGACY_MODEL_UNIT_SCALE = 32.0f;
+  private static final int MAX_OBJECT_SHADOW = 30;
+  private static final float MODEL_HEIGHT_TO_SHADOW_SCALE = 32.0f;
 
   public byte[] resolve(int sampleWidth, int sampleHeight, List<WorldSceneObject> sceneObjects) {
     byte[] shadowSamples = new byte[sampleWidth * sampleHeight];
@@ -20,10 +20,9 @@ public final class TerrainShadowResolver {
       switch (sceneObject.type()) {
         case 0 -> applyStraightWallShadow(shadowSamples, sampleWidth, sampleHeight, sceneObject);
         case 1, 3 -> applyCornerWallShadow(shadowSamples, sampleWidth, sampleHeight, sceneObject);
-        // Type 9 is a diagonal wall; types 10-11 are full interactives (trees, statues, machines);
-        // types 12-17 are wall-attached interactives that nonetheless rest on the ground and cast
-        // visible ground shade (lecterns, signposts, banner stands, market crates, etc).
-        case 9, 10, 11, 12, 13, 14, 15, 16, 17 -> applyLargeObjectShadow(shadowSamples, sampleWidth, sampleHeight, sceneObject);
+        // Legacy MapRegion only stamps footprint shadows for full interactives (10/11). Diagonal
+        // walls and wall-attached interactives do not participate in this byte shadow grid.
+        case 10, 11 -> applyLargeObjectShadow(shadowSamples, sampleWidth, sampleHeight, sceneObject);
         default -> {
         }
       }
@@ -96,39 +95,20 @@ public final class TerrainShadowResolver {
         setShadow(shadowSamples, sampleWidth, sampleHeight, sampleX, sampleY, shadowStrength);
       }
     }
-    // Legacy MapRegion lights from the north-west, so each tall object casts a soft shadow off to
-    // the south-east. Stamp a one-tile penumbra at reduced strength in that direction so the
-    // shadow reads as a real cast shadow rather than a uniform dark blob under the footprint.
-    int penumbraStrength = (shadowStrength * 5) / 8;
-    if (penumbraStrength <= 0) {
-      return;
-    }
-    int penumbraMinX = sceneObject.localX() + 1;
-    int penumbraMaxX = maxSampleX + 1;
-    int penumbraMinY = sceneObject.localY() - 1;
-    int penumbraMaxY = maxSampleY - 1;
-    for (int sampleY = penumbraMinY; sampleY <= penumbraMaxY; sampleY++) {
-      for (int sampleX = penumbraMinX; sampleX <= penumbraMaxX; sampleX++) {
-        setShadow(shadowSamples, sampleWidth, sampleHeight, sampleX, sampleY, penumbraStrength);
-      }
-    }
   }
 
   private int objectShadowStrength(WorldSceneObject sceneObject) {
-    if (sceneObject.geometry() != null) {
-      float maxRadius = 0.0f;
-      float[] vertexX = sceneObject.geometry().vertexX();
-      float[] vertexZ = sceneObject.geometry().vertexZ();
-      for (int index = 0; index < vertexX.length; index++) {
-        maxRadius = Math.max(maxRadius, (float) Math.hypot(vertexX[index], vertexZ[index]));
-      }
-      return clamp(Math.round(maxRadius * LEGACY_MODEL_UNIT_SCALE), 0, MAX_OBJECT_SHADOW);
+    if (sceneObject.geometry() == null) {
+      return 0;
     }
-    float fallbackRadius = (float) Math.hypot(
-        Math.max(1, sceneObject.sizeX()) * 0.5f,
-        Math.max(1, sceneObject.sizeY()) * 0.5f
-    );
-    return clamp(Math.round(fallbackRadius * LEGACY_MODEL_UNIT_SCALE), 0, MAX_OBJECT_SHADOW);
+    float minY = Float.POSITIVE_INFINITY;
+    float maxY = Float.NEGATIVE_INFINITY;
+    for (float vertexY : sceneObject.geometry().vertexY()) {
+      minY = Math.min(minY, vertexY);
+      maxY = Math.max(maxY, vertexY);
+    }
+    float modelHeight = Math.max(0.0f, maxY - minY);
+    return clamp(Math.round(modelHeight * MODEL_HEIGHT_TO_SHADOW_SCALE), 0, MAX_OBJECT_SHADOW);
   }
 
   private void setShadow(byte[] shadowSamples, int sampleWidth, int sampleHeight, int sampleX, int sampleY, int shadowStrength) {

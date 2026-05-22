@@ -1,6 +1,6 @@
 package io.github.ffakira.rsps.client.core;
 
-import io.github.ffakira.rsps.protocol.BootstrapItemSlot;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapItemSlot;
 import java.util.List;
 import java.util.Optional;
 

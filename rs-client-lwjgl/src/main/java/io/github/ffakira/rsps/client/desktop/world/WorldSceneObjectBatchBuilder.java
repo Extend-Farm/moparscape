@@ -10,6 +10,7 @@ import io.github.ffakira.rsps.client.desktop.world.terrain.TerrainLayerSource;
 import io.github.ffakira.rsps.client.desktop.world.visibility.WorldSceneOcclusionContext;
 import io.github.ffakira.rsps.client.desktop.world.visibility.WorldSceneOcclusionPlanner;
 import io.github.ffakira.rsps.client.desktop.world.visibility.WorldSceneVisibilityWindow;
+import java.util.Locale;
 import java.util.Set;
 
 final class WorldSceneObjectBatchBuilder {
@@ -19,6 +20,12 @@ final class WorldSceneObjectBatchBuilder {
   // the proxy box adds nothing recognisable.
   private static final Set<Integer> FALLBACK_PROXY_DENYLIST = Set.of();
   private static final String ANONYMOUS_OBJECT_NAME_PREFIX = "object-";
+  private static final float GROUND_DECORATION_DEPTH_BIAS = 2.0f / 128.0f;
+  private static final float WALL_DECOR_DISPLACEMENT_SCALE = 1.0f / 128.0f;
+  private static final float HALF_TILE = 0.5f;
+  private static final int FLAT_RASTER_MODE_MASK = 1;
+  private static final int GOURAUD_RASTER_MODE_MASK = 1 << 1;
+  private static final int TEXTURED_RASTER_MODE_MASK = 1 << 2;
 
   void addBatches(
       SceneRenderQueueBuilder renderQueueBuilder,
@@ -46,34 +53,43 @@ final class WorldSceneObjectBatchBuilder {
       }
       if (worldSceneObject.geometry() != null) {
         WorldSceneObjectGeometry geometry = terrainContouredGeometry(worldScene, worldSceneObject, baseHeight);
-        float objectCenterX = worldSceneObject.centerX();
-        float objectCenterZ = worldSceneObject.centerY();
-        float[] wallDecorOffset = wallDecorationCenterOffset(worldSceneObject);
-        objectCenterX += wallDecorOffset[0];
-        objectCenterZ += wallDecorOffset[1];
-        flatBuilder.addGeometry(geometry, objectCenterX, baseHeight, objectCenterZ, SceneRasterMode.FLAT);
-        gouraudBuilder.addGeometry(geometry, objectCenterX, baseHeight, objectCenterZ, SceneRasterMode.GOURAUD);
-        texturedBuilder.addGeometry(geometry, objectCenterX, baseHeight, objectCenterZ, SceneRasterMode.TEXTURED);
+        int rasterModeMask = geometryRasterModeMask(geometry);
+        float objectCenterX = worldSceneObject.centerX() + wallDecorationOffsetX(worldSceneObject);
+        float objectCenterZ = worldSceneObject.centerY() + wallDecorationOffsetZ(worldSceneObject);
+        float objectBaseHeight = baseHeight + groundDecorationDepthBias(worldSceneObject);
+        if ((rasterModeMask & FLAT_RASTER_MODE_MASK) != 0) {
+          flatBuilder.addGeometry(geometry, objectCenterX, objectBaseHeight, objectCenterZ, SceneRasterMode.FLAT);
+        }
+        if ((rasterModeMask & GOURAUD_RASTER_MODE_MASK) != 0) {
+          gouraudBuilder.addGeometry(geometry, objectCenterX, objectBaseHeight, objectCenterZ, SceneRasterMode.GOURAUD);
+        }
+        if ((rasterModeMask & TEXTURED_RASTER_MODE_MASK) != 0) {
+          texturedBuilder.addGeometry(geometry, objectCenterX, objectBaseHeight, objectCenterZ, SceneRasterMode.TEXTURED);
+        }
         continue;
       }
       if (worldSceneObject.allowFallbackProxy() && !isFallbackProxyDenied(worldSceneObject)) {
-        appendFallbackObject(flatBuilder, worldScene, worldSceneObject);
+        appendFallbackObject(flatBuilder, worldSceneObject, baseHeight);
       }
     }
-    renderQueueBuilder.add(SceneSubmissionKind.STATIC_OBJECT, SceneRasterMode.FLAT, flatBuilder.build());
-    renderQueueBuilder.add(SceneSubmissionKind.STATIC_OBJECT, SceneRasterMode.GOURAUD, gouraudBuilder.build());
-    renderQueueBuilder.add(SceneSubmissionKind.STATIC_OBJECT, SceneRasterMode.TEXTURED, texturedBuilder.build());
+    renderQueueBuilder.add(SceneSubmissionKind.STATIC_OBJECT, SceneRasterMode.FLAT, flatBuilder.buildDetached());
+    renderQueueBuilder.add(SceneSubmissionKind.STATIC_OBJECT, SceneRasterMode.GOURAUD, gouraudBuilder.buildDetached());
+    renderQueueBuilder.add(SceneSubmissionKind.STATIC_OBJECT, SceneRasterMode.TEXTURED, texturedBuilder.buildDetached());
   }
 
-  private void appendFallbackObject(SceneTriangleMeshBuilder builder, WorldScene worldScene, WorldSceneObject worldSceneObject) {
+  private void appendFallbackObject(
+      SceneTriangleMeshBuilder builder,
+      WorldSceneObject worldSceneObject,
+      float baseHeight
+  ) {
     float minX = worldSceneObject.localX();
     float minZ = worldSceneObject.localY();
     float maxX = minX + Math.max(0.25f, worldSceneObject.sizeX());
     float maxZ = minZ + Math.max(0.25f, worldSceneObject.sizeY());
-    float baseHeight = sampleObjectBaseHeight(worldScene, worldSceneObject, maxX, maxZ);
     float objectHeight = fallbackObjectHeight(worldSceneObject);
     float topHeight = baseHeight + objectHeight;
-    int objectColor = fallbackObjectColor(worldSceneObject);
+    String lowercaseName = lowercaseObjectName(worldSceneObject.name());
+    int objectColor = fallbackObjectColor(worldSceneObject.objectId(), lowercaseName);
     if (isStraightWallType(worldSceneObject.type())) {
       appendEdgeWallFallback(
           builder,
@@ -84,13 +100,13 @@ final class WorldSceneObjectBatchBuilder {
           baseHeight,
           topHeight,
           worldSceneObject.orientation(),
-          fallbackWallThickness(worldSceneObject),
+          fallbackWallThickness(lowercaseName),
           objectColor
       );
       return;
     }
     if (worldSceneObject.type() == 2) {
-      float wallThickness = fallbackWallThickness(worldSceneObject);
+      float wallThickness = fallbackWallThickness(lowercaseName);
       appendEdgeWallFallback(
           builder,
           minX,
@@ -127,7 +143,7 @@ final class WorldSceneObjectBatchBuilder {
           baseHeight,
           topHeight,
           worldSceneObject.orientation(),
-          fallbackWallThickness(worldSceneObject),
+          fallbackWallThickness(lowercaseName),
           objectColor
       );
       return;
@@ -137,15 +153,14 @@ final class WorldSceneObjectBatchBuilder {
       appendPerimeterFallback(builder, minX, maxX, minZ, maxZ, baseHeight, topHeight, objectColor);
       return;
     }
-    if (isColumnLikeObject(worldSceneObject)) {
+    if (isColumnLikeObject(lowercaseName)) {
       appendColumnFallback(builder, minX, maxX, minZ, maxZ, baseHeight, topHeight, objectColor);
       return;
     }
     appendCuboid(builder, minX, maxX, minZ, maxZ, baseHeight, topHeight, objectColor);
   }
 
-  private boolean isColumnLikeObject(WorldSceneObject worldSceneObject) {
-    String lowercaseName = worldSceneObject.name().toLowerCase();
+  private boolean isColumnLikeObject(String lowercaseName) {
     return lowercaseName.contains("statue")
         || lowercaseName.contains("monument")
         || lowercaseName.contains("pillar")
@@ -254,6 +269,10 @@ final class WorldSceneObjectBatchBuilder {
     return samples == 0 ? 0.0f : total / samples;
   }
 
+  private float groundDecorationDepthBias(WorldSceneObject worldSceneObject) {
+    return worldSceneObject.type() == 22 ? GROUND_DECORATION_DEPTH_BIAS : 0.0f;
+  }
+
   private boolean shouldUseBridgeLowerSurface(WorldScene worldScene, WorldSceneObject worldSceneObject) {
     if (worldSceneObject.plane() != 0 || (worldSceneObject.type() != 10 && worldSceneObject.type() != 11)) {
       return false;
@@ -281,15 +300,28 @@ final class WorldSceneObjectBatchBuilder {
     if (geometry == null || !worldSceneObject.contouredGround() || geometry.vertexY().length == 0) {
       return geometry;
     }
-    GroundHeightProfile heightProfile = sampleGroundHeightProfile(worldScene, worldSceneObject);
+    int localX = worldSceneObject.localX();
+    int localY = worldSceneObject.localY();
+    int eastX = localX + Math.max(1, worldSceneObject.sizeX());
+    int northY = localY + Math.max(1, worldSceneObject.sizeY());
+    float southWest = sampleTerrainCornerHeight(worldScene, localX, localY);
+    float southEast = sampleTerrainCornerHeight(worldScene, eastX, localY);
+    float northEast = sampleTerrainCornerHeight(worldScene, eastX, northY);
+    float northWest = sampleTerrainCornerHeight(worldScene, localX, northY);
+    if (southWest == baseHeight
+        && southEast == baseHeight
+        && northEast == baseHeight
+        && northWest == baseHeight) {
+      return geometry;
+    }
     float footprintWidth = Math.max(1, worldSceneObject.sizeX());
     float footprintDepth = Math.max(1, worldSceneObject.sizeY());
     float[] contouredVertexY = new float[geometry.vertexY().length];
     for (int index = 0; index < geometry.vertexY().length; index++) {
       float xBlend = (geometry.vertexX()[index] + footprintWidth * 0.5f) / footprintWidth;
       float zBlend = (geometry.vertexZ()[index] + footprintDepth * 0.5f) / footprintDepth;
-      float southHeight = interpolate(heightProfile.southWest(), heightProfile.southEast(), xBlend);
-      float northHeight = interpolate(heightProfile.northWest(), heightProfile.northEast(), xBlend);
+      float southHeight = interpolate(southWest, southEast, xBlend);
+      float northHeight = interpolate(northWest, northEast, xBlend);
       float terrainHeight = interpolate(southHeight, northHeight, zBlend);
       contouredVertexY[index] = geometry.vertexY()[index] + (terrainHeight - baseHeight);
     }
@@ -311,18 +343,6 @@ final class WorldSceneObjectBatchBuilder {
         geometry.textureVertexC(),
         geometry.facePriorities()
     );
-  }
-
-  private GroundHeightProfile sampleGroundHeightProfile(WorldScene worldScene, WorldSceneObject worldSceneObject) {
-    int localX = worldSceneObject.localX();
-    int localY = worldSceneObject.localY();
-    int eastX = localX + Math.max(1, worldSceneObject.sizeX());
-    int northY = localY + Math.max(1, worldSceneObject.sizeY());
-    float southWest = sampleTerrainCornerHeight(worldScene, localX, localY);
-    float southEast = sampleTerrainCornerHeight(worldScene, eastX, localY);
-    float northEast = sampleTerrainCornerHeight(worldScene, eastX, northY);
-    float northWest = sampleTerrainCornerHeight(worldScene, localX, northY);
-    return new GroundHeightProfile(southWest, southEast, northEast, northWest);
   }
 
   private float sampleTerrainCornerHeight(WorldScene worldScene, int tileX, int tileY) {
@@ -411,20 +431,31 @@ final class WorldSceneObjectBatchBuilder {
     return baseHeight + minY + (maxY - minY) * 0.58f;
   }
 
-  private float[] wallDecorationCenterOffset(WorldSceneObject worldSceneObject) {
+  private float wallDecorationOffsetX(WorldSceneObject worldSceneObject) {
     int type = worldSceneObject.type();
     if (type < 4 || type > 8) {
-      return new float[]{0.0f, 0.0f};
+      return 0.0f;
     }
-    float displacement = worldSceneObject.wallDecorDisplacement() / 128.0f;
-    float halfTile = 0.5f;
-    float pushFromCenter = halfTile - displacement;
+    float pushFromCenter = HALF_TILE - worldSceneObject.wallDecorDisplacement() * WALL_DECOR_DISPLACEMENT_SCALE;
     int orientation = worldSceneObject.orientation() & 3;
     return switch (orientation) {
-      case 0 -> new float[]{-pushFromCenter, 0.0f};
-      case 1 -> new float[]{0.0f, pushFromCenter};
-      case 2 -> new float[]{pushFromCenter, 0.0f};
-      default -> new float[]{0.0f, -pushFromCenter};
+      case 0 -> -pushFromCenter;
+      case 2 -> pushFromCenter;
+      default -> 0.0f;
+    };
+  }
+
+  private float wallDecorationOffsetZ(WorldSceneObject worldSceneObject) {
+    int type = worldSceneObject.type();
+    if (type < 4 || type > 8) {
+      return 0.0f;
+    }
+    float pushFromCenter = HALF_TILE - worldSceneObject.wallDecorDisplacement() * WALL_DECOR_DISPLACEMENT_SCALE;
+    int orientation = worldSceneObject.orientation() & 3;
+    return switch (orientation) {
+      case 1 -> pushFromCenter;
+      case 3 -> -pushFromCenter;
+      default -> 0.0f;
     };
   }
 
@@ -436,8 +467,7 @@ final class WorldSceneObjectBatchBuilder {
     return name != null && name.startsWith(ANONYMOUS_OBJECT_NAME_PREFIX);
   }
 
-  private int fallbackObjectColor(WorldSceneObject worldSceneObject) {
-    String lowercaseName = worldSceneObject.name().toLowerCase();
+  private int fallbackObjectColor(int objectId, String lowercaseName) {
     if (lowercaseName.contains("tree") || lowercaseName.contains("bush")
         || lowercaseName.contains("cactus") || lowercaseName.contains("hedge")) {
       return 0x557c39;
@@ -461,7 +491,7 @@ final class WorldSceneObjectBatchBuilder {
     if (lowercaseName.contains("shield") || lowercaseName.contains("banner")) {
       return 0x355d8a;
     }
-    return hashedColor(worldSceneObject.objectId(), 0x5e4f39, 0xa88d63);
+    return hashedColor(objectId, 0x5e4f39, 0xa88d63);
   }
 
   private boolean isStraightWallType(int objectType) {
@@ -479,8 +509,7 @@ final class WorldSceneObjectBatchBuilder {
     };
   }
 
-  private float fallbackWallThickness(WorldSceneObject worldSceneObject) {
-    String lowercaseName = worldSceneObject.name().toLowerCase();
+  private float fallbackWallThickness(String lowercaseName) {
     if (lowercaseName.contains("door") || lowercaseName.contains("gate")) {
       return 0.12f;
     }
@@ -516,15 +545,26 @@ final class WorldSceneObjectBatchBuilder {
     return Math.max(0, Math.min(tileBound - 1, value));
   }
 
-  private float interpolate(float start, float end, float blend) {
-    return start + (end - start) * blend;
+  private int geometryRasterModeMask(WorldSceneObjectGeometry geometry) {
+    int mask = 0;
+    for (SceneRasterMode rasterMode : geometry.faceRasterModes()) {
+      mask |= switch (rasterMode) {
+        case FLAT -> FLAT_RASTER_MODE_MASK;
+        case GOURAUD -> GOURAUD_RASTER_MODE_MASK;
+        case TEXTURED -> TEXTURED_RASTER_MODE_MASK;
+      };
+      if (mask == (FLAT_RASTER_MODE_MASK | GOURAUD_RASTER_MODE_MASK | TEXTURED_RASTER_MODE_MASK)) {
+        return mask;
+      }
+    }
+    return mask;
   }
 
-  private record GroundHeightProfile(
-      float southWest,
-      float southEast,
-      float northEast,
-      float northWest
-  ) {
+  private String lowercaseObjectName(String name) {
+    return name == null ? "" : name.toLowerCase(Locale.ROOT);
+  }
+
+  private float interpolate(float start, float end, float blend) {
+    return start + (end - start) * blend;
   }
 }

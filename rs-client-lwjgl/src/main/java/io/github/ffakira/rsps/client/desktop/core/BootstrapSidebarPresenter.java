@@ -2,9 +2,9 @@ package io.github.ffakira.rsps.client.desktop.core;
 
 import io.github.ffakira.rsps.client.core.ClientViewModel;
 import io.github.ffakira.rsps.model.WorldPoint;
-import io.github.ffakira.rsps.protocol.BootstrapItemSlot;
-import io.github.ffakira.rsps.protocol.BootstrapSkill;
-import io.github.ffakira.rsps.protocol.CharacterBootstrapPayload;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapItemSlot;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapSkill;
+import io.github.ffakira.rsps.protocol.bootstrap.CharacterBootstrapPayload;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;

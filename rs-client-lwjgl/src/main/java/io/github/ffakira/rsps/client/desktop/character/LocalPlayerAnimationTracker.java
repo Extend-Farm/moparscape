@@ -1,7 +1,7 @@
 package io.github.ffakira.rsps.client.desktop.character;
 
 import io.github.ffakira.rsps.model.WorldPoint;
-import io.github.ffakira.rsps.protocol.BootstrapAnimationProfile;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapAnimationProfile;
 import io.github.ffakira.rsps.content.AnimationSequenceCatalog;
 import io.github.ffakira.rsps.content.AnimationSequenceDefinition;
 import java.util.Objects;

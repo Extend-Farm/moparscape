@@ -2,19 +2,19 @@ package io.github.ffakira.rsps.server.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.github.ffakira.rsps.protocol.BootstrapAnimationProfile;
-import io.github.ffakira.rsps.protocol.ActionSequenceIntentMessage;
-import io.github.ffakira.rsps.protocol.CharacterBootstrapMessage;
-import io.github.ffakira.rsps.protocol.EntityActionSequenceMessage;
-import io.github.ffakira.rsps.protocol.HandshakeAccepted;
-import io.github.ffakira.rsps.protocol.HandshakeRequest;
-import io.github.ffakira.rsps.protocol.LoginAccepted;
-import io.github.ffakira.rsps.protocol.LoginRequest;
-import io.github.ffakira.rsps.protocol.MoveIntentMessage;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapAnimationProfile;
+import io.github.ffakira.rsps.protocol.input.ActionSequenceIntentMessage;
+import io.github.ffakira.rsps.protocol.bootstrap.CharacterBootstrapMessage;
+import io.github.ffakira.rsps.protocol.world.EntityActionSequenceMessage;
+import io.github.ffakira.rsps.protocol.session.HandshakeAccepted;
+import io.github.ffakira.rsps.protocol.session.HandshakeRequest;
+import io.github.ffakira.rsps.protocol.session.LoginAccepted;
+import io.github.ffakira.rsps.protocol.session.LoginRequest;
+import io.github.ffakira.rsps.protocol.input.MoveIntentMessage;
 import io.github.ffakira.rsps.protocol.ProtocolSession;
 import io.github.ffakira.rsps.protocol.ProtocolVersion;
 import io.github.ffakira.rsps.protocol.ServerMessage;
-import io.github.ffakira.rsps.protocol.WorldSnapshotMessage;
+import io.github.ffakira.rsps.protocol.world.WorldSnapshotMessage;
 import io.github.ffakira.rsps.model.MovementMode;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -90,12 +90,12 @@ class GameplayRuntimeCoordinatorTest {
       assertThat(session.messages().get(3)).isInstanceOf(WorldSnapshotMessage.class);
       assertThat(session.messages().get(4))
           .isInstanceOfSatisfying(
-              io.github.ffakira.rsps.protocol.EntityPositionMessage.class,
+              io.github.ffakira.rsps.protocol.world.EntityPositionMessage.class,
               message -> assertThat(message.worldPoint().x()).isEqualTo(3250)
           );
       assertThat(session.messages().get(5))
           .isInstanceOfSatisfying(
-              io.github.ffakira.rsps.protocol.EntityPositionMessage.class,
+              io.github.ffakira.rsps.protocol.world.EntityPositionMessage.class,
               message -> assertThat(message.worldPoint().x()).isEqualTo(3251)
           );
     } finally {

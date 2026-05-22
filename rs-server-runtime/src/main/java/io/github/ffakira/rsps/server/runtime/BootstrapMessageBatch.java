@@ -3,17 +3,17 @@ package io.github.ffakira.rsps.server.runtime;
 import io.github.ffakira.rsps.persistence.CharacterItemSlot;
 import io.github.ffakira.rsps.persistence.CharacterSkill;
 import io.github.ffakira.rsps.persistence.CharacterSnapshot;
-import io.github.ffakira.rsps.protocol.BootstrapAppearance;
-import io.github.ffakira.rsps.protocol.BootstrapAnimationProfile;
-import io.github.ffakira.rsps.protocol.BootstrapItemSlot;
-import io.github.ffakira.rsps.protocol.BootstrapProfile;
-import io.github.ffakira.rsps.protocol.BootstrapSkill;
-import io.github.ffakira.rsps.protocol.CharacterBootstrapMessage;
-import io.github.ffakira.rsps.protocol.CharacterBootstrapPayload;
-import io.github.ffakira.rsps.protocol.EntityPositionMessage;
-import io.github.ffakira.rsps.protocol.LoginAccepted;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapAppearance;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapAnimationProfile;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapItemSlot;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapProfile;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapSkill;
+import io.github.ffakira.rsps.protocol.bootstrap.CharacterBootstrapMessage;
+import io.github.ffakira.rsps.protocol.bootstrap.CharacterBootstrapPayload;
+import io.github.ffakira.rsps.protocol.world.EntityPositionMessage;
+import io.github.ffakira.rsps.protocol.session.LoginAccepted;
 import io.github.ffakira.rsps.protocol.ServerMessage;
-import io.github.ffakira.rsps.protocol.WorldSnapshotMessage;
+import io.github.ffakira.rsps.protocol.world.WorldSnapshotMessage;
 import java.util.List;
 
 final class BootstrapMessageBatch {

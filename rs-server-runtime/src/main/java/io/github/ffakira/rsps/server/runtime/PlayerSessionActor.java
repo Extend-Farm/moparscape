@@ -1,14 +1,14 @@
 package io.github.ffakira.rsps.server.runtime;
 
-import io.github.ffakira.rsps.protocol.ActionSequenceIntentMessage;
+import io.github.ffakira.rsps.protocol.input.ActionSequenceIntentMessage;
 import io.github.ffakira.rsps.protocol.ClientMessage;
-import io.github.ffakira.rsps.protocol.DisconnectNotice;
-import io.github.ffakira.rsps.protocol.EntityActionSequenceMessage;
-import io.github.ffakira.rsps.protocol.EntityPositionMessage;
-import io.github.ffakira.rsps.protocol.HandshakeRequest;
-import io.github.ffakira.rsps.protocol.LoginRejected;
-import io.github.ffakira.rsps.protocol.LoginRequest;
-import io.github.ffakira.rsps.protocol.MoveIntentMessage;
+import io.github.ffakira.rsps.protocol.session.DisconnectNotice;
+import io.github.ffakira.rsps.protocol.world.EntityActionSequenceMessage;
+import io.github.ffakira.rsps.protocol.world.EntityPositionMessage;
+import io.github.ffakira.rsps.protocol.session.HandshakeRequest;
+import io.github.ffakira.rsps.protocol.session.LoginRejected;
+import io.github.ffakira.rsps.protocol.session.LoginRequest;
+import io.github.ffakira.rsps.protocol.input.MoveIntentMessage;
 import io.github.ffakira.rsps.protocol.ProtocolSession;
 import io.github.ffakira.rsps.sim.EntityMovedEvent;
 import io.github.ffakira.rsps.sim.MoveEntityCommand;
@@ -78,6 +78,7 @@ public final class PlayerSessionActor extends MailboxActor<SessionMessage> {
       case MoveIntentMessage moveIntentMessage -> handleMove(moveIntentMessage);
       case ActionSequenceIntentMessage actionSequenceIntentMessage -> handleActionSequence(actionSequenceIntentMessage);
       case DisconnectNotice disconnectNotice -> terminate(disconnectNotice.reason());
+      default -> throw new IllegalArgumentException("Unsupported client message: " + message.getClass().getName());
     }
   }
 

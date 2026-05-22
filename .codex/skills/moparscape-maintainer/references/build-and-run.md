@@ -19,6 +19,8 @@
   - `./gradlew :game-client:run`
 - Run native LWJGL client:
   - `./gradlew :rs-client-lwjgl:run`
+- Run native QUIC server:
+  - `./gradlew :rs-transport-quic:run`
 - Build desktop client jar:
   - `./gradlew :game-client:jar`
 
@@ -29,6 +31,13 @@
 - PostgreSQL persistence for `:rs-client-lwjgl`:
   - `RSPS_PERSISTENCE_MODE=postgres ./gradlew :rs-client-lwjgl:run`
 - The native client does not require `:emulator:run`; it boots against the native in-process runtime.
+- To use the external QUIC server instead of the in-process runtime:
+  - `RSPS_RUNTIME_MODE=quic ./gradlew :rs-client-lwjgl:run`
+- Native QUIC defaults:
+  - host: `localhost`
+  - bind host: `127.0.0.1`
+  - port: `43594`
+  - certificate dir: `artifacts/quic`
 - Current native client state:
   - cache-backed title/login shell
   - cache-backed gameplay frame shell
@@ -52,6 +61,8 @@
   - `server/moparscape/moparclient.jar`
 - Prefer Gradle for the native client:
   - `./gradlew :rs-client-lwjgl:run`
+- Prefer Gradle for the native QUIC server:
+  - `./gradlew :rs-transport-quic:run`
 
 ## Retest discipline
 

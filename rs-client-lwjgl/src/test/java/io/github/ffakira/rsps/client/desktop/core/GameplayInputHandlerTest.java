@@ -64,7 +64,7 @@ class GameplayInputHandlerTest {
         movementPort
     );
 
-    inputHandler.handleMouseButton(GLFW_MOUSE_BUTTON_LEFT, GLFW_PRESS, 120.0, 80.0);
+    inputHandler.handleMouseButton(0L, GLFW_MOUSE_BUTTON_LEFT, GLFW_PRESS, 120.0, 80.0);
 
     assertThat(clickPort.lastButton).isEqualTo(GameplayMouseButton.LEFT);
     assertThat(movementPort.lastDeltaX).isEqualTo(3);
@@ -84,12 +84,87 @@ class GameplayInputHandlerTest {
     );
 
     inputHandler.handleKey(0L, GLFW_KEY_LEFT_SHIFT, GLFW_PRESS);
-    inputHandler.handleMouseButton(GLFW_MOUSE_BUTTON_LEFT, GLFW_PRESS, 120.0, 80.0);
+    inputHandler.handleMouseButton(0L, GLFW_MOUSE_BUTTON_LEFT, GLFW_PRESS, 120.0, 80.0);
     inputHandler.handleKey(0L, GLFW_KEY_LEFT_SHIFT, GLFW_RELEASE);
 
     assertThat(movementPort.lastDeltaX).isEqualTo(2);
     assertThat(movementPort.lastDeltaY).isEqualTo(1);
     assertThat(movementPort.lastMovementMode).isEqualTo(MovementMode.RUN);
+  }
+
+  @Test
+  void requestsLogoutFromSuccessfulLogoutClicks() {
+    TestGameplayClickPort clickPort = new TestGameplayClickPort();
+    clickPort.nextResult = GameplayClickResult.logout();
+    TestWindowClosePort windowClosePort = new TestWindowClosePort();
+    TestLogoutPort logoutPort = new TestLogoutPort();
+    GameplayInputHandler inputHandler = new GameplayInputHandler(
+        clickPort,
+        new TestGameplayCameraInputPort(),
+        (x, y, mode) -> {
+        },
+        windowClosePort,
+        logoutPort
+    );
+
+    inputHandler.handleMouseButton(42L, GLFW_MOUSE_BUTTON_LEFT, GLFW_PRESS, 120.0, 80.0);
+
+    assertThat(logoutPort.requested).isTrue();
+    assertThat(windowClosePort.lastWindowHandle).isEqualTo(-1L);
+  }
+
+  @Test
+  void routesGameplayScrollToTheScrollPort() {
+    TestGameplayScrollPort scrollPort = new TestGameplayScrollPort();
+    GameplayInputHandler inputHandler = new GameplayInputHandler(
+        (mouseX, mouseY, button) -> GameplayClickResult.handledClick(),
+        scrollPort,
+        (mouseX, mouseY) -> false,
+        () -> {
+        },
+        new TestGameplayCameraInputPort(),
+        (x, y, mode) -> {
+        },
+        windowHandle -> {
+        },
+        () -> {
+        }
+    );
+
+    inputHandler.handleScroll(180.0, 96.0, -1.0);
+
+    assertThat(scrollPort.calls).isEqualTo(1);
+    assertThat(scrollPort.lastMouseX).isEqualTo(180.0);
+    assertThat(scrollPort.lastMouseY).isEqualTo(96.0);
+    assertThat(scrollPort.lastYOffset).isEqualTo(-1.0);
+  }
+
+  @Test
+  void routesPointerDragByPixelWhileTheLeftButtonIsHeld() {
+    TestGameplayPointerMovePort pointerMovePort = new TestGameplayPointerMovePort();
+    GameplayInputHandler inputHandler = new GameplayInputHandler(
+        (mouseX, mouseY, button) -> GameplayClickResult.handledClick(),
+        (mouseX, mouseY, yOffset) -> false,
+        pointerMovePort,
+        () -> {
+        },
+        new TestGameplayCameraInputPort(),
+        (x, y, mode) -> {
+        },
+        windowHandle -> {
+        },
+        () -> {
+        }
+    );
+
+    inputHandler.handleMouseButton(0L, GLFW_MOUSE_BUTTON_LEFT, GLFW_PRESS, 120.0, 80.0);
+    inputHandler.handlePointerMove(146.0, 101.0);
+    inputHandler.handleMouseButton(0L, GLFW_MOUSE_BUTTON_LEFT, GLFW_RELEASE, 146.0, 101.0);
+    inputHandler.handlePointerMove(160.0, 110.0);
+
+    assertThat(pointerMovePort.calls).isEqualTo(1);
+    assertThat(pointerMovePort.lastMouseX).isEqualTo(146.0);
+    assertThat(pointerMovePort.lastMouseY).isEqualTo(101.0);
   }
 
   private static final class TestGameplayClickPort implements GameplayInputHandler.GameplayClickPort {
@@ -130,6 +205,58 @@ class GameplayInputHandlerTest {
       lastDeltaX = deltaX;
       lastDeltaY = deltaY;
       lastMovementMode = movementMode;
+    }
+  }
+
+  private static final class TestGameplayScrollPort implements GameplayInputHandler.GameplayScrollPort {
+
+    private int calls;
+    private double lastMouseX;
+    private double lastMouseY;
+    private double lastYOffset;
+
+    @Override
+    public boolean handleGameplayScroll(double mouseX, double mouseY, double yOffset) {
+      calls++;
+      lastMouseX = mouseX;
+      lastMouseY = mouseY;
+      lastYOffset = yOffset;
+      return true;
+    }
+  }
+
+  private static final class TestGameplayPointerMovePort implements GameplayInputHandler.GameplayPointerMovePort {
+
+    private int calls;
+    private double lastMouseX;
+    private double lastMouseY;
+
+    @Override
+    public boolean handleGameplayPointerMove(double mouseX, double mouseY) {
+      calls++;
+      lastMouseX = mouseX;
+      lastMouseY = mouseY;
+      return true;
+    }
+  }
+
+  private static final class TestWindowClosePort implements GameplayInputHandler.WindowClosePort {
+
+    private long lastWindowHandle = -1L;
+
+    @Override
+    public void requestClose(long windowHandle) {
+      lastWindowHandle = windowHandle;
+    }
+  }
+
+  private static final class TestLogoutPort implements GameplayInputHandler.LogoutPort {
+
+    private boolean requested;
+
+    @Override
+    public void requestLogout() {
+      requested = true;
     }
   }
 }

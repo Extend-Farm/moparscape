@@ -3,9 +3,9 @@ package io.github.ffakira.rsps.client.desktop.gameplay.sidebar;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.ffakira.rsps.client.core.ClientViewModel;
-import io.github.ffakira.rsps.protocol.BootstrapProfile;
-import io.github.ffakira.rsps.protocol.BootstrapSkill;
-import io.github.ffakira.rsps.protocol.CharacterBootstrapPayload;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapProfile;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapSkill;
+import io.github.ffakira.rsps.protocol.bootstrap.CharacterBootstrapPayload;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

@@ -47,11 +47,38 @@ Notes:
 - this does **not** require `:emulator:run`
 - it boots against the native in-process runtime from `:rs-server-runtime`
 - default persistence is character files under `client/characters`
+- set `RSPS_RUNTIME_MODE=quic` if you want the client to connect to the external QUIC server instead
 - current native status:
   - cache-backed title/login shell
   - cache-backed gameplay frame shell
   - native tabs/chat/minimap
   - world viewport still mid-migration to full RuneScape scene parity
+
+### Run the native QUIC server + LWJGL client
+
+Use two terminals from the repo root.
+
+1. Start the native QUIC server:
+
+```bash
+./gradlew :rs-transport-quic:run
+```
+
+2. Start the native LWJGL client against QUIC:
+
+```bash
+RSPS_RUNTIME_MODE=quic ./gradlew :rs-client-lwjgl:run
+```
+
+Notes:
+
+- the QUIC server defaults to `localhost:43594`
+- local QUIC certificate material is generated under `artifacts/quic/`
+- override host, bind host, port, or cert dir with:
+  - `RSPS_QUIC_HOST`
+  - `RSPS_QUIC_BIND_HOST`
+  - `RSPS_QUIC_PORT`
+  - `RSPS_QUIC_CERTIFICATE_DIR`
 
 ### Run the native LWJGL client with PostgreSQL
 
@@ -117,10 +144,11 @@ Avoid relying on the stale checked-in legacy jar:
 | `rs-sim-ecs/` | Deterministic simulation foundation for the native rewrite. |
 | `rs-persistence-api/` | Persistence interfaces used by the native runtime. |
 | `rs-persistence-sql/` | PostgreSQL and Flyway support for the native runtime. |
-| `rs-protocol/` | Native client/server protocol models and bootstrap messages. |
+| `rs-protocol/` | Native client/server framing, codecs, and protocol packet domains such as bootstrap, session, input, and world state. |
 | `rs-server-runtime/` | Native runtime, login/session orchestration, and in-process game bootstrap. |
 | `rs-client-core/` | Native client state and view-model layer. |
 | `rs-client-lwjgl/` | Native LWJGL desktop client. |
+| `rs-transport-quic/` | QUIC transport, external native server entrypoint, and desktop QUIC client adapter. |
 | `rs-test-fixtures/` | Shared fixtures and parity helpers used by tests. |
 | `.codex/docs/` | Repo-local architecture notes, parity docs, and deeper technical references. |
 | `.codex/plan/` | Active task notes and handoff plans for ongoing work. |
@@ -168,12 +196,18 @@ Avoid relying on the stale checked-in legacy jar:
   - native runtime bootstrap
   - login/session flow
   - persistence selection
+- `rs-transport-quic/`
+  - external QUIC server entrypoint
+  - QUIC stream transport
+  - local certificate bootstrap
 - `rs-persistence-api/`
   - persistence contracts
 - `rs-persistence-sql/`
   - PostgreSQL adapters and migrations
 - `rs-protocol/`
-  - bootstrap messages and runtime-facing protocol models
+  - bootstrap messages
+  - runtime-facing protocol models
+  - transport-neutral binary wire codec
 
 #### Client side
 

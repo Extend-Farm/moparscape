@@ -6,6 +6,7 @@ import static org.assertj.core.data.Offset.offset;
 import io.github.ffakira.rsps.cache.RawModelRepository;
 import io.github.ffakira.rsps.client.desktop.character.ActorAnimationState;
 import io.github.ffakira.rsps.client.desktop.character.CharacterModelAssembler;
+import io.github.ffakira.rsps.client.desktop.character.NpcModelAssembler;
 import io.github.ffakira.rsps.client.desktop.core.ArgbImage;
 import io.github.ffakira.rsps.client.desktop.world.object.WorldSceneObject;
 import io.github.ffakira.rsps.client.desktop.world.object.WorldSceneObjectGeometry;
@@ -18,8 +19,9 @@ import io.github.ffakira.rsps.content.ContentBootstrapService;
 import io.github.ffakira.rsps.content.ContentManifest;
 import io.github.ffakira.rsps.content.IdentityKitDefinitionCatalog;
 import io.github.ffakira.rsps.content.ItemDefinitionCatalog;
+import io.github.ffakira.rsps.content.NpcDefinitionCatalog;
 import io.github.ffakira.rsps.model.WorldPoint;
-import io.github.ffakira.rsps.protocol.BootstrapAppearance;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapAppearance;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -99,6 +101,38 @@ class WorldSceneSubmissionBuilderTest {
 
     assertThat(actorBatches).hasSize(1);
     assertThat(actorBatches).extracting(SceneRenderBatch::rasterMode).containsExactly(SceneRasterMode.GOURAUD);
+    assertThat(actorBatches).allMatch(batch -> !batch.isEmpty());
+  }
+
+  @Test
+  void addsADebugGoblinActorBatchBesideTheLocalPlayer() {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    CharacterModelAssembler characterAssembler = new CharacterModelAssembler(
+        ItemDefinitionCatalog.load(manifest),
+        IdentityKitDefinitionCatalog.load(manifest),
+        new RawModelRepository(manifest.cacheStore())
+    );
+    NpcModelAssembler npcAssembler = new NpcModelAssembler(
+        NpcDefinitionCatalog.load(manifest),
+        new RawModelRepository(manifest.cacheStore())
+    );
+
+    WorldSceneRenderSubmission submission = new WorldSceneSubmissionBuilder(characterAssembler, npcAssembler).build(
+        testWorldScene(),
+        new WorldPoint(3204, 3204, 0),
+        new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1)),
+        List.of(),
+        ActorAnimationState.idle(),
+        496,
+        318
+    );
+
+    List<SceneRenderBatch> actorBatches = submission.renderQueue().batches().stream()
+        .filter(batch -> batch.kind() == SceneSubmissionKind.ACTOR)
+        .toList();
+
+    assertThat(actorBatches).hasSize(2);
+    assertThat(actorBatches).allMatch(batch -> batch.rasterMode() == SceneRasterMode.GOURAUD);
     assertThat(actorBatches).allMatch(batch -> !batch.isEmpty());
   }
 
@@ -583,6 +617,69 @@ class WorldSceneSubmissionBuilderTest {
 
     assertThat(staticObjectMesh.vertexX()).containsExactly(2.0f, 3.0f, 3.0f, 2.0f);
     assertThat(staticObjectMesh.vertexZ()).containsExactly(3.0f, 3.0f, 4.0f, 4.0f);
+  }
+
+  @Test
+  void liftsGroundDecorationsSlightlyAboveTheTerrainSurface() {
+    WorldSceneObjectGeometry geometry = new WorldSceneObjectGeometry(
+        new float[]{-0.5f, 0.5f, 0.5f, -0.5f},
+        new float[]{0.0f, 0.0f, 0.25f, 0.25f},
+        new float[]{-0.5f, -0.5f, 0.5f, 0.5f},
+        new int[]{0, 0},
+        new int[]{1, 2},
+        new int[]{2, 3},
+        new int[]{0xffffff, 0xffffff},
+        new int[]{0xffffff, 0xffffff},
+        new int[]{0xffffff, 0xffffff},
+        new int[]{255, 255},
+        new SceneRasterMode[]{SceneRasterMode.GOURAUD, SceneRasterMode.GOURAUD},
+        new int[]{-1, -1},
+        new int[]{-1, -1},
+        new int[]{-1, -1},
+        new int[]{-1, -1}
+    );
+    WorldScene worldScene = new WorldScene(
+        "ground-decoration",
+        3200,
+        3200,
+        0,
+        8,
+        8,
+        filledInts(64, 0),
+        filledInts(64, 0x4a6a3c),
+        filledInts(64, 0x4a6a3c),
+        filledInts(64, 0),
+        filledInts(64, -1),
+        filledInts(64, -1),
+        new byte[64],
+        new byte[64],
+        new byte[64],
+        List.of(new WorldSceneObject(4738, "Farm patch", 2, 3, 0, 22, 0, 1, 1, true, -1, -1, List.of(), true, geometry)),
+        List.of(),
+        new ArgbImage(1, 1, new int[]{0xff000000}),
+        new ArgbImage(8, 8, filledInts(64, 0xff334455)),
+        new WorldSceneProjection(5, 3, 0, 0)
+    );
+
+    WorldSceneRenderSubmission submission = new WorldSceneSubmissionBuilder(null).build(
+        worldScene,
+        new WorldPoint(3204, 3204, 0),
+        null,
+        List.of(),
+        ActorAnimationState.idle(),
+        496,
+        318
+    );
+
+    SceneTriangleMesh staticObjectMesh = batchOf(submission, SceneSubmissionKind.STATIC_OBJECT, SceneRasterMode.GOURAUD).mesh();
+    float expectedBias = 2.0f / 128.0f;
+
+    assertThat(staticObjectMesh.vertexY()).containsExactly(
+        expectedBias,
+        expectedBias,
+        0.25f + expectedBias,
+        0.25f + expectedBias
+    );
   }
 
   @Test

@@ -87,7 +87,8 @@ final class DesktopClientApplication implements AutoCloseable {
       new DesktopInputRouter(
           window,
           renderSystem,
-          runtimeContext.session(),
+          () -> requireRuntimeContext().session(),
+          () -> restartRuntimeForLogin(workingDirectory, loginScreenController, renderSystem, state),
           loginScreenController,
           state,
           WELCOME_STATUS,
@@ -157,6 +158,7 @@ final class DesktopClientApplication implements AutoCloseable {
         null,
         null,
         null,
+        null,
         null
     );
   }
@@ -182,10 +184,11 @@ final class DesktopClientApplication implements AutoCloseable {
       DesktopClientState state,
       CacheBackedWorldSceneLoader worldSceneLoader
   ) {
-    var session = runtimeContext.session();
     while (!glfwWindowShouldClose(window)) {
+      NativeClientRuntimeContext activeRuntimeContext = requireRuntimeContext();
+      var session = activeRuntimeContext.session();
       NativeClientRuntimeCoordinator.drainServerMessages(
-          runtimeContext.inboundMessages(),
+          activeRuntimeContext.inboundMessages(),
           session,
           loginScreenController,
           renderSystem,
@@ -207,6 +210,31 @@ final class DesktopClientApplication implements AutoCloseable {
         glfwSetWindowShouldClose(window, true);
       }
     }
+  }
+
+  private NativeClientRuntimeContext requireRuntimeContext() {
+    if (runtimeContext == null) {
+      throw new IllegalStateException("Native runtime context is not available");
+    }
+    return runtimeContext;
+  }
+
+  private void restartRuntimeForLogin(
+      Path workingDirectory,
+      LoginScreenController loginScreenController,
+      OpenGlTileRenderSystem renderSystem,
+      DesktopClientState state
+  ) {
+    if (runtimeContext != null) {
+      runtimeContext.close();
+    }
+    runtimeContext = NativeClientBootstrap.openRuntimeContext(workingDirectory, CLIENT_DESCRIPTOR);
+    loginScreenController.showCredentials();
+    renderSystem.setLoginScreenState(loginScreenController.state());
+    renderSystem.clearWorldScene();
+    state.setActiveSceneKey(null);
+    state.setGameplayBootstrapApplied(false);
+    state.setTitleScreenStatus(CREDENTIALS_STATUS);
   }
 
   private void updateGameplayBootstrapState(

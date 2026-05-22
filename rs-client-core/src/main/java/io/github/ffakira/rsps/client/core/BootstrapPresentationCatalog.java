@@ -2,9 +2,9 @@ package io.github.ffakira.rsps.client.core;
 
 import io.github.ffakira.rsps.content.ItemDefinition;
 import io.github.ffakira.rsps.content.ItemDefinitionCatalog;
-import io.github.ffakira.rsps.protocol.BootstrapItemSlot;
-import io.github.ffakira.rsps.protocol.BootstrapSkill;
-import io.github.ffakira.rsps.protocol.CharacterBootstrapPayload;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapItemSlot;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapSkill;
+import io.github.ffakira.rsps.protocol.bootstrap.CharacterBootstrapPayload;
 import java.util.List;
 
 public final class BootstrapPresentationCatalog {

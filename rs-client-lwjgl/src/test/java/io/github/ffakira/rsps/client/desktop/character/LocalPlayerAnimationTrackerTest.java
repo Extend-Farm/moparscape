@@ -7,7 +7,7 @@ import io.github.ffakira.rsps.model.WorldPoint;
 import io.github.ffakira.rsps.content.AnimationSequenceCatalog;
 import io.github.ffakira.rsps.content.ContentBootstrapService;
 import io.github.ffakira.rsps.content.ContentManifest;
-import io.github.ffakira.rsps.protocol.BootstrapAnimationProfile;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapAnimationProfile;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 

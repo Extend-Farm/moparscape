@@ -5,6 +5,7 @@ import io.github.ffakira.rsps.cache.AnimationFrameCatalog;
 import io.github.ffakira.rsps.client.core.GameplayClientSession;
 import io.github.ffakira.rsps.cache.RawModelRepository;
 import io.github.ffakira.rsps.client.desktop.character.CharacterModelAssembler;
+import io.github.ffakira.rsps.client.desktop.character.NpcModelAssembler;
 import io.github.ffakira.rsps.client.desktop.gameplay.GameplayFrameAssetLoader;
 import io.github.ffakira.rsps.client.desktop.gameplay.GameplayFrameAssets;
 import io.github.ffakira.rsps.client.desktop.itemicon.ItemIconRenderer;
@@ -16,6 +17,7 @@ import io.github.ffakira.rsps.content.AnimationSequenceCatalog;
 import io.github.ffakira.rsps.content.ContentBootstrapService;
 import io.github.ffakira.rsps.content.IdentityKitDefinitionCatalog;
 import io.github.ffakira.rsps.content.ItemDefinitionCatalog;
+import io.github.ffakira.rsps.content.NpcDefinitionCatalog;
 import io.github.ffakira.rsps.persistence.AccountRepository;
 import io.github.ffakira.rsps.persistence.CharacterRepository;
 import io.github.ffakira.rsps.persistence.sql.PostgresAccountRepository;
@@ -25,12 +27,17 @@ import io.github.ffakira.rsps.persistence.sql.SqlPersistenceEnvironment;
 import io.github.ffakira.rsps.server.runtime.CharacterFileRepository;
 import io.github.ffakira.rsps.server.runtime.InProcessServerRuntime;
 import io.github.ffakira.rsps.server.runtime.PlayerSessionActor;
+import io.github.ffakira.rsps.transport.quic.QuicClientTransport;
+import io.github.ffakira.rsps.transport.quic.QuicTransportConfiguration;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.BiConsumer;
 
 final class NativeClientBootstrap {
+
+  private static final String IN_PROCESS_RUNTIME_MODE = "inprocess";
+  private static final String QUIC_RUNTIME_MODE = "quic";
 
   private NativeClientBootstrap() {
   }
@@ -59,6 +66,9 @@ final class NativeClientBootstrap {
     progress.accept(75, "Preparing character models");
     CharacterModelAssembler characterModelAssembler =
         createCharacterModelAssembler(workingDirectory, itemDefinitionCatalog);
+    progress.accept(82, "Preparing npc models");
+    NpcModelAssembler npcModelAssembler =
+        createNpcModelAssembler(workingDirectory);
     progress.accept(90, "Loading world scene cache");
     CacheBackedWorldSceneLoader worldSceneLoader = createWorldSceneLoader(workingDirectory);
     return new NativeClientAssets(
@@ -68,11 +78,39 @@ final class NativeClientBootstrap {
         itemDefinitionCatalog,
         itemIconRenderer,
         characterModelAssembler,
+        npcModelAssembler,
         worldSceneLoader
     );
   }
 
   static NativeClientRuntimeContext openRuntimeContext(Path workingDirectory, String clientDescriptor) {
+    String runtimeMode = readRuntimeMode();
+    if (QUIC_RUNTIME_MODE.equalsIgnoreCase(runtimeMode)) {
+      return openQuicRuntimeContext(workingDirectory, clientDescriptor);
+    }
+    return openInProcessRuntimeContext(workingDirectory, clientDescriptor);
+  }
+
+  private static NativeClientRuntimeContext openQuicRuntimeContext(Path workingDirectory, String clientDescriptor) {
+    ConcurrentLinkedQueue<ServerMessage> inboundMessages = new ConcurrentLinkedQueue<>();
+    QuicTransportConfiguration transportConfiguration = QuicTransportConfiguration.defaults(workingDirectory);
+    QuicClientTransport transport = QuicClientTransport.connect(
+        transportConfiguration,
+        inboundMessages::add
+    );
+    GameplayClientSession gameplayClientSession = new GameplayClientSession(new ClientCore(), transport, clientDescriptor);
+    try {
+      gameplayClientSession.bootstrap();
+      gameplayClientSession.connect();
+      return new NativeClientRuntimeContext(() -> {
+      }, gameplayClientSession, inboundMessages);
+    } catch (RuntimeException | Error exception) {
+      gameplayClientSession.close();
+      throw exception;
+    }
+  }
+
+  private static NativeClientRuntimeContext openInProcessRuntimeContext(Path workingDirectory, String clientDescriptor) {
     RepositoryPair repositories = createRepositories(workingDirectory);
     InProcessProtocolBridge protocolBridge = new InProcessProtocolBridge();
     ConcurrentLinkedQueue<ServerMessage> inboundMessages = new ConcurrentLinkedQueue<>();
@@ -96,6 +134,18 @@ final class NativeClientBootstrap {
       runtime.close();
       throw exception;
     }
+  }
+
+  private static String readRuntimeMode() {
+    String propertyValue = System.getProperty("rsps.runtimeMode");
+    if (propertyValue != null && !propertyValue.isBlank()) {
+      return propertyValue;
+    }
+    String environmentValue = System.getenv("RSPS_RUNTIME_MODE");
+    if (environmentValue != null && !environmentValue.isBlank()) {
+      return environmentValue;
+    }
+    return IN_PROCESS_RUNTIME_MODE;
   }
 
   static TitleScreenAssets loadTitleScreenAssets(Path workingDirectory) {
@@ -179,6 +229,19 @@ final class NativeClientBootstrap {
       return new CacheBackedWorldSceneLoader(workingDirectory);
     } catch (RuntimeException runtimeException) {
       System.err.println("Using placeholder world view: " + runtimeException.getMessage());
+      return null;
+    }
+  }
+
+  static NpcModelAssembler createNpcModelAssembler(Path workingDirectory) {
+    try {
+      var manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(workingDirectory);
+      return new NpcModelAssembler(
+          NpcDefinitionCatalog.load(manifest),
+          new RawModelRepository(manifest.cacheStore())
+      );
+    } catch (RuntimeException runtimeException) {
+      System.err.println("Using player-only scene actors: " + runtimeException.getMessage());
       return null;
     }
   }

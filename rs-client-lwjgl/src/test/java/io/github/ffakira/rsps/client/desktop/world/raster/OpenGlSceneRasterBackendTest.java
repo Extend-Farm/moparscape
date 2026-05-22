@@ -7,22 +7,26 @@ import org.junit.jupiter.api.Test;
 class OpenGlSceneRasterBackendTest {
 
   @Test
-  void appliesTerrainShadeOnlyToTerrainBatches() {
-    assertThat(OpenGlSceneRasterBackend.terrainShadeStrength(batch(SceneSubmissionKind.TILE_PAINT, SceneRasterMode.GOURAUD)))
+  void keepsTerrainBatchesAtTheirCurrentShadeStrength() {
+    assertThat(OpenGlSceneRasterBackend.surfaceShadeStrength(batch(SceneSubmissionKind.TILE_PAINT, SceneRasterMode.GOURAUD)))
         .isEqualTo(0.0f);
-    assertThat(OpenGlSceneRasterBackend.terrainShadeStrength(batch(SceneSubmissionKind.TILE_MODEL, SceneRasterMode.TEXTURED)))
+    assertThat(OpenGlSceneRasterBackend.surfaceShadeStrength(batch(SceneSubmissionKind.TILE_MODEL, SceneRasterMode.TEXTURED)))
         .isEqualTo(0.0f);
-    assertThat(OpenGlSceneRasterBackend.terrainShadeStrength(batch(SceneSubmissionKind.STATIC_OBJECT, SceneRasterMode.GOURAUD)))
-        .isEqualTo(0.0f);
-    assertThat(OpenGlSceneRasterBackend.terrainShadeStrength(batch(SceneSubmissionKind.ACTOR, SceneRasterMode.TEXTURED)))
+    assertThat(OpenGlSceneRasterBackend.surfaceShadeStrength(batch(SceneSubmissionKind.STATIC_OBJECT, SceneRasterMode.GOURAUD)))
         .isEqualTo(0.0f);
   }
 
   @Test
-  void keepsTerrainShadeRoutingIndependentFromActorBatches() {
-    assertThat(OpenGlSceneRasterBackend.terrainShadeStrength(batch(SceneSubmissionKind.ACTOR, SceneRasterMode.GOURAUD)))
-        .isEqualTo(0.0f);
-    assertThat(OpenGlSceneRasterBackend.terrainShadeStrength(batch(SceneSubmissionKind.STATIC_OBJECT, SceneRasterMode.GOURAUD)))
+  void appliesSurfaceShadeToActorBatches() {
+    assertThat(OpenGlSceneRasterBackend.surfaceShadeStrength(batch(SceneSubmissionKind.ACTOR, SceneRasterMode.TEXTURED)))
+        .isEqualTo(0.18f);
+    assertThat(OpenGlSceneRasterBackend.surfaceShadeStrength(batch(SceneSubmissionKind.ACTOR, SceneRasterMode.GOURAUD)))
+        .isEqualTo(0.18f);
+  }
+
+  @Test
+  void keepsNonActorNonTerrainBatchesUnshaded() {
+    assertThat(OpenGlSceneRasterBackend.surfaceShadeStrength(batch(SceneSubmissionKind.STATIC_OBJECT, SceneRasterMode.GOURAUD)))
         .isEqualTo(0.0f);
   }
 

@@ -2,6 +2,7 @@ package io.github.ffakira.rsps.client.desktop.world;
 
 import io.github.ffakira.rsps.client.desktop.character.ActorAnimationState;
 import io.github.ffakira.rsps.client.desktop.character.CharacterModelAssembler;
+import io.github.ffakira.rsps.client.desktop.character.NpcModelAssembler;
 import io.github.ffakira.rsps.client.desktop.world.raster.SceneRasterMode;
 import io.github.ffakira.rsps.client.desktop.world.raster.SceneRenderQueueBuilder;
 import io.github.ffakira.rsps.client.desktop.world.raster.SceneSubmissionKind;
@@ -13,8 +14,8 @@ import io.github.ffakira.rsps.client.desktop.world.visibility.WorldScenePlaneRul
 import io.github.ffakira.rsps.client.desktop.world.visibility.WorldSceneVisibilityPlanner;
 import io.github.ffakira.rsps.client.desktop.world.visibility.WorldSceneVisibilityWindow;
 import io.github.ffakira.rsps.model.WorldPoint;
-import io.github.ffakira.rsps.protocol.BootstrapAppearance;
-import io.github.ffakira.rsps.protocol.BootstrapItemSlot;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapAppearance;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapItemSlot;
 import java.util.List;
 
 public final class WorldSceneSubmissionBuilder {
@@ -23,12 +24,21 @@ public final class WorldSceneSubmissionBuilder {
   private final WorldSceneCameraPlanner worldSceneCameraPlanner;
   private final WorldSceneObjectBatchBuilder objectBatchBuilder;
   private final WorldSceneActorBatchBuilder actorBatchBuilder;
+  private final WorldSceneNpcBatchBuilder npcBatchBuilder;
 
   public WorldSceneSubmissionBuilder(CharacterModelAssembler characterModelAssembler) {
+    this(characterModelAssembler, null);
+  }
+
+  public WorldSceneSubmissionBuilder(
+      CharacterModelAssembler characterModelAssembler,
+      NpcModelAssembler npcModelAssembler
+  ) {
     this.terrainSceneMeshBuilder = new TerrainSceneMeshBuilder();
     this.worldSceneCameraPlanner = new WorldSceneCameraPlanner();
     this.objectBatchBuilder = new WorldSceneObjectBatchBuilder();
     this.actorBatchBuilder = new WorldSceneActorBatchBuilder(characterModelAssembler);
+    this.npcBatchBuilder = new WorldSceneNpcBatchBuilder(npcModelAssembler);
   }
 
   // This is the first native scene-submission boundary for the rewrite. It does not attempt full
@@ -119,6 +129,15 @@ public final class WorldSceneSubmissionBuilder {
         appearance,
         equipment,
         actorAnimationState
+    );
+    npcBatchBuilder.addDebugGoblinBatch(
+        renderQueueBuilder,
+        worldScene,
+        visibilityWindow,
+        occlusionContext,
+        cameraState,
+        playerLocalX,
+        playerLocalY
     );
     return new WorldSceneRenderSubmission(renderPlane, cameraState, renderQueueBuilder.build());
   }

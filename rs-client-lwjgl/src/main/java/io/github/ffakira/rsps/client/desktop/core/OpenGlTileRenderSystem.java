@@ -5,6 +5,7 @@ import io.github.ffakira.rsps.client.core.RenderSystem;
 import io.github.ffakira.rsps.client.desktop.character.ActorAnimationState;
 import io.github.ffakira.rsps.client.desktop.character.CharacterModelAssembler;
 import io.github.ffakira.rsps.client.desktop.character.LocalPlayerAnimationTracker;
+import io.github.ffakira.rsps.client.desktop.character.NpcModelAssembler;
 import io.github.ffakira.rsps.client.desktop.gameplay.GameplayCameraController;
 import io.github.ffakira.rsps.client.desktop.gameplay.GameplayChromeRenderer;
 import io.github.ffakira.rsps.client.desktop.gameplay.GameplayClickResult;
@@ -25,7 +26,7 @@ import io.github.ffakira.rsps.client.desktop.world.WorldViewportRenderer;
 import io.github.ffakira.rsps.client.desktop.world.raster.SceneTextureAssets;
 import io.github.ffakira.rsps.content.ItemDefinitionCatalog;
 import io.github.ffakira.rsps.model.WorldPoint;
-import io.github.ffakira.rsps.protocol.BootstrapAppearance;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapAppearance;
 import java.util.Objects;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -72,7 +73,8 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
       SceneTextureAssets sceneTextureAssets,
       ItemDefinitionCatalog itemDefinitionCatalog,
       ItemIconRenderer itemIconRenderer,
-      CharacterModelAssembler characterModelAssembler
+      CharacterModelAssembler characterModelAssembler,
+      NpcModelAssembler npcModelAssembler
   ) {
     this.primitives = new ImmediateModeRenderer2d();
     this.titleScreenRenderer = new TitleScreenRenderer(titleScreenAssets, primitives);
@@ -87,7 +89,7 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
     this.localPlayerAnimationTracker = new LocalPlayerAnimationTracker(
         characterModelAssembler == null ? null : characterModelAssembler.animationSequenceCatalog()
     );
-    this.worldSceneSubmissionBuilder = new WorldSceneSubmissionBuilder(characterModelAssembler);
+    this.worldSceneSubmissionBuilder = new WorldSceneSubmissionBuilder(characterModelAssembler, npcModelAssembler);
     this.worldViewportRenderer = new WorldViewportRenderer(sceneTextureAssets);
     this.worldViewportClickPlanner = new WorldViewportClickPlanner();
     resize(width, height);
@@ -157,9 +159,12 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
       }
       return executeMenuAction(selectedAction, GameplayMouseButton.RIGHT, x, y);
     }
-    if (button == GameplayMouseButton.LEFT && gameplayChromeRenderer.handleClick(x, y)) {
-      gameplayChromeRenderer.closeContextMenu();
-      return GameplayClickResult.handledClick();
+    if (button == GameplayMouseButton.LEFT) {
+      GameplayClickResult chromeClickResult = gameplayChromeRenderer.handleClick(x, y);
+      if (chromeClickResult.handled()) {
+        gameplayChromeRenderer.closeContextMenu();
+        return chromeClickResult;
+      }
     }
     ScreenRect worldViewport = GameplayLayout.worldViewportInnerRect();
     if (!worldViewport.contains(x, y)) {
@@ -177,6 +182,18 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
     }
     gameplayChromeRenderer.closeContextMenu();
     return executeMenuAction(GameplayMenuAction.walkTo(pickWorldTarget(x, y, worldViewport)), GameplayMouseButton.LEFT, x, y);
+  }
+
+  public boolean handleGameplayScroll(double x, double y, double yOffset) {
+    return gameplayChromeRenderer.handleScroll(x, y, yOffset);
+  }
+
+  public boolean handleGameplayPointerMove(double x, double y) {
+    return gameplayChromeRenderer.handlePointerMove(x, y);
+  }
+
+  public void endGameplayPointerDrag() {
+    gameplayChromeRenderer.endPointerDrag();
   }
 
   public void resetGameplayTabForBootstrap() {

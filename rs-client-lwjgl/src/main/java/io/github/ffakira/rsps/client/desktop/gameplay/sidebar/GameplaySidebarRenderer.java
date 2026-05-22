@@ -8,6 +8,7 @@ import io.github.ffakira.rsps.client.desktop.core.ArgbImage;
 import io.github.ffakira.rsps.client.desktop.core.ImmediateModeRenderer2d;
 import io.github.ffakira.rsps.client.desktop.core.OpenGlTexture;
 import io.github.ffakira.rsps.client.desktop.core.ScreenRect;
+import io.github.ffakira.rsps.client.desktop.gameplay.GameplayClickResult;
 import io.github.ffakira.rsps.client.desktop.gameplay.GameplayFrameAssets;
 import io.github.ffakira.rsps.client.desktop.gameplay.GameplayLayout;
 import io.github.ffakira.rsps.client.desktop.gameplay.GameplayTab;
@@ -16,7 +17,7 @@ import io.github.ffakira.rsps.client.desktop.login.TitleScreenBitmapFont;
 import io.github.ffakira.rsps.client.desktop.login.TitleScreenFonts;
 import io.github.ffakira.rsps.content.ItemDefinition;
 import io.github.ffakira.rsps.content.ItemDefinitionCatalog;
-import io.github.ffakira.rsps.protocol.BootstrapItemSlot;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapItemSlot;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +41,7 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
   private final OpenGlTexture statsButtonLeftTexture;
   private final OpenGlTexture statsButtonRightTexture;
   private final OpenGlTexture[] statIconTexturesBySkillId;
-  private final CombatSidebarWidgetRenderer combatWidgetRenderer;
+  private final SidebarWidgetRenderer sidebarWidgetRenderer;
   private final Map<Integer, OpenGlTexture> itemIconTextures = new HashMap<>();
   private final Map<Integer, GameplayCombatSidebarModel> combatModelsByWeaponItemId = new HashMap<>();
   private final Map<String, OpenGlTexture> inventoryAmountTextures = new HashMap<>();
@@ -48,6 +49,9 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
   private final InventoryEquipmentSidebarPanelRenderer inventoryEquipmentPanelRenderer;
   private final StatsSidebarPanelRenderer statsPanelRenderer;
   private final CombatSidebarPanelRenderer combatPanelRenderer;
+  private final PrayerSidebarPanelRenderer prayerPanelRenderer;
+  private final MagicSidebarPanelRenderer magicPanelRenderer;
+  private final LogoutSidebarPanelRenderer logoutPanelRenderer;
 
   public GameplaySidebarRenderer(
       ItemDefinitionCatalog itemDefinitionCatalog,
@@ -66,7 +70,7 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
     this.statsButtonLeftTexture = statsTabAssets == null ? null : OpenGlTexture.fromArgbImage(statsTabAssets.buttonLeft());
     this.statsButtonRightTexture = statsTabAssets == null ? null : OpenGlTexture.fromArgbImage(statsTabAssets.buttonRight());
     this.statIconTexturesBySkillId = buildStatIconTextures(statsTabAssets);
-    this.combatWidgetRenderer = gameplayFrameAssets == null ? null : new CombatSidebarWidgetRenderer(
+    this.sidebarWidgetRenderer = gameplayFrameAssets == null ? null : new SidebarWidgetRenderer(
         gameplayFrameAssets.interfaceComponents(),
         gameplayFrameAssets.mediaSpriteResolver(),
         itemIconRenderer,
@@ -76,16 +80,49 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
     this.inventoryEquipmentPanelRenderer = new InventoryEquipmentSidebarPanelRenderer(this);
     this.statsPanelRenderer = new StatsSidebarPanelRenderer(this);
     this.combatPanelRenderer = new CombatSidebarPanelRenderer(this);
+    this.prayerPanelRenderer = new PrayerSidebarPanelRenderer(this);
+    this.magicPanelRenderer = new MagicSidebarPanelRenderer(this);
+    this.logoutPanelRenderer = new LogoutSidebarPanelRenderer(this);
   }
 
-  public boolean handleSidebarClick(GameplayTab activeGameplayTab, double x, double y) {
-    if (activeGameplayTab != GameplayTab.STATS) {
-      return false;
-    }
-    return statsPanelRenderer.handleSidebarClick(GameplayLayout.sidebarPanelRect(), x, y);
+  public GameplayClickResult handleSidebarClick(GameplayTab activeGameplayTab, double x, double y) {
+    ScreenRect sidebarRect = GameplayLayout.sidebarPanelRect();
+    return switch (activeGameplayTab) {
+      case STATS -> statsPanelRenderer.handleSidebarClick(sidebarRect, x, y)
+          ? GameplayClickResult.handledClick()
+          : GameplayClickResult.ignored();
+      case MAGIC -> magicPanelRenderer.handleSidebarClick(sidebarRect, x, y)
+          ? GameplayClickResult.handledClick()
+          : GameplayClickResult.ignored();
+      case LOGOUT -> logoutPanelRenderer.handleSidebarClick(sidebarRect, x, y);
+      default -> GameplayClickResult.ignored();
+    };
+  }
+
+  public boolean handleSidebarScroll(GameplayTab activeGameplayTab, double x, double y, double yOffset) {
+    ScreenRect sidebarRect = GameplayLayout.sidebarPanelRect();
+    return switch (activeGameplayTab) {
+      case MAGIC -> magicPanelRenderer.handleSidebarScroll(sidebarRect, x, y, yOffset);
+      default -> false;
+    };
+  }
+
+  public boolean handleSidebarPointerMove(GameplayTab activeGameplayTab, double x, double y) {
+    ScreenRect sidebarRect = GameplayLayout.sidebarPanelRect();
+    return switch (activeGameplayTab) {
+      case MAGIC -> magicPanelRenderer.handleSidebarPointerMove(sidebarRect, x, y);
+      default -> false;
+    };
+  }
+
+  public void endSidebarPointerDrag() {
+    magicPanelRenderer.endSidebarPointerDrag();
   }
 
   public void clearTransientState() {
+    if (sidebarWidgetRenderer != null) {
+      sidebarWidgetRenderer.clearTransientState();
+    }
   }
 
   public void drawSidebar(ClientViewModel viewModel, GameplayTab activeGameplayTab, double pointerX, double pointerY) {
@@ -95,7 +132,10 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
     if (activeGameplayTab != GameplayTab.INVENTORY
         && activeGameplayTab != GameplayTab.STATS
         && activeGameplayTab != GameplayTab.COMBAT
-        && activeGameplayTab != GameplayTab.EQUIPMENT) {
+        && activeGameplayTab != GameplayTab.EQUIPMENT
+        && activeGameplayTab != GameplayTab.PRAYER
+        && activeGameplayTab != GameplayTab.MAGIC
+        && activeGameplayTab != GameplayTab.LOGOUT) {
       primitives.drawText(left, top, activeGameplayTab.label(), 0.92f, 0.86f, 0.46f);
     }
     switch (activeGameplayTab) {
@@ -104,11 +144,11 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
       case STATS -> statsPanelRenderer.drawStatsSidebar(viewModel, rect, pointerX, pointerY);
       case COMBAT -> combatPanelRenderer.drawCombatSidebar(viewModel, rect);
       case QUESTS -> drawSidebarPlaceholder(left, top + 16.0f, "Quest journal not synced yet.", "Native widget rendering is next.");
-      case PRAYER -> drawSidebarPlaceholder(left, top + 16.0f, "Prayer book not synced yet.", "Skill state is available through Stats.");
-      case MAGIC -> drawSidebarPlaceholder(left, top + 16.0f, "Spellbook not decoded yet.", "Runes are available in inventory.");
+      case PRAYER -> prayerPanelRenderer.drawPrayerSidebar(rect, pointerX, pointerY);
+      case MAGIC -> magicPanelRenderer.drawMagicSidebar(rect);
       case FRIENDS -> drawSidebarPlaceholder(left, top + 16.0f, "Friends list not synced yet.", "Social state will move into protocol snapshots.");
       case IGNORES -> drawSidebarPlaceholder(left, top + 16.0f, "Ignore list not synced yet.", "Legacy file import already stores social links.");
-      case LOGOUT -> drawSidebarPlaceholder(left, top + 16.0f, "Logout flow is not wired to a tab yet.", "Use Esc to close the client.");
+      case LOGOUT -> logoutPanelRenderer.drawLogoutSidebar(rect);
       case SETTINGS -> drawSidebarPlaceholder(left, top + 16.0f, "Settings panel not implemented yet.", "Run energy and rights are in chat status.");
       case EMOTES -> drawSidebarPlaceholder(left, top + 16.0f, "Emote book not decoded yet.", "Runtime action sequence packets are ready; emote UI is still pending.");
       case MUSIC -> drawSidebarPlaceholder(left, top + 16.0f, "Music player not decoded yet.", "Audio is outside the current world slice.");
@@ -165,8 +205,8 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
     for (OpenGlTexture iconTexture : statIconTexturesBySkillId) {
       closeTexture(iconTexture);
     }
-    if (combatWidgetRenderer != null) {
-      combatWidgetRenderer.close();
+    if (sidebarWidgetRenderer != null) {
+      sidebarWidgetRenderer.close();
     }
   }
 
@@ -205,8 +245,8 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
     return statIconTexturesBySkillId[skillId];
   }
 
-  CombatSidebarWidgetRenderer combatWidgetRenderer() {
-    return combatWidgetRenderer;
+  SidebarWidgetRenderer sidebarWidgetRenderer() {
+    return sidebarWidgetRenderer;
   }
 
   boolean canDrawLegacyStatsTab() {

@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.github.ffakira.rsps.client.core.EquipmentLoadout;
 import io.github.ffakira.rsps.content.ItemDefinition;
 import io.github.ffakira.rsps.content.ItemDefinitionCatalog;
-import io.github.ffakira.rsps.protocol.BootstrapItemSlot;
+import io.github.ffakira.rsps.protocol.bootstrap.BootstrapItemSlot;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

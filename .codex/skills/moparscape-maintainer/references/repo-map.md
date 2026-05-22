@@ -14,10 +14,11 @@
   - `:rs-sim-ecs` -> deterministic simulation core
   - `:rs-persistence-api` -> persistence contracts
   - `:rs-persistence-sql` -> PostgreSQL/Flyway persistence
-  - `:rs-protocol` -> native client/server messages
+  - `:rs-protocol` -> native client/server framing, codecs, and domain packet models
   - `:rs-server-runtime` -> native runtime/auth/session orchestration
   - `:rs-client-core` -> native client state/view model
   - `:rs-client-lwjgl` -> native LWJGL desktop client
+  - `:rs-transport-quic` -> QUIC transport and external native server
 
 ## Physical source layout
 
@@ -33,6 +34,7 @@
 - Emulator main class: `server`
 - Desktop client main class: `io.github.ffakira.moparscape.client.GameClient`
 - Native LWJGL client main class: `io.github.ffakira.rsps.client.desktop.core.DesktopClientMain`
+- Native QUIC server main class: `io.github.ffakira.rsps.transport.quic.QuicServerMain`
 
 ## High-risk files
 

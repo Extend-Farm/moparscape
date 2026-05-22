@@ -4,6 +4,7 @@ import io.github.ffakira.rsps.client.core.GameplayClientSession;
 import io.github.ffakira.rsps.client.desktop.login.LoginScreenController;
 import org.lwjgl.system.MemoryStack;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 import static org.lwjgl.glfw.GLFW.glfwGetCursorPos;
 import static org.lwjgl.glfw.GLFW.glfwSetCharCallback;
@@ -11,6 +12,7 @@ import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetFramebufferSizeCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
 final class DesktopInputRouter {
@@ -25,7 +27,8 @@ final class DesktopInputRouter {
   DesktopInputRouter(
       long window,
       OpenGlTileRenderSystem renderSystem,
-      GameplayClientSession gameplayClientSession,
+      Supplier<GameplayClientSession> gameplayClientSessionSupplier,
+      GameplayInputHandler.LogoutPort logoutPort,
       LoginScreenController loginScreenController,
       DesktopClientState state,
       String welcomeStatus,
@@ -38,14 +41,15 @@ final class DesktopInputRouter {
     this.loginInputHandler = new LoginInputHandler(
         renderSystem,
         loginScreenController,
-        gameplayClientSession,
+        gameplayClientSessionSupplier,
         state,
         welcomeStatus,
         credentialsStatus,
         authenticatingStatus
     );
-    this.gameplayInputHandler = new GameplayInputHandler(renderSystem, gameplayClientSession);
-    this.gameplayActiveSupplier = () -> NativeClientRuntimeCoordinator.isGameplayActive(gameplayClientSession.viewModel());
+    this.gameplayInputHandler = new GameplayInputHandler(renderSystem, gameplayClientSessionSupplier, logoutPort);
+    this.gameplayActiveSupplier = () ->
+        NativeClientRuntimeCoordinator.isGameplayActive(gameplayClientSessionSupplier.get().viewModel());
   }
 
   DesktopInputRouter(
@@ -79,6 +83,10 @@ final class DesktopInputRouter {
       syncMousePosition(windowHandle);
       routeMouseButton(windowHandle, button, action);
     });
+    glfwSetScrollCallback(window, (windowHandle, xOffset, yOffset) -> {
+      syncMousePosition(windowHandle);
+      routeScroll(yOffset);
+    });
     glfwSetKeyCallback(window, (windowHandle, key, scancode, action, mods) -> {
       routeKey(windowHandle, key, action);
     });
@@ -93,7 +101,7 @@ final class DesktopInputRouter {
 
   void routeMouseButton(long windowHandle, int button, int action) {
     if (isGameplayActive()) {
-      gameplayInputHandler.handleMouseButton(button, action, state.mouseX(), state.mouseY());
+      gameplayInputHandler.handleMouseButton(windowHandle, button, action, state.mouseX(), state.mouseY());
       return;
     }
     loginInputHandler.handleMouseButton(button, action, state.mouseX(), state.mouseY());
@@ -108,6 +116,13 @@ final class DesktopInputRouter {
     loginInputHandler.handleKey(windowHandle, key, action);
   }
 
+  void routeScroll(double yOffset) {
+    if (!isGameplayActive()) {
+      return;
+    }
+    gameplayInputHandler.handleScroll(state.mouseX(), state.mouseY(), yOffset);
+  }
+
   private boolean isGameplayActive() {
     return gameplayActiveSupplier.getAsBoolean();
   }
@@ -115,6 +130,9 @@ final class DesktopInputRouter {
   private void updatePointerPosition(double mouseX, double mouseY) {
     state.setMousePosition(mouseX, mouseY);
     renderSystem.setPointerPosition(mouseX, mouseY);
+    if (isGameplayActive()) {
+      gameplayInputHandler.handlePointerMove(mouseX, mouseY);
+    }
   }
 
   private void syncMousePosition(long windowHandle) {

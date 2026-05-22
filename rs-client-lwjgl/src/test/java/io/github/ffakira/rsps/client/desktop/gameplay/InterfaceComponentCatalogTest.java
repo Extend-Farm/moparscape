@@ -20,6 +20,10 @@ import org.junit.jupiter.api.Test;
 class InterfaceComponentCatalogTest {
 
   private static final int[] COMBAT_ROOT_INTERFACES = {328, 1764, 2423, 5570, 5855, 12290};
+  private static final int PRAYER_ROOT_INTERFACE = 5608;
+  private static final int MODERN_MAGIC_ROOT_INTERFACE = 1151;
+  private static final int MODERN_MAGIC_SPELLBOOK_CONTAINER = 12424;
+  private static final int LOGOUT_ROOT_INTERFACE = 2449;
 
   private static InterfaceComponentCatalog catalog;
   private static Object[] referenceWidgets;
@@ -67,6 +71,76 @@ class InterfaceComponentCatalogTest {
       collectComponentTypes(rootId, componentTypes, new HashSet<>());
     }
     assertThat(componentTypes).containsOnly(0, 3, 4, 5, 6);
+  }
+
+  @Test
+  void decodesLogoutSidebarRootAndDescendantsLikeTheReferenceClient() throws Exception {
+    compareSubtree(LOGOUT_ROOT_INTERFACE, new HashSet<>());
+  }
+
+  @Test
+  void decodesPrayerSidebarRootAndDescendantsLikeTheReferenceClient() throws Exception {
+    compareSubtree(PRAYER_ROOT_INTERFACE, new HashSet<>());
+  }
+
+  @Test
+  void decodesModernMagicSidebarRootAndDescendantsLikeTheReferenceClient() throws Exception {
+    compareSubtree(MODERN_MAGIC_ROOT_INTERFACE, new HashSet<>());
+  }
+
+  @Test
+  void logoutSidebarInterfaceStaysWithinTheCurrentNativeWidgetRenderSubset() {
+    Set<Integer> componentTypes = new HashSet<>();
+    collectComponentTypes(LOGOUT_ROOT_INTERFACE, componentTypes, new HashSet<>());
+    assertThat(componentTypes).allMatch(componentType -> componentType == 0
+        || componentType == 3
+        || componentType == 4
+        || componentType == 5
+        || componentType == 6);
+  }
+
+  @Test
+  void prayerSidebarInterfaceStaysWithinTheCurrentNativeWidgetRenderSubset() {
+    Set<Integer> componentTypes = new HashSet<>();
+    collectComponentTypes(PRAYER_ROOT_INTERFACE, componentTypes, new HashSet<>());
+    assertThat(componentTypes).allMatch(componentType -> componentType == 0
+        || componentType == 3
+        || componentType == 4
+        || componentType == 5
+        || componentType == 6);
+  }
+
+  @Test
+  void prayerSidebarContainsHoverTargetsForIconDescriptions() {
+    assertThat(hasHoverTarget(PRAYER_ROOT_INTERFACE, new HashSet<>())).isTrue();
+  }
+
+  @Test
+  void modernMagicSidebarInterfaceStaysWithinTheCurrentNativeWidgetRenderSubset() {
+    Set<Integer> componentTypes = new HashSet<>();
+    collectComponentTypes(MODERN_MAGIC_ROOT_INTERFACE, componentTypes, new HashSet<>());
+    assertThat(componentTypes).allMatch(componentType -> componentType == 0
+        || componentType == 3
+        || componentType == 4
+        || componentType == 5
+        || componentType == 6);
+  }
+
+  @Test
+  void modernMagicSpellbookContainerRequiresScrollbar() throws Exception {
+    InterfaceComponentDefinition container = catalog.require(MODERN_MAGIC_SPELLBOOK_CONTAINER);
+    Object referenceWidget = referenceWidgets[MODERN_MAGIC_SPELLBOOK_CONTAINER];
+
+    assertThat(container.componentType()).isZero();
+    assertThat(container.height()).isEqualTo(167);
+    assertThat(container.container().scrollContentHeight()).isEqualTo(215);
+    assertThat(container.container().scrollContentHeight()).isGreaterThan(container.height());
+    assertThat(container.container().scrollContentHeight()).isEqualTo(readInt(referenceWidget, "anInt261"));
+  }
+
+  @Test
+  void logoutSidebarContainsAtLeastOneActionableComponent() {
+    assertThat(hasActionableComponent(LOGOUT_ROOT_INTERFACE, new HashSet<>())).isTrue();
   }
 
   private void compareSubtree(int componentId, Set<Integer> visited) throws Exception {
@@ -130,6 +204,38 @@ class InterfaceComponentCatalogTest {
     for (int childId : component.container().childIds()) {
       collectComponentTypes(childId, componentTypes, visited);
     }
+  }
+
+  private boolean hasActionableComponent(int componentId, Set<Integer> visited) {
+    if (!visited.add(componentId)) {
+      return false;
+    }
+    InterfaceComponentDefinition component = catalog.require(componentId);
+    if (component.optionType() != 0 || !component.actionLabel().isEmpty()) {
+      return true;
+    }
+    for (int childId : component.container().childIds()) {
+      if (hasActionableComponent(childId, visited)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean hasHoverTarget(int componentId, Set<Integer> visited) {
+    if (!visited.add(componentId)) {
+      return false;
+    }
+    InterfaceComponentDefinition component = catalog.require(componentId);
+    if (component.hoverTargetId() >= 0 || component.colors().hoverColor() != 0) {
+      return true;
+    }
+    for (int childId : component.container().childIds()) {
+      if (hasHoverTarget(childId, visited)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private int readInt(Object target, String fieldName) throws Exception {

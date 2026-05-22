@@ -67,6 +67,44 @@ class DesktopInputRouterTest {
     assertThat(loginInputPort.lastKey).isEqualTo(GLFW_KEY_TAB);
   }
 
+  @Test
+  void routesGameplayScrollToTheGameplayHandlerWhenGameplayIsActive() {
+    AtomicBoolean gameplayActive = new AtomicBoolean(true);
+    DesktopClientState state = new DesktopClientState("status");
+    state.setMousePosition(140.0, 88.0);
+    TestGameplayCameraInputPort cameraInputPort = new TestGameplayCameraInputPort();
+    TestGameplayScrollPort scrollPort = new TestGameplayScrollPort();
+    GameplayInputHandler gameplayInputHandler = new GameplayInputHandler(
+        (mouseX, mouseY, button) -> GameplayClickResult.handledClick(),
+        scrollPort,
+        (mouseX, mouseY) -> false,
+        () -> {
+        },
+        cameraInputPort,
+        (deltaX, deltaY, movementMode) -> {
+        },
+        windowHandle -> {
+        },
+        () -> {
+        }
+    );
+    DesktopInputRouter inputRouter = new DesktopInputRouter(
+        0L,
+        null,
+        state,
+        new TestLoginInputPort(),
+        gameplayInputHandler,
+        gameplayActive::get
+    );
+
+    inputRouter.routeScroll(-1.0);
+
+    assertThat(scrollPort.calls).isEqualTo(1);
+    assertThat(scrollPort.lastMouseX).isEqualTo(140.0);
+    assertThat(scrollPort.lastMouseY).isEqualTo(88.0);
+    assertThat(scrollPort.lastYOffset).isEqualTo(-1.0);
+  }
+
   private static final class TestGameplayCameraInputPort implements GameplayInputHandler.GameplayCameraInputPort {
 
     private boolean[] lastInputs = new boolean[4];
@@ -99,6 +137,23 @@ class DesktopInputRouterTest {
     public void handleKey(long windowHandle, int key, int action) {
       keyCalls++;
       lastKey = key;
+    }
+  }
+
+  private static final class TestGameplayScrollPort implements GameplayInputHandler.GameplayScrollPort {
+
+    private int calls;
+    private double lastMouseX;
+    private double lastMouseY;
+    private double lastYOffset;
+
+    @Override
+    public boolean handleGameplayScroll(double mouseX, double mouseY, double yOffset) {
+      calls++;
+      lastMouseX = mouseX;
+      lastMouseY = mouseY;
+      lastYOffset = yOffset;
+      return true;
     }
   }
 }
