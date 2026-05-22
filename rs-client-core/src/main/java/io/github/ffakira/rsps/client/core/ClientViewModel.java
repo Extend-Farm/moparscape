@@ -45,6 +45,10 @@ public record ClientViewModel(
     return bootstrap == null ? List.of() : bootstrap.equipment();
   }
 
+  public EquipmentLoadout equipmentLoadout() {
+    return EquipmentLoadout.from(equipment());
+  }
+
   public List<io.github.ffakira.rsps.protocol.BootstrapSkill> skills() {
     return bootstrap == null ? List.of() : bootstrap.skills();
   }

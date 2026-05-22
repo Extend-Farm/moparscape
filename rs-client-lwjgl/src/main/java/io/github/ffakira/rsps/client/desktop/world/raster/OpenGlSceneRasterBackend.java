@@ -83,14 +83,24 @@ public final class OpenGlSceneRasterBackend implements SceneRasterBackend, AutoC
     if (!passPlan.hasOpaqueFaces()) {
       return;
     }
+    boolean sceneDepthOnly = usesSceneDepthOnly(renderBatch);
+    if (sceneDepthOnly) {
+      // After actor faces are culled and ordered like the reference painter, the actor should
+      // still test against world depth but not self-occlude through the z-buffer. That keeps
+      // front-facing jewelry from being half-buried by nearly coplanar torso faces.
+      glDepthMask(false);
+    }
     if (shouldFallbackTexturedActorBatch(renderBatch)) {
       drawGouraudMesh(renderBatch.mesh(), passPlan.opaqueFaces(), terrainShadeStrength(renderBatch));
-      return;
+    } else {
+      switch (renderBatch.rasterMode()) {
+        case FLAT -> drawFlatMesh(renderBatch.mesh(), passPlan.opaqueFaces(), terrainShadeStrength(renderBatch));
+        case GOURAUD -> drawGouraudMesh(renderBatch.mesh(), passPlan.opaqueFaces(), terrainShadeStrength(renderBatch));
+        case TEXTURED -> drawTexturedMesh(renderBatch.mesh(), passPlan.opaqueFaces(), terrainShadeStrength(renderBatch));
+      }
     }
-    switch (renderBatch.rasterMode()) {
-      case FLAT -> drawFlatMesh(renderBatch.mesh(), passPlan.opaqueFaces(), terrainShadeStrength(renderBatch));
-      case GOURAUD -> drawGouraudMesh(renderBatch.mesh(), passPlan.opaqueFaces(), terrainShadeStrength(renderBatch));
-      case TEXTURED -> drawTexturedMesh(renderBatch.mesh(), passPlan.opaqueFaces(), terrainShadeStrength(renderBatch));
+    if (sceneDepthOnly) {
+      glDepthMask(true);
     }
   }
 
@@ -231,6 +241,10 @@ public final class OpenGlSceneRasterBackend implements SceneRasterBackend, AutoC
 
   private boolean shouldFallbackTexturedActorBatch(SceneRenderBatch renderBatch) {
     return renderBatch.kind() == SceneSubmissionKind.ACTOR && renderBatch.rasterMode() == SceneRasterMode.TEXTURED;
+  }
+
+  static boolean usesSceneDepthOnly(SceneRenderBatch renderBatch) {
+    return renderBatch != null && renderBatch.kind() == SceneSubmissionKind.ACTOR;
   }
 
   static float terrainShadeStrength(SceneRenderBatch renderBatch) {

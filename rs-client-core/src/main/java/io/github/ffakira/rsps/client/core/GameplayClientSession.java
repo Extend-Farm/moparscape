@@ -183,7 +183,28 @@ public final class GameplayClientSession implements AutoCloseable {
         steps.addLast(new QueuedMovementStep(stepDeltaX, stepY, movementMode));
       }
     }
-    return List.copyOf(steps);
+    if (movementMode != MovementMode.RUN || steps.size() <= 1) {
+      return List.copyOf(steps);
+    }
+    return collapseRunBursts(steps);
+  }
+
+  private List<QueuedMovementStep> collapseRunBursts(ArrayDeque<QueuedMovementStep> steps) {
+    ArrayDeque<QueuedMovementStep> collapsedSteps = new ArrayDeque<>((steps.size() + 1) / 2);
+    while (!steps.isEmpty()) {
+      QueuedMovementStep firstStep = steps.pollFirst();
+      QueuedMovementStep secondStep = steps.pollFirst();
+      if (secondStep == null) {
+        collapsedSteps.addLast(firstStep);
+        continue;
+      }
+      collapsedSteps.addLast(new QueuedMovementStep(
+          firstStep.deltaX() + secondStep.deltaX(),
+          firstStep.deltaY() + secondStep.deltaY(),
+          MovementMode.RUN
+      ));
+    }
+    return List.copyOf(collapsedSteps);
   }
 
   private boolean positionChanged(WorldPoint previousPosition, WorldPoint currentPosition) {

@@ -17,6 +17,7 @@ public final class ItemIconRenderer {
   private final ItemIconDefinitionResolver definitionResolver;
   private final ItemIconModelProjector modelProjector;
   private final Map<Integer, ArgbImage> iconsByRenderableItemId = new HashMap<>();
+  private final Map<WidgetPreviewKey, ArgbImage> widgetPreviewsByRenderableItemId = new HashMap<>();
 
   public ItemIconRenderer(ItemDefinitionCatalog itemDefinitions, RawModelRepository rawModelRepository) {
     this(itemDefinitions, rawModelRepository, null);
@@ -45,6 +46,17 @@ public final class ItemIconRenderer {
     return iconsByRenderableItemId.computeIfAbsent(renderableDefinition.id(), this::renderResolvedItemIcon);
   }
 
+  public ArgbImage renderWidgetPreview(int itemId, int zoomScale) {
+    ItemDefinition renderableDefinition = definitionResolver.resolveRenderableDefinition(itemId, 1);
+    if (renderableDefinition == null || zoomScale <= 0) {
+      return null;
+    }
+    return widgetPreviewsByRenderableItemId.computeIfAbsent(
+        new WidgetPreviewKey(renderableDefinition.id(), zoomScale),
+        key -> renderResolvedWidgetPreview(key.itemId(), key.zoomScale())
+    );
+  }
+
   private ArgbImage renderResolvedItemIcon(int itemId) {
     List<ProjectedFace> projectedFaces = modelProjector.project(itemId);
     if (projectedFaces.isEmpty()) {
@@ -52,6 +64,14 @@ public final class ItemIconRenderer {
     }
     ArgbImage icon = ItemIconRasterizer.rasterize(projectedFaces);
     return compositeNoteOverlay(itemId, icon);
+  }
+
+  private ArgbImage renderResolvedWidgetPreview(int itemId, int zoomScale) {
+    List<ProjectedFace> projectedFaces = modelProjector.projectWidgetPreview(itemId, zoomScale);
+    if (projectedFaces.isEmpty()) {
+      return null;
+    }
+    return scaleIntoCanvas(ItemIconRasterizer.rasterize(projectedFaces), 100.0f / zoomScale);
   }
 
   private ArgbImage compositeNoteOverlay(int itemId, ArgbImage baseIcon) {
@@ -86,5 +106,35 @@ public final class ItemIconRenderer {
           : PixelBlender.blend(compositedPixels[index], overlayArgb, overlayAlpha);
     }
     return new ArgbImage(baseIcon.width(), baseIcon.height(), compositedPixels);
+  }
+
+  private ArgbImage scaleIntoCanvas(ArgbImage sourceImage, float scale) {
+    if (sourceImage == null || scale >= 0.999f || scale <= 0.0f) {
+      return sourceImage;
+    }
+    int[] scaledPixels = new int[sourceImage.width() * sourceImage.height()];
+    float centerX = sourceImage.width() * 0.5f;
+    float centerY = sourceImage.height() * 0.5f;
+    for (int targetY = 0; targetY < sourceImage.height(); targetY++) {
+      float sourceY = centerY + (targetY - centerY) / scale;
+      int sourcePixelY = Math.round(sourceY);
+      if (sourcePixelY < 0 || sourcePixelY >= sourceImage.height()) {
+        continue;
+      }
+      int targetRowOffset = targetY * sourceImage.width();
+      int sourceRowOffset = sourcePixelY * sourceImage.width();
+      for (int targetX = 0; targetX < sourceImage.width(); targetX++) {
+        float sourceX = centerX + (targetX - centerX) / scale;
+        int sourcePixelX = Math.round(sourceX);
+        if (sourcePixelX < 0 || sourcePixelX >= sourceImage.width()) {
+          continue;
+        }
+        scaledPixels[targetRowOffset + targetX] = sourceImage.pixels()[sourceRowOffset + sourcePixelX];
+      }
+    }
+    return new ArgbImage(sourceImage.width(), sourceImage.height(), scaledPixels);
+  }
+
+  private record WidgetPreviewKey(int itemId, int zoomScale) {
   }
 }

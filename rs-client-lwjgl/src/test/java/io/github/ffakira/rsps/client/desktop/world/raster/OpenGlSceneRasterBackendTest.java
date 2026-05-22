@@ -18,6 +18,22 @@ class OpenGlSceneRasterBackendTest {
         .isEqualTo(0.0f);
   }
 
+  @Test
+  void keepsTerrainShadeRoutingIndependentFromActorBatches() {
+    assertThat(OpenGlSceneRasterBackend.terrainShadeStrength(batch(SceneSubmissionKind.ACTOR, SceneRasterMode.GOURAUD)))
+        .isEqualTo(0.0f);
+    assertThat(OpenGlSceneRasterBackend.terrainShadeStrength(batch(SceneSubmissionKind.STATIC_OBJECT, SceneRasterMode.GOURAUD)))
+        .isEqualTo(0.0f);
+  }
+
+  @Test
+  void usesSceneDepthButNotActorSelfDepthForActorBatches() {
+    assertThat(OpenGlSceneRasterBackend.usesSceneDepthOnly(batch(SceneSubmissionKind.ACTOR, SceneRasterMode.GOURAUD)))
+        .isTrue();
+    assertThat(OpenGlSceneRasterBackend.usesSceneDepthOnly(batch(SceneSubmissionKind.STATIC_OBJECT, SceneRasterMode.GOURAUD)))
+        .isFalse();
+  }
+
   private static SceneRenderBatch batch(SceneSubmissionKind kind, SceneRasterMode rasterMode) {
     return new SceneRenderBatch(kind, rasterMode, SceneTriangleMesh.EMPTY);
   }

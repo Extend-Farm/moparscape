@@ -1,18 +1,18 @@
-package io.github.ffakira.rsps.client.desktop.gameplay;
+package io.github.ffakira.rsps.client.desktop.gameplay.sidebar;
 
 import io.github.ffakira.rsps.client.desktop.core.ArgbImage;
 
-record GameplayStatsTabAssets(
+public record GameplayStatsTabAssets(
     ArgbImage buttonLeft,
     ArgbImage buttonRight,
     ArgbImage[] skillIconsBySkillId
 ) {
 
-  GameplayStatsTabAssets {
+  public GameplayStatsTabAssets {
     skillIconsBySkillId = skillIconsBySkillId.clone();
   }
 
-  ArgbImage iconForSkill(int skillId) {
+  public ArgbImage iconForSkill(int skillId) {
     if (skillId < 0 || skillId >= skillIconsBySkillId.length) {
       return null;
     }

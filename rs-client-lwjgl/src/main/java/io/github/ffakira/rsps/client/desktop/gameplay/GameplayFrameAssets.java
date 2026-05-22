@@ -1,6 +1,9 @@
 package io.github.ffakira.rsps.client.desktop.gameplay;
 
 import io.github.ffakira.rsps.client.desktop.core.ArgbImage;
+import io.github.ffakira.rsps.client.desktop.core.ArchiveSpriteResolver;
+import io.github.ffakira.rsps.client.desktop.gameplay.sidebar.GameplayStatsTabAssets;
+import io.github.ffakira.rsps.content.InterfaceComponentCatalog;
 
 public record GameplayFrameAssets(
     ArgbImage backLeft1,
@@ -33,6 +36,8 @@ public record GameplayFrameAssets(
     ArgbImage[] mapFunctionIcons,
     ArgbImage[] mapDotIcons,
     ArgbImage[] clickCrosses,
-    GameplayStatsTabAssets statsTabAssets
+    GameplayStatsTabAssets statsTabAssets,
+    InterfaceComponentCatalog interfaceComponents,
+    ArchiveSpriteResolver mediaSpriteResolver
 ) {
 }

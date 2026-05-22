@@ -142,10 +142,16 @@ public final class CharacterModelAssembler {
   private CharacterModelSourceBuilder.SequenceEquipmentOverrides resolveSequenceEquipmentOverrides(
       ActorAnimationState animationState
   ) {
-    if (animationState == null || animationState.actionSequenceId() < 0 || animationSequenceCatalog == null) {
+    if (animationState == null || animationSequenceCatalog == null) {
       return CharacterModelSourceBuilder.SequenceEquipmentOverrides.none();
     }
-    AnimationSequenceDefinition sequence = animationSequenceCatalog.find(animationState.actionSequenceId()).orElse(null);
+    int activeSequenceId = animationState.activeSequenceId();
+    if (activeSequenceId < 0) {
+      return CharacterModelSourceBuilder.SequenceEquipmentOverrides.none();
+    }
+    // The reference player model pulls slot-3/5 overrides from whichever sequence is currently
+    // driving the rendered frame, not only from forced/action animations.
+    AnimationSequenceDefinition sequence = animationSequenceCatalog.find(activeSequenceId).orElse(null);
     if (sequence == null) {
       return CharacterModelSourceBuilder.SequenceEquipmentOverrides.none();
     }

@@ -1,4 +1,4 @@
-package io.github.ffakira.rsps.client.desktop.gameplay;
+package io.github.ffakira.rsps.client.desktop.gameplay.sidebar;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

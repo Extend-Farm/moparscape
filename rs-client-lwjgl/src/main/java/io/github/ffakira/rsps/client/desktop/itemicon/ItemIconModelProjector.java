@@ -57,6 +57,28 @@ final class ItemIconModelProjector {
     );
   }
 
+  List<ProjectedFace> projectWidgetPreview(int itemId, int zoomScale) {
+    ItemDefinition definition = itemDefinitions.find(itemId).orElse(null);
+    if (definition == null || !definitionResolver.hasInventoryModel(definition) || zoomScale <= 0) {
+      return List.of();
+    }
+    RawModelData rawModelData = rawModelRepository.loadModel(definition.inventoryAppearance().modelId());
+    if (rawModelData == null || rawModelData.faceCount() == 0) {
+      return List.of();
+    }
+
+    PreparedInventoryModel preparedInventoryModel = prepareInventoryModel(rawModelData, definition.inventoryAppearance());
+    WidgetPreviewAppearance widgetPreviewAppearance = widgetPreviewAppearance(definition.inventoryAppearance(), zoomScale);
+    ProjectedVertices projectedVertices = projectWidgetPreviewVertices(preparedInventoryModel, widgetPreviewAppearance);
+    NormalSet normalSet = computeNormals(rawModelData, preparedInventoryModel.axes());
+    return projectFaces(
+        rawModelData,
+        definition,
+        projectedVertices.viewSpaceAxes(),
+        normalSet
+    );
+  }
+
   private PreparedInventoryModel prepareInventoryModel(
       RawModelData rawModelData,
       ItemDefinition.InventoryAppearance inventoryAppearance
@@ -115,6 +137,40 @@ final class ItemIconModelProjector {
       z += cameraZ;
       int projectedY = y * pitchCos - z * pitchSin >> 16;
       int depth = y * pitchSin + z * pitchCos >> 16;
+      viewX[vertexIndex] = x;
+      viewY[vertexIndex] = projectedY;
+      viewZ[vertexIndex] = depth;
+    }
+    return new ProjectedVertices(new float[][]{viewX, viewY, viewZ});
+  }
+
+  private ProjectedVertices projectWidgetPreviewVertices(
+      PreparedInventoryModel preparedInventoryModel,
+      WidgetPreviewAppearance widgetPreviewAppearance
+  ) {
+    float[] viewX = new float[preparedInventoryModel.x().length];
+    float[] viewY = new float[preparedInventoryModel.x().length];
+    float[] viewZ = new float[preparedInventoryModel.x().length];
+    int rotationSin = SINE[angleIndex(widgetPreviewAppearance.rotationX())];
+    int rotationCos = COSINE[angleIndex(widgetPreviewAppearance.rotationX())];
+    int tiltSin = SINE[angleIndex(widgetPreviewAppearance.rotationY())];
+    int tiltCos = COSINE[angleIndex(widgetPreviewAppearance.rotationY())];
+    int cameraY = (rotationSin * widgetPreviewAppearance.zoom() >> 16)
+        + preparedInventoryModel.modelHeight() / 2;
+    int cameraZ = rotationCos * widgetPreviewAppearance.zoom() >> 16;
+    for (int vertexIndex = 0; vertexIndex < preparedInventoryModel.x().length; vertexIndex++) {
+      int x = preparedInventoryModel.x()[vertexIndex];
+      int y = preparedInventoryModel.y()[vertexIndex];
+      int z = preparedInventoryModel.z()[vertexIndex];
+      if (widgetPreviewAppearance.rotationY() != 0) {
+        int rotatedX = z * tiltSin + x * tiltCos >> 16;
+        z = z * tiltCos - x * tiltSin >> 16;
+        x = rotatedX;
+      }
+      y += cameraY;
+      z += cameraZ;
+      int projectedY = y * rotationCos - z * rotationSin >> 16;
+      int depth = y * rotationSin + z * rotationCos >> 16;
       viewX[vertexIndex] = x;
       viewY[vertexIndex] = projectedY;
       viewZ[vertexIndex] = depth;
@@ -584,6 +640,14 @@ final class ItemIconModelProjector {
     return Math.max(minimum, Math.min(maximum, value));
   }
 
+  private static WidgetPreviewAppearance widgetPreviewAppearance(
+      ItemDefinition.InventoryAppearance inventoryAppearance,
+      int zoomScale
+  ) {
+    int widgetZoom = inventoryAppearance.zoom() * 100 / zoomScale;
+    return new WidgetPreviewAppearance(widgetZoom, inventoryAppearance.rotationX(), inventoryAppearance.rotationY());
+  }
+
   private record FaceSurface(
       FaceColors colors,
       int alpha,
@@ -626,6 +690,13 @@ final class ItemIconModelProjector {
 
   private record ProjectedVertices(
       float[][] viewSpaceAxes
+  ) {
+  }
+
+  private record WidgetPreviewAppearance(
+      int zoom,
+      int rotationX,
+      int rotationY
   ) {
   }
 

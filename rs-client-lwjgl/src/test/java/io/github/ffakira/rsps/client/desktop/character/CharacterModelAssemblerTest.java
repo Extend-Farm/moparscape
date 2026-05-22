@@ -244,6 +244,40 @@ class CharacterModelAssemblerTest {
   }
 
   @Test
+  void usesTheActiveMovementSequenceForEquipmentOverridesWhenNoActionFrameIsPresent() throws Exception {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    AnimationFrameCatalog animationFrames = AnimationFrameCatalog.load(manifest.cacheStore());
+    AnimationSequenceCatalog animationSequences = AnimationSequenceCatalog.load(manifest, animationFrames);
+    CharacterModelAssembler assembler = new CharacterModelAssembler(
+        ItemDefinitionCatalog.load(manifest),
+        IdentityKitDefinitionCatalog.load(manifest),
+        new RawModelRepository(manifest.cacheStore()),
+        animationSequences,
+        animationFrames
+    );
+    SequenceOverrideCandidate overrideCandidate = findSequenceOverrideCandidate(animationSequences);
+
+    assertThat(overrideCandidate).isNotNull();
+    CharacterModelSourceBuilder.SequenceEquipmentOverrides equipmentOverrides = resolveSequenceEquipmentOverrides(
+        assembler,
+        new ActorAnimationState(
+            0.0f,
+            0.0f,
+            0.0f,
+            0.0f,
+            ActorAnimationState.LocomotionMode.IDLE,
+            overrideCandidate.sequenceId(),
+            overrideCandidate.frameId(),
+            0.0f,
+            0.0f
+        )
+    );
+
+    assertThat(equipmentOverrides.mainhandAppearanceId()).isEqualTo(overrideCandidate.mainhandAppearanceId());
+    assertThat(equipmentOverrides.offhandAppearanceId()).isEqualTo(overrideCandidate.offhandAppearanceId());
+  }
+
+  @Test
   void keepsTheAssembledActorOnAHumanSizedFootprint() {
     ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
     CharacterModelAssembler assembler = new CharacterModelAssembler(
@@ -325,6 +359,32 @@ class CharacterModelAssemblerTest {
 
     assertThat(geometry).isNotNull();
     assertThat(geometry.faceRasterModes()).contains(SceneRasterMode.FLAT, SceneRasterMode.GOURAUD);
+  }
+
+  @Test
+  void assemblesHighPriorityFacesForTheRuntimeAmuletLoadout() {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    CharacterModelAssembler assembler = new CharacterModelAssembler(
+        ItemDefinitionCatalog.load(manifest),
+        IdentityKitDefinitionCatalog.load(manifest),
+        new RawModelRepository(manifest.cacheStore())
+    );
+
+    WorldSceneObjectGeometry geometry = assembler.assemble(
+        new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1)),
+        List.of(
+            new BootstrapItemSlot(0, 1048, 1),
+            new BootstrapItemSlot(2, 1712, 1),
+            new BootstrapItemSlot(3, 1265, 1),
+            new BootstrapItemSlot(4, 1115, 1),
+            new BootstrapItemSlot(7, 1067, 1),
+            new BootstrapItemSlot(9, 6110, 1),
+            new BootstrapItemSlot(10, 4121, 1)
+        )
+    );
+
+    assertThat(geometry).isNotNull();
+    assertThat(geometry.facePriorities()).containsAnyOf(10, 11);
   }
 
   @Test
@@ -1050,6 +1110,39 @@ class CharacterModelAssemblerTest {
     return null;
   }
 
+  private SequenceOverrideCandidate findSequenceOverrideCandidate(AnimationSequenceCatalog animationSequences)
+      throws ReflectiveOperationException {
+    for (Map.Entry<Integer, AnimationSequenceDefinition> entry : sequenceDefinitions(animationSequences).entrySet()) {
+      AnimationSequenceDefinition sequence = entry.getValue();
+      int frameId = sequence.frameIdAt(0);
+      if (frameId < 0) {
+        continue;
+      }
+      if (sequence.playerMainhandAppearanceId() < 0 && sequence.playerOffhandAppearanceId() < 0) {
+        continue;
+      }
+      return new SequenceOverrideCandidate(
+          entry.getKey(),
+          frameId,
+          sequence.playerMainhandAppearanceId(),
+          sequence.playerOffhandAppearanceId()
+      );
+    }
+    return null;
+  }
+
+  private CharacterModelSourceBuilder.SequenceEquipmentOverrides resolveSequenceEquipmentOverrides(
+      CharacterModelAssembler assembler,
+      ActorAnimationState animationState
+  ) throws ReflectiveOperationException {
+    Method method = CharacterModelAssembler.class.getDeclaredMethod(
+        "resolveSequenceEquipmentOverrides",
+        ActorAnimationState.class
+    );
+    method.setAccessible(true);
+    return (CharacterModelSourceBuilder.SequenceEquipmentOverrides) method.invoke(assembler, animationState);
+  }
+
   @SuppressWarnings("unchecked")
   private Map<Integer, AnimationSequenceDefinition> sequenceDefinitions(AnimationSequenceCatalog animationSequences)
       throws ReflectiveOperationException {
@@ -1064,6 +1157,14 @@ class CharacterModelAssemblerTest {
       WorldSceneObjectGeometry movementOnlyGeometry,
       WorldSceneObjectGeometry actionOnlyGeometry,
       WorldSceneObjectGeometry blendedGeometry
+  ) {
+  }
+
+  private record SequenceOverrideCandidate(
+      int sequenceId,
+      int frameId,
+      int mainhandAppearanceId,
+      int offhandAppearanceId
   ) {
   }
 

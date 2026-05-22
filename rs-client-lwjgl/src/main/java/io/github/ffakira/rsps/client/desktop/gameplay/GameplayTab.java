@@ -1,6 +1,6 @@
 package io.github.ffakira.rsps.client.desktop.gameplay;
 
-enum GameplayTab {
+public enum GameplayTab {
   COMBAT(0, "Combat"),
   STATS(1, "Stats"),
   QUESTS(2, "Quests"),
@@ -28,7 +28,7 @@ enum GameplayTab {
     return index;
   }
 
-  String label() {
+  public String label() {
     return label;
   }
 

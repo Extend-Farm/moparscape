@@ -4,9 +4,12 @@ import io.github.ffakira.rsps.cache.CacheArchiveContainer;
 import io.github.ffakira.rsps.cache.CacheArchiveRepository;
 import io.github.ffakira.rsps.client.desktop.core.ArgbImage;
 import io.github.ffakira.rsps.client.desktop.core.ArgbImageTransforms;
+import io.github.ffakira.rsps.client.desktop.core.ArchiveSpriteResolver;
 import io.github.ffakira.rsps.client.desktop.core.TitleArchiveSpriteDecoder;
+import io.github.ffakira.rsps.client.desktop.gameplay.sidebar.GameplayStatsTabAssets;
 import io.github.ffakira.rsps.content.ContentBootstrapService;
 import io.github.ffakira.rsps.content.ContentManifest;
+import io.github.ffakira.rsps.content.InterfaceComponentCatalog;
 import io.github.ffakira.rsps.content.TopLevelArchiveId;
 import java.nio.file.Path;
 
@@ -20,9 +23,11 @@ public final class GameplayFrameAssetLoader {
   public static GameplayFrameAssets loadFromWorkingDirectory(Path workingDirectory) {
     try {
       ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(workingDirectory);
-      CacheArchiveContainer mediaArchive = new CacheArchiveRepository(manifest.cacheStore())
-          .loadArchive(TOP_LEVEL_ARCHIVE_STORE, TopLevelArchiveId.MEDIA.archiveId());
+      CacheArchiveRepository archiveRepository = new CacheArchiveRepository(manifest.cacheStore());
+      CacheArchiveContainer mediaArchive = archiveRepository.loadArchive(TOP_LEVEL_ARCHIVE_STORE, TopLevelArchiveId.MEDIA.archiveId());
       TitleArchiveSpriteDecoder spriteDecoder = new TitleArchiveSpriteDecoder(mediaArchive);
+      ArchiveSpriteResolver mediaSpriteResolver = new ArchiveSpriteResolver(mediaArchive);
+      InterfaceComponentCatalog interfaceComponents = InterfaceComponentCatalog.load(manifest);
       GameplayStatsTabAssets statsTabAssets = loadStatsTabAssets(spriteDecoder, mediaArchive);
 
       ArgbImage[] sideIcons = new ArgbImage[13];
@@ -75,7 +80,9 @@ public final class GameplayFrameAssetLoader {
           mapFunctionIcons,
           mapDotIcons,
           clickCrosses,
-          statsTabAssets
+          statsTabAssets,
+          interfaceComponents,
+          mediaSpriteResolver
       );
     } catch (Exception exception) {
       throw new IllegalStateException("Failed to load gameplay frame assets from media archive", exception);

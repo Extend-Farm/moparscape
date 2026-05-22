@@ -4,6 +4,7 @@ import io.github.ffakira.rsps.client.core.ClientViewModel;
 import io.github.ffakira.rsps.client.desktop.core.ImmediateModeRenderer2d;
 import io.github.ffakira.rsps.client.desktop.core.OpenGlTexture;
 import io.github.ffakira.rsps.client.desktop.core.ScreenRect;
+import io.github.ffakira.rsps.client.desktop.gameplay.sidebar.GameplaySidebarRenderer;
 import io.github.ffakira.rsps.client.desktop.itemicon.ItemIconRenderer;
 import io.github.ffakira.rsps.client.desktop.login.TitleScreenBitmapFont;
 import io.github.ffakira.rsps.client.desktop.login.TitleScreenFonts;
@@ -18,6 +19,9 @@ import static org.lwjgl.opengl.GL11.glColor3f;
 
 public final class GameplayChromeRenderer implements AutoCloseable {
 
+  private static final float SCENE_ACTION_HINT_LEFT_PADDING = 4.0f;
+  private static final float SCENE_ACTION_HINT_BASELINE_OFFSET = 11.0f;
+
   private final ImmediateModeRenderer2d primitives;
   private final GameplayChromeTextures chromeTextures;
   private final GameplayMinimapRenderer minimapRenderer;
@@ -26,6 +30,7 @@ public final class GameplayChromeRenderer implements AutoCloseable {
   private final GameplayCursorMarker cursorMarker = new GameplayCursorMarker();
   private final Map<String, OpenGlTexture> menuTextTextures = new HashMap<>();
   private GameplayContextMenu contextMenu;
+  private SceneActionHint sceneActionHint;
   private GameplayTab activeGameplayTab = GameplayTab.INVENTORY;
   private double pointerX = Double.NaN;
   private double pointerY = Double.NaN;
@@ -49,7 +54,7 @@ public final class GameplayChromeRenderer implements AutoCloseable {
     sidebarRenderer = new GameplaySidebarRenderer(
         itemDefinitionCatalog,
         itemIconRenderer,
-        gameplayFrameAssets == null ? null : gameplayFrameAssets.statsTabAssets(),
+        gameplayFrameAssets,
         titleScreenFonts,
         primitives
     );
@@ -108,12 +113,25 @@ public final class GameplayChromeRenderer implements AutoCloseable {
 
   public void clearTransientState() {
     contextMenu = null;
+    sceneActionHint = null;
     sidebarRenderer.clearTransientState();
   }
 
   public void setPointerPosition(double x, double y) {
     pointerX = x;
     pointerY = y;
+  }
+
+  public void showSceneActionHint(String primaryText, int optionCount) {
+    if (primaryText == null || primaryText.isBlank()) {
+      sceneActionHint = null;
+      return;
+    }
+    sceneActionHint = new SceneActionHint(primaryText, Math.max(0, optionCount));
+  }
+
+  public void clearSceneActionHint() {
+    sceneActionHint = null;
   }
 
   public void render(
@@ -125,7 +143,8 @@ public final class GameplayChromeRenderer implements AutoCloseable {
     // Chrome is a deliberate mix today:
     // - authentic cache-backed frame art when media assets are available
     // - a native scene-state minimap inside that frame
-    // - native/synthetic sidebar and chat contents until widget decoding is ported
+    // - a mixed sidebar where combat can now render from decoded interface widgets while the
+    //   remaining tabs still fall back to native/bootstrap surfaces
     if (chromeTextures.isAvailable()) {
       chromeTextures.drawFrame(primitives);
     } else {
@@ -140,6 +159,7 @@ public final class GameplayChromeRenderer implements AutoCloseable {
     sidebarRenderer.drawSidebar(viewModel, activeGameplayTab, pointerX, pointerY);
     sidebarRenderer.drawChatbox(viewModel, activeGameplayTab);
     drawCursorMarker();
+    drawSceneActionHint();
     drawContextMenu();
   }
 
@@ -160,6 +180,24 @@ public final class GameplayChromeRenderer implements AutoCloseable {
 
   static float[] minimapMarkerOffset(float eastDelta, float northDelta, WorldCameraState cameraState) {
     return GameplayMinimapRenderer.minimapMarkerOffset(eastDelta, northDelta, cameraState);
+  }
+
+  static String formatSceneActionHint(String primaryText, int optionCount) {
+    if (primaryText == null || primaryText.isBlank() || optionCount < 2) {
+      return primaryText;
+    }
+    if (optionCount == 2) {
+      return primaryText;
+    }
+    return primaryText + " / " + (optionCount - 2) + " more options";
+  }
+
+  static float sceneActionHintLeft(ScreenRect worldViewport) {
+    return worldViewport.left() + SCENE_ACTION_HINT_LEFT_PADDING;
+  }
+
+  static float sceneActionHintBaselineY(ScreenRect worldViewport) {
+    return worldViewport.top() + SCENE_ACTION_HINT_BASELINE_OFFSET;
   }
 
   private void drawCursorMarker() {
@@ -221,6 +259,24 @@ public final class GameplayChromeRenderer implements AutoCloseable {
       GameplayContextMenu.Entry entry = contextMenu.entries().get(index);
       drawMenuEntry(entry, contextMenu.entryLeft(), contextMenu.entryBaselineY(index), hoveredEntryIndex == index);
     }
+  }
+
+  private void drawSceneActionHint() {
+    if (contextMenu != null || sceneActionHint == null) {
+      return;
+    }
+    String hintText = formatSceneActionHint(sceneActionHint.primaryText(), sceneActionHint.optionCount());
+    if (hintText == null || hintText.isBlank()) {
+      return;
+    }
+    ScreenRect worldViewport = GameplayLayout.worldViewportInnerRect();
+    drawMenuText(
+        hintText,
+        GameplayContextMenu.ACTION_RGB,
+        true,
+        sceneActionHintLeft(worldViewport),
+        sceneActionHintBaselineY(worldViewport)
+    );
   }
 
   GameplayTab activeGameplayTab() {
@@ -298,5 +354,8 @@ public final class GameplayChromeRenderer implements AutoCloseable {
     if (texture != null) {
       texture.close();
     }
+  }
+
+  private record SceneActionHint(String primaryText, int optionCount) {
   }
 }

@@ -64,11 +64,11 @@ public final class GameplayLayout {
     return new ScreenRect(COMPASS_LEFT, COMPASS_TOP, COMPASS_WIDTH, COMPASS_HEIGHT);
   }
 
-  static ScreenRect sidebarPanelRect() {
+  public static ScreenRect sidebarPanelRect() {
     return new ScreenRect(SIDEBAR_PANEL_LEFT, SIDEBAR_PANEL_TOP, SIDEBAR_PANEL_WIDTH, SIDEBAR_PANEL_HEIGHT);
   }
 
-  static ScreenRect chatboxPanelRect() {
+  public static ScreenRect chatboxPanelRect() {
     return new ScreenRect(CHATBOX_PANEL_LEFT, CHATBOX_PANEL_TOP, CHATBOX_PANEL_WIDTH, CHATBOX_PANEL_HEIGHT);
   }
 

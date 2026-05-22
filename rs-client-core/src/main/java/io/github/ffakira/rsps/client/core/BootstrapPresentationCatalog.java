@@ -33,23 +33,6 @@ public final class BootstrapPresentationCatalog {
       "Runecrafting"
   };
 
-  private static final String[] EQUIPMENT_SLOT_NAMES = {
-      "Head",
-      "Cape",
-      "Neck",
-      "Weapon",
-      "Body",
-      "Shield",
-      "Slot 6",
-      "Legs",
-      "Slot 8",
-      "Hands",
-      "Feet",
-      "Slot 11",
-      "Ring",
-      "Ammo"
-  };
-
   private final ItemDefinitionCatalog itemDefinitions;
 
   private BootstrapPresentationCatalog(ItemDefinitionCatalog itemDefinitions) {
@@ -89,7 +72,7 @@ public final class BootstrapPresentationCatalog {
     ItemDefinition itemDefinition = itemDefinitions.find(itemSlot.itemId()).orElse(null);
     return new BootstrapEquipmentItemPresentation(
         itemSlot.slotIndex(),
-        equipmentSlotName(itemSlot.slotIndex()),
+        EquipmentLoadout.slotName(itemSlot.slotIndex()),
         itemSlot.itemId(),
         itemDefinition == null ? "item-" + itemSlot.itemId() : itemDefinition.name(),
         itemSlot.quantity(),
@@ -113,12 +96,5 @@ public final class BootstrapPresentationCatalog {
       return "Skill " + skillId;
     }
     return SKILL_NAMES[skillId];
-  }
-
-  private String equipmentSlotName(int slotIndex) {
-    if (slotIndex < 0 || slotIndex >= EQUIPMENT_SLOT_NAMES.length) {
-      return "Slot " + slotIndex;
-    }
-    return EQUIPMENT_SLOT_NAMES[slotIndex];
   }
 }

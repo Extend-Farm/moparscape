@@ -1,4 +1,4 @@
-package io.github.ffakira.rsps.client.desktop.gameplay;
+package io.github.ffakira.rsps.client.desktop.gameplay.sidebar;
 
 import io.github.ffakira.rsps.client.core.BootstrapSkillPresentation;
 import io.github.ffakira.rsps.client.core.ClientViewModel;

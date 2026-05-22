@@ -53,6 +53,8 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
   private OpenGlTexture worldMinimapTexture;
   private WorldPoint lastLocalPlayerPosition;
   private WorldSceneRenderSubmission lastWorldSceneSubmission;
+  private double pointerX = Double.NaN;
+  private double pointerY = Double.NaN;
   private final ImmediateModeRenderer2d primitives;
   private final TitleScreenRenderer titleScreenRenderer;
   private final GameplayChromeRenderer gameplayChromeRenderer;
@@ -142,6 +144,8 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
   }
 
   public void setPointerPosition(double x, double y) {
+    pointerX = x;
+    pointerY = y;
     gameplayChromeRenderer.setPointerPosition(x, y);
   }
 
@@ -209,6 +213,7 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
     } else {
       renderFallbackWorld(viewModel);
     }
+    updateSceneActionHint();
     configureProjection();
     gameplayChromeRenderer.render(
         viewModel,
@@ -315,6 +320,24 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
         worldScene.originWorldY() + clickTarget.localY(),
         worldScene.plane()
     );
+  }
+
+  private void updateSceneActionHint() {
+    if (gameplayChromeRenderer.hasOpenContextMenu()) {
+      gameplayChromeRenderer.clearSceneActionHint();
+      return;
+    }
+    ScreenRect worldViewport = GameplayLayout.worldViewportInnerRect();
+    if (Double.isNaN(pointerX) || Double.isNaN(pointerY) || !worldViewport.contains(pointerX, pointerY)) {
+      gameplayChromeRenderer.clearSceneActionHint();
+      return;
+    }
+    WorldPoint hoveredWorldPoint = pickWorldTarget(pointerX, pointerY, worldViewport);
+    if (hoveredWorldPoint == null) {
+      gameplayChromeRenderer.clearSceneActionHint();
+      return;
+    }
+    gameplayChromeRenderer.showSceneActionHint("Walk here", 2);
   }
 
   private GameplayClickResult executeMenuAction(

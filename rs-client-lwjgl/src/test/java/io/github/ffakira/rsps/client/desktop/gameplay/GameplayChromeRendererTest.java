@@ -44,6 +44,25 @@ class GameplayChromeRendererTest {
     assertThat(GameplayChromeRenderer.legacyMapFunctionSpriteIndex(60)).isEqualTo(60);
   }
 
+  @Test
+  void formatsSceneActionHintWithoutExtraSuffixForTwoOptions() {
+    assertThat(GameplayChromeRenderer.formatSceneActionHint("Walk here", 2)).isEqualTo("Walk here");
+  }
+
+  @Test
+  void formatsSceneActionHintWithMoreOptionsSuffixBeyondTwoEntries() {
+    assertThat(GameplayChromeRenderer.formatSceneActionHint("Walk here", 3)).isEqualTo("Walk here / 1 more options");
+    assertThat(GameplayChromeRenderer.formatSceneActionHint("Walk here", 5)).isEqualTo("Walk here / 3 more options");
+  }
+
+  @Test
+  void insetsSceneActionHintFromTheViewportEdge() {
+    ScreenRect worldViewport = GameplayLayout.worldViewportInnerRect();
+
+    assertThat(GameplayChromeRenderer.sceneActionHintLeft(worldViewport)).isEqualTo(worldViewport.left() + 4.0f);
+    assertThat(GameplayChromeRenderer.sceneActionHintBaselineY(worldViewport)).isEqualTo(worldViewport.top() + 11.0f);
+  }
+
   private static double centerX(ScreenRect rect) {
     return rect.left() + rect.width() * 0.5;
   }

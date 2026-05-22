@@ -105,6 +105,28 @@ class ItemIconRendererTest {
   }
 
   @Test
+  void combatWidgetPreviewsApplyTheSendWeaponZoomContract() {
+    var manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    SceneTextureAssets sceneTextureAssets = TextureArchiveAssetLoader.loadFromWorkingDirectory(Path.of("."));
+    ItemIconRenderer itemIconRenderer = new ItemIconRenderer(
+        ItemDefinitionCatalog.load(manifest),
+        new RawModelRepository(manifest.cacheStore()),
+        sceneTextureAssets
+    );
+
+    ArgbImage inventoryIcon = itemIconRenderer.render(1265, 1);
+    ArgbImage combatWidgetPreview = itemIconRenderer.renderWidgetPreview(1265, 200);
+    OpaqueBounds inventoryBounds = opaqueBounds(inventoryIcon);
+    OpaqueBounds previewBounds = opaqueBounds(combatWidgetPreview);
+
+    assertThat(inventoryIcon).isNotNull();
+    assertThat(combatWidgetPreview).isNotNull();
+    assertThat(opaquePixelCount(combatWidgetPreview)).isGreaterThan(20);
+    assertThat(previewBounds.width()).isLessThan(inventoryBounds.width());
+    assertThat(previewBounds.height()).isLessThan(inventoryBounds.height());
+  }
+
+  @Test
   void rendersTexturedItemIconsEvenWithoutNativeSceneTextureSampling() {
     var manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
     ItemDefinitionCatalog itemDefinitionCatalog = ItemDefinitionCatalog.load(manifest);

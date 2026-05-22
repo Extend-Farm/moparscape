@@ -8,6 +8,8 @@ import io.github.ffakira.rsps.model.MovementMode;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT_SHIFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
@@ -25,6 +27,7 @@ final class GameplayInputHandler {
   private boolean rotateRightPressed;
   private boolean pitchUpPressed;
   private boolean pitchDownPressed;
+  private boolean runModifierPressed;
 
   GameplayInputHandler(OpenGlTileRenderSystem renderSystem, GameplayClientSession gameplayClientSession) {
     this(
@@ -53,7 +56,11 @@ final class GameplayInputHandler {
       return;
     }
     GameplayClickResult.MovementDelta movementDelta = clickResult.movementDelta();
-    movementPort.move(movementDelta.deltaX(), movementDelta.deltaY(), MovementMode.WALK);
+    movementPort.move(
+        movementDelta.deltaX(),
+        movementDelta.deltaY(),
+        runModifierPressed ? MovementMode.RUN : MovementMode.WALK
+    );
   }
 
   void handleKey(long windowHandle, int key, int action) {
@@ -81,6 +88,7 @@ final class GameplayInputHandler {
         pitchDownPressed = action != GLFW_RELEASE;
         applyCameraInputs();
       }
+      case GLFW_KEY_LEFT_SHIFT, GLFW_KEY_RIGHT_SHIFT -> runModifierPressed = action != GLFW_RELEASE;
       default -> {
       }
     }
@@ -91,6 +99,7 @@ final class GameplayInputHandler {
     rotateRightPressed = false;
     pitchUpPressed = false;
     pitchDownPressed = false;
+    runModifierPressed = false;
     applyCameraInputs();
   }
 

@@ -2,6 +2,7 @@ package io.github.ffakira.rsps.client.desktop.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
@@ -69,6 +70,26 @@ class GameplayInputHandlerTest {
     assertThat(movementPort.lastDeltaX).isEqualTo(3);
     assertThat(movementPort.lastDeltaY).isEqualTo(-2);
     assertThat(movementPort.lastMovementMode).isEqualTo(MovementMode.WALK);
+  }
+
+  @Test
+  void dispatchesRunMovementWhenShiftIsHeldDuringViewportClicks() {
+    TestGameplayClickPort clickPort = new TestGameplayClickPort();
+    clickPort.nextResult = GameplayClickResult.move(2, 1);
+    TestMovementPort movementPort = new TestMovementPort();
+    GameplayInputHandler inputHandler = new GameplayInputHandler(
+        clickPort,
+        new TestGameplayCameraInputPort(),
+        movementPort
+    );
+
+    inputHandler.handleKey(0L, GLFW_KEY_LEFT_SHIFT, GLFW_PRESS);
+    inputHandler.handleMouseButton(GLFW_MOUSE_BUTTON_LEFT, GLFW_PRESS, 120.0, 80.0);
+    inputHandler.handleKey(0L, GLFW_KEY_LEFT_SHIFT, GLFW_RELEASE);
+
+    assertThat(movementPort.lastDeltaX).isEqualTo(2);
+    assertThat(movementPort.lastDeltaY).isEqualTo(1);
+    assertThat(movementPort.lastMovementMode).isEqualTo(MovementMode.RUN);
   }
 
   private static final class TestGameplayClickPort implements GameplayInputHandler.GameplayClickPort {

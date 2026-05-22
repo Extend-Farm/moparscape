@@ -13,6 +13,7 @@ import io.github.ffakira.rsps.client.desktop.world.visibility.WorldSceneOcclusio
 import io.github.ffakira.rsps.client.desktop.world.visibility.WorldSceneVisibilityWindow;
 import io.github.ffakira.rsps.protocol.BootstrapAppearance;
 import io.github.ffakira.rsps.protocol.BootstrapItemSlot;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -96,19 +97,72 @@ final class WorldSceneActorBatchBuilder {
     if (mesh == null || mesh.isEmpty() || cameraState == null) {
       return mesh;
     }
-    Integer[] faceOrder = new Integer[mesh.faceVertexA().length];
-    for (int faceIndex = 0; faceIndex < faceOrder.length; faceIndex++) {
-      faceOrder[faceIndex] = faceIndex;
+    ActorViewProjection projection = ActorViewProjection.project(mesh, cameraState);
+    @SuppressWarnings("unchecked")
+    List<FaceDepth>[] facesByPriority = new List[12];
+    for (int priority = 0; priority < facesByPriority.length; priority++) {
+      facesByPriority[priority] = new ArrayList<>();
     }
-    Arrays.sort(
-        faceOrder,
-        Comparator.comparingInt((Integer faceIndex) -> mesh.facePriorities()[faceIndex])
-            .thenComparing(
-                (Integer faceIndex) -> faceAverageViewDepth(mesh, faceIndex, cameraState),
-                Comparator.reverseOrder()
-            )
-            .thenComparingInt(Integer::intValue)
+    for (int faceIndex = 0; faceIndex < mesh.faceVertexA().length; faceIndex++) {
+      if (!projection.isFrontFacing(mesh, faceIndex)) {
+        continue;
+      }
+      facesByPriority[normalizedPriority(mesh.facePriorities()[faceIndex])]
+          .add(new FaceDepth(faceIndex, projection.faceAverageDepth(mesh, faceIndex)));
+    }
+    for (List<FaceDepth> faces : facesByPriority) {
+      faces.sort(
+          Comparator.comparingDouble(FaceDepth::depth).reversed()
+              .thenComparingInt(FaceDepth::faceIndex)
+      );
+    }
+    float priorityOneTwoMeanDepth = averageDepth(facesByPriority[1], facesByPriority[2]);
+    float priorityThreeFourMeanDepth = averageDepth(facesByPriority[3], facesByPriority[4]);
+    float prioritySixEightMeanDepth = averageDepth(facesByPriority[6], facesByPriority[8]);
+    SpecialPriorityCursor specialPriorityCursor = new SpecialPriorityCursor(
+        facesByPriority[10],
+        facesByPriority[11]
     );
+    int[] faceOrder = new int[mesh.faceVertexA().length];
+    int orderedFaceCount = 0;
+    for (int priority = 0; priority < 10; priority++) {
+      if (priority == 0) {
+        orderedFaceCount = appendSpecialFacesAboveDepth(
+            specialPriorityCursor,
+            faceOrder,
+            orderedFaceCount,
+            priorityOneTwoMeanDepth
+        );
+      } else if (priority == 3) {
+        orderedFaceCount = appendSpecialFacesAboveDepth(
+            specialPriorityCursor,
+            faceOrder,
+            orderedFaceCount,
+            priorityThreeFourMeanDepth
+        );
+      } else if (priority == 5) {
+        orderedFaceCount = appendSpecialFacesAboveDepth(
+            specialPriorityCursor,
+            faceOrder,
+            orderedFaceCount,
+            prioritySixEightMeanDepth
+        );
+      }
+      orderedFaceCount = appendFaces(
+          facesByPriority[priority],
+          faceOrder,
+          orderedFaceCount
+      );
+    }
+    orderedFaceCount = appendSpecialFacesAboveDepth(
+        specialPriorityCursor,
+        faceOrder,
+        orderedFaceCount,
+        Float.NEGATIVE_INFINITY
+    );
+    if (orderedFaceCount != faceOrder.length) {
+      faceOrder = Arrays.copyOf(faceOrder, orderedFaceCount);
+    }
     return reorderFaces(mesh, faceOrder);
   }
 
@@ -193,7 +247,48 @@ final class WorldSceneActorBatchBuilder {
     return (red << 16) | (green << 8) | blue;
   }
 
-  private static SceneTriangleMesh reorderFaces(SceneTriangleMesh mesh, Integer[] faceOrder) {
+  private static int appendFaces(
+      List<FaceDepth> faces,
+      int[] faceOrder,
+      int orderedFaceCount
+  ) {
+    for (FaceDepth face : faces) {
+      faceOrder[orderedFaceCount++] = face.faceIndex();
+    }
+    return orderedFaceCount;
+  }
+
+  private static int appendSpecialFacesAboveDepth(
+      SpecialPriorityCursor cursor,
+      int[] faceOrder,
+      int orderedFaceCount,
+      float thresholdDepth
+  ) {
+    while (cursor.currentDepth() > thresholdDepth) {
+      faceOrder[orderedFaceCount++] = cursor.consumeFaceIndex();
+    }
+    return orderedFaceCount;
+  }
+
+  private static float averageDepth(List<FaceDepth> firstBucket, List<FaceDepth> secondBucket) {
+    float depthSum = 0.0f;
+    int faceCount = 0;
+    for (FaceDepth face : firstBucket) {
+      depthSum += face.depth();
+      faceCount++;
+    }
+    for (FaceDepth face : secondBucket) {
+      depthSum += face.depth();
+      faceCount++;
+    }
+    return faceCount == 0 ? 0.0f : depthSum / faceCount;
+  }
+
+  private static int normalizedPriority(int priority) {
+    return Math.max(0, Math.min(11, priority));
+  }
+
+  private static SceneTriangleMesh reorderFaces(SceneTriangleMesh mesh, int[] faceOrder) {
     int[] sortedFaceVertexA = new int[faceOrder.length];
     int[] sortedFaceVertexB = new int[faceOrder.length];
     int[] sortedFaceVertexC = new int[faceOrder.length];
@@ -240,26 +335,127 @@ final class WorldSceneActorBatchBuilder {
     );
   }
 
-  private static float faceAverageViewDepth(SceneTriangleMesh mesh, int faceIndex, WorldCameraState cameraState) {
-    return (viewDepth(mesh, mesh.faceVertexA()[faceIndex], cameraState)
-        + viewDepth(mesh, mesh.faceVertexB()[faceIndex], cameraState)
-        + viewDepth(mesh, mesh.faceVertexC()[faceIndex], cameraState)) / 3.0f;
+  private record FaceDepth(int faceIndex, float depth) {
   }
 
-  private static float viewDepth(SceneTriangleMesh mesh, int vertexIndex, WorldCameraState cameraState) {
-    float localX = mesh.vertexX()[vertexIndex] - cameraState.focusX();
-    float localY = mesh.vertexY()[vertexIndex] - cameraState.focusHeight();
-    float localZ = -(mesh.vertexZ()[vertexIndex] - cameraState.focusY());
-    float yawRadians = (float) Math.toRadians(-cameraState.yawDegrees());
-    float yawCosine = (float) Math.cos(yawRadians);
-    float yawSine = (float) Math.sin(yawRadians);
-    float yawAdjustedX = localX * yawCosine + localZ * yawSine;
-    float yawAdjustedZ = -localX * yawSine + localZ * yawCosine;
-    float pitchRadians = (float) Math.toRadians(cameraState.pitchDegrees());
-    float pitchCosine = (float) Math.cos(pitchRadians);
-    float pitchSine = (float) Math.sin(pitchRadians);
-    float viewZ = localY * pitchSine + yawAdjustedZ * pitchCosine - cameraState.distance();
-    return -viewZ;
+  private static final class SpecialPriorityCursor {
+    private final List<FaceDepth> priorityTenFaces;
+    private final List<FaceDepth> priorityElevenFaces;
+    private int activePriority;
+    private int faceIndex;
+
+    private SpecialPriorityCursor(List<FaceDepth> priorityTenFaces, List<FaceDepth> priorityElevenFaces) {
+      this.priorityTenFaces = priorityTenFaces;
+      this.priorityElevenFaces = priorityElevenFaces;
+      this.activePriority = priorityTenFaces.isEmpty()
+          ? (priorityElevenFaces.isEmpty() ? -1 : 11)
+          : 10;
+    }
+
+    private float currentDepth() {
+      FaceDepth currentFace = currentFace();
+      return currentFace == null ? Float.NEGATIVE_INFINITY : currentFace.depth();
+    }
+
+    private int consumeFaceIndex() {
+      FaceDepth currentFace = currentFace();
+      int currentFaceIndex = currentFace == null ? -1 : currentFace.faceIndex();
+      advance();
+      return currentFaceIndex;
+    }
+
+    private FaceDepth currentFace() {
+      List<FaceDepth> activeFaces = activeFaces();
+      if (activeFaces == null || faceIndex >= activeFaces.size()) {
+        return null;
+      }
+      return activeFaces.get(faceIndex);
+    }
+
+    private void advance() {
+      faceIndex++;
+      List<FaceDepth> activeFaces = activeFaces();
+      if (activeFaces != null && faceIndex >= activeFaces.size()) {
+        if (activePriority == 10 && !priorityElevenFaces.isEmpty()) {
+          activePriority = 11;
+          faceIndex = 0;
+          return;
+        }
+        activePriority = -1;
+        faceIndex = 0;
+      }
+    }
+
+    private List<FaceDepth> activeFaces() {
+      return switch (activePriority) {
+        case 10 -> priorityTenFaces;
+        case 11 -> priorityElevenFaces;
+        default -> null;
+      };
+    }
+  }
+
+  private static final class ActorViewProjection {
+    private final float[] depth;
+    private final float[] projectedX;
+    private final float[] projectedY;
+
+    private ActorViewProjection(float[] depth, float[] projectedX, float[] projectedY) {
+      this.depth = depth;
+      this.projectedX = projectedX;
+      this.projectedY = projectedY;
+    }
+
+    private static ActorViewProjection project(SceneTriangleMesh mesh, WorldCameraState cameraState) {
+      float[] depth = new float[mesh.vertexX().length];
+      float[] projectedX = new float[mesh.vertexX().length];
+      float[] projectedY = new float[mesh.vertexX().length];
+      float yawRadians = (float) Math.toRadians(-cameraState.yawDegrees());
+      float yawCosine = (float) Math.cos(yawRadians);
+      float yawSine = (float) Math.sin(yawRadians);
+      float pitchRadians = (float) Math.toRadians(cameraState.pitchDegrees());
+      float pitchCosine = (float) Math.cos(pitchRadians);
+      float pitchSine = (float) Math.sin(pitchRadians);
+      for (int vertexIndex = 0; vertexIndex < mesh.vertexX().length; vertexIndex++) {
+        float localX = mesh.vertexX()[vertexIndex] - cameraState.focusX();
+        float localY = mesh.vertexY()[vertexIndex] - cameraState.focusHeight();
+        float localZ = -(mesh.vertexZ()[vertexIndex] - cameraState.focusY());
+        float yawAdjustedX = localX * yawCosine + localZ * yawSine;
+        float yawAdjustedZ = -localX * yawSine + localZ * yawCosine;
+        float viewY = localY * pitchCosine - yawAdjustedZ * pitchSine + cameraState.screenOffsetY();
+        float viewZ = localY * pitchSine + yawAdjustedZ * pitchCosine - cameraState.distance();
+        depth[vertexIndex] = -viewZ;
+        if (depth[vertexIndex] <= 0.0001f) {
+          projectedX[vertexIndex] = 0.0f;
+          projectedY[vertexIndex] = 0.0f;
+        } else {
+          projectedX[vertexIndex] = yawAdjustedX / depth[vertexIndex];
+          projectedY[vertexIndex] = -viewY / depth[vertexIndex];
+        }
+      }
+      return new ActorViewProjection(depth, projectedX, projectedY);
+    }
+
+    private float faceAverageDepth(SceneTriangleMesh mesh, int faceIndex) {
+      return (depth[mesh.faceVertexA()[faceIndex]]
+          + depth[mesh.faceVertexB()[faceIndex]]
+          + depth[mesh.faceVertexC()[faceIndex]]) / 3.0f;
+    }
+
+    private boolean isFrontFacing(SceneTriangleMesh mesh, int faceIndex) {
+      int vertexA = mesh.faceVertexA()[faceIndex];
+      int vertexB = mesh.faceVertexB()[faceIndex];
+      int vertexC = mesh.faceVertexC()[faceIndex];
+      if (depth[vertexA] <= WorldViewportProjection.NEAR_PLANE
+          || depth[vertexB] <= WorldViewportProjection.NEAR_PLANE
+          || depth[vertexC] <= WorldViewportProjection.NEAR_PLANE) {
+        return true;
+      }
+      float crossProduct =
+          (projectedX[vertexA] - projectedX[vertexB]) * (projectedY[vertexC] - projectedY[vertexB])
+              - (projectedY[vertexA] - projectedY[vertexB]) * (projectedX[vertexC] - projectedX[vertexB]);
+      return crossProduct > 0.0f;
+    }
   }
 
   private static float sampleTerrainHeight(WorldScene worldScene, float localX, float localY) {

@@ -103,7 +103,7 @@ class WorldSceneSubmissionBuilderTest {
   }
 
   @Test
-  void sortsActorFacesByPriorityBeforeSubmission() {
+  void interleavesSpecialPriorityTenActorFacesBeforeRegularBuckets() {
     SceneTriangleMesh mesh = new SceneTriangleMesh(
         new float[]{0.0f, 1.0f, 0.0f, 2.0f, 3.0f, 2.0f},
         new float[]{0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f},
@@ -127,8 +127,8 @@ class WorldSceneSubmissionBuilderTest {
         new WorldCameraState(22.5f, 0.0f, 9.0f, 0.0f, 0.0f, 0.0f, 0.0f)
     );
 
-    assertThat(sortedMesh.facePriorities()).containsExactly(5, 10);
-    assertThat(sortedMesh.faceColorA()).containsExactly(0x0055aa, 0xaa5500);
+    assertThat(sortedMesh.facePriorities()).containsExactly(10, 5);
+    assertThat(sortedMesh.faceColorA()).containsExactly(0xaa5500, 0x0055aa);
   }
 
   @Test
@@ -157,6 +157,87 @@ class WorldSceneSubmissionBuilderTest {
     );
 
     assertThat(sortedMesh.faceColorA()).containsExactly(0x884400, 0x448800);
+  }
+
+  @Test
+  void cullsBackFacingActorFacesBeforeSubmission() {
+    SceneTriangleMesh mesh = new SceneTriangleMesh(
+        new float[]{0.0f, 1.0f, 0.0f, 2.0f, 3.0f, 2.0f},
+        new float[]{0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f},
+        new float[]{5.0f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f},
+        new int[]{0, 3},
+        new int[]{1, 4},
+        new int[]{2, 5},
+        new int[]{0x884400, 0x448800},
+        new int[]{0x884400, 0x448800},
+        new int[]{0x884400, 0x448800},
+        new int[]{255, 255},
+        new int[]{-1, -1},
+        new int[]{-1, -1},
+        new int[]{-1, -1},
+        new int[]{-1, -1},
+        new int[]{0, 0}
+    );
+
+    SceneTriangleMesh sortedMesh = WorldSceneSubmissionBuilder.sortActorMeshForSubmission(
+        mesh,
+        new WorldCameraState(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f)
+    );
+
+    assertThat(sortedMesh.faceColorA()).containsExactly(0x884400);
+    assertThat(sortedMesh.faceVertexA()).hasSize(1);
+  }
+
+  @Test
+  void interleavesPriorityTenAndElevenFacesLikeTheReferencePainter() {
+    SceneTriangleMesh mesh = new SceneTriangleMesh(
+        new float[]{
+            0.0f, 1.0f, 0.0f,
+            2.0f, 3.0f, 2.0f,
+            4.0f, 5.0f, 4.0f,
+            6.0f, 7.0f, 6.0f,
+            8.0f, 9.0f, 8.0f,
+            10.0f, 11.0f, 10.0f
+        },
+        new float[]{
+            0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f
+        },
+        new float[]{
+            6.0f, 6.0f, 6.0f,
+            2.0f, 2.0f, 2.0f,
+            1.0f, 1.0f, 1.0f,
+            4.5f, 4.5f, 4.5f,
+            5.0f, 5.0f, 5.0f,
+            3.0f, 3.0f, 3.0f
+        },
+        new int[]{0, 3, 6, 9, 12, 15},
+        new int[]{1, 4, 7, 10, 13, 16},
+        new int[]{2, 5, 8, 11, 14, 17},
+        new int[]{0x100000, 0x200000, 0x300000, 0x400000, 0x500000, 0x600000},
+        new int[]{0x100000, 0x200000, 0x300000, 0x400000, 0x500000, 0x600000},
+        new int[]{0x100000, 0x200000, 0x300000, 0x400000, 0x500000, 0x600000},
+        new int[]{255, 255, 255, 255, 255, 255},
+        new int[]{-1, -1, -1, -1, -1, -1},
+        new int[]{-1, -1, -1, -1, -1, -1},
+        new int[]{-1, -1, -1, -1, -1, -1},
+        new int[]{-1, -1, -1, -1, -1, -1},
+        new int[]{10, 10, 11, 0, 1, 2}
+    );
+
+    SceneTriangleMesh sortedMesh = WorldSceneSubmissionBuilder.sortActorMeshForSubmission(
+        mesh,
+        new WorldCameraState(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f)
+    );
+
+    assertThat(sortedMesh.faceColorA())
+        .containsExactly(0x100000, 0x400000, 0x500000, 0x600000, 0x200000, 0x300000);
+    assertThat(sortedMesh.facePriorities())
+        .containsExactly(10, 0, 1, 2, 10, 11);
   }
 
   @Test
@@ -191,9 +272,8 @@ class WorldSceneSubmissionBuilderTest {
     SceneTriangleMesh northMesh = batchOf(northFacingSubmission, SceneSubmissionKind.ACTOR, SceneRasterMode.GOURAUD).mesh();
     SceneTriangleMesh eastMesh = batchOf(eastFacingSubmission, SceneSubmissionKind.ACTOR, SceneRasterMode.GOURAUD).mesh();
 
-    assertThat(northMesh.faceVertexA()).hasSameSizeAs(eastMesh.faceVertexA());
-    assertThat(northMesh.faceVertexB()).hasSameSizeAs(eastMesh.faceVertexB());
-    assertThat(northMesh.faceVertexC()).hasSameSizeAs(eastMesh.faceVertexC());
+    assertThat(northMesh.faceVertexA()).isNotEmpty();
+    assertThat(eastMesh.faceVertexA()).isNotEmpty();
     assertThat(Arrays.equals(northMesh.vertexX(), eastMesh.vertexX())).isFalse();
     assertThat(Arrays.equals(northMesh.vertexZ(), eastMesh.vertexZ())).isFalse();
   }
