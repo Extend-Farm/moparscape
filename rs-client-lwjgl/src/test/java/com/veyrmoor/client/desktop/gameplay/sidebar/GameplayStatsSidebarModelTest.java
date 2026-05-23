@@ -3,6 +3,7 @@ package com.veyrmoor.client.desktop.gameplay.sidebar;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.veyrmoor.client.core.ClientViewModel;
+import com.veyrmoor.model.StaffRole;
 import com.veyrmoor.protocol.bootstrap.BootstrapProfile;
 import com.veyrmoor.protocol.bootstrap.BootstrapSkill;
 import com.veyrmoor.protocol.bootstrap.CharacterBootstrapPayload;
@@ -19,7 +20,7 @@ class GameplayStatsSidebarModelTest {
         "akira",
         "region",
         null,
-        new BootstrapProfile((short) 0, false, 100),
+        new BootstrapProfile(StaffRole.NONE, false, 100),
         null,
         List.of(),
         List.of(),
@@ -42,7 +43,7 @@ class GameplayStatsSidebarModelTest {
         "akira",
         "region",
         null,
-        new BootstrapProfile((short) 0, false, 100),
+        new BootstrapProfile(StaffRole.NONE, false, 100),
         null,
         List.of(),
         List.of(),

@@ -250,7 +250,7 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
         viewModel,
         worldScene,
         worldMinimapTexture,
-        lastWorldSceneSubmission == null ? null : lastWorldSceneSubmission.cameraState()
+        lastWorldSceneSubmission
     );
   }
 

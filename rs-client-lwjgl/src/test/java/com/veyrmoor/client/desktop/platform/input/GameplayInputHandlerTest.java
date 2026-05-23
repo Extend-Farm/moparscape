@@ -203,6 +203,38 @@ class GameplayInputHandlerTest {
   }
 
   @Test
+  void keepsCameraMovementActiveWhileTypingAndAcrossChatTransitions() {
+    GameplayChatController chatController = new GameplayChatController();
+    TestGameplayCameraInputPort cameraInputPort = new TestGameplayCameraInputPort();
+    GameplayInputHandler inputHandler = new GameplayInputHandler(
+        (mouseX, mouseY, button) -> GameplayClickResult.handledClick(),
+        cameraInputPort,
+        (deltaX, deltaY, movementMode) -> {
+        },
+        text -> {
+        },
+        chatController,
+        windowHandle -> {
+        },
+        () -> {
+        }
+    );
+
+    inputHandler.handleKey(0L, GLFW_KEY_LEFT, GLFW_PRESS);
+    inputHandler.handleKey(0L, GLFW_KEY_ENTER, GLFW_PRESS);
+    inputHandler.handleCharacter('h');
+    inputHandler.handleKey(0L, GLFW_KEY_UP, GLFW_PRESS);
+    inputHandler.handleKey(0L, GLFW_KEY_ENTER, GLFW_PRESS);
+
+    assertThat(cameraInputPort.lastInputs).containsExactly(true, false, true, false);
+
+    inputHandler.handleKey(0L, GLFW_KEY_LEFT, GLFW_RELEASE);
+    inputHandler.handleKey(0L, GLFW_KEY_UP, GLFW_RELEASE);
+
+    assertThat(cameraInputPort.lastInputs).containsExactly(false, false, false, false);
+  }
+
+  @Test
   void startsTypingOnTheFirstPrintableCharacterWithoutClickingOrPressingEnter() {
     GameplayChatController chatController = new GameplayChatController();
     TestPublicChatPort publicChatPort = new TestPublicChatPort();
@@ -251,6 +283,31 @@ class GameplayInputHandlerTest {
     assertThat(publicChatPort.messages).isEmpty();
     assertThat(chatController.isTyping()).isFalse();
     assertThat(windowClosePort.lastWindowHandle).isEqualTo(-1L);
+  }
+
+  @Test
+  void arrowKeysStillDriveCameraWhileTyping() {
+    GameplayChatController chatController = new GameplayChatController();
+    TestGameplayCameraInputPort cameraInputPort = new TestGameplayCameraInputPort();
+    GameplayInputHandler inputHandler = new GameplayInputHandler(
+        (mouseX, mouseY, button) -> GameplayClickResult.handledClick(),
+        cameraInputPort,
+        (deltaX, deltaY, movementMode) -> {
+        },
+        text -> {
+        },
+        chatController,
+        windowHandle -> {
+        },
+        () -> {
+        }
+    );
+
+    inputHandler.handleCharacter('h');
+    inputHandler.handleKey(0L, GLFW_KEY_RIGHT, GLFW_PRESS);
+
+    assertThat(chatController.isTyping()).isTrue();
+    assertThat(cameraInputPort.lastInputs).containsExactly(false, true, false, false);
   }
 
   private static final class TestGameplayClickPort implements GameplayInputHandler.GameplayClickPort {

@@ -1,5 +1,6 @@
 package com.veyrmoor.client.desktop.gameplay.sidebar;
 
+import com.veyrmoor.client.core.ClientViewModel;
 import com.veyrmoor.client.desktop.render.common.ScreenRect;
 import com.veyrmoor.client.desktop.gameplay.GameplayClickResult;
 
@@ -13,9 +14,9 @@ final class LogoutSidebarPanelRenderer {
     this.owner = owner;
   }
 
-  void drawLogoutSidebar(ScreenRect sidebarRect) {
+  void drawLogoutSidebar(ClientViewModel viewModel, ScreenRect sidebarRect) {
     if (owner.sidebarWidgetRenderer() != null && owner.sidebarWidgetRenderer().canRender(LOGOUT_INTERFACE_ID)) {
-      owner.sidebarWidgetRenderer().draw(sidebarRect, LOGOUT_INTERFACE_ID);
+      owner.sidebarWidgetRenderer().draw(sidebarRect, LOGOUT_INTERFACE_ID, viewModel);
       return;
     }
     float left = sidebarRect.left() + 12.0f;

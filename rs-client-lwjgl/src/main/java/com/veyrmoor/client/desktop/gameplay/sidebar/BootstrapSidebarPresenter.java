@@ -60,7 +60,7 @@ final class BootstrapSidebarPresenter {
   private List<String> profileLines(CharacterBootstrapPayload bootstrap) {
     return List.of(
         "Account " + bootstrap.accountId() + "  Character " + bootstrap.characterId(),
-        "Rights " + bootstrap.profile().rights() + "  " + (bootstrap.profile().member() ? "Member" : "Free"),
+        "Role " + bootstrap.profile().staffRole().displayName() + "  " + (bootstrap.profile().member() ? "Member" : "Free"),
         "Run energy " + bootstrap.profile().runEnergy() + "%",
         bootstrap.worldPoint() == null ? "Coords pending" : formatWorldPoint(bootstrap.worldPoint())
     );

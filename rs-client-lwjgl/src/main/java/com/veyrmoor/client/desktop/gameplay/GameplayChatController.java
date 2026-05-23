@@ -85,7 +85,7 @@ public final class GameplayChatController {
     if (Character.isWhitespace(codePoint) || Character.isSpaceChar(codePoint)) {
       return ' ';
     }
-    return Character.toLowerCase(codePoint);
+    return codePoint;
   }
 
   private boolean endsWithSpace() {

@@ -243,7 +243,7 @@ final class GameplayInputHandler {
     if (action != GLFW_PRESS && action != GLFW_REPEAT && action != GLFW_RELEASE) {
       return;
     }
-    if (handleChatKey(windowHandle, key, action)) {
+    if (handleChatKey(key, action)) {
       return;
     }
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
@@ -251,7 +251,6 @@ final class GameplayInputHandler {
       return;
     }
     if (isEnterKey(key) && action == GLFW_PRESS) {
-      clearCameraInputs();
       chatController.activateTyping();
       return;
     }
@@ -311,18 +310,19 @@ final class GameplayInputHandler {
     inputPort.setGameplayCameraInputs(rotateLeftPressed, rotateRightPressed, pitchUpPressed, pitchDownPressed);
   }
 
-  private boolean handleChatKey(long windowHandle, int key, int action) {
+  private boolean handleChatKey(int key, int action) {
     if (!chatController.isTyping()) {
+      return false;
+    }
+    if (isCameraControlKey(key) || isModifierKey(key)) {
       return false;
     }
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
       chatController.cancelTyping();
-      clearCameraInputs();
       return true;
     }
     if (isEnterKey(key) && action == GLFW_PRESS) {
       String submittedText = chatController.submitDraft();
-      clearCameraInputs();
       if (submittedText != null) {
         publicChatPort.sendPublicChat(submittedText);
       }
@@ -337,6 +337,17 @@ final class GameplayInputHandler {
 
   private static boolean isEnterKey(int key) {
     return key == GLFW_KEY_ENTER || key == GLFW_KEY_KP_ENTER;
+  }
+
+  private static boolean isCameraControlKey(int key) {
+    return key == GLFW_KEY_LEFT
+        || key == GLFW_KEY_RIGHT
+        || key == GLFW_KEY_UP
+        || key == GLFW_KEY_DOWN;
+  }
+
+  private static boolean isModifierKey(int key) {
+    return key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT;
   }
 
   private static GameplayMouseButton gameplayMouseButton(int button) {

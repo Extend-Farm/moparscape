@@ -9,14 +9,15 @@ import static org.lwjgl.opengl.GL11.glScissor;
 import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
 import static org.lwjgl.opengl.GL11.GL_VIEWPORT;
 
+import com.veyrmoor.client.core.ClientViewModel;
 import com.veyrmoor.client.desktop.assets.image.ArgbImage;
 import com.veyrmoor.client.desktop.assets.sprite.ArchiveSpriteResolver;
-import com.veyrmoor.client.desktop.render.common.ImmediateModeRenderer2d;
-import com.veyrmoor.client.desktop.render.common.OpenGlTexture;
-import com.veyrmoor.client.desktop.render.common.ScreenRect;
 import com.veyrmoor.client.desktop.itemicon.ItemIconRenderer;
 import com.veyrmoor.client.desktop.login.TitleScreenBitmapFont;
 import com.veyrmoor.client.desktop.login.TitleScreenFonts;
+import com.veyrmoor.client.desktop.render.common.ImmediateModeRenderer2d;
+import com.veyrmoor.client.desktop.render.common.OpenGlTexture;
+import com.veyrmoor.client.desktop.render.common.ScreenRect;
 import com.veyrmoor.content.InterfaceComponentCatalog;
 import com.veyrmoor.content.InterfaceComponentDefinition;
 import java.nio.IntBuffer;
@@ -27,27 +28,23 @@ import org.lwjgl.BufferUtils;
 final class SidebarWidgetRenderer implements AutoCloseable {
 
   private static final int SEND_WEAPON_WIDGET_ZOOM_SCALE = 200;
-  private static final int SCROLLBAR_ARROW_SCROLL_STEP = 4;
-  private static final int SCROLLBAR_WHEEL_SCROLL_STEP = 30;
   private static final int SCROLLBAR_TRACK_RGB = 0x23201b;
   private static final int SCROLLBAR_THUMB_FILL_RGB = 0x4d4233;
   private static final int SCROLLBAR_HIGHLIGHT_RGB = 0x766654;
   private static final int SCROLLBAR_DARK_RGB = 0x332d25;
-  private static final int SCROLLBAR_WIDTH = 16;
-  private static final int SCROLLBAR_ARROW_HEIGHT = 16;
 
   private final InterfaceComponentCatalog interfaceComponents;
   private final ArchiveSpriteResolver mediaSpriteResolver;
   private final ItemIconRenderer itemIconRenderer;
   private final TitleScreenFonts fonts;
   private final ImmediateModeRenderer2d primitives;
+  private final SidebarWidgetScrollState scrollState;
+  private final SidebarWidgetLocator locator;
   private final IntBuffer viewportBuffer = BufferUtils.createIntBuffer(4);
-  private final Map<Integer, Integer> scrollPositions = new HashMap<>();
   private final Map<SpriteKey, OpenGlTexture> spriteTextures = new HashMap<>();
   private final Map<TextKey, BitmapTextTexture> textTextures = new HashMap<>();
   private final Map<Integer, OpenGlTexture> itemTextures = new HashMap<>();
   private final Map<Integer, OpenGlTexture> weaponPreviewTextures = new HashMap<>();
-  private ScrollbarDragState scrollbarDragState;
 
   SidebarWidgetRenderer(
       InterfaceComponentCatalog interfaceComponents,
@@ -61,6 +58,8 @@ final class SidebarWidgetRenderer implements AutoCloseable {
     this.itemIconRenderer = itemIconRenderer;
     this.fonts = fonts;
     this.primitives = primitives;
+    this.scrollState = new SidebarWidgetScrollState();
+    this.locator = new SidebarWidgetLocator(interfaceComponents, scrollState);
   }
 
   boolean canRender(int interfaceId) {
@@ -73,125 +72,82 @@ final class SidebarWidgetRenderer implements AutoCloseable {
     return combatModel != null && canRender(combatModel.interfaceId());
   }
 
-  void draw(ScreenRect sidebarRect, int interfaceId) {
-    draw(sidebarRect, interfaceId, Double.NaN, Double.NaN);
+  void draw(ScreenRect sidebarRect, int interfaceId, ClientViewModel viewModel) {
+    draw(sidebarRect, interfaceId, viewModel, Double.NaN, Double.NaN);
   }
 
-  void draw(ScreenRect sidebarRect, int interfaceId, double pointerX, double pointerY) {
+  void draw(ScreenRect sidebarRect, int interfaceId, ClientViewModel viewModel, double pointerX, double pointerY) {
     InterfaceComponentDefinition root = interfaceComponents.require(interfaceId);
-    int hoveredWidgetId = hoveredWidgetId(root, sidebarRect.left(), sidebarRect.top(), null, pointerX, pointerY);
-    renderComponent(root, sidebarRect.left(), sidebarRect.top(), null, null, hoveredWidgetId);
+    int hoveredWidgetId = locator.hoveredWidgetId(root, sidebarRect.left(), sidebarRect.top(), null, pointerX, pointerY);
+    renderComponent(
+        root,
+        sidebarRect.left(),
+        sidebarRect.top(),
+        new WidgetRenderContext(viewModel, null, viewModel == null ? null : GameplayStatsSidebarModel.from(viewModel), hoveredWidgetId),
+        null
+    );
   }
 
-  void draw(ScreenRect sidebarRect, GameplayCombatSidebarModel combatModel) {
+  void draw(ScreenRect sidebarRect, GameplayCombatSidebarModel combatModel, ClientViewModel viewModel) {
     InterfaceComponentDefinition root = interfaceComponents.require(combatModel.interfaceId());
-    renderComponent(root, sidebarRect.left(), sidebarRect.top(), combatModel, null, -1);
+    renderComponent(
+        root,
+        sidebarRect.left(),
+        sidebarRect.top(),
+        new WidgetRenderContext(viewModel, combatModel, viewModel == null ? null : GameplayStatsSidebarModel.from(viewModel), -1),
+        null
+    );
   }
 
   boolean handleScrollbarClick(int interfaceId, ScreenRect sidebarRect, double x, double y) {
     if (!canRender(interfaceId) || !sidebarRect.contains(x, y)) {
       return false;
     }
-    ScrollTarget scrollTarget = findScrollTarget(
+    return scrollState.handleScrollbarClick(
         interfaceComponents.require(interfaceId),
         sidebarRect.left(),
         sidebarRect.top(),
-        null,
         x,
-        y
-    );
-    if (scrollTarget == null || !scrollTarget.overScrollbar()) {
-      return false;
-    }
-    int viewportHeight = scrollTarget.container().height();
-    int scrollContentHeight = scrollTarget.container().container().scrollContentHeight();
-    int currentScrollPosition = scrollPosition(scrollTarget.container());
-    ScreenRect scrollbarRect = scrollbarRect(scrollTarget.container(), scrollTarget.left(), scrollTarget.top());
-    if (topArrowRect(scrollbarRect).contains(x, y)) {
-      scrollbarDragState = null;
-      setScrollPosition(scrollTarget.container(), currentScrollPosition - SCROLLBAR_ARROW_SCROLL_STEP);
-      return true;
-    }
-    if (bottomArrowRect(scrollbarRect).contains(x, y)) {
-      scrollbarDragState = null;
-      setScrollPosition(scrollTarget.container(), currentScrollPosition + SCROLLBAR_ARROW_SCROLL_STEP);
-      return true;
-    }
-    int thumbHeight = scrollbarThumbHeight(viewportHeight, scrollContentHeight);
-    ScreenRect thumbRect = scrollbarThumbRect(scrollTarget.container(), scrollTarget.left(), scrollTarget.top(), currentScrollPosition);
-    if (thumbRect.contains(x, y)) {
-      scrollbarDragState = new ScrollbarDragState(scrollTarget.container().id(), y - thumbRect.top());
-      return true;
-    }
-    scrollbarDragState = null;
-    int nextScrollPosition = trackScrollPosition(
         y,
-        scrollbarRect.top(),
-        viewportHeight,
-        scrollContentHeight,
-        thumbHeight
+        locator
     );
-    setScrollPosition(scrollTarget.container(), nextScrollPosition);
-    return true;
   }
 
   boolean handleScroll(int interfaceId, ScreenRect sidebarRect, double x, double y, double yOffset) {
     if (!canRender(interfaceId) || !sidebarRect.contains(x, y) || yOffset == 0.0d) {
       return false;
     }
-    ScrollTarget scrollTarget = findScrollTarget(
+    return scrollState.handleScroll(
         interfaceComponents.require(interfaceId),
         sidebarRect.left(),
         sidebarRect.top(),
-        null,
         x,
-        y
+        y,
+        yOffset,
+        locator
     );
-    if (scrollTarget == null) {
-      return false;
-    }
-    int direction = yOffset > 0.0d ? -1 : 1;
-    setScrollPosition(scrollTarget.container(), scrollPosition(scrollTarget.container()) + direction * SCROLLBAR_WHEEL_SCROLL_STEP);
-    return true;
   }
 
   boolean handlePointerMove(int interfaceId, ScreenRect sidebarRect, double x, double y) {
-    if (scrollbarDragState == null || !canRender(interfaceId)) {
+    if (!canRender(interfaceId)) {
       return false;
     }
-    ScrollTarget scrollTarget = findScrollTargetByContainerId(
+    return scrollState.handlePointerMove(
         interfaceComponents.require(interfaceId),
         sidebarRect.left(),
         sidebarRect.top(),
-        null,
-        scrollbarDragState.containerId()
-    );
-    if (scrollTarget == null) {
-      scrollbarDragState = null;
-      return false;
-    }
-    InterfaceComponentDefinition container = scrollTarget.container();
-    int viewportHeight = container.height();
-    int scrollContentHeight = container.container().scrollContentHeight();
-    int thumbHeight = scrollbarThumbHeight(viewportHeight, scrollContentHeight);
-    int nextScrollPosition = dragScrollPosition(
+        x,
         y,
-        scrollTarget.top(),
-        viewportHeight,
-        scrollContentHeight,
-        thumbHeight,
-        scrollbarDragState.thumbGrabOffsetY()
+        locator
     );
-    setScrollPosition(container, nextScrollPosition);
-    return true;
   }
 
   void endPointerDrag() {
-    scrollbarDragState = null;
+    scrollState.endPointerDrag();
   }
 
   void clearTransientState() {
-    scrollbarDragState = null;
+    scrollState.clearTransientState();
   }
 
   boolean hasActionAt(int interfaceId, ScreenRect sidebarRect, double x, double y) {
@@ -199,7 +155,7 @@ final class SidebarWidgetRenderer implements AutoCloseable {
       return false;
     }
     InterfaceComponentDefinition root = interfaceComponents.require(interfaceId);
-    return hasActionAt(root, sidebarRect.left(), sidebarRect.top(), x, y);
+    return locator.hasActionAt(root, sidebarRect.left(), sidebarRect.top(), x, y);
   }
 
   @Override
@@ -226,22 +182,21 @@ final class SidebarWidgetRenderer implements AutoCloseable {
       InterfaceComponentDefinition component,
       float left,
       float top,
-      GameplayCombatSidebarModel combatModel,
-      ScreenRect clipRect,
-      int hoveredWidgetId
+      WidgetRenderContext context,
+      ScreenRect clipRect
   ) {
     if (component == null) {
       return;
     }
-    if (component.componentType() == 0 && component.container().hidden() && component.id() != hoveredWidgetId) {
+    if (component.componentType() == 0 && component.container().hidden() && component.id() != context.hoveredWidgetId()) {
       return;
     }
     switch (component.componentType()) {
-      case 0 -> renderContainer(component, left, top, combatModel, clipRect, hoveredWidgetId);
-      case 3 -> drawRectangle(component, left, top, hoveredWidgetId);
-      case 4 -> drawText(component, left, top, combatModel, hoveredWidgetId);
+      case 0 -> renderContainer(component, left, top, context, clipRect);
+      case 3 -> drawRectangle(component, left, top, context.hoveredWidgetId());
+      case 4 -> drawText(component, left, top, context);
       case 5 -> drawSprite(component, left, top);
-      case 6 -> drawModelPreview(component, left, top, combatModel);
+      case 6 -> drawModelPreview(component, left, top, context.combatModel());
       default -> {
         // Current native sidebar widget rendering only needs containers, rectangles, text, sprites,
         // and optional model preview overrides.
@@ -253,13 +208,12 @@ final class SidebarWidgetRenderer implements AutoCloseable {
       InterfaceComponentDefinition container,
       float left,
       float top,
-      GameplayCombatSidebarModel combatModel,
-      ScreenRect clipRect,
-      int hoveredWidgetId
+      WidgetRenderContext context,
+      ScreenRect clipRect
   ) {
-    int scrollPosition = scrollPosition(container);
-    ScreenRect containerRect = componentBounds(container, left, top);
-    ScreenRect containerClipRect = intersectClipRect(clipRect, containerRect);
+    int scrollPosition = scrollState.scrollPosition(container);
+    ScreenRect containerRect = SidebarWidgetLocator.componentBounds(container, left, top);
+    ScreenRect containerClipRect = SidebarWidgetLocator.intersectClipRect(clipRect, containerRect);
     ScreenRect previousClipRect = clipRect;
     applyClipRect(containerClipRect);
     int[] childIds = container.container().childIds();
@@ -274,9 +228,8 @@ final class SidebarWidgetRenderer implements AutoCloseable {
           child,
           left + childX[childIndex],
           top + childY[childIndex] - scrollPosition,
-          combatModel,
-          containerClipRect,
-          hoveredWidgetId
+          context,
+          containerClipRect
       );
     }
     applyClipRect(previousClipRect);
@@ -285,38 +238,8 @@ final class SidebarWidgetRenderer implements AutoCloseable {
     }
   }
 
-  private boolean hasActionAt(
-      InterfaceComponentDefinition component,
-      float left,
-      float top,
-      double x,
-      double y
-  ) {
-    if (component == null) {
-      return false;
-    }
-    if (component.componentType() == 0 && component.container().hidden()) {
-      return false;
-    }
-    if (component.componentType() == 0) {
-      int scrollPosition = scrollPosition(component);
-      int[] childIds = component.container().childIds();
-      int[] childX = component.container().childX();
-      int[] childY = component.container().childY();
-      for (int childIndex = childIds.length - 1; childIndex >= 0; childIndex--) {
-        InterfaceComponentDefinition child = interfaceComponents.getOrNull(childIds[childIndex]);
-        if (child != null && hasActionAt(child, left + childX[childIndex], top + childY[childIndex] - scrollPosition, x, y)) {
-          return true;
-        }
-      }
-    }
-    return isActionable(component) && componentBounds(component, left, top).contains(x, y);
-  }
-
   private void drawRectangle(InterfaceComponentDefinition component, float left, float top, int hoveredWidgetId) {
-    int rgb = component.id() == hoveredWidgetId && component.colors().hoverColor() != 0
-        ? component.colors().hoverColor()
-        : component.colors().defaultColor();
+    int rgb = componentRgb(component, hoveredWidgetId);
     float alpha = component.alpha() == 0 ? 1.0f : Math.max(0.0f, Math.min(1.0f, (256.0f - component.alpha()) / 256.0f));
     glColor4f(rgbUnit(rgb, 16), rgbUnit(rgb, 8), rgbUnit(rgb, 0), alpha);
     primitives.drawQuad(left, top, component.width(), component.height());
@@ -326,25 +249,19 @@ final class SidebarWidgetRenderer implements AutoCloseable {
       InterfaceComponentDefinition component,
       float left,
       float top,
-      GameplayCombatSidebarModel combatModel,
-      int hoveredWidgetId
+      WidgetRenderContext context
   ) {
-    String text = overrideText(component.id(), combatModel);
-    if (text == null || text.isEmpty()) {
-      text = component.textBlock().defaultText();
-    }
+    String text = resolveText(component, context);
     if (text == null || text.isEmpty()) {
       return;
     }
     TitleScreenBitmapFont font = fontFor(component.textBlock().fontIndex());
     if (font == null) {
-      drawFallbackText(component, left, top, text, hoveredWidgetId);
+      drawFallbackText(component, left, top, text, context.hoveredWidgetId());
       return;
     }
     int baselineY = Math.round(top + font.maxGlyphHeight());
-    int rgb = component.id() == hoveredWidgetId && component.colors().hoverColor() != 0
-        ? component.colors().hoverColor()
-        : component.colors().defaultColor();
+    int rgb = componentRgb(component, context.hoveredWidgetId());
     int lineHeight = font.maxGlyphHeight();
     int lineY = baselineY;
     int lineStart = 0;
@@ -385,9 +302,7 @@ final class SidebarWidgetRenderer implements AutoCloseable {
       String text,
       int hoveredWidgetId
   ) {
-    int rgb = component.id() == hoveredWidgetId && component.colors().hoverColor() != 0
-        ? component.colors().hoverColor()
-        : component.colors().defaultColor();
+    int rgb = componentRgb(component, hoveredWidgetId);
     float red = rgbUnit(rgb, 16);
     float green = rgbUnit(rgb, 8);
     float blue = rgbUnit(rgb, 0);
@@ -408,48 +323,6 @@ final class SidebarWidgetRenderer implements AutoCloseable {
         spriteTexture,
         new ScreenRect(left, top, spriteTexture.width(), spriteTexture.height())
     );
-  }
-
-  private int hoveredWidgetId(
-      InterfaceComponentDefinition component,
-      float left,
-      float top,
-      ScreenRect clipRect,
-      double x,
-      double y
-  ) {
-    if (component == null || component.componentType() != 0 || component.container().hidden()) {
-      return -1;
-    }
-    ScreenRect containerRect = componentBounds(component, left, top);
-    ScreenRect containerClipRect = intersectClipRect(clipRect, containerRect);
-    if (containerClipRect == null || !containerClipRect.contains(x, y)) {
-      return -1;
-    }
-    int hoveredWidgetId = -1;
-    int scrollPosition = scrollPosition(component);
-    int[] childIds = component.container().childIds();
-    int[] childX = component.container().childX();
-    int[] childY = component.container().childY();
-    for (int childIndex = 0; childIndex < childIds.length; childIndex++) {
-      InterfaceComponentDefinition child = interfaceComponents.getOrNull(childIds[childIndex]);
-      if (child == null) {
-        continue;
-      }
-      float childLeft = left + childX[childIndex];
-      float childTop = top + childY[childIndex] - scrollPosition;
-      if ((child.hoverTargetId() >= 0 || child.colors().hoverColor() != 0)
-          && componentBounds(child, childLeft, childTop).contains(x, y)) {
-        hoveredWidgetId = child.hoverTargetId() >= 0 ? child.hoverTargetId() : child.id();
-      }
-      if (child.componentType() == 0 && !child.container().hidden()) {
-        int childHoveredWidgetId = hoveredWidgetId(child, childLeft, childTop, containerClipRect, x, y);
-        if (childHoveredWidgetId >= 0) {
-          hoveredWidgetId = childHoveredWidgetId;
-        }
-      }
-    }
-    return hoveredWidgetId;
   }
 
   private void drawModelPreview(
@@ -486,6 +359,20 @@ final class SidebarWidgetRenderer implements AutoCloseable {
       return combatModel.weaponName();
     }
     return null;
+  }
+
+  private String resolveText(InterfaceComponentDefinition component, WidgetRenderContext context) {
+    String text = overrideText(component.id(), context.combatModel());
+    if (text == null || text.isEmpty()) {
+      text = component.textBlock().defaultText();
+    }
+    return SidebarWidgetTextResolver.interpolate(component, text, context.viewModel(), context.statsModel());
+  }
+
+  private int componentRgb(InterfaceComponentDefinition component, int hoveredWidgetId) {
+    return component.id() == hoveredWidgetId && component.colors().hoverColor() != 0
+        ? component.colors().hoverColor()
+        : component.colors().defaultColor();
   }
 
   private TitleScreenBitmapFont fontFor(int fontIndex) {
@@ -558,58 +445,6 @@ final class SidebarWidgetRenderer implements AutoCloseable {
     return new TextTextureLayout(canvasLeft, canvasTop, width, height, baselineY);
   }
 
-  static int scrollbarThumbHeight(int viewportHeight, int scrollContentHeight) {
-    int thumbHeight = ((viewportHeight - 32) * viewportHeight) / scrollContentHeight;
-    return Math.max(8, thumbHeight);
-  }
-
-  static int scrollbarThumbOffset(int scrollPosition, int viewportHeight, int scrollContentHeight, int thumbHeight) {
-    if (scrollContentHeight <= viewportHeight) {
-      return 0;
-    }
-    return ((viewportHeight - 32 - thumbHeight) * scrollPosition) / (scrollContentHeight - viewportHeight);
-  }
-
-  static int trackScrollPosition(
-      double mouseY,
-      float scrollbarTop,
-      int viewportHeight,
-      int scrollContentHeight,
-      int thumbHeight
-  ) {
-    if (scrollContentHeight <= viewportHeight) {
-      return 0;
-    }
-    int trackHeight = viewportHeight - SCROLLBAR_ARROW_HEIGHT * 2 - thumbHeight;
-    if (trackHeight <= 0) {
-      return 0;
-    }
-    double trackMouseY = mouseY - scrollbarTop - SCROLLBAR_ARROW_HEIGHT - thumbHeight * 0.5d;
-    int scrollPosition = (int) (((scrollContentHeight - viewportHeight) * trackMouseY) / trackHeight);
-    return clampScrollPosition(scrollPosition, viewportHeight, scrollContentHeight);
-  }
-
-  static int dragScrollPosition(
-      double mouseY,
-      float containerTop,
-      int viewportHeight,
-      int scrollContentHeight,
-      int thumbHeight,
-      double thumbGrabOffsetY
-  ) {
-    if (scrollContentHeight <= viewportHeight) {
-      return 0;
-    }
-    int trackHeight = viewportHeight - SCROLLBAR_ARROW_HEIGHT * 2 - thumbHeight;
-    if (trackHeight <= 0) {
-      return 0;
-    }
-    double thumbTop = mouseY - thumbGrabOffsetY;
-    double trackMouseY = thumbTop - containerTop - SCROLLBAR_ARROW_HEIGHT;
-    int scrollPosition = (int) (((scrollContentHeight - viewportHeight) * trackMouseY) / trackHeight);
-    return clampScrollPosition(scrollPosition, viewportHeight, scrollContentHeight);
-  }
-
   private OpenGlTexture weaponPreviewTexture(int itemId) {
     if (itemIconRenderer == null || itemId < 0) {
       return null;
@@ -662,54 +497,35 @@ final class SidebarWidgetRenderer implements AutoCloseable {
           new ScreenRect(left, top + viewportHeight - bottomArrowTexture.height(), bottomArrowTexture.width(), bottomArrowTexture.height())
       );
     }
-    fillRect(left, top + SCROLLBAR_ARROW_HEIGHT, SCROLLBAR_WIDTH, viewportHeight - SCROLLBAR_ARROW_HEIGHT * 2.0f, SCROLLBAR_TRACK_RGB);
-    int thumbHeight = scrollbarThumbHeight(viewportHeight, scrollContentHeight);
-    int thumbOffset = scrollbarThumbOffset(scrollPosition, viewportHeight, scrollContentHeight, thumbHeight);
-    float thumbTop = top + SCROLLBAR_ARROW_HEIGHT + thumbOffset;
-    fillRect(left, thumbTop, SCROLLBAR_WIDTH, thumbHeight, SCROLLBAR_THUMB_FILL_RGB);
+    fillRect(
+        left,
+        top + SidebarWidgetScrollState.SCROLLBAR_ARROW_HEIGHT,
+        SidebarWidgetScrollState.SCROLLBAR_WIDTH,
+        viewportHeight - SidebarWidgetScrollState.SCROLLBAR_ARROW_HEIGHT * 2.0f,
+        SCROLLBAR_TRACK_RGB
+    );
+    int thumbHeight = SidebarWidgetScrollState.scrollbarThumbHeight(viewportHeight, scrollContentHeight);
+    int thumbOffset = SidebarWidgetScrollState.scrollbarThumbOffset(scrollPosition, viewportHeight, scrollContentHeight, thumbHeight);
+    float thumbTop = top + SidebarWidgetScrollState.SCROLLBAR_ARROW_HEIGHT + thumbOffset;
+    fillRect(left, thumbTop, SidebarWidgetScrollState.SCROLLBAR_WIDTH, thumbHeight, SCROLLBAR_THUMB_FILL_RGB);
     drawVerticalLine(left, thumbTop, thumbHeight, SCROLLBAR_HIGHLIGHT_RGB);
     drawVerticalLine(left + 1.0f, thumbTop, thumbHeight, SCROLLBAR_HIGHLIGHT_RGB);
-    drawHorizontalLine(left, thumbTop, SCROLLBAR_WIDTH, SCROLLBAR_HIGHLIGHT_RGB);
-    drawHorizontalLine(left, thumbTop + 1.0f, SCROLLBAR_WIDTH, SCROLLBAR_HIGHLIGHT_RGB);
-    drawVerticalLine(left + SCROLLBAR_WIDTH - 1.0f, thumbTop, thumbHeight, SCROLLBAR_DARK_RGB);
-    drawVerticalLine(left + SCROLLBAR_WIDTH - 2.0f, thumbTop + 1.0f, thumbHeight - 1.0f, SCROLLBAR_DARK_RGB);
-    drawHorizontalLine(left, thumbTop + thumbHeight - 1.0f, SCROLLBAR_WIDTH, SCROLLBAR_DARK_RGB);
-    drawHorizontalLine(left + 1.0f, thumbTop + thumbHeight - 2.0f, SCROLLBAR_WIDTH - 1.0f, SCROLLBAR_DARK_RGB);
-  }
-
-  private int scrollPosition(InterfaceComponentDefinition container) {
-    return clampScrollPosition(
-        scrollPositions.getOrDefault(container.id(), 0),
-        container.height(),
-        container.container().scrollContentHeight()
+    drawHorizontalLine(left, thumbTop, SidebarWidgetScrollState.SCROLLBAR_WIDTH, SCROLLBAR_HIGHLIGHT_RGB);
+    drawHorizontalLine(left, thumbTop + 1.0f, SidebarWidgetScrollState.SCROLLBAR_WIDTH, SCROLLBAR_HIGHLIGHT_RGB);
+    drawVerticalLine(left + SidebarWidgetScrollState.SCROLLBAR_WIDTH - 1.0f, thumbTop, thumbHeight, SCROLLBAR_DARK_RGB);
+    drawVerticalLine(
+        left + SidebarWidgetScrollState.SCROLLBAR_WIDTH - 2.0f,
+        thumbTop + 1.0f,
+        thumbHeight - 1.0f,
+        SCROLLBAR_DARK_RGB
     );
-  }
-
-  private void setScrollPosition(InterfaceComponentDefinition container, int scrollPosition) {
-    int clampedScrollPosition = clampScrollPosition(
-        scrollPosition,
-        container.height(),
-        container.container().scrollContentHeight()
+    drawHorizontalLine(left, thumbTop + thumbHeight - 1.0f, SidebarWidgetScrollState.SCROLLBAR_WIDTH, SCROLLBAR_DARK_RGB);
+    drawHorizontalLine(
+        left + 1.0f,
+        thumbTop + thumbHeight - 2.0f,
+        SidebarWidgetScrollState.SCROLLBAR_WIDTH - 1.0f,
+        SCROLLBAR_DARK_RGB
     );
-    if (clampedScrollPosition == 0) {
-      scrollPositions.remove(container.id());
-      return;
-    }
-    scrollPositions.put(container.id(), clampedScrollPosition);
-  }
-
-  private ScreenRect intersectClipRect(ScreenRect clipRect, ScreenRect bounds) {
-    if (clipRect == null) {
-      return bounds;
-    }
-    float left = Math.max(clipRect.left(), bounds.left());
-    float top = Math.max(clipRect.top(), bounds.top());
-    float right = Math.min(clipRect.left() + clipRect.width(), bounds.left() + bounds.width());
-    float bottom = Math.min(clipRect.top() + clipRect.height(), bounds.top() + bounds.height());
-    if (right <= left || bottom <= top) {
-      return new ScreenRect(left, top, 0.0f, 0.0f);
-    }
-    return new ScreenRect(left, top, right - left, bottom - top);
   }
 
   private void applyClipRect(ScreenRect clipRect) {
@@ -748,143 +564,6 @@ final class SidebarWidgetRenderer implements AutoCloseable {
     primitives.drawLine(left, top, left, top + height - 1.0f);
   }
 
-  private ScrollTarget findScrollTarget(
-      InterfaceComponentDefinition component,
-      float left,
-      float top,
-      ScreenRect clipRect,
-      double x,
-      double y
-  ) {
-    if (component == null || component.componentType() != 0 || component.container().hidden()) {
-      return null;
-    }
-    ScreenRect containerRect = componentBounds(component, left, top);
-    ScreenRect containerClipRect = intersectClipRect(clipRect, containerRect);
-    int scrollPosition = scrollPosition(component);
-    int[] childIds = component.container().childIds();
-    int[] childX = component.container().childX();
-    int[] childY = component.container().childY();
-    for (int childIndex = childIds.length - 1; childIndex >= 0; childIndex--) {
-      InterfaceComponentDefinition child = interfaceComponents.getOrNull(childIds[childIndex]);
-      if (child == null) {
-        continue;
-      }
-      ScrollTarget childTarget = findScrollTarget(
-          child,
-          left + childX[childIndex],
-          top + childY[childIndex] - scrollPosition,
-          containerClipRect,
-          x,
-          y
-      );
-      if (childTarget != null) {
-        return childTarget;
-      }
-    }
-    if (component.container().scrollContentHeight() <= component.height()) {
-      return null;
-    }
-    ScreenRect scrollbarRect = scrollbarRect(component, left, top);
-    if (scrollbarRect.contains(x, y)) {
-      return new ScrollTarget(component, left, top, true);
-    }
-    if (containerClipRect != null && containerClipRect.contains(x, y)) {
-      return new ScrollTarget(component, left, top, false);
-    }
-    return null;
-  }
-
-  private ScrollTarget findScrollTargetByContainerId(
-      InterfaceComponentDefinition component,
-      float left,
-      float top,
-      ScreenRect clipRect,
-      int containerId
-  ) {
-    if (component == null || component.componentType() != 0 || component.container().hidden()) {
-      return null;
-    }
-    if (component.id() == containerId) {
-      return new ScrollTarget(component, left, top, false);
-    }
-    ScreenRect containerRect = componentBounds(component, left, top);
-    ScreenRect containerClipRect = intersectClipRect(clipRect, containerRect);
-    int scrollPosition = scrollPosition(component);
-    int[] childIds = component.container().childIds();
-    int[] childX = component.container().childX();
-    int[] childY = component.container().childY();
-    for (int childIndex = 0; childIndex < childIds.length; childIndex++) {
-      InterfaceComponentDefinition child = interfaceComponents.getOrNull(childIds[childIndex]);
-      if (child == null) {
-        continue;
-      }
-      ScrollTarget childTarget = findScrollTargetByContainerId(
-          child,
-          left + childX[childIndex],
-          top + childY[childIndex] - scrollPosition,
-          containerClipRect,
-          containerId
-      );
-      if (childTarget != null) {
-        return childTarget;
-      }
-    }
-    return null;
-  }
-
-  private ScreenRect scrollbarRect(InterfaceComponentDefinition component, float left, float top) {
-    return new ScreenRect(left + component.width(), top, SCROLLBAR_WIDTH, component.height());
-  }
-
-  private ScreenRect topArrowRect(ScreenRect scrollbarRect) {
-    return new ScreenRect(scrollbarRect.left(), scrollbarRect.top(), SCROLLBAR_WIDTH, SCROLLBAR_ARROW_HEIGHT);
-  }
-
-  private ScreenRect bottomArrowRect(ScreenRect scrollbarRect) {
-    return new ScreenRect(
-        scrollbarRect.left(),
-        scrollbarRect.top() + scrollbarRect.height() - SCROLLBAR_ARROW_HEIGHT,
-        SCROLLBAR_WIDTH,
-        SCROLLBAR_ARROW_HEIGHT
-    );
-  }
-
-  private ScreenRect scrollbarThumbRect(
-      InterfaceComponentDefinition component,
-      float left,
-      float top,
-      int scrollPosition
-  ) {
-    ScreenRect scrollbarRect = scrollbarRect(component, left, top);
-    int thumbHeight = scrollbarThumbHeight(component.height(), component.container().scrollContentHeight());
-    int thumbOffset = scrollbarThumbOffset(
-        scrollPosition,
-        component.height(),
-        component.container().scrollContentHeight(),
-        thumbHeight
-    );
-    return new ScreenRect(
-        scrollbarRect.left(),
-        scrollbarRect.top() + SCROLLBAR_ARROW_HEIGHT + thumbOffset,
-        SCROLLBAR_WIDTH,
-        thumbHeight
-    );
-  }
-
-  private static int clampScrollPosition(int scrollPosition, int viewportHeight, int scrollContentHeight) {
-    int maxScrollPosition = Math.max(0, scrollContentHeight - viewportHeight);
-    return Math.max(0, Math.min(maxScrollPosition, scrollPosition));
-  }
-
-  private boolean isActionable(InterfaceComponentDefinition component) {
-    return component.optionType() != 0 || !component.actionLabel().isEmpty();
-  }
-
-  private ScreenRect componentBounds(InterfaceComponentDefinition component, float left, float top) {
-    return new ScreenRect(left, top, Math.max(0.0f, component.width()), Math.max(0.0f, component.height()));
-  }
-
   private record SpriteKey(String entryName, int frameIndex) {
   }
 
@@ -894,10 +573,12 @@ final class SidebarWidgetRenderer implements AutoCloseable {
   private record BitmapTextTexture(OpenGlTexture texture, int drawOffsetX, int drawOffsetY) {
   }
 
-  private record ScrollTarget(InterfaceComponentDefinition container, float left, float top, boolean overScrollbar) {
-  }
-
-  private record ScrollbarDragState(int containerId, double thumbGrabOffsetY) {
+  private record WidgetRenderContext(
+      ClientViewModel viewModel,
+      GameplayCombatSidebarModel combatModel,
+      GameplayStatsSidebarModel statsModel,
+      int hoveredWidgetId
+  ) {
   }
 
   record TextTextureLayout(int canvasLeft, int canvasTop, int width, int height, int baselineY) {

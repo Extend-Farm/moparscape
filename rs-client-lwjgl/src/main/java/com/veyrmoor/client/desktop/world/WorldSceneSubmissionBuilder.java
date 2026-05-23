@@ -121,7 +121,7 @@ public final class WorldSceneSubmissionBuilder {
     SceneRenderQueueBuilder renderQueueBuilder = new SceneRenderQueueBuilder();
     renderQueueBuilder.addAll(terrainQueue(worldScene));
     objectBatchBuilder.addBatches(renderQueueBuilder, worldScene, visibilityWindow, occlusionContext);
-    actorBatchBuilder.addBatches(
+    WorldSceneRenderSubmission.ActorOverheadAnchor localPlayerOverheadAnchor = actorBatchBuilder.addBatches(
         renderQueueBuilder,
         worldScene,
         visibilityWindow,
@@ -142,7 +142,12 @@ public final class WorldSceneSubmissionBuilder {
         playerLocalX,
         playerLocalY
     );
-    return new WorldSceneRenderSubmission(renderPlane, cameraState, renderQueueBuilder.build());
+    return new WorldSceneRenderSubmission(
+        renderPlane,
+        cameraState,
+        renderQueueBuilder.build(),
+        localPlayerOverheadAnchor
+    );
   }
 
   static float actorYawDegrees(ActorAnimationState actorAnimationState) {

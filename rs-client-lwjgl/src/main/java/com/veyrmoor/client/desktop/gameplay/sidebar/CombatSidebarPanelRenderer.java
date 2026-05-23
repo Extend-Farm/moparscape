@@ -42,7 +42,7 @@ final class CombatSidebarPanelRenderer {
   void drawCombatSidebar(ClientViewModel viewModel, ScreenRect sidebarRect) {
     GameplayCombatSidebarModel combatModel = owner.combatModelFor(viewModel);
     if (owner.sidebarWidgetRenderer() != null && owner.sidebarWidgetRenderer().canRender(combatModel)) {
-      owner.sidebarWidgetRenderer().draw(sidebarRect, combatModel);
+      owner.sidebarWidgetRenderer().draw(sidebarRect, combatModel, viewModel);
       return;
     }
     float left = sidebarRect.left() + COMBAT_FALLBACK_LEFT_INSET;

@@ -22,6 +22,7 @@ import com.veyrmoor.client.desktop.login.TitleScreenBitmapFont;
 import com.veyrmoor.client.desktop.login.TitleScreenFonts;
 import com.veyrmoor.content.ItemDefinition;
 import com.veyrmoor.content.ItemDefinitionCatalog;
+import com.veyrmoor.model.StaffRole;
 import com.veyrmoor.protocol.bootstrap.BootstrapItemSlot;
 import java.text.NumberFormat;
 import java.util.HashMap;
@@ -36,9 +37,8 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
   private static final float CHAT_LINE_HEIGHT = 14.0f;
   private static final float CHAT_HISTORY_BOTTOM_BASELINE_OFFSET = 70.0f;
   private static final float CHAT_PROMPT_LEFT_OFFSET = 4.0f;
+  private static final float CHAT_RIGHT_PADDING = 4.0f;
   private static final int CHAT_HISTORY_LINES = 5;
-  private static final int CHAT_HISTORY_MAX_CHARS = 80;
-  private static final int CHAT_PROMPT_MAX_CHARS = 78;
   private static final int CHAT_LABEL_RGB = 0x000000;
   private static final int CHAT_PUBLIC_TEXT_RGB = 0x0000ff;
   private static final int CHAT_PROMPT_TEXT_RGB = 0x0000ff;
@@ -53,6 +53,7 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
   private static final int CHAT_SCROLLBAR_ARROW_HEIGHT = 16;
   private static final float CHAT_CROWN_BASELINE_OFFSET_Y = 12.0f;
   private static final float CHAT_CROWN_TEXT_GAP = 2.0f;
+  private static final String CHAT_ELLIPSIS = "...";
   private static final NumberFormat LEGACY_NUMBER_FORMAT = NumberFormat.getIntegerInstance();
   private static final ClientChatMessage DEFAULT_WELCOME_MESSAGE =
       ClientChatMessage.system("Welcome to Veyrmoor! Have fun.");
@@ -83,6 +84,7 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
   private final MagicSidebarPanelRenderer magicPanelRenderer;
   private final LogoutSidebarPanelRenderer logoutPanelRenderer;
   private final Map<BitmapGlyphKey, BitmapGlyphTexture> bitmapGlyphTextures = new HashMap<>();
+  private boolean promptGlyphsPrewarmed;
 
   public GameplaySidebarRenderer(
       ItemDefinitionCatalog itemDefinitionCatalog,
@@ -124,6 +126,7 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
     this.prayerPanelRenderer = new PrayerSidebarPanelRenderer(this);
     this.magicPanelRenderer = new MagicSidebarPanelRenderer(this);
     this.logoutPanelRenderer = new LogoutSidebarPanelRenderer(this);
+    prewarmChatPromptGlyphTextures();
   }
 
   public GameplayClickResult handleSidebarClick(GameplayTab activeGameplayTab, double x, double y) {
@@ -193,12 +196,12 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
       case STATS -> statsPanelRenderer.drawStatsSidebar(viewModel, rect, pointerX, pointerY);
       case COMBAT -> combatPanelRenderer.drawCombatSidebar(viewModel, rect);
       case QUESTS -> drawSidebarPlaceholder(left, top + 16.0f, "Quest journal not synced yet.", "Native widget rendering is next.");
-      case PRAYER -> prayerPanelRenderer.drawPrayerSidebar(rect, pointerX, pointerY);
-      case MAGIC -> magicPanelRenderer.drawMagicSidebar(rect);
+      case PRAYER -> prayerPanelRenderer.drawPrayerSidebar(viewModel, rect, pointerX, pointerY);
+      case MAGIC -> magicPanelRenderer.drawMagicSidebar(viewModel, rect);
       case FRIENDS -> drawSidebarPlaceholder(left, top + 16.0f, "Friends list not synced yet.", "Social state will move into protocol snapshots.");
       case IGNORES -> drawSidebarPlaceholder(left, top + 16.0f, "Ignore list not synced yet.", "Legacy file import already stores social links.");
-      case LOGOUT -> logoutPanelRenderer.drawLogoutSidebar(rect);
-      case SETTINGS -> drawSidebarPlaceholder(left, top + 16.0f, "Settings panel not implemented yet.", "Run energy and rights are in chat status.");
+      case LOGOUT -> logoutPanelRenderer.drawLogoutSidebar(viewModel, rect);
+      case SETTINGS -> drawSidebarPlaceholder(left, top + 16.0f, "Settings panel not implemented yet.", "Run energy and role are in chat status.");
       case EMOTES -> drawSidebarPlaceholder(left, top + 16.0f, "Emote book not decoded yet.", "Runtime action sequence packets are ready; emote UI is still pending.");
       case MUSIC -> drawSidebarPlaceholder(left, top + 16.0f, "Music player not decoded yet.", "Audio is outside the current world slice.");
     }
@@ -412,12 +415,13 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
     List<ClientChatMessage> renderedMessages = renderedChatMessages(viewModel);
     int visibleCount = Math.min(renderedMessages.size(), CHAT_HISTORY_LINES);
     int startIndex = renderedMessages.size() - visibleCount;
+    float historyRight = historyRect.left() + historyRect.width() - CHAT_RIGHT_PADDING;
     for (int index = 0; index < visibleCount; index++) {
       ClientChatMessage message = renderedMessages.get(startIndex + index);
       float baselineY = historyRect.top()
           + CHAT_HISTORY_BOTTOM_BASELINE_OFFSET
           - (visibleCount - 1 - index) * CHAT_LINE_HEIGHT;
-      drawChatMessageLine(viewModel, historyRect.left(), baselineY, message);
+      drawChatMessageLine(viewModel, historyRect.left(), historyRight, baselineY, message);
     }
     drawChatScrollbar(historyRect, Math.max(1, renderedMessages.size()));
   }
@@ -427,11 +431,11 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
     String displayName = viewModel.bootstrap() == null ? "You" : viewModel.bootstrap().displayName();
     float baselineY = GameplayLayout.chatPromptBaselineY();
     drawBitmapTextAtBaseline(chatFont, inputRect.left() + CHAT_PROMPT_LEFT_OFFSET, baselineY, displayName + ":", CHAT_LABEL_RGB, false);
-    String promptText = truncateChatPrompt(chatState.draftText() + "*");
     float promptLeft = inputRect.left()
         + CHAT_PROMPT_LEFT_OFFSET
         + measureBitmapText(chatFont, displayName + ": ")
         + 2.0f;
+    String promptText = fitChatPromptText(chatFont, chatState.draftText() + "*", inputRect.left() + inputRect.width() - CHAT_RIGHT_PADDING - promptLeft);
     drawBitmapTextGlyphsAtBaseline(
         chatFont,
         promptLeft,
@@ -540,13 +544,13 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
     return -1;
   }
 
-  private void drawChatMessageLine(ClientViewModel viewModel, float left, float baselineY, ClientChatMessage message) {
+  private void drawChatMessageLine(ClientViewModel viewModel, float left, float right, float baselineY, ClientChatMessage message) {
     if (message.kind() == ClientChatMessageKind.SYSTEM || message.speakerDisplayName() == null) {
       drawBitmapTextAtBaseline(
           chatFont,
           left,
           baselineY,
-          truncateChatHistory(message.text()),
+          fitChatHistoryText(chatFont, message.text(), right - left),
           CHAT_SYSTEM_RGB,
           false
       );
@@ -565,7 +569,7 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
         chatFont,
         messageLeft,
         baselineY,
-        truncateChatHistory(message.text()),
+        fitChatHistoryText(chatFont, message.text(), right - messageLeft),
         CHAT_PUBLIC_TEXT_RGB,
         false
     );
@@ -590,8 +594,8 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
     outlineRect(scrollbarRect.left(), trackTop, scrollbarRect.width(), trackHeight, CHAT_SCROLLBAR_DARK_RGB);
     int viewportHeight = Math.round(historyRect.height());
     int scrollContentHeight = Math.max(viewportHeight, totalMessages * Math.round(CHAT_LINE_HEIGHT));
-    int thumbHeight = SidebarWidgetRenderer.scrollbarThumbHeight(viewportHeight, scrollContentHeight);
-    int thumbOffset = SidebarWidgetRenderer.scrollbarThumbOffset(
+    int thumbHeight = SidebarWidgetScrollState.scrollbarThumbHeight(viewportHeight, scrollContentHeight);
+    int thumbOffset = SidebarWidgetScrollState.scrollbarThumbOffset(
         Math.max(0, scrollContentHeight - viewportHeight),
         viewportHeight,
         scrollContentHeight,
@@ -711,42 +715,80 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
     if (message == null || message.speakerDisplayName() == null || modIconTextures.length < 2) {
       return null;
     }
-    return switch (speakerCrownIndex(viewModel, message.speakerDisplayName())) {
-      case 0 -> modIconTextures[0];
-      case 1 -> modIconTextures[1];
-      default -> null;
-    };
+    StaffRole staffRole = speakerStaffRole(viewModel, message.speakerDisplayName());
+    if (!staffRole.hasCrown()) {
+      return null;
+    }
+    int crownSpriteIndex = staffRole.crownSpriteIndex();
+    return crownSpriteIndex >= 0 && crownSpriteIndex < modIconTextures.length
+        ? modIconTextures[crownSpriteIndex]
+        : null;
   }
 
-  private int speakerCrownIndex(ClientViewModel viewModel, String speakerDisplayName) {
+  private StaffRole speakerStaffRole(ClientViewModel viewModel, String speakerDisplayName) {
     if (speakerDisplayName == null || viewModel == null || viewModel.bootstrap() == null) {
-      return -1;
+      return StaffRole.NONE;
     }
     if (!speakerDisplayName.equals(viewModel.bootstrap().displayName())) {
-      return -1;
+      return StaffRole.NONE;
     }
-    int rights = viewModel.bootstrap().profile() == null ? 0 : viewModel.bootstrap().profile().rights();
-    if (rights >= 2) {
-      return 1;
-    }
-    if (rights >= 1) {
-      return 0;
-    }
-    return -1;
+    return viewModel.bootstrap().profile() == null ? StaffRole.NONE : viewModel.bootstrap().profile().staffRole();
   }
 
-  private static String truncateChatHistory(String text) {
-    if (text == null || text.length() <= CHAT_HISTORY_MAX_CHARS) {
-      return Objects.toString(text, "");
-    }
-    return text.substring(0, CHAT_HISTORY_MAX_CHARS - 3) + "...";
+  static String fitChatHistoryText(TitleScreenBitmapFont font, String text, float maxWidth) {
+    return fitChatTextFromStart(font, text, maxWidth);
   }
 
-  private static String truncateChatPrompt(String text) {
-    if (text == null || text.length() <= CHAT_PROMPT_MAX_CHARS) {
-      return Objects.toString(text, "");
+  static String fitChatPromptText(TitleScreenBitmapFont font, String text, float maxWidth) {
+    return fitChatTextFromEnd(font, text, maxWidth);
+  }
+
+  private static String fitChatTextFromStart(TitleScreenBitmapFont font, String text, float maxWidth) {
+    String safeText = Objects.toString(text, "");
+    if (font == null || safeText.isEmpty() || maxWidth <= 0.0f) {
+      return "";
     }
-    return "..." + text.substring(text.length() - (CHAT_PROMPT_MAX_CHARS - 3));
+    if (measureBitmapText(font, safeText) <= maxWidth) {
+      return safeText;
+    }
+    float ellipsisWidth = measureBitmapText(font, CHAT_ELLIPSIS);
+    if (ellipsisWidth > maxWidth) {
+      return "";
+    }
+    String bestFit = CHAT_ELLIPSIS;
+    for (int endIndex = 1; endIndex <= safeText.length(); endIndex++) {
+      String candidate = safeText.substring(0, endIndex) + CHAT_ELLIPSIS;
+      if (measureBitmapText(font, candidate) <= maxWidth) {
+        bestFit = candidate;
+        continue;
+      }
+      break;
+    }
+    return bestFit;
+  }
+
+  private static String fitChatTextFromEnd(TitleScreenBitmapFont font, String text, float maxWidth) {
+    String safeText = Objects.toString(text, "");
+    if (font == null || safeText.isEmpty() || maxWidth <= 0.0f) {
+      return "";
+    }
+    if (measureBitmapText(font, safeText) <= maxWidth) {
+      return safeText;
+    }
+    float ellipsisWidth = measureBitmapText(font, CHAT_ELLIPSIS);
+    if (ellipsisWidth > maxWidth) {
+      return "";
+    }
+    String bestFit = CHAT_ELLIPSIS;
+    for (int startIndex = safeText.length() - 1; startIndex >= 0; startIndex--) {
+      String candidate = CHAT_ELLIPSIS + safeText.substring(startIndex);
+      if (measureBitmapText(font, candidate) <= maxWidth) {
+        bestFit = candidate;
+        continue;
+      }
+      break;
+    }
+    return bestFit;
   }
 
   private BitmapGlyphTexture bitmapGlyphTexture(
@@ -781,6 +823,18 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
         layout,
         key.font().measureGlyph(key.glyph())
     );
+  }
+
+  // Keep live chat typing hitch-free by warming the printable prompt glyph set once instead of
+  // uploading new GL textures the first time Shift introduces an uppercase character.
+  private void prewarmChatPromptGlyphTextures() {
+    if (chatFont == null || promptGlyphsPrewarmed) {
+      return;
+    }
+    for (int glyph = 32; glyph <= 126; glyph++) {
+      bitmapGlyphTexture(chatFont, (char) glyph, CHAT_PROMPT_TEXT_RGB, false);
+    }
+    promptGlyphsPrewarmed = true;
   }
 
   private record BitmapTextKey(

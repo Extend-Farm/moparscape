@@ -1,4 +1,10 @@
 package com.veyrmoor.protocol.bootstrap;
 
-public record BootstrapProfile(short rights, boolean member, int runEnergy) {
+import com.veyrmoor.model.StaffRole;
+
+public record BootstrapProfile(StaffRole staffRole, boolean member, int runEnergy) {
+
+  public BootstrapProfile {
+    staffRole = staffRole == null ? StaffRole.NONE : staffRole;
+  }
 }

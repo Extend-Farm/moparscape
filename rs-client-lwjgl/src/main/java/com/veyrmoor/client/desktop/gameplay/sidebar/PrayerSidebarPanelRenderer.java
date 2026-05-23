@@ -1,5 +1,6 @@
 package com.veyrmoor.client.desktop.gameplay.sidebar;
 
+import com.veyrmoor.client.core.ClientViewModel;
 import com.veyrmoor.client.desktop.render.common.ScreenRect;
 
 final class PrayerSidebarPanelRenderer {
@@ -12,9 +13,9 @@ final class PrayerSidebarPanelRenderer {
     this.owner = owner;
   }
 
-  void drawPrayerSidebar(ScreenRect sidebarRect, double pointerX, double pointerY) {
+  void drawPrayerSidebar(ClientViewModel viewModel, ScreenRect sidebarRect, double pointerX, double pointerY) {
     if (owner.sidebarWidgetRenderer() != null && owner.sidebarWidgetRenderer().canRender(PRAYER_INTERFACE_ID)) {
-      owner.sidebarWidgetRenderer().draw(sidebarRect, PRAYER_INTERFACE_ID, pointerX, pointerY);
+      owner.sidebarWidgetRenderer().draw(sidebarRect, PRAYER_INTERFACE_ID, viewModel, pointerX, pointerY);
       return;
     }
     float left = sidebarRect.left() + 12.0f;

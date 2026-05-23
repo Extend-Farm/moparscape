@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.veyrmoor.model.MovementMode;
+import com.veyrmoor.model.StaffRole;
 import com.veyrmoor.model.WorldPoint;
 import com.veyrmoor.protocol.bootstrap.BootstrapAnimationProfile;
 import com.veyrmoor.protocol.bootstrap.BootstrapAppearance;
@@ -55,7 +56,7 @@ class ProtocolBinaryCodecTest {
         "Akira",
         "50_50",
         new WorldPoint(3200, 3201, 0),
-        new BootstrapProfile((short) 2, true, 100),
+        new BootstrapProfile(StaffRole.ADMIN, true, 100),
         new BootstrapAppearance(
             List.of(0x100, 0x101, 0x102, 0x103, 0x104, 0x105),
             new BootstrapAnimationProfile(808, 809, 810, 811, 812, 813, 814)

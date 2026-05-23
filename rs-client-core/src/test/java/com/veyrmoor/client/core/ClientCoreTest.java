@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.veyrmoor.content.ItemDefinition;
 import com.veyrmoor.content.ItemDefinitionCatalog;
+import com.veyrmoor.model.StaffRole;
 import com.veyrmoor.model.WorldPoint;
 import com.veyrmoor.protocol.bootstrap.BootstrapAppearance;
 import com.veyrmoor.protocol.bootstrap.BootstrapAnimationProfile;
@@ -79,7 +80,7 @@ class ClientCoreTest {
             "Akira",
             "lumbridge",
             new WorldPoint(3200, 3201, 0),
-            new BootstrapProfile((short) 2, true, 100),
+            new BootstrapProfile(StaffRole.ADMIN, true, 100),
             new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1)),
             List.of(new BootstrapItemSlot(0, 555, 1000)),
             List.of(new BootstrapItemSlot(0, 1048, 1)),
@@ -117,7 +118,7 @@ class ClientCoreTest {
         "Akira",
         "lumbridge",
         new WorldPoint(3200, 3201, 0),
-        new BootstrapProfile((short) 2, true, 100),
+        new BootstrapProfile(StaffRole.ADMIN, true, 100),
         new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1)),
         List.of(),
         List.of(),

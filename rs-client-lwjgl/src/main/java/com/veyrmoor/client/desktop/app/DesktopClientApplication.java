@@ -88,7 +88,7 @@ final class DesktopClientApplication implements AutoCloseable {
       DesktopClientState state = new DesktopClientState(WELCOME_STATUS);
 
       renderSystem.setLoginScreenState(loginScreenController.state());
-      new DesktopInputRouter(
+      DesktopInputRouter inputRouter = new DesktopInputRouter(
           window,
           renderSystem,
           () -> requireRuntimeContext().session(),
@@ -98,9 +98,10 @@ final class DesktopClientApplication implements AutoCloseable {
           WELCOME_STATUS,
           CREDENTIALS_STATUS,
           AUTHENTICATING_STATUS
-      ).bind();
+      );
+      inputRouter.bind();
 
-      runLoop(renderSystem, loginScreenController, state, assets.worldSceneLoader());
+      runLoop(renderSystem, loginScreenController, state, inputRouter, assets.worldSceneLoader());
     }
   }
 
@@ -186,6 +187,7 @@ final class DesktopClientApplication implements AutoCloseable {
       OpenGlTileRenderSystem renderSystem,
       LoginScreenController loginScreenController,
       DesktopClientState state,
+      DesktopInputRouter inputRouter,
       CacheBackedWorldSceneLoader worldSceneLoader
   ) {
     while (!glfwWindowShouldClose(window)) {
@@ -212,6 +214,7 @@ final class DesktopClientApplication implements AutoCloseable {
           state
       );
       updateGameplayBootstrapState(renderSystem, session.viewModel(), state);
+      inputRouter.advanceFrame(System.nanoTime());
       session.pumpMovement();
       renderSystem.render(NativeClientRuntimeCoordinator.renderViewModel(state.titleScreenStatus(), session.viewModel()));
       glfwSwapBuffers(window);

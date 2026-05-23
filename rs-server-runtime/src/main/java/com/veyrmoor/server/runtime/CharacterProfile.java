@@ -1,7 +1,9 @@
 package com.veyrmoor.server.runtime;
 
+import com.veyrmoor.model.StaffRole;
+
 public record CharacterProfile(
-    int rights,
+    StaffRole staffRole,
     boolean member,
     int messageCount,
     int runEnergy,
@@ -10,6 +12,6 @@ public record CharacterProfile(
 ) {
 
   public static CharacterProfile minimal() {
-    return new CharacterProfile(0, false, 0, 100, 0, 0);
+    return new CharacterProfile(StaffRole.NONE, false, 0, 100, 0, 0);
   }
 }

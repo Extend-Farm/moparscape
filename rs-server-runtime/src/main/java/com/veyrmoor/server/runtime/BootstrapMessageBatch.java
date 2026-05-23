@@ -30,7 +30,7 @@ final class BootstrapMessageBatch {
         admission.regionKey(),
         characterSnapshot.worldPoint(),
         new BootstrapProfile(
-            characterSnapshot.profile().rights(),
+            characterSnapshot.profile().staffRole(),
             characterSnapshot.profile().member(),
             characterSnapshot.profile().runEnergy()
         ),

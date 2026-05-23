@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.veyrmoor.model.AccountId;
 import com.veyrmoor.model.CharacterId;
 import com.veyrmoor.model.MovementMode;
+import com.veyrmoor.model.StaffRole;
 import com.veyrmoor.model.WorldPoint;
 import com.veyrmoor.persistence.AccountRecord;
 import com.veyrmoor.persistence.AccountRepository;
@@ -54,7 +55,7 @@ class InProcessServerRuntimeTest {
         accountRecord.id(),
         "Akira",
         new WorldPoint(3200, 3201, 0),
-        new CharacterProfile((short) 2, true, 100, null, 0L, 0L),
+        new CharacterProfile(StaffRole.ADMIN, true, 100, null, 0L, 0L),
         new CharacterAppearance(List.of(-1, -1, -1, -1, -1, -1)),
         List.of(new CharacterSkill(0, 99, 14_000_000)),
         List.of(new CharacterItemSlot(ItemContainerKind.INVENTORY, 0, 555, 1000)),
@@ -106,7 +107,7 @@ class InProcessServerRuntimeTest {
         accountRecord.id(),
         "Akira",
         new WorldPoint(3200, 3201, 0),
-        new CharacterProfile((short) 2, true, 100, null, 0L, 0L),
+        new CharacterProfile(StaffRole.ADMIN, true, 100, null, 0L, 0L),
         new CharacterAppearance(List.of(-1, -1, -1, -1, -1, -1)),
         List.of(),
         List.of(),
@@ -144,7 +145,7 @@ class InProcessServerRuntimeTest {
         accountRecord.id(),
         "Akira",
         new WorldPoint(3200, 3201, 0),
-        new CharacterProfile((short) 2, true, 100, null, 0L, 0L),
+        new CharacterProfile(StaffRole.ADMIN, true, 100, null, 0L, 0L),
         new CharacterAppearance(List.of(-1, -1, -1, -1, -1, -1)),
         List.of(),
         List.of(),
@@ -186,7 +187,7 @@ class InProcessServerRuntimeTest {
         accountRecord.id(),
         "Akira",
         new WorldPoint(3200, 3201, 0),
-        new CharacterProfile((short) 2, true, 100, null, 0L, 0L),
+        new CharacterProfile(StaffRole.ADMIN, true, 100, null, 0L, 0L),
         new CharacterAppearance(List.of(-1, -1, -1, -1, -1, -1)),
         List.of(),
         List.of(),
@@ -221,7 +222,7 @@ class InProcessServerRuntimeTest {
         accountRecord.id(),
         "Akira",
         new WorldPoint(3200, 3201, 0),
-        new CharacterProfile((short) 2, true, 100, null, 0L, 0L),
+        new CharacterProfile(StaffRole.ADMIN, true, 100, null, 0L, 0L),
         new CharacterAppearance(List.of(-1, -1, -1, -1, -1, -1)),
         List.of(),
         List.of(),

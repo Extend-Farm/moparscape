@@ -8,6 +8,20 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import org.lwjgl.system.MemoryStack;
 
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_BACKSPACE;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_KP_ENTER;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT_SHIFT;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_WORLD_2;
+import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
+import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 import static org.lwjgl.glfw.GLFW.glfwGetCursorPos;
 import static org.lwjgl.glfw.GLFW.glfwSetCharCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
@@ -19,12 +33,17 @@ import static org.lwjgl.system.MemoryStack.stackPush;
 
 public final class DesktopInputRouter {
 
+  static final long GAMEPLAY_CHAT_REPEAT_INITIAL_DELAY_NANOS = 120_000_000L;
+  static final long GAMEPLAY_CHAT_REPEAT_INTERVAL_NANOS = 33_000_000L;
+
   private final long window;
   private final OpenGlTileRenderSystem renderSystem;
   private final DesktopClientState state;
   private final LoginInputPort loginInputHandler;
   private final GameplayInputHandler gameplayInputHandler;
   private final BooleanSupplier gameplayActiveSupplier;
+  private PendingGameplayCharacterKey pendingGameplayCharacterKey;
+  private ActiveGameplayCharacterRepeat activeGameplayCharacterRepeat;
 
   public DesktopInputRouter(
       long window,
@@ -94,15 +113,20 @@ public final class DesktopInputRouter {
       routeScroll(yOffset);
     });
     glfwSetKeyCallback(window, (windowHandle, key, scancode, action, mods) -> {
-      routeKey(windowHandle, key, action);
+      routeKey(windowHandle, key, scancode, action, mods);
     });
   }
 
   void routeCharacter(int codePoint) {
     if (isGameplayActive()) {
+      if (shouldSuppressGameplayCharacter(codePoint)) {
+        return;
+      }
       gameplayInputHandler.handleCharacter(codePoint);
+      startGameplayCharacterRepeat(codePoint, System.nanoTime());
       return;
     }
+    clearGameplayCharacterRepeatState();
     loginInputHandler.handleCharacter(codePoint);
   }
 
@@ -115,10 +139,16 @@ public final class DesktopInputRouter {
   }
 
   void routeKey(long windowHandle, int key, int action) {
+    routeKey(windowHandle, key, 0, action, 0);
+  }
+
+  void routeKey(long windowHandle, int key, int scancode, int action, int mods) {
     if (isGameplayActive()) {
+      trackGameplayCharacterRepeatKey(key, action);
       gameplayInputHandler.handleKey(windowHandle, key, action);
       return;
     }
+    clearGameplayCharacterRepeatState();
     gameplayInputHandler.clearCameraInputs();
     loginInputHandler.handleKey(windowHandle, key, action);
   }
@@ -130,8 +160,73 @@ public final class DesktopInputRouter {
     gameplayInputHandler.handleScroll(state.mouseX(), state.mouseY(), yOffset);
   }
 
+  public void advanceFrame(long nowNanos) {
+    if (!isGameplayActive()) {
+      clearGameplayCharacterRepeatState();
+      return;
+    }
+    if (activeGameplayCharacterRepeat == null || nowNanos < activeGameplayCharacterRepeat.nextRepeatAtNanos()) {
+      return;
+    }
+    gameplayInputHandler.handleCharacter(activeGameplayCharacterRepeat.codePoint());
+    activeGameplayCharacterRepeat =
+        activeGameplayCharacterRepeat.withNextRepeatAtNanos(nowNanos + GAMEPLAY_CHAT_REPEAT_INTERVAL_NANOS);
+  }
+
   private boolean isGameplayActive() {
     return gameplayActiveSupplier.getAsBoolean();
+  }
+
+  private void trackGameplayCharacterRepeatKey(int key, int action) {
+    if (action == GLFW_PRESS && isPrintableGameplayKey(key)) {
+      pendingGameplayCharacterKey = new PendingGameplayCharacterKey(key);
+      return;
+    }
+    if (action != GLFW_RELEASE) {
+      return;
+    }
+    if (pendingGameplayCharacterKey != null && pendingGameplayCharacterKey.key() == key) {
+      pendingGameplayCharacterKey = null;
+    }
+    if (activeGameplayCharacterRepeat != null && activeGameplayCharacterRepeat.key() == key) {
+      activeGameplayCharacterRepeat = null;
+    }
+  }
+
+  private void startGameplayCharacterRepeat(int codePoint, long nowNanos) {
+    if (pendingGameplayCharacterKey == null) {
+      return;
+    }
+    activeGameplayCharacterRepeat = new ActiveGameplayCharacterRepeat(
+        pendingGameplayCharacterKey.key(),
+        codePoint,
+        nowNanos + GAMEPLAY_CHAT_REPEAT_INITIAL_DELAY_NANOS
+    );
+    pendingGameplayCharacterKey = null;
+  }
+
+  private boolean shouldSuppressGameplayCharacter(int codePoint) {
+    return activeGameplayCharacterRepeat != null && activeGameplayCharacterRepeat.codePoint() == codePoint;
+  }
+
+  private void clearGameplayCharacterRepeatState() {
+    pendingGameplayCharacterKey = null;
+    activeGameplayCharacterRepeat = null;
+  }
+
+  private static boolean isPrintableGameplayKey(int key) {
+    return key >= GLFW_KEY_SPACE
+        && key <= GLFW_KEY_WORLD_2
+        && key != GLFW_KEY_ENTER
+        && key != GLFW_KEY_KP_ENTER
+        && key != GLFW_KEY_BACKSPACE
+        && key != GLFW_KEY_ESCAPE
+        && key != GLFW_KEY_LEFT
+        && key != GLFW_KEY_RIGHT
+        && key != GLFW_KEY_UP
+        && key != GLFW_KEY_DOWN
+        && key != GLFW_KEY_LEFT_SHIFT
+        && key != GLFW_KEY_RIGHT_SHIFT;
   }
 
   private static boolean isGameplayActive(GameplayClientSession gameplayClientSession) {
@@ -162,5 +257,15 @@ public final class DesktopInputRouter {
     void handleMouseButton(int button, int action, double mouseX, double mouseY);
 
     void handleKey(long windowHandle, int key, int action);
+  }
+
+  private record PendingGameplayCharacterKey(int key) {
+  }
+
+  private record ActiveGameplayCharacterRepeat(int key, int codePoint, long nextRepeatAtNanos) {
+
+    private ActiveGameplayCharacterRepeat withNextRepeatAtNanos(long nextRepeatAtNanos) {
+      return new ActiveGameplayCharacterRepeat(key, codePoint, nextRepeatAtNanos);
+    }
   }
 }

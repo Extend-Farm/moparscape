@@ -1,5 +1,7 @@
 package com.veyrmoor.client.desktop.gameplay;
 
+import com.veyrmoor.client.core.ClientChatMessage;
+import com.veyrmoor.client.core.ClientChatMessageKind;
 import com.veyrmoor.client.core.ClientViewModel;
 import com.veyrmoor.client.desktop.render.common.ImmediateModeRenderer2d;
 import com.veyrmoor.client.desktop.render.common.OpenGlTexture;
@@ -10,10 +12,14 @@ import com.veyrmoor.client.desktop.login.TitleScreenBitmapFont;
 import com.veyrmoor.client.desktop.login.TitleScreenFonts;
 import com.veyrmoor.client.desktop.world.WorldCameraState;
 import com.veyrmoor.client.desktop.world.WorldScene;
+import com.veyrmoor.client.desktop.world.WorldSceneRenderSubmission;
+import com.veyrmoor.client.desktop.world.WorldViewportScreenProjector;
 import com.veyrmoor.content.ItemDefinitionCatalog;
 import com.veyrmoor.model.WorldPoint;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.LongSupplier;
 
 import static org.lwjgl.opengl.GL11.glColor3f;
 
@@ -21,17 +27,25 @@ public final class GameplayChromeRenderer implements AutoCloseable {
 
   private static final float SCENE_ACTION_HINT_LEFT_PADDING = 0.0f;
   private static final float SCENE_ACTION_HINT_BASELINE_OFFSET = 11.0f;
+  private static final long OVERHEAD_CHAT_DURATION_NANOS = 3_000_000_000L;
+  private static final int OVERHEAD_CHAT_RGB = 0xffff00;
+  private static final float OVERHEAD_CHAT_BASELINE_OFFSET = 4.0f;
+  private static final float OVERHEAD_CHAT_HORIZONTAL_PADDING = 4.0f;
+  private static final String TEXT_ELLIPSIS = "...";
 
   private final ImmediateModeRenderer2d primitives;
   private final GameplayChromeTextures chromeTextures;
   private final GameplayMinimapRenderer minimapRenderer;
   private final GameplaySidebarRenderer sidebarRenderer;
   private final TitleScreenBitmapFont menuFont;
+  private final LongSupplier nanoClock;
   private final GameplayCursorMarker cursorMarker = new GameplayCursorMarker();
   private final Map<String, OpenGlTexture> menuTextTextures = new HashMap<>();
   private long renderFrameCounter;
   private GameplayContextMenu contextMenu;
   private SceneActionHint sceneActionHint;
+  private OverheadChatState overheadChatState;
+  private ClientChatMessage lastSeenLocalPublicChatMessage;
   private GameplayTab activeGameplayTab = GameplayTab.INVENTORY;
   private double pointerX = Double.NaN;
   private double pointerY = Double.NaN;
@@ -44,8 +58,29 @@ public final class GameplayChromeRenderer implements AutoCloseable {
       TitleScreenFonts titleScreenFonts,
       ImmediateModeRenderer2d primitives
   ) {
+    this(
+        gameplayFrameAssets,
+        itemDefinitionCatalog,
+        itemIconRenderer,
+        chatController,
+        titleScreenFonts,
+        primitives,
+        System::nanoTime
+    );
+  }
+
+  GameplayChromeRenderer(
+      GameplayFrameAssets gameplayFrameAssets,
+      ItemDefinitionCatalog itemDefinitionCatalog,
+      ItemIconRenderer itemIconRenderer,
+      GameplayChatController chatController,
+      TitleScreenFonts titleScreenFonts,
+      ImmediateModeRenderer2d primitives,
+      LongSupplier nanoClock
+  ) {
     this.primitives = primitives;
     this.menuFont = titleScreenFonts == null ? null : titleScreenFonts.bold();
+    this.nanoClock = nanoClock == null ? System::nanoTime : nanoClock;
     chromeTextures = new GameplayChromeTextures(gameplayFrameAssets);
     minimapRenderer = new GameplayMinimapRenderer(
         primitives,
@@ -133,6 +168,8 @@ public final class GameplayChromeRenderer implements AutoCloseable {
   public void clearTransientState() {
     contextMenu = null;
     sceneActionHint = null;
+    overheadChatState = null;
+    lastSeenLocalPublicChatMessage = null;
     sidebarRenderer.clearTransientState();
   }
 
@@ -157,9 +194,11 @@ public final class GameplayChromeRenderer implements AutoCloseable {
       ClientViewModel viewModel,
       WorldScene worldScene,
       OpenGlTexture worldMinimapTexture,
-      WorldCameraState cameraState
+      WorldSceneRenderSubmission worldSceneSubmission
   ) {
     renderFrameCounter++;
+    WorldCameraState cameraState = worldSceneSubmission == null ? null : worldSceneSubmission.cameraState();
+    updateOverheadChat(viewModel);
     // Chrome is a deliberate mix today:
     // - authentic cache-backed frame art when media assets are available
     // - a native scene-state minimap inside that frame
@@ -176,6 +215,7 @@ public final class GameplayChromeRenderer implements AutoCloseable {
     chromeTextures.drawActiveGameplayTabHighlight(primitives, activeGameplayTab);
     chromeTextures.drawSideIcons(primitives);
     minimapRenderer.drawMinimap(viewModel, worldScene, worldMinimapTexture, cameraState);
+    drawOverheadChat(worldSceneSubmission);
     sidebarRenderer.drawSidebar(viewModel, activeGameplayTab, pointerX, pointerY);
     sidebarRenderer.drawChatbox(viewModel);
     drawCursorMarker();
@@ -218,6 +258,25 @@ public final class GameplayChromeRenderer implements AutoCloseable {
 
   static float sceneActionHintBaselineY(ScreenRect worldViewport) {
     return worldViewport.top() + SCENE_ACTION_HINT_BASELINE_OFFSET;
+  }
+
+  static ClientChatMessage latestLocalPublicChatMessage(ClientViewModel viewModel) {
+    if (viewModel == null || viewModel.bootstrap() == null) {
+      return null;
+    }
+    String localDisplayName = viewModel.bootstrap().displayName();
+    if (localDisplayName == null || localDisplayName.isBlank()) {
+      return null;
+    }
+    List<ClientChatMessage> chatMessages = viewModel.chatMessages();
+    for (int index = chatMessages.size() - 1; index >= 0; index--) {
+      ClientChatMessage message = chatMessages.get(index);
+      if (message.kind() == ClientChatMessageKind.PUBLIC
+          && localDisplayName.equals(message.speakerDisplayName())) {
+        return message;
+      }
+    }
+    return null;
   }
 
   private void drawCursorMarker() {
@@ -299,6 +358,56 @@ public final class GameplayChromeRenderer implements AutoCloseable {
     );
   }
 
+  private void updateOverheadChat(ClientViewModel viewModel) {
+    long now = nanoClock.getAsLong();
+    ClientChatMessage latestLocalPublicChatMessage = latestLocalPublicChatMessage(viewModel);
+    if (latestLocalPublicChatMessage != null && latestLocalPublicChatMessage != lastSeenLocalPublicChatMessage) {
+      overheadChatState = new OverheadChatState(latestLocalPublicChatMessage, now + OVERHEAD_CHAT_DURATION_NANOS);
+      lastSeenLocalPublicChatMessage = latestLocalPublicChatMessage;
+    }
+    if (overheadChatState != null && now >= overheadChatState.expiresAtNanos()) {
+      overheadChatState = null;
+    }
+  }
+
+  private void drawOverheadChat(WorldSceneRenderSubmission worldSceneSubmission) {
+    if (overheadChatState == null || worldSceneSubmission == null || worldSceneSubmission.localPlayerOverheadAnchor() == null) {
+      return;
+    }
+    WorldSceneRenderSubmission.ActorOverheadAnchor overheadAnchor = worldSceneSubmission.localPlayerOverheadAnchor();
+    ScreenRect worldViewport = GameplayLayout.worldViewportInnerRect();
+    WorldViewportScreenProjector.ScreenProjection screenProjection = WorldViewportScreenProjector.project(
+        worldViewport,
+        worldSceneSubmission.cameraState(),
+        overheadAnchor.localX(),
+        overheadAnchor.worldHeight(),
+        overheadAnchor.localY()
+    );
+    if (screenProjection == null) {
+      return;
+    }
+    String overheadText = overheadChatState.sourceMessage().text();
+    if (overheadText == null || overheadText.isBlank()) {
+      return;
+    }
+    String fittedOverheadText = fitOverheadChatText(
+        overheadText,
+        worldViewport.width() - OVERHEAD_CHAT_HORIZONTAL_PADDING * 2.0f
+    );
+    if (fittedOverheadText.isBlank()) {
+      return;
+    }
+    int textWidth = measureMenuTextWidth(fittedOverheadText);
+    float minLeft = worldViewport.left() + OVERHEAD_CHAT_HORIZONTAL_PADDING;
+    float maxLeft = worldViewport.left() + worldViewport.width() - textWidth;
+    float drawLeft = Math.max(minLeft, Math.min(maxLeft, screenProjection.screenX() - textWidth * 0.5f));
+    float baselineY = Math.max(
+        worldViewport.top() + (menuFont == null ? 10.0f : menuFont.maxGlyphHeight()),
+        screenProjection.screenY() - OVERHEAD_CHAT_BASELINE_OFFSET
+    );
+    drawMenuText(fittedOverheadText, OVERHEAD_CHAT_RGB, true, drawLeft, baselineY);
+  }
+
   GameplayTab activeGameplayTab() {
     return activeGameplayTab;
   }
@@ -318,6 +427,55 @@ public final class GameplayChromeRenderer implements AutoCloseable {
       return menuFont.measureText(text);
     }
     return Math.round(primitives.measureTextWidth(text));
+  }
+
+  String fitOverheadChatText(String text, float maxWidth) {
+    if (menuFont != null) {
+      return fitOverheadChatText(menuFont, text, maxWidth);
+    }
+    if (text == null || text.isBlank() || maxWidth <= 0.0f) {
+      return "";
+    }
+    if (measureMenuTextWidth(text) <= maxWidth) {
+      return text;
+    }
+    int ellipsisWidth = measureMenuTextWidth(TEXT_ELLIPSIS);
+    if (ellipsisWidth > maxWidth) {
+      return "";
+    }
+    String bestFit = TEXT_ELLIPSIS;
+    for (int endIndex = 1; endIndex <= text.length(); endIndex++) {
+      String candidate = text.substring(0, endIndex) + TEXT_ELLIPSIS;
+      if (measureMenuTextWidth(candidate) <= maxWidth) {
+        bestFit = candidate;
+        continue;
+      }
+      break;
+    }
+    return bestFit;
+  }
+
+  static String fitOverheadChatText(TitleScreenBitmapFont font, String text, float maxWidth) {
+    if (font == null || text == null || text.isBlank() || maxWidth <= 0.0f) {
+      return "";
+    }
+    if (font.measureText(text) <= maxWidth) {
+      return text;
+    }
+    int ellipsisWidth = font.measureText(TEXT_ELLIPSIS);
+    if (ellipsisWidth > maxWidth) {
+      return "";
+    }
+    String bestFit = TEXT_ELLIPSIS;
+    for (int endIndex = 1; endIndex <= text.length(); endIndex++) {
+      String candidate = text.substring(0, endIndex) + TEXT_ELLIPSIS;
+      if (font.measureText(candidate) <= maxWidth) {
+        bestFit = candidate;
+        continue;
+      }
+      break;
+    }
+    return bestFit;
   }
 
   private void drawMenuText(String text, int rgb, boolean shadow, float left, float baselineY) {
@@ -416,5 +574,8 @@ public final class GameplayChromeRenderer implements AutoCloseable {
   }
 
   private record SceneActionHint(String primaryText, int optionCount) {
+  }
+
+  private record OverheadChatState(ClientChatMessage sourceMessage, long expiresAtNanos) {
   }
 }

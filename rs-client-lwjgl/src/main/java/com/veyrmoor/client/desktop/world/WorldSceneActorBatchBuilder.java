@@ -20,13 +20,15 @@ import java.util.List;
 
 final class WorldSceneActorBatchBuilder {
 
+  private static final float OVERHEAD_TEXT_WORLD_PADDING = 0.0f;
+
   private final CharacterModelAssembler characterModelAssembler;
 
   WorldSceneActorBatchBuilder(CharacterModelAssembler characterModelAssembler) {
     this.characterModelAssembler = characterModelAssembler;
   }
 
-  void addBatches(
+  WorldSceneRenderSubmission.ActorOverheadAnchor addBatches(
       SceneRenderQueueBuilder renderQueueBuilder,
       WorldScene worldScene,
       WorldSceneVisibilityWindow visibilityWindow,
@@ -39,12 +41,12 @@ final class WorldSceneActorBatchBuilder {
       ActorAnimationState actorAnimationState
   ) {
     if (actorLocalX < 0.0f || actorLocalY < 0.0f || actorLocalX >= worldScene.tileWidth() || actorLocalY >= worldScene.tileHeight()) {
-      return;
+      return null;
     }
     int actorTileX = clampTile((int) Math.floor(actorLocalX), worldScene.tileWidth());
     int actorTileY = clampTile((int) Math.floor(actorLocalY), worldScene.tileHeight());
     if (!visibilityWindow.containsTile(actorTileX, actorTileY)) {
-      return;
+      return null;
     }
     float baseHeight = sampleTerrainHeight(worldScene, actorLocalX, actorLocalY);
     if (WorldSceneOcclusionPlanner.isOccluded(
@@ -53,7 +55,7 @@ final class WorldSceneActorBatchBuilder {
         baseHeight + 1.1f,
         actorLocalY
     )) {
-      return;
+      return null;
     }
     if (characterModelAssembler != null) {
       WorldSceneObjectGeometry geometry = characterModelAssembler.assemble(appearance, equipment, actorAnimationState);
@@ -67,19 +69,22 @@ final class WorldSceneActorBatchBuilder {
         // buckets changes cross-face order and can bury worn items like the amulet behind torso
         // faces that submit later.
         actorBuilder.addGeometry(geometry, actorLocalX, baseHeight, actorLocalY, actorYawDegrees, null);
+        SceneTriangleMesh actorMesh = actorBuilder.buildDetached();
         renderQueueBuilder.add(
             SceneSubmissionKind.ACTOR,
             SceneRasterMode.GOURAUD,
-            sortActorMeshForSubmission(actorBuilder.buildDetached(), cameraState)
+            sortActorMeshForSubmission(actorMesh, cameraState)
         );
-        return;
+        return overheadAnchor(actorLocalX, actorLocalY, actorMesh);
       }
     }
+    SceneTriangleMesh fallbackMesh = buildFallbackActorMesh(actorLocalX, actorLocalY, baseHeight, appearance, equipment);
     renderQueueBuilder.add(
         SceneSubmissionKind.ACTOR,
         SceneRasterMode.GOURAUD,
-        sortActorMeshForSubmission(buildFallbackActorMesh(actorLocalX, actorLocalY, baseHeight, appearance, equipment), cameraState)
+        sortActorMeshForSubmission(fallbackMesh, cameraState)
     );
+    return overheadAnchor(actorLocalX, actorLocalY, fallbackMesh);
   }
 
   static float renderedLocalAxis(int rawTile, float positionOffset, int sceneSize) {
@@ -208,6 +213,29 @@ final class WorldSceneActorBatchBuilder {
       appendCuboid(builder, centerX + 0.17f, centerX + 0.23f, centerZ - 0.02f, centerZ + 0.04f, baseHeight + 0.62f, baseHeight + 1.52f, 0x9f8350);
     }
     return builder.buildDetached();
+  }
+
+  private WorldSceneRenderSubmission.ActorOverheadAnchor overheadAnchor(
+      float actorLocalX,
+      float actorLocalY,
+      SceneTriangleMesh actorMesh
+  ) {
+    if (actorMesh == null || actorMesh.vertexY().length == 0) {
+      return null;
+    }
+    return new WorldSceneRenderSubmission.ActorOverheadAnchor(
+        actorLocalX,
+        actorLocalY,
+        maxVertexY(actorMesh) + OVERHEAD_TEXT_WORLD_PADDING
+    );
+  }
+
+  private float maxVertexY(SceneTriangleMesh actorMesh) {
+    float maxVertexY = Float.NEGATIVE_INFINITY;
+    for (float vertexY : actorMesh.vertexY()) {
+      maxVertexY = Math.max(maxVertexY, vertexY);
+    }
+    return maxVertexY;
   }
 
   private void appendCuboid(

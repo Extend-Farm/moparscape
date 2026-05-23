@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.veyrmoor.model.AccountId;
 import com.veyrmoor.model.CharacterId;
+import com.veyrmoor.model.StaffRole;
 import com.veyrmoor.model.WorldPoint;
 import com.veyrmoor.persistence.AccountRecord;
 import com.veyrmoor.persistence.CharacterAppearance;
@@ -71,7 +72,7 @@ class PostgresPersistenceIntegrationTest {
         accountId,
         "Akira",
         new WorldPoint(3235, 3219, 0),
-        new CharacterProfile((short) 2, true, 87, 19483, 1_234L, 77L),
+        new CharacterProfile(StaffRole.ADMIN, true, 87, 19483, 1_234L, 77L),
         new CharacterAppearance(List.of(0, 1, 2, 3, 4, 5)),
         List.of(
             new CharacterSkill(0, 99, 13_034_431),

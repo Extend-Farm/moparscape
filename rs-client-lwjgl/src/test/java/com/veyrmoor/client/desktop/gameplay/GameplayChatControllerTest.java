@@ -35,7 +35,7 @@ class GameplayChatControllerTest {
   }
 
   @Test
-  void lowercasesDraftTextButNormalizesSubmittedSentences() {
+  void preservesDraftCaseButNormalizesSubmittedSentences() {
     GameplayChatController controller = new GameplayChatController();
 
     controller.activateTyping();
@@ -58,7 +58,7 @@ class GameplayChatControllerTest {
     controller.appendCodePoint('A');
     controller.appendCodePoint('L');
 
-    assertThat(controller.state().draftText()).isEqualTo("hi there. general");
+    assertThat(controller.state().draftText()).isEqualTo("Hi THERE. GENERAL");
     assertThat(controller.submitDraft()).isEqualTo("Hi there. General");
   }
 

@@ -3,6 +3,7 @@ package com.veyrmoor.server.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.veyrmoor.model.AccountId;
+import com.veyrmoor.model.StaffRole;
 import com.veyrmoor.persistence.ItemContainerKind;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -72,7 +73,7 @@ class CharacterFileRepositoryTest {
     AccountId accountId = repository.findByUsername("akira").orElseThrow().id();
     var snapshot = repository.loadByAccountId(accountId).orElseThrow();
 
-    assertThat(snapshot.profile().rights()).isEqualTo((short) 2);
+    assertThat(snapshot.profile().staffRole()).isEqualTo(StaffRole.ADMIN);
     assertThat(snapshot.profile().member()).isTrue();
     assertThat(snapshot.skills()).hasSize(2);
     assertThat(snapshot.inventorySlots()).singleElement()

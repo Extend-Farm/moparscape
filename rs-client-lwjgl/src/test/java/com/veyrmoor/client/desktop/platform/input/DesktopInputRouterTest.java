@@ -1,10 +1,12 @@
 package com.veyrmoor.client.desktop.platform.input;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_TAB;
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
+import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 
 import com.veyrmoor.client.desktop.app.DesktopClientState;
 import com.veyrmoor.client.desktop.gameplay.GameplayChatController;
@@ -140,6 +142,49 @@ class DesktopInputRouterTest {
 
     assertThat(chatController.state().draftText()).isEqualTo("h");
     assertThat(loginInputPort.characterCalls).isZero();
+  }
+
+  @Test
+  void repeatsHeldGameplayCharactersOnTheFrameClock() {
+    AtomicBoolean gameplayActive = new AtomicBoolean(true);
+    GameplayChatController chatController = new GameplayChatController();
+    DesktopInputRouter inputRouter = new DesktopInputRouter(
+        0L,
+        null,
+        new DesktopClientState("status"),
+        new TestLoginInputPort(),
+        new GameplayInputHandler(
+            (mouseX, mouseY, button) -> GameplayClickResult.handledClick(),
+            new TestGameplayCameraInputPort(),
+            (deltaX, deltaY, movementMode) -> {
+            },
+            text -> {
+            },
+            chatController,
+            windowHandle -> {
+            },
+            () -> {
+            }
+        ),
+        gameplayActive::get
+    );
+
+    inputRouter.routeKey(0L, GLFW_KEY_A, 0, GLFW_PRESS, 0);
+    inputRouter.routeCharacter('a');
+
+    long firstRepeatAt = System.nanoTime()
+        + DesktopInputRouter.GAMEPLAY_CHAT_REPEAT_INITIAL_DELAY_NANOS
+        + DesktopInputRouter.GAMEPLAY_CHAT_REPEAT_INTERVAL_NANOS;
+    inputRouter.advanceFrame(firstRepeatAt);
+    inputRouter.routeCharacter('a');
+    inputRouter.advanceFrame(firstRepeatAt + DesktopInputRouter.GAMEPLAY_CHAT_REPEAT_INTERVAL_NANOS);
+
+    assertThat(chatController.state().draftText()).isEqualTo("aaa");
+
+    inputRouter.routeKey(0L, GLFW_KEY_A, 0, GLFW_RELEASE, 0);
+    inputRouter.advanceFrame(firstRepeatAt + DesktopInputRouter.GAMEPLAY_CHAT_REPEAT_INTERVAL_NANOS * 4);
+
+    assertThat(chatController.state().draftText()).isEqualTo("aaa");
   }
 
   private static final class TestGameplayCameraInputPort implements GameplayInputHandler.GameplayCameraInputPort {

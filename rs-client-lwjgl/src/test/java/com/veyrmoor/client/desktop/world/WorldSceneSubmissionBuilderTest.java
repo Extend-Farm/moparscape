@@ -71,6 +71,9 @@ class WorldSceneSubmissionBuilderTest {
     assertThat(tileModelGouraudBatch.isEmpty()).isFalse();
     assertThat(tileModelTexturedBatch.isEmpty()).isFalse();
     assertThat(actorBatch.isEmpty()).isFalse();
+    assertThat(submission.localPlayerOverheadAnchor()).isNotNull();
+    assertThat(submission.localPlayerOverheadAnchor().localX()).isCloseTo(4.5f, offset(0.0001f));
+    assertThat(submission.localPlayerOverheadAnchor().localY()).isCloseTo(4.5f, offset(0.0001f));
     assertThat(tilePaintBatch.mesh().faceColorA()).hasSameSizeAs(tilePaintBatch.mesh().faceVertexA());
     assertThat(tilePaintBatch.mesh().faceTextureIds()).containsOnly(12);
     assertThat(tileModelTexturedBatch.mesh().faceTextureIds()).containsOnly(12);

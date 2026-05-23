@@ -2,6 +2,7 @@ package com.veyrmoor.server.runtime;
 
 import com.veyrmoor.model.AccountId;
 import com.veyrmoor.model.CharacterId;
+import com.veyrmoor.model.StaffRole;
 import com.veyrmoor.model.WorldPoint;
 import com.veyrmoor.persistence.AccountRecord;
 import com.veyrmoor.persistence.AccountRepository;
@@ -135,7 +136,7 @@ public final class CharacterFileRepository implements AccountRepository, Charact
           case "character-height" -> builder.plane = Integer.parseInt(value);
           case "character-posx" -> builder.worldX = Integer.parseInt(value);
           case "character-posy" -> builder.worldY = Integer.parseInt(value);
-          case "character-rights" -> builder.rights = Short.parseShort(value);
+          case "character-rights" -> builder.staffRole = StaffRole.fromId(Short.parseShort(value));
           case "character-ismember" -> builder.member = !"0".equals(value);
           case "character-lastlogin" -> builder.lastLoginDay = Integer.parseInt(value);
           case "character-energy" -> builder.runEnergy = Integer.parseInt(value);
@@ -255,7 +256,7 @@ public final class CharacterFileRepository implements AccountRepository, Charact
     private int worldX;
     private int worldY;
     private int plane;
-    private short rights;
+    private StaffRole staffRole = StaffRole.NONE;
     private boolean member;
     private int runEnergy = 100;
     private Integer lastLoginDay;
@@ -271,7 +272,7 @@ public final class CharacterFileRepository implements AccountRepository, Charact
           username,
           password,
           new WorldPoint(worldX, worldY, plane),
-          new CharacterProfile(rights, member, runEnergy, lastLoginDay, gameTimeCounter, gameCountCounter),
+          new CharacterProfile(staffRole, member, runEnergy, lastLoginDay, gameTimeCounter, gameCountCounter),
           new CharacterAppearance(lookValues),
           List.copyOf(skills),
           List.copyOf(itemSlots),

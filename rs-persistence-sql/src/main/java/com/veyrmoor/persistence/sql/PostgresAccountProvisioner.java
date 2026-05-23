@@ -241,10 +241,10 @@ public final class PostgresAccountProvisioner {
         insert into character_profiles
           (character_id, rights, is_member, run_energy, last_login_day, game_time_counter, game_count_counter)
         values (?, ?, ?, ?, ?, ?, ?)
-        """
+      """
     )) {
       statement.setLong(1, characterId.value());
-      statement.setShort(2, profile.rights());
+      statement.setShort(2, (short) profile.staffRole().id());
       statement.setBoolean(3, profile.member());
       statement.setInt(4, profile.runEnergy());
       statement.setObject(5, profile.lastLoginDay());

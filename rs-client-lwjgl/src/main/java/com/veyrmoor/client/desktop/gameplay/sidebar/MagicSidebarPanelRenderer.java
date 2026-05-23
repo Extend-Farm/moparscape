@@ -1,5 +1,6 @@
 package com.veyrmoor.client.desktop.gameplay.sidebar;
 
+import com.veyrmoor.client.core.ClientViewModel;
 import com.veyrmoor.client.desktop.render.common.ScreenRect;
 
 final class MagicSidebarPanelRenderer {
@@ -13,11 +14,11 @@ final class MagicSidebarPanelRenderer {
     this.owner = owner;
   }
 
-  void drawMagicSidebar(ScreenRect sidebarRect) {
+  void drawMagicSidebar(ClientViewModel viewModel, ScreenRect sidebarRect) {
     if (owner.sidebarWidgetRenderer() != null) {
       int interfaceId = currentMagicInterfaceId();
       if (owner.sidebarWidgetRenderer().canRender(interfaceId)) {
-        owner.sidebarWidgetRenderer().draw(sidebarRect, interfaceId);
+        owner.sidebarWidgetRenderer().draw(sidebarRect, interfaceId, viewModel);
         return;
       }
     }

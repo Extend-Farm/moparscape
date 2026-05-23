@@ -2,6 +2,7 @@ package com.veyrmoor.persistence.sql;
 
 import com.veyrmoor.model.AccountId;
 import com.veyrmoor.model.CharacterId;
+import com.veyrmoor.model.StaffRole;
 import com.veyrmoor.model.WorldPoint;
 import com.veyrmoor.persistence.CharacterAppearance;
 import com.veyrmoor.persistence.CharacterItemSlot;
@@ -188,13 +189,13 @@ public class PostgresCharacterRepository implements CharacterRepository {
   }
 
   private CharacterProfile mapProfile(ResultSet resultSet) throws SQLException {
-    short rights = resultSet.getShort("rights");
+    short staffRoleId = resultSet.getShort("rights");
     boolean hasProfile = !resultSet.wasNull();
     if (!hasProfile) {
       return CharacterProfile.defaults();
     }
     return new CharacterProfile(
-        rights,
+        StaffRole.fromId(staffRoleId),
         resultSet.getBoolean("is_member"),
         resultSet.getInt("run_energy"),
         (Integer) resultSet.getObject("last_login_day"),
@@ -300,7 +301,7 @@ public class PostgresCharacterRepository implements CharacterRepository {
 
   private void saveProfile(CharacterSnapshot characterSnapshot, PreparedStatement statement) throws SQLException {
     statement.setLong(1, characterSnapshot.id().value());
-    statement.setShort(2, characterSnapshot.profile().rights());
+    statement.setShort(2, (short) characterSnapshot.profile().staffRole().id());
     statement.setBoolean(3, characterSnapshot.profile().member());
     statement.setInt(4, characterSnapshot.profile().runEnergy());
     if (characterSnapshot.profile().lastLoginDay() == null) {

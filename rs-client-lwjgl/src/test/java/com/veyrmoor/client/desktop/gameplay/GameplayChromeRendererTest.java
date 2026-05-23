@@ -3,8 +3,18 @@ package com.veyrmoor.client.desktop.gameplay;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
+import com.veyrmoor.client.core.ClientChatMessage;
+import com.veyrmoor.client.core.ClientViewModel;
+import com.veyrmoor.client.desktop.login.TitleScreenAssetLoader;
+import com.veyrmoor.client.desktop.login.TitleScreenFonts;
 import com.veyrmoor.client.desktop.render.common.ScreenRect;
+import com.veyrmoor.model.StaffRole;
 import com.veyrmoor.client.desktop.world.WorldCameraState;
+import com.veyrmoor.protocol.bootstrap.BootstrapAppearance;
+import com.veyrmoor.protocol.bootstrap.BootstrapProfile;
+import com.veyrmoor.protocol.bootstrap.CharacterBootstrapPayload;
+import java.nio.file.Path;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class GameplayChromeRendererTest {
@@ -61,6 +71,57 @@ class GameplayChromeRendererTest {
 
     assertThat(GameplayChromeRenderer.sceneActionHintLeft(worldViewport)).isEqualTo(worldViewport.left());
     assertThat(GameplayChromeRenderer.sceneActionHintBaselineY(worldViewport)).isEqualTo(worldViewport.top() + 11.0f);
+  }
+
+  @Test
+  void picksTheLatestLocalPublicChatLineForOverheadRendering() {
+    ClientViewModel viewModel = new ClientViewModel(
+        "In world",
+        true,
+        null,
+        -1,
+        1L,
+        2L,
+        null,
+        new CharacterBootstrapPayload(
+            1L,
+            2L,
+            "Akira",
+            null,
+            null,
+            new BootstrapProfile(StaffRole.NONE, false, 100),
+            new BootstrapAppearance(List.of()),
+            List.of(),
+            List.of(),
+            List.of()
+        ),
+        null,
+        List.of(
+            ClientChatMessage.system("Welcome."),
+            ClientChatMessage.publicChat("Other", "Hello"),
+            ClientChatMessage.publicChat("Akira", "First"),
+            ClientChatMessage.publicChat("Akira", "Newest")
+        )
+    );
+
+    assertThat(GameplayChromeRenderer.latestLocalPublicChatMessage(viewModel))
+        .extracting(ClientChatMessage::text)
+        .isEqualTo("Newest");
+  }
+
+  @Test
+  void constrainsOverheadChatTextToTheWorldViewportWidth() {
+    TitleScreenFonts fonts = TitleScreenAssetLoader.loadFromWorkingDirectory(Path.of(".")).fonts();
+    float maxWidth = GameplayLayout.worldViewportInnerRect().width() - 8.0f;
+
+    String constrained = GameplayChromeRenderer.fitOverheadChatText(
+        fonts.bold(),
+        "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        maxWidth
+    );
+
+    assertThat(fonts.bold().measureText(constrained)).isLessThanOrEqualTo(Math.round(maxWidth));
+    assertThat(constrained).endsWith("...");
   }
 
   private static double centerX(ScreenRect rect) {
