@@ -61,32 +61,32 @@ Use these legacy methods as the behavior target.
 
 Terrain:
 
-- `server/moparscape/.../MapRegion.method171(...)`
+- `moparscape-reference/server/moparscape/.../MapRegion.method171(...)`
   - floor color blending
   - terrain light and shadow values
   - underlay/overlay tile submission
   - `SceneTilePaint` vs `SceneTileModel` split
   - terrain occlusion bit generation
-- `server/moparscape/.../SceneGraph.method279(...)`
+- `moparscape-reference/server/moparscape/.../SceneGraph.method279(...)`
   - actual tile-paint/tile-model scene object construction
-- `server/moparscape/.../SceneTilePaint`
+- `moparscape-reference/server/moparscape/.../SceneTilePaint`
   - paint-triangle texture anchor behavior
-- `server/moparscape/.../SceneTileModel`
+- `moparscape-reference/server/moparscape/.../SceneTileModel`
   - shaped tile vertex, color, and texture-triangle contract
-- `server/moparscape/.../SceneGraph.method315(...)`
+- `moparscape-reference/server/moparscape/.../SceneGraph.method315(...)`
   - tile-paint render contract
-- `server/moparscape/.../SceneGraph.method316(...)`
+- `moparscape-reference/server/moparscape/.../SceneGraph.method316(...)`
   - tile-model render contract
 
 Minimap:
 
-- `server/moparscape/.../GameClientCore.method24(...)`
+- `moparscape-reference/server/moparscape/.../GameClientCore.method24(...)`
   - minimap base generation from scene state
   - mapscene discovery
   - mapfunction collection
-- `server/moparscape/.../GameClientCore.method50(...)`
+- `moparscape-reference/server/moparscape/.../GameClientCore.method50(...)`
   - wall, diagonal wall, and object edge marks
-- `server/moparscape/.../SceneGraph.method309(...)`
+- `moparscape-reference/server/moparscape/.../SceneGraph.method309(...)`
   - terrain contribution into minimap pixels
 
 ## Reverse-engineered legacy pipeline

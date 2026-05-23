@@ -4,7 +4,7 @@
 
 - Emulator listens on port `43594`.
 - The desktop client is wired for local testing against `127.0.0.1:43594`.
-- Emulator-side local bootstrap defaults live in `client/BootstrapConfig.java`.
+- Emulator-side local bootstrap defaults live in `moparscape-reference/client/BootstrapConfig.java`.
 
 ## Desktop client startup
 
@@ -27,12 +27,13 @@
 - `RemoteBootstrapConfigProvider.loadClientOverrides(...)` parses the optional client override feed for `Config1`, `Config2`, and `sidebar` entries.
 - Remote client overrides are optional compatibility behavior, not required for local startup.
 
-## Account storage
+## Legacy emulator account storage
 
-- Accounts are stored server-side as flat files in `client/characters/<username>.txt`.
-- Current behavior is legacy:
+- The legacy emulator still stores accounts in `moparscape-reference/client/characters/<username>.txt`.
+- That behavior is only for the legacy reference path:
   - passwords are stored in plaintext
   - login comparison lowercases passwords, so passwords are effectively case-insensitive
+- The native runtime does not use that storage path.
 
 ## When debugging login
 

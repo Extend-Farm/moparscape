@@ -30,5 +30,5 @@ dependencies {
 }
 
 application {
-  mainClass.set("io.github.ffakira.rsps.client.desktop.core.DesktopClientMain")
+  mainClass.set("com.veyrmoor.client.desktop.app.DesktopClientMain")
 }

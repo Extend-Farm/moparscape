@@ -2,11 +2,11 @@
 
 ## Modules
 
-- `client/` is the emulator/server module.
-- `server/moparscape/` is the desktop game client.
+- `moparscape-reference/client/` is the emulator/server module.
+- `moparscape-reference/server/moparscape/` is the desktop game client.
 - Gradle project names:
-  - `:emulator` -> `client/`
-  - `:game-client` -> `server/moparscape/`
+  - `:emulator` -> `moparscape-reference/client/`
+  - `:game-client` -> `moparscape-reference/server/moparscape/`
 - Native rewrite modules:
   - `:rs-model` -> shared world/value types
   - `:rs-cache` -> cache store/bootstrap/archive access
@@ -22,40 +22,40 @@
 
 ## Physical source layout
 
-- Emulator sources are still flat under `client/` and remain in the default package.
+- Emulator sources are still flat under `moparscape-reference/client/` and remain in the default package.
 - Desktop client sources now live under:
-  - `server/moparscape/src/main/java/io/github/ffakira/moparscape/client`
-  - `server/moparscape/src/main/java/io/github/ffakira/moparscape/cache`
-  - `server/moparscape/src/main/java/io/github/ffakira/moparscape/net`
-  - `server/moparscape/src/main/java/io/github/ffakira/moparscape/sign`
+  - `moparscape-reference/server/moparscape/src/main/java/io/github/ffakira/moparscape/client`
+  - `moparscape-reference/server/moparscape/src/main/java/io/github/ffakira/moparscape/cache`
+  - `moparscape-reference/server/moparscape/src/main/java/io/github/ffakira/moparscape/net`
+  - `moparscape-reference/server/moparscape/src/main/java/io/github/ffakira/moparscape/sign`
 
 ## Main entry points
 
 - Emulator main class: `server`
 - Desktop client main class: `io.github.ffakira.moparscape.client.GameClient`
-- Native LWJGL client main class: `io.github.ffakira.rsps.client.desktop.core.DesktopClientMain`
+- Native LWJGL client main class: `io.github.ffakira.rsps.client.desktop.app.DesktopClientMain`
 - Native QUIC server main class: `io.github.ffakira.rsps.transport.quic.QuicServerMain`
 
 ## High-risk files
 
 - Emulator bootstrap and listener:
-  - `client/server.java`
-  - `client/PlayerHandler.java`
-  - `client/client.java`
+  - `moparscape-reference/client/server.java`
+  - `moparscape-reference/client/PlayerHandler.java`
+  - `moparscape-reference/client/client.java`
 - Desktop client bootstrap and windowing:
-  - `server/moparscape/src/main/java/io/github/ffakira/moparscape/client/GameClientCore.java`
-  - `server/moparscape/src/main/java/io/github/ffakira/moparscape/client/GameShell.java`
-  - `server/moparscape/src/main/java/io/github/ffakira/moparscape/client/GameFrame.java`
+  - `moparscape-reference/server/moparscape/src/main/java/io/github/ffakira/moparscape/client/GameClientCore.java`
+  - `moparscape-reference/server/moparscape/src/main/java/io/github/ffakira/moparscape/client/GameShell.java`
+  - `moparscape-reference/server/moparscape/src/main/java/io/github/ffakira/moparscape/client/GameFrame.java`
 - Native client bootstrap and rendering:
-  - `rs-client-lwjgl/src/main/java/io/github/ffakira/rsps/client/desktop/core/DesktopClientMain.java`
-  - `rs-client-lwjgl/src/main/java/io/github/ffakira/rsps/client/desktop/core/OpenGlTileRenderSystem.java`
-  - `rs-client-lwjgl/src/main/java/io/github/ffakira/rsps/client/desktop/core/CacheBackedWorldSceneLoader.java`
+  - `rs-client-lwjgl/src/main/java/io/github/ffakira/rsps/client/desktop/app/DesktopClientMain.java`
+  - `rs-client-lwjgl/src/main/java/io/github/ffakira/rsps/client/desktop/render/opengl/OpenGlTileRenderSystem.java`
+  - `rs-client-lwjgl/src/main/java/io/github/ffakira/rsps/client/desktop/world/CacheBackedWorldSceneLoader.java`
 
 ## Persistence today
 
-- Character saves live under `client/characters/`.
-- Ban lists live under `client/Bans/`.
-- Native runtime defaults to the character-file repository unless `RSPS_PERSISTENCE_MODE=postgres`.
+- Legacy emulator character saves live under `moparscape-reference/client/characters/`.
+- Ban lists live under `moparscape-reference/client/Bans/`.
+- Native runtime uses PostgreSQL repositories from `:rs-persistence-sql`.
 - The emulator still has legacy remote-config hooks, but local startup should not depend on them.
 
 ## Native client status
@@ -69,7 +69,7 @@
 
 ## Architecture boundary
 
-- `client/` and `server/moparscape/` are legacy reference modules.
+- `moparscape-reference/client/` and `moparscape-reference/server/moparscape/` are reference modules.
 - `rs-*` modules must not import or execute legacy runtime code.
 - Legacy code can still be read as a reference for migration planning, parity tests, and documentation.
 

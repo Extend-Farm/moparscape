@@ -2,19 +2,19 @@
 
 ## Legacy remote config
 
-- `client/server.java` still contains old HybridScape remote-config/version logic.
-- `client/client.java::sConfig(...)` also references the old remote config endpoint.
+- `moparscape-reference/client/server.java` still contains old HybridScape remote-config/version logic.
+- `moparscape-reference/client/client.java::sConfig(...)` also references the old remote config endpoint.
 - These paths must fail closed. Local startup and login should continue without them.
 
 ## Module naming is misleading
 
-- `client/` is the emulator.
-- `server/moparscape/` is the desktop client.
+- `moparscape-reference/client/` is the emulator.
+- `moparscape-reference/server/moparscape/` is the desktop client.
 
 ## Fresh build vs stale binary
 
 - Prefer Gradle run tasks or `build/libs/game-client.jar`.
-- Do not trust `server/moparscape/moparclient.jar` for modernized behavior.
+- Do not trust `moparscape-reference/server/moparscape/moparclient.jar` for modernized behavior.
 
 ## Native client shell vs world parity
 

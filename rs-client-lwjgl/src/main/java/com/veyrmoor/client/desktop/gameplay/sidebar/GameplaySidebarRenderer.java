@@ -1,0 +1,808 @@
+package com.veyrmoor.client.desktop.gameplay.sidebar;
+
+import static org.lwjgl.opengl.GL11.glColor3f;
+
+import com.veyrmoor.client.core.ClientChatMessage;
+import com.veyrmoor.client.core.ClientChatMessageKind;
+import com.veyrmoor.client.core.ClientViewModel;
+import com.veyrmoor.client.core.EquipmentLoadout;
+import com.veyrmoor.client.desktop.assets.image.ArgbImage;
+import com.veyrmoor.client.desktop.assets.sprite.ArchiveSpriteResolver;
+import com.veyrmoor.client.desktop.gameplay.GameplayChatController;
+import com.veyrmoor.client.desktop.gameplay.GameplayChatState;
+import com.veyrmoor.client.desktop.render.common.ImmediateModeRenderer2d;
+import com.veyrmoor.client.desktop.render.common.OpenGlTexture;
+import com.veyrmoor.client.desktop.render.common.ScreenRect;
+import com.veyrmoor.client.desktop.gameplay.GameplayClickResult;
+import com.veyrmoor.client.desktop.gameplay.GameplayFrameAssets;
+import com.veyrmoor.client.desktop.gameplay.GameplayLayout;
+import com.veyrmoor.client.desktop.gameplay.GameplayTab;
+import com.veyrmoor.client.desktop.itemicon.ItemIconRenderer;
+import com.veyrmoor.client.desktop.login.TitleScreenBitmapFont;
+import com.veyrmoor.client.desktop.login.TitleScreenFonts;
+import com.veyrmoor.content.ItemDefinition;
+import com.veyrmoor.content.ItemDefinitionCatalog;
+import com.veyrmoor.protocol.bootstrap.BootstrapItemSlot;
+import java.text.NumberFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+public final class GameplaySidebarRenderer implements AutoCloseable {
+
+  private static final float SIDEBAR_CONTENT_LEFT_INSET = 12.0f;
+  private static final float SIDEBAR_CONTENT_TOP_INSET = 22.0f;
+  private static final float CHAT_LINE_HEIGHT = 14.0f;
+  private static final float CHAT_HISTORY_BOTTOM_BASELINE_OFFSET = 70.0f;
+  private static final float CHAT_PROMPT_LEFT_OFFSET = 4.0f;
+  private static final int CHAT_HISTORY_LINES = 5;
+  private static final int CHAT_HISTORY_MAX_CHARS = 80;
+  private static final int CHAT_PROMPT_MAX_CHARS = 78;
+  private static final int CHAT_LABEL_RGB = 0x000000;
+  private static final int CHAT_PUBLIC_TEXT_RGB = 0x0000ff;
+  private static final int CHAT_PROMPT_TEXT_RGB = 0x0000ff;
+  private static final int CHAT_SYSTEM_RGB = 0x000000;
+  private static final int CHAT_SEPARATOR_RGB = 0x000000;
+  private static final float CHAT_SEPARATOR_TOP_OFFSET = 77.0f;
+  private static final int CHAT_SCROLLBAR_TRACK_RGB = 0x23201b;
+  private static final int CHAT_SCROLLBAR_THUMB_FILL_RGB = 0x4d4233;
+  private static final int CHAT_SCROLLBAR_HIGHLIGHT_RGB = 0x766654;
+  private static final int CHAT_SCROLLBAR_DARK_RGB = 0x332d25;
+  private static final int CHAT_SCROLLBAR_WIDTH = 16;
+  private static final int CHAT_SCROLLBAR_ARROW_HEIGHT = 16;
+  private static final float CHAT_CROWN_BASELINE_OFFSET_Y = 12.0f;
+  private static final float CHAT_CROWN_TEXT_GAP = 2.0f;
+  private static final NumberFormat LEGACY_NUMBER_FORMAT = NumberFormat.getIntegerInstance();
+  private static final ClientChatMessage DEFAULT_WELCOME_MESSAGE =
+      ClientChatMessage.system("Welcome to Veyrmoor! Have fun.");
+
+  private final ItemDefinitionCatalog itemDefinitionCatalog;
+  private final ItemIconRenderer itemIconRenderer;
+  private final GameplayChatController chatController;
+  private final TitleScreenBitmapFont inventoryAmountFont;
+  private final TitleScreenBitmapFont chatFont;
+  private final TitleScreenBitmapFont statsSmallFont;
+  private final TitleScreenBitmapFont statsLabelFont;
+  private final ImmediateModeRenderer2d primitives;
+  private final OpenGlTexture statsButtonLeftTexture;
+  private final OpenGlTexture statsButtonRightTexture;
+  private final OpenGlTexture chatScrollbarTopArrowTexture;
+  private final OpenGlTexture chatScrollbarBottomArrowTexture;
+  private final OpenGlTexture[] modIconTextures;
+  private final OpenGlTexture[] statIconTexturesBySkillId;
+  private final SidebarWidgetRenderer sidebarWidgetRenderer;
+  private final Map<Integer, OpenGlTexture> itemIconTextures = new HashMap<>();
+  private final Map<Integer, GameplayCombatSidebarModel> combatModelsByWeaponItemId = new HashMap<>();
+  private final Map<String, OpenGlTexture> inventoryAmountTextures = new HashMap<>();
+  private final Map<BitmapTextKey, OpenGlTexture> bitmapTextTextures = new HashMap<>();
+  private final InventoryEquipmentSidebarPanelRenderer inventoryEquipmentPanelRenderer;
+  private final StatsSidebarPanelRenderer statsPanelRenderer;
+  private final CombatSidebarPanelRenderer combatPanelRenderer;
+  private final PrayerSidebarPanelRenderer prayerPanelRenderer;
+  private final MagicSidebarPanelRenderer magicPanelRenderer;
+  private final LogoutSidebarPanelRenderer logoutPanelRenderer;
+  private final Map<BitmapGlyphKey, BitmapGlyphTexture> bitmapGlyphTextures = new HashMap<>();
+
+  public GameplaySidebarRenderer(
+      ItemDefinitionCatalog itemDefinitionCatalog,
+      ItemIconRenderer itemIconRenderer,
+      GameplayChatController chatController,
+      GameplayFrameAssets gameplayFrameAssets,
+      TitleScreenFonts titleScreenFonts,
+      ImmediateModeRenderer2d primitives
+  ) {
+    this.itemDefinitionCatalog = itemDefinitionCatalog;
+    this.itemIconRenderer = itemIconRenderer;
+    this.chatController = chatController;
+    this.inventoryAmountFont = titleScreenFonts == null ? null : titleScreenFonts.plainSmall();
+    this.chatFont = titleScreenFonts == null ? null : titleScreenFonts.plain();
+    this.statsSmallFont = titleScreenFonts == null ? null : titleScreenFonts.plainSmall();
+    this.statsLabelFont = titleScreenFonts == null ? null : titleScreenFonts.plain();
+    this.primitives = primitives;
+    GameplayStatsTabAssets statsTabAssets = gameplayFrameAssets == null ? null : gameplayFrameAssets.statsTabAssets();
+    this.statsButtonLeftTexture = statsTabAssets == null ? null : OpenGlTexture.fromArgbImage(statsTabAssets.buttonLeft());
+    this.statsButtonRightTexture = statsTabAssets == null ? null : OpenGlTexture.fromArgbImage(statsTabAssets.buttonRight());
+    ArchiveSpriteResolver mediaSpriteResolver = gameplayFrameAssets == null ? null : gameplayFrameAssets.mediaSpriteResolver();
+    this.chatScrollbarTopArrowTexture = spriteTexture(mediaSpriteResolver, "scrollbar", 0);
+    this.chatScrollbarBottomArrowTexture = spriteTexture(mediaSpriteResolver, "scrollbar", 1);
+    this.modIconTextures = new OpenGlTexture[]{
+        spriteTexture(mediaSpriteResolver, "mod_icons", 0),
+        spriteTexture(mediaSpriteResolver, "mod_icons", 1)
+    };
+    this.statIconTexturesBySkillId = buildStatIconTextures(statsTabAssets);
+    this.sidebarWidgetRenderer = gameplayFrameAssets == null ? null : new SidebarWidgetRenderer(
+        gameplayFrameAssets.interfaceComponents(),
+        gameplayFrameAssets.mediaSpriteResolver(),
+        itemIconRenderer,
+        titleScreenFonts,
+        primitives
+    );
+    this.inventoryEquipmentPanelRenderer = new InventoryEquipmentSidebarPanelRenderer(this);
+    this.statsPanelRenderer = new StatsSidebarPanelRenderer(this);
+    this.combatPanelRenderer = new CombatSidebarPanelRenderer(this);
+    this.prayerPanelRenderer = new PrayerSidebarPanelRenderer(this);
+    this.magicPanelRenderer = new MagicSidebarPanelRenderer(this);
+    this.logoutPanelRenderer = new LogoutSidebarPanelRenderer(this);
+  }
+
+  public GameplayClickResult handleSidebarClick(GameplayTab activeGameplayTab, double x, double y) {
+    ScreenRect sidebarRect = GameplayLayout.sidebarPanelRect();
+    return switch (activeGameplayTab) {
+      case STATS -> statsPanelRenderer.handleSidebarClick(sidebarRect, x, y)
+          ? GameplayClickResult.handledClick()
+          : GameplayClickResult.ignored();
+      case MAGIC -> magicPanelRenderer.handleSidebarClick(sidebarRect, x, y)
+          ? GameplayClickResult.handledClick()
+          : GameplayClickResult.ignored();
+      case LOGOUT -> logoutPanelRenderer.handleSidebarClick(sidebarRect, x, y);
+      default -> GameplayClickResult.ignored();
+    };
+  }
+
+  public GameplayClickResult handleChatboxClick(double x, double y) {
+    if (!GameplayLayout.chatboxPanelRect().contains(x, y)) {
+      return GameplayClickResult.ignored();
+    }
+    chatController.activateTyping();
+    return GameplayClickResult.handledClick();
+  }
+
+  public boolean handleSidebarScroll(GameplayTab activeGameplayTab, double x, double y, double yOffset) {
+    ScreenRect sidebarRect = GameplayLayout.sidebarPanelRect();
+    return switch (activeGameplayTab) {
+      case MAGIC -> magicPanelRenderer.handleSidebarScroll(sidebarRect, x, y, yOffset);
+      default -> false;
+    };
+  }
+
+  public boolean handleSidebarPointerMove(GameplayTab activeGameplayTab, double x, double y) {
+    ScreenRect sidebarRect = GameplayLayout.sidebarPanelRect();
+    return switch (activeGameplayTab) {
+      case MAGIC -> magicPanelRenderer.handleSidebarPointerMove(sidebarRect, x, y);
+      default -> false;
+    };
+  }
+
+  public void endSidebarPointerDrag() {
+    magicPanelRenderer.endSidebarPointerDrag();
+  }
+
+  public void clearTransientState() {
+    if (sidebarWidgetRenderer != null) {
+      sidebarWidgetRenderer.clearTransientState();
+    }
+  }
+
+  public void drawSidebar(ClientViewModel viewModel, GameplayTab activeGameplayTab, double pointerX, double pointerY) {
+    ScreenRect rect = GameplayLayout.sidebarPanelRect();
+    float left = rect.left() + SIDEBAR_CONTENT_LEFT_INSET;
+    float top = rect.top() + SIDEBAR_CONTENT_TOP_INSET;
+    if (activeGameplayTab != GameplayTab.INVENTORY
+        && activeGameplayTab != GameplayTab.STATS
+        && activeGameplayTab != GameplayTab.COMBAT
+        && activeGameplayTab != GameplayTab.EQUIPMENT
+        && activeGameplayTab != GameplayTab.PRAYER
+        && activeGameplayTab != GameplayTab.MAGIC
+        && activeGameplayTab != GameplayTab.LOGOUT) {
+      primitives.drawText(left, top, activeGameplayTab.label(), 0.92f, 0.86f, 0.46f);
+    }
+    switch (activeGameplayTab) {
+      case INVENTORY -> inventoryEquipmentPanelRenderer.drawInventorySidebar(viewModel, rect);
+      case EQUIPMENT -> inventoryEquipmentPanelRenderer.drawEquipmentSidebar(viewModel, left, top + 16.0f);
+      case STATS -> statsPanelRenderer.drawStatsSidebar(viewModel, rect, pointerX, pointerY);
+      case COMBAT -> combatPanelRenderer.drawCombatSidebar(viewModel, rect);
+      case QUESTS -> drawSidebarPlaceholder(left, top + 16.0f, "Quest journal not synced yet.", "Native widget rendering is next.");
+      case PRAYER -> prayerPanelRenderer.drawPrayerSidebar(rect, pointerX, pointerY);
+      case MAGIC -> magicPanelRenderer.drawMagicSidebar(rect);
+      case FRIENDS -> drawSidebarPlaceholder(left, top + 16.0f, "Friends list not synced yet.", "Social state will move into protocol snapshots.");
+      case IGNORES -> drawSidebarPlaceholder(left, top + 16.0f, "Ignore list not synced yet.", "Legacy file import already stores social links.");
+      case LOGOUT -> logoutPanelRenderer.drawLogoutSidebar(rect);
+      case SETTINGS -> drawSidebarPlaceholder(left, top + 16.0f, "Settings panel not implemented yet.", "Run energy and rights are in chat status.");
+      case EMOTES -> drawSidebarPlaceholder(left, top + 16.0f, "Emote book not decoded yet.", "Runtime action sequence packets are ready; emote UI is still pending.");
+      case MUSIC -> drawSidebarPlaceholder(left, top + 16.0f, "Music player not decoded yet.", "Audio is outside the current world slice.");
+    }
+  }
+
+  public void drawChatbox(ClientViewModel viewModel) {
+    ScreenRect chatboxRect = GameplayLayout.chatboxPanelRect();
+    ScreenRect historyRect = GameplayLayout.chatHistoryRect();
+    ScreenRect inputRect = GameplayLayout.chatInputRect();
+    drawChatHistory(viewModel, historyRect);
+    drawChatPromptSeparator(chatboxRect);
+    drawChatPrompt(viewModel, inputRect);
+    drawChatOptionsBar();
+  }
+
+  @Override
+  public void close() {
+    for (OpenGlTexture itemIconTexture : itemIconTextures.values()) {
+      closeTexture(itemIconTexture);
+    }
+    for (OpenGlTexture inventoryAmountTexture : inventoryAmountTextures.values()) {
+      closeTexture(inventoryAmountTexture);
+    }
+    for (OpenGlTexture bitmapTextTexture : bitmapTextTextures.values()) {
+      closeTexture(bitmapTextTexture);
+    }
+    for (BitmapGlyphTexture bitmapGlyphTexture : bitmapGlyphTextures.values()) {
+      closeTexture(bitmapGlyphTexture.texture());
+    }
+    closeTexture(statsButtonLeftTexture);
+    closeTexture(statsButtonRightTexture);
+    closeTexture(chatScrollbarTopArrowTexture);
+    closeTexture(chatScrollbarBottomArrowTexture);
+    for (OpenGlTexture modIconTexture : modIconTextures) {
+      closeTexture(modIconTexture);
+    }
+    for (OpenGlTexture iconTexture : statIconTexturesBySkillId) {
+      closeTexture(iconTexture);
+    }
+    if (sidebarWidgetRenderer != null) {
+      sidebarWidgetRenderer.close();
+    }
+  }
+
+  ImmediateModeRenderer2d primitives() {
+    return primitives;
+  }
+
+  TitleScreenBitmapFont inventoryAmountFont() {
+    return inventoryAmountFont;
+  }
+
+  boolean canRenderItemIcons() {
+    return itemIconRenderer != null;
+  }
+
+  TitleScreenBitmapFont statsSmallFont() {
+    return statsSmallFont;
+  }
+
+  TitleScreenBitmapFont statsLabelFont() {
+    return statsLabelFont;
+  }
+
+  OpenGlTexture statsButtonLeftTexture() {
+    return statsButtonLeftTexture;
+  }
+
+  OpenGlTexture statsButtonRightTexture() {
+    return statsButtonRightTexture;
+  }
+
+  OpenGlTexture statIconTexture(int skillId) {
+    if (skillId < 0 || skillId >= statIconTexturesBySkillId.length) {
+      return null;
+    }
+    return statIconTexturesBySkillId[skillId];
+  }
+
+  SidebarWidgetRenderer sidebarWidgetRenderer() {
+    return sidebarWidgetRenderer;
+  }
+
+  boolean canDrawLegacyStatsTab() {
+    return statsButtonLeftTexture != null
+        && statsButtonRightTexture != null
+        && statsSmallFont != null
+        && statsLabelFont != null;
+  }
+
+  String resolveItemName(int itemId) {
+    if (itemDefinitionCatalog == null) {
+      return "item-" + itemId;
+    }
+    return itemDefinitionCatalog.find(itemId)
+        .map(ItemDefinition::name)
+        .orElse("item-" + itemId);
+  }
+
+  String formatQuantity(int quantity) {
+    if (quantity >= InventoryEquipmentSidebarPanelRenderer.MILLION_STACK_THRESHOLD) {
+      return (quantity / InventoryEquipmentSidebarPanelRenderer.MILLION_STACK_DIVISOR) + "M";
+    }
+    if (quantity >= InventoryEquipmentSidebarPanelRenderer.THOUSAND_STACK_THRESHOLD) {
+      return (quantity / InventoryEquipmentSidebarPanelRenderer.THOUSAND_STACK_DIVISOR) + "K";
+    }
+    return Integer.toString(quantity);
+  }
+
+  OpenGlTexture itemIconTexture(int itemId, int quantity) {
+    if (itemIconRenderer == null) {
+      return null;
+    }
+    int iconKey = itemIconRenderer.iconKey(itemId, quantity);
+    if (iconKey < 0) {
+      return null;
+    }
+    if (itemIconTextures.containsKey(iconKey)) {
+      return itemIconTextures.get(iconKey);
+    }
+    ArgbImage iconImage = itemIconRenderer.render(itemId, quantity);
+    OpenGlTexture createdTexture = iconImage == null ? null : OpenGlTexture.fromArgbImage(iconImage);
+    itemIconTextures.put(iconKey, createdTexture);
+    return createdTexture;
+  }
+
+  void drawShadowedText(float left, float top, String text, float red, float green, float blue) {
+    drawShadowedText(left, top, text, red, green, blue, 1.0f);
+  }
+
+  void drawShadowedText(float left, float top, String text, float red, float green, float blue, float scale) {
+    float shadowOffset = scale < 0.8f ? 0.75f : 1.0f;
+    primitives.drawText(left + shadowOffset, top + shadowOffset, text, 0.0f, 0.0f, 0.0f, scale);
+    primitives.drawText(left, top, text, red, green, blue, scale);
+  }
+
+  void drawLegacyStatsText(TitleScreenBitmapFont font, float left, float top, String text, int rgb) {
+    OpenGlTexture textTexture = bitmapTextTexture(font, text, rgb, true);
+    drawTextureAt(textTexture, left, top);
+  }
+
+  void drawLegacyStatsTextCentered(
+      TitleScreenBitmapFont font,
+      float left,
+      float top,
+      int width,
+      String text,
+      int rgb
+  ) {
+    if (font == null || text == null) {
+      return;
+    }
+    float centeredLeft = left + width * 0.5f - font.measureText(text) * 0.5f;
+    drawLegacyStatsText(font, centeredLeft, top, text, rgb);
+  }
+
+  void drawTextureAt(OpenGlTexture texture, float left, float top) {
+    if (texture == null) {
+      return;
+    }
+    primitives.drawTexturedQuad(texture, new ScreenRect(left, top, texture.width(), texture.height()));
+  }
+
+  OpenGlTexture inventoryAmountTexture(String text) {
+    if (inventoryAmountFont == null || text == null || text.isEmpty()) {
+      return null;
+    }
+    return inventoryAmountTextures.computeIfAbsent(text, this::createInventoryAmountTexture);
+  }
+
+  String formatLegacyNumber(int value) {
+    synchronized (LEGACY_NUMBER_FORMAT) {
+      return LEGACY_NUMBER_FORMAT.format(value);
+    }
+  }
+
+  void fillRect(float left, float top, float width, float height, int rgb) {
+    glColor3f(rgbUnit(rgb, 16), rgbUnit(rgb, 8), rgbUnit(rgb, 0));
+    primitives.drawQuad(left, top, width, height);
+  }
+
+  void outlineRect(float left, float top, float width, float height, int rgb) {
+    glColor3f(rgbUnit(rgb, 16), rgbUnit(rgb, 8), rgbUnit(rgb, 0));
+    primitives.drawOutline(left, top, width, height);
+  }
+
+  void drawGlyphLine(float startX, float startY, float endX, float endY, int rgb) {
+    glColor3f(rgbUnit(rgb, 16), rgbUnit(rgb, 8), rgbUnit(rgb, 0));
+    primitives.drawLine(startX, startY, endX, endY);
+  }
+
+  GameplayCombatSidebarModel combatModelFor(ClientViewModel viewModel) {
+    int weaponItemId = weaponItemId(viewModel.equipment());
+    return combatModelsByWeaponItemId.computeIfAbsent(
+        weaponItemId,
+        ignored -> GameplayCombatSidebarModel.from(viewModel.equipment(), itemDefinitionCatalog)
+    );
+  }
+
+  static float rgbUnit(int rgb, int shift) {
+    return ((rgb >>> shift) & 0xff) / 255.0f;
+  }
+
+  private void drawSidebarPlaceholder(float left, float top, String... lines) {
+    for (int index = 0; index < lines.length; index++) {
+      primitives.drawText(left, top + index * 14.0f, lines[index], 0.84f, 0.88f, 0.94f);
+    }
+  }
+
+  private void drawChatHistory(ClientViewModel viewModel, ScreenRect historyRect) {
+    List<ClientChatMessage> renderedMessages = renderedChatMessages(viewModel);
+    int visibleCount = Math.min(renderedMessages.size(), CHAT_HISTORY_LINES);
+    int startIndex = renderedMessages.size() - visibleCount;
+    for (int index = 0; index < visibleCount; index++) {
+      ClientChatMessage message = renderedMessages.get(startIndex + index);
+      float baselineY = historyRect.top()
+          + CHAT_HISTORY_BOTTOM_BASELINE_OFFSET
+          - (visibleCount - 1 - index) * CHAT_LINE_HEIGHT;
+      drawChatMessageLine(viewModel, historyRect.left(), baselineY, message);
+    }
+    drawChatScrollbar(historyRect, Math.max(1, renderedMessages.size()));
+  }
+
+  private void drawChatPrompt(ClientViewModel viewModel, ScreenRect inputRect) {
+    GameplayChatState chatState = chatController.state();
+    String displayName = viewModel.bootstrap() == null ? "You" : viewModel.bootstrap().displayName();
+    float baselineY = GameplayLayout.chatPromptBaselineY();
+    drawBitmapTextAtBaseline(chatFont, inputRect.left() + CHAT_PROMPT_LEFT_OFFSET, baselineY, displayName + ":", CHAT_LABEL_RGB, false);
+    String promptText = truncateChatPrompt(chatState.draftText() + "*");
+    float promptLeft = inputRect.left()
+        + CHAT_PROMPT_LEFT_OFFSET
+        + measureBitmapText(chatFont, displayName + ": ")
+        + 2.0f;
+    drawBitmapTextGlyphsAtBaseline(
+        chatFont,
+        promptLeft,
+        baselineY,
+        promptText,
+        CHAT_PROMPT_TEXT_RGB,
+        false
+    );
+  }
+
+  private void drawChatPromptSeparator(ScreenRect chatboxRect) {
+    fillRect(
+        chatboxRect.left(),
+        chatboxRect.top() + CHAT_SEPARATOR_TOP_OFFSET,
+        chatboxRect.width(),
+        1.0f,
+        CHAT_SEPARATOR_RGB
+    );
+  }
+
+  private void drawChatOptionsBar() {
+    drawBitmapTextCentered(chatFont, 55.0f, 481.0f, "Public chat", 0xffffff, true);
+    drawBitmapTextCentered(chatFont, 55.0f, 494.0f, "On", 0x00ff00, true);
+    drawBitmapTextCentered(chatFont, 184.0f, 481.0f, "Private chat", 0xffffff, true);
+    drawBitmapTextCentered(chatFont, 184.0f, 494.0f, "On", 0x00ff00, true);
+    drawBitmapTextCentered(chatFont, 324.0f, 481.0f, "Trade/compete", 0xffffff, true);
+    drawBitmapTextCentered(chatFont, 324.0f, 494.0f, "On", 0x00ff00, true);
+    drawBitmapTextCentered(chatFont, 458.0f, 486.0f, "Report abuse", 0xffffff, true);
+  }
+
+  private OpenGlTexture createInventoryAmountTexture(String text) {
+    int width = Math.max(1, inventoryAmountFont.measureText(text) + 1);
+    int height = Math.max(1, inventoryAmountFont.maxGlyphHeight() + 1);
+    int[] pixels = new int[width * height];
+    inventoryAmountFont.drawText(
+        pixels,
+        width,
+        height,
+        text,
+        0,
+        inventoryAmountFont.maxGlyphHeight(),
+        InventoryEquipmentSidebarPanelRenderer.INVENTORY_STACK_TEXT_RGB,
+        true
+    );
+    return OpenGlTexture.fromArgbImage(new ArgbImage(width, height, pixels));
+  }
+
+  private OpenGlTexture[] buildStatIconTextures(GameplayStatsTabAssets statsTabAssets) {
+    OpenGlTexture[] textures = new OpenGlTexture[21];
+    if (statsTabAssets == null) {
+      return textures;
+    }
+    for (int skillId = 0; skillId < textures.length; skillId++) {
+      ArgbImage icon = statsTabAssets.iconForSkill(skillId);
+      if (icon != null) {
+        textures[skillId] = OpenGlTexture.fromArgbImage(icon);
+      }
+    }
+    return textures;
+  }
+
+  private OpenGlTexture bitmapTextTexture(
+      TitleScreenBitmapFont font,
+      String text,
+      int rgb,
+      boolean shadow
+  ) {
+    if (font == null || text == null || text.isEmpty()) {
+      return null;
+    }
+    return bitmapTextTextures.computeIfAbsent(
+        new BitmapTextKey(font, text, rgb, shadow),
+        this::createBitmapTextTexture
+    );
+  }
+
+  private OpenGlTexture createBitmapTextTexture(BitmapTextKey key) {
+    SidebarWidgetRenderer.TextTextureLayout layout =
+        SidebarWidgetRenderer.textTextureLayout(key.font(), key.text(), key.shadow());
+    int[] pixels = new int[layout.width() * layout.height()];
+    key.font().drawText(
+        pixels,
+        layout.width(),
+        layout.height(),
+        key.text(),
+        -layout.canvasLeft(),
+        layout.baselineY(),
+        key.rgb(),
+        key.shadow()
+    );
+    return OpenGlTexture.fromArgbImage(new ArgbImage(layout.width(), layout.height(), pixels));
+  }
+
+  private static void closeTexture(OpenGlTexture texture) {
+    if (texture != null) {
+      texture.close();
+    }
+  }
+
+  private static int weaponItemId(List<BootstrapItemSlot> equipment) {
+    for (BootstrapItemSlot itemSlot : equipment) {
+      if (itemSlot != null && itemSlot.slotIndex() == EquipmentLoadout.WEAPON_SLOT) {
+        return itemSlot.itemId();
+      }
+    }
+    return -1;
+  }
+
+  private void drawChatMessageLine(ClientViewModel viewModel, float left, float baselineY, ClientChatMessage message) {
+    if (message.kind() == ClientChatMessageKind.SYSTEM || message.speakerDisplayName() == null) {
+      drawBitmapTextAtBaseline(
+          chatFont,
+          left,
+          baselineY,
+          truncateChatHistory(message.text()),
+          CHAT_SYSTEM_RGB,
+          false
+      );
+      return;
+    }
+    float currentLeft = left;
+    OpenGlTexture crownTexture = speakerCrownTexture(viewModel, message);
+    if (crownTexture != null) {
+      drawTextureAt(crownTexture, currentLeft, baselineY - CHAT_CROWN_BASELINE_OFFSET_Y);
+      currentLeft += crownTexture.width() + CHAT_CROWN_TEXT_GAP;
+    }
+    String speaker = message.speakerDisplayName() + ":";
+    drawBitmapTextAtBaseline(chatFont, currentLeft, baselineY, speaker, CHAT_LABEL_RGB, false);
+    float messageLeft = currentLeft + measureBitmapText(chatFont, speaker + " ");
+    drawBitmapTextAtBaseline(
+        chatFont,
+        messageLeft,
+        baselineY,
+        truncateChatHistory(message.text()),
+        CHAT_PUBLIC_TEXT_RGB,
+        false
+    );
+  }
+
+  private void drawChatScrollbar(ScreenRect historyRect, int totalMessages) {
+    ScreenRect scrollbarRect = new ScreenRect(
+        historyRect.left() + historyRect.width(),
+        historyRect.top(),
+        CHAT_SCROLLBAR_WIDTH,
+        historyRect.height()
+    );
+    drawTextureAt(chatScrollbarTopArrowTexture, scrollbarRect.left(), scrollbarRect.top());
+    drawTextureAt(
+        chatScrollbarBottomArrowTexture,
+        scrollbarRect.left(),
+        scrollbarRect.top() + scrollbarRect.height() - CHAT_SCROLLBAR_ARROW_HEIGHT
+    );
+    float trackTop = scrollbarRect.top() + CHAT_SCROLLBAR_ARROW_HEIGHT;
+    float trackHeight = scrollbarRect.height() - CHAT_SCROLLBAR_ARROW_HEIGHT * 2.0f;
+    fillRect(scrollbarRect.left(), trackTop, scrollbarRect.width(), trackHeight, CHAT_SCROLLBAR_TRACK_RGB);
+    outlineRect(scrollbarRect.left(), trackTop, scrollbarRect.width(), trackHeight, CHAT_SCROLLBAR_DARK_RGB);
+    int viewportHeight = Math.round(historyRect.height());
+    int scrollContentHeight = Math.max(viewportHeight, totalMessages * Math.round(CHAT_LINE_HEIGHT));
+    int thumbHeight = SidebarWidgetRenderer.scrollbarThumbHeight(viewportHeight, scrollContentHeight);
+    int thumbOffset = SidebarWidgetRenderer.scrollbarThumbOffset(
+        Math.max(0, scrollContentHeight - viewportHeight),
+        viewportHeight,
+        scrollContentHeight,
+        thumbHeight
+    );
+    float thumbTop = scrollbarRect.top() + CHAT_SCROLLBAR_ARROW_HEIGHT + thumbOffset;
+    fillRect(scrollbarRect.left() + 1.0f, thumbTop, scrollbarRect.width() - 2.0f, thumbHeight, CHAT_SCROLLBAR_THUMB_FILL_RGB);
+    drawGlyphLine(scrollbarRect.left(), thumbTop, scrollbarRect.left() + scrollbarRect.width() - 1.0f, thumbTop, CHAT_SCROLLBAR_HIGHLIGHT_RGB);
+    drawGlyphLine(scrollbarRect.left(), thumbTop, scrollbarRect.left(), thumbTop + thumbHeight - 1.0f, CHAT_SCROLLBAR_HIGHLIGHT_RGB);
+    drawGlyphLine(
+        scrollbarRect.left() + scrollbarRect.width() - 1.0f,
+        thumbTop,
+        scrollbarRect.left() + scrollbarRect.width() - 1.0f,
+        thumbTop + thumbHeight - 1.0f,
+        CHAT_SCROLLBAR_DARK_RGB
+    );
+    drawGlyphLine(
+        scrollbarRect.left(),
+        thumbTop + thumbHeight - 1.0f,
+        scrollbarRect.left() + scrollbarRect.width() - 1.0f,
+        thumbTop + thumbHeight - 1.0f,
+        CHAT_SCROLLBAR_DARK_RGB
+    );
+  }
+
+  private void drawBitmapTextAtBaseline(
+      TitleScreenBitmapFont font,
+      float left,
+      float baselineY,
+      String text,
+      int rgb,
+      boolean shadow
+  ) {
+    if (font == null || text == null || text.isEmpty()) {
+      return;
+    }
+    SidebarWidgetRenderer.TextTextureLayout layout = SidebarWidgetRenderer.textTextureLayout(font, text, shadow);
+    OpenGlTexture texture = bitmapTextTexture(font, text, rgb, shadow);
+    if (texture == null) {
+      return;
+    }
+    drawTextureAt(
+        texture,
+        left + layout.canvasLeft(),
+        baselineY - font.maxGlyphHeight() + layout.canvasTop()
+    );
+  }
+
+  private void drawBitmapTextGlyphsAtBaseline(
+      TitleScreenBitmapFont font,
+      float left,
+      float baselineY,
+      String text,
+      int rgb,
+      boolean shadow
+  ) {
+    if (font == null || text == null || text.isEmpty()) {
+      return;
+    }
+    float currentLeft = left;
+    for (int index = 0; index < text.length(); index++) {
+      BitmapGlyphTexture glyphTexture = bitmapGlyphTexture(font, text.charAt(index), rgb, shadow);
+      if (glyphTexture == null) {
+        continue;
+      }
+      drawTextureAt(
+          glyphTexture.texture(),
+          currentLeft + glyphTexture.layout().canvasLeft(),
+          baselineY - font.maxGlyphHeight() + glyphTexture.layout().canvasTop()
+      );
+      currentLeft += glyphTexture.advance();
+    }
+  }
+
+  private void drawBitmapTextCentered(
+      TitleScreenBitmapFont font,
+      float centerX,
+      float baselineY,
+      String text,
+      int rgb,
+      boolean shadow
+  ) {
+    if (font == null || text == null || text.isEmpty()) {
+      return;
+    }
+    float left = centerX - measureBitmapText(font, text) * 0.5f;
+    drawBitmapTextAtBaseline(font, left, baselineY, text, rgb, shadow);
+  }
+
+  private static float measureBitmapText(TitleScreenBitmapFont font, String text) {
+    if (font == null || text == null) {
+      return 0.0f;
+    }
+    return font.measureText(text);
+  }
+
+  private static OpenGlTexture spriteTexture(
+      ArchiveSpriteResolver spriteResolver,
+      String entryName,
+      int frameIndex
+  ) {
+    if (spriteResolver == null) {
+      return null;
+    }
+    ArgbImage image = spriteResolver.resolve(entryName, frameIndex);
+    return image == null ? null : OpenGlTexture.fromArgbImage(image);
+  }
+
+  private List<ClientChatMessage> renderedChatMessages(ClientViewModel viewModel) {
+    if (!viewModel.chatMessages().isEmpty()) {
+      return viewModel.chatMessages();
+    }
+    return List.of(DEFAULT_WELCOME_MESSAGE);
+  }
+
+  private OpenGlTexture speakerCrownTexture(ClientViewModel viewModel, ClientChatMessage message) {
+    if (message == null || message.speakerDisplayName() == null || modIconTextures.length < 2) {
+      return null;
+    }
+    return switch (speakerCrownIndex(viewModel, message.speakerDisplayName())) {
+      case 0 -> modIconTextures[0];
+      case 1 -> modIconTextures[1];
+      default -> null;
+    };
+  }
+
+  private int speakerCrownIndex(ClientViewModel viewModel, String speakerDisplayName) {
+    if (speakerDisplayName == null || viewModel == null || viewModel.bootstrap() == null) {
+      return -1;
+    }
+    if (!speakerDisplayName.equals(viewModel.bootstrap().displayName())) {
+      return -1;
+    }
+    int rights = viewModel.bootstrap().profile() == null ? 0 : viewModel.bootstrap().profile().rights();
+    if (rights >= 2) {
+      return 1;
+    }
+    if (rights >= 1) {
+      return 0;
+    }
+    return -1;
+  }
+
+  private static String truncateChatHistory(String text) {
+    if (text == null || text.length() <= CHAT_HISTORY_MAX_CHARS) {
+      return Objects.toString(text, "");
+    }
+    return text.substring(0, CHAT_HISTORY_MAX_CHARS - 3) + "...";
+  }
+
+  private static String truncateChatPrompt(String text) {
+    if (text == null || text.length() <= CHAT_PROMPT_MAX_CHARS) {
+      return Objects.toString(text, "");
+    }
+    return "..." + text.substring(text.length() - (CHAT_PROMPT_MAX_CHARS - 3));
+  }
+
+  private BitmapGlyphTexture bitmapGlyphTexture(
+      TitleScreenBitmapFont font,
+      char glyph,
+      int rgb,
+      boolean shadow
+  ) {
+    return bitmapGlyphTextures.computeIfAbsent(
+        new BitmapGlyphKey(font, glyph, rgb, shadow),
+        this::createBitmapGlyphTexture
+    );
+  }
+
+  private BitmapGlyphTexture createBitmapGlyphTexture(BitmapGlyphKey key) {
+    String glyphText = String.valueOf(key.glyph());
+    SidebarWidgetRenderer.TextTextureLayout layout =
+        SidebarWidgetRenderer.textTextureLayout(key.font(), glyphText, key.shadow());
+    int[] pixels = new int[layout.width() * layout.height()];
+    key.font().drawText(
+        pixels,
+        layout.width(),
+        layout.height(),
+        glyphText,
+        -layout.canvasLeft(),
+        layout.baselineY(),
+        key.rgb(),
+        key.shadow()
+    );
+    return new BitmapGlyphTexture(
+        OpenGlTexture.fromArgbImage(new ArgbImage(layout.width(), layout.height(), pixels)),
+        layout,
+        key.font().measureGlyph(key.glyph())
+    );
+  }
+
+  private record BitmapTextKey(
+      TitleScreenBitmapFont font,
+      String text,
+      int rgb,
+      boolean shadow
+  ) {
+  }
+
+  private record BitmapGlyphKey(
+      TitleScreenBitmapFont font,
+      char glyph,
+      int rgb,
+      boolean shadow
+  ) {
+  }
+
+  private record BitmapGlyphTexture(
+      OpenGlTexture texture,
+      SidebarWidgetRenderer.TextTextureLayout layout,
+      int advance
+  ) {
+  }
+}

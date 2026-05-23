@@ -7,3 +7,4 @@ OriginalMopar.zip
 build/
 *.class
 .env
+.secrets/

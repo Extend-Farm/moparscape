@@ -6,7 +6,7 @@ The practical question is no longer "what does `GameClientCore` do?" but "which 
 
 ## Working rule
 
-- `server/moparscape/` and the docs in this directory are reference-only.
+- `moparscape-reference/server/moparscape/` and the docs in this directory are reference-only.
 - The live rewrite is the `rs-*` module set, especially `:rs-protocol`, `:rs-client-core`, `:rs-server-runtime`, and `:rs-client-lwjgl`.
 - Do not import or execute legacy runtime code from the native client.
 - Only extend the legacy docs when a native workstream hits behavior that is still undocumented.

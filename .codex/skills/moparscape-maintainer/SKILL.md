@@ -1,6 +1,6 @@
 ---
 name: moparscape-maintainer
-description: Use when working in the Moparscape repo on emulator or desktop client startup, login, sidebar tabs, local build or run flows, persistence decisions, Java 21 modernization, or refactors touching GameClientCore, GameShell, GameFrame, client/server.java, client/client.java, or PlayerHandler. Covers repo-specific architecture, remote-config traps, safe modernization workflow, and Java 21 best practices for this codebase.
+description: Use when working in the Moparscape repo on emulator or desktop client startup, login, sidebar tabs, local build or run flows, persistence decisions, Java 21 modernization, or refactors touching GameClientCore, GameShell, GameFrame, moparscape-reference/client/server.java, moparscape-reference/client/client.java, or PlayerHandler. Covers repo-specific architecture, remote-config traps, safe modernization workflow, and Java 21 best practices for this codebase.
 ---
 
 # Moparscape Maintainer
@@ -19,7 +19,7 @@ Use this skill for repo-specific work in `moparscape`.
 
 ## Working rules
 
-- Treat `client/` and `server/moparscape/` as separate codebases sharing a brittle protocol.
+- Treat `moparscape-reference/client/` and `moparscape-reference/server/moparscape/` as separate codebases sharing a brittle protocol.
 - Prefer small refactors with compile checks after each slice.
 - Keep documentation current in the same slice when a refactor changes structure, workflow, module boundaries, run commands, visible limitations, or ownership expectations.
 - Use Java 21 features when they improve clarity, but do not force broad mechanical rewrites through fragile decompiled code.

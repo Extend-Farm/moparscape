@@ -12,5 +12,5 @@ dependencies {
 }
 
 application {
-  mainClass.set("io.github.ffakira.rsps.server.runtime.ServerRuntimeMain")
+  mainClass.set("com.veyrmoor.server.runtime.ServerRuntimeMain")
 }

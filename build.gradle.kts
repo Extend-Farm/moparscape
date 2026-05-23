@@ -4,7 +4,7 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 
 allprojects {
-  group = "io.github.ffakira.rsps"
+  group = "com.veyrmoor"
   version = "0.1.0-SNAPSHOT"
 }
 

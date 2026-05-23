@@ -8,10 +8,10 @@ pluginManagement {
 rootProject.name = "moparscape"
 
 include(":emulator")
-project(":emulator").projectDir = file("client")
+project(":emulator").projectDir = file("moparscape-reference/client")
 
 include(":game-client")
-project(":game-client").projectDir = file("server/moparscape")
+project(":game-client").projectDir = file("moparscape-reference/server/moparscape")
 
 include(":rs-model")
 include(":rs-cache")

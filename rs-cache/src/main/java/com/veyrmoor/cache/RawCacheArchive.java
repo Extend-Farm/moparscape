@@ -1,0 +1,12 @@
+package com.veyrmoor.cache;
+
+public record RawCacheArchive(
+    int storeIndex,
+    CacheIndexEntry indexEntry,
+    byte[] bytes
+) {
+
+  public CacheArchiveCompressionHeader compressionHeader() {
+    return CacheArchiveCompressionHeader.parse(bytes);
+  }
+}

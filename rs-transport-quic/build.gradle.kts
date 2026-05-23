@@ -23,5 +23,5 @@ dependencies {
 }
 
 application {
-  mainClass.set("io.github.ffakira.rsps.transport.quic.QuicServerMain")
+  mainClass.set("com.veyrmoor.transport.quic.QuicServerMain")
 }

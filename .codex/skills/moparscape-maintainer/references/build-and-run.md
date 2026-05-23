@@ -26,10 +26,8 @@
 
 ## Native client modes
 
-- Default persistence for `:rs-client-lwjgl`:
-  - character files under `client/characters`
-- PostgreSQL persistence for `:rs-client-lwjgl`:
-  - `RSPS_PERSISTENCE_MODE=postgres ./gradlew :rs-client-lwjgl:run`
+- Persistence for `:rs-client-lwjgl`:
+  - PostgreSQL through `:rs-persistence-sql`
 - The native client does not require `:emulator:run`; it boots against the native in-process runtime.
 - To use the external QUIC server instead of the in-process runtime:
   - `RSPS_RUNTIME_MODE=quic ./gradlew :rs-client-lwjgl:run`
@@ -48,17 +46,33 @@
 
 - Start the repo-local database:
   - `docker compose up -d postgres`
+- Start the repo-local database plus the one-shot bootstrap container:
+  - `docker compose up --build postgres postgres-init`
 - Test connectivity:
   - `./gradlew :rs-persistence-sql:testDevDatabaseConnection`
 - Apply migrations:
   - `./gradlew :rs-persistence-sql:migrateDevDatabase`
+- Create a new native account:
+  - `./gradlew :rs-client-lwjgl:run`
+  - enter a new username and password in the login frame
+- Provision one account and starter character from environment variables:
+  - `RSPS_BOOTSTRAP_ACCOUNT_USERNAME=akira RSPS_BOOTSTRAP_ACCOUNT_PASSWORD='choose-a-real-development-password' RSPS_BOOTSTRAP_CHARACTER_NAME=Akira ./gradlew :rs-persistence-sql:provisionDevAccount`
+- Migrate and provision in one command:
+  - `RSPS_BOOTSTRAP_ACCOUNT_USERNAME=akira RSPS_BOOTSTRAP_ACCOUNT_PASSWORD='choose-a-real-development-password' RSPS_BOOTSTRAP_CHARACTER_NAME=Akira ./gradlew :rs-persistence-sql:migrateAndProvisionDevDatabase`
+- Wipe and rebuild the schema:
+  - `./gradlew :rs-persistence-sql:resetDevDatabase`
+- Wipe, rebuild, and reprovision:
+  - `RSPS_BOOTSTRAP_ACCOUNT_USERNAME=akira RSPS_BOOTSTRAP_ACCOUNT_PASSWORD='choose-a-real-development-password' RSPS_BOOTSTRAP_CHARACTER_NAME=Akira ./gradlew :rs-persistence-sql:resetAndProvisionDevDatabase`
+- The SQL module does not import `moparscape-reference/client/characters/*.txt`.
+- The default compose flow uses `RSPS_POSTGRES_PASSWORD` directly for local development.
+- The SQL tooling still accepts either direct password env vars or `*_FILE` secret-file env vars, but not both at once.
 
 ## Preferred binaries and run paths
 
 - Preferred desktop client jar:
-  - `server/moparscape/build/libs/game-client.jar`
+  - `moparscape-reference/server/moparscape/build/libs/game-client.jar`
 - Avoid the stale legacy jar:
-  - `server/moparscape/moparclient.jar`
+  - `moparscape-reference/server/moparscape/moparclient.jar`
 - Prefer Gradle for the native client:
   - `./gradlew :rs-client-lwjgl:run`
 - Prefer Gradle for the native QUIC server:

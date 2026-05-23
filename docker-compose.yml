@@ -19,5 +19,19 @@ services:
       timeout: 5s
       retries: 10
 
+  postgres-init:
+    build:
+      context: .
+      dockerfile: rs-persistence-sql/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      RSPS_DB_JDBC_URL: jdbc:postgresql://postgres:5432/${RSPS_POSTGRES_DB:-moparscape}
+      RSPS_DB_USERNAME: ${RSPS_POSTGRES_USER:-moparscape}
+      RSPS_DB_PASSWORD: ${RSPS_POSTGRES_PASSWORD:-moparscape}
+    command: ["migrate"]
+    restart: "no"
+
 volumes:
   moparscape-postgres-data:

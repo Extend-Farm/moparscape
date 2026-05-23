@@ -1,0 +1,11 @@
+[silabsoft 2] used command yell testing
+[silabsoft 2]yell hello
+[akira 2]pickup 995 111
+[akira 2]item 995 1
+[akira 2]pickup 995 10000
+[akira 2]item 995 1000
+[akira 2]item 92182891 1
+[akira 2]test
+[akira 2]yell
+[akira 2]pickup 9111 1
+[akira 2]cyan hello 

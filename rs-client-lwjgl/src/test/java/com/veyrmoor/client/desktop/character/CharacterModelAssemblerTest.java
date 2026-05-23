@@ -1,0 +1,1183 @@
+package com.veyrmoor.client.desktop.character;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
+
+import com.veyrmoor.cache.AnimationFrameCatalog;
+import com.veyrmoor.cache.CacheStoreReader;
+import com.veyrmoor.cache.RawModelRepository;
+import com.veyrmoor.client.desktop.world.object.WorldSceneObjectGeometry;
+import com.veyrmoor.client.desktop.world.raster.SceneRasterMode;
+import com.veyrmoor.content.AnimationSequenceCatalog;
+import com.veyrmoor.content.AnimationSequenceDefinition;
+import com.veyrmoor.content.ContentBootstrapService;
+import com.veyrmoor.content.ContentManifest;
+import com.veyrmoor.content.IdentityKitDefinitionCatalog;
+import com.veyrmoor.content.ItemDefinitionCatalog;
+import com.veyrmoor.content.TopLevelArchiveId;
+import com.veyrmoor.protocol.bootstrap.BootstrapAppearance;
+import com.veyrmoor.protocol.bootstrap.BootstrapItemSlot;
+import java.io.ByteArrayInputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.zip.GZIPInputStream;
+import org.junit.jupiter.api.Test;
+
+class CharacterModelAssemblerTest {
+
+  private static final int REFERENCE_WALK_SEQUENCE_ID = 819;
+  private static final int IDENTITY_KIT_APPEARANCE_BASE = 0x100;
+  private static final int ITEM_APPEARANCE_BASE = 0x200;
+  private static final int GOLD_AMULET_ITEM_ID = 1712;
+
+  @Test
+  void assemblesNativeCharacterGeometryFromCacheBackedIdentityKits() {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    CharacterModelAssembler assembler = new CharacterModelAssembler(
+        ItemDefinitionCatalog.load(manifest),
+        IdentityKitDefinitionCatalog.load(manifest),
+        new RawModelRepository(manifest.cacheStore())
+    );
+
+    WorldSceneObjectGeometry geometry = assembler.assemble(
+        new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1)),
+        List.of()
+    );
+
+    assertThat(geometry).isNotNull();
+    assertThat(geometry.vertexX()).isNotEmpty();
+    assertThat(geometry.vertexY()).hasSameSizeAs(geometry.vertexX());
+    assertThat(geometry.vertexZ()).hasSameSizeAs(geometry.vertexX());
+    assertThat(geometry.faceVertexA()).isNotEmpty();
+    assertThat(geometry.faceVertexB()).hasSameSizeAs(geometry.faceVertexA());
+    assertThat(geometry.faceVertexC()).hasSameSizeAs(geometry.faceVertexA());
+    assertThat(geometry.faceColorA()).hasSameSizeAs(geometry.faceVertexA());
+    assertThat(geometry.faceColorB()).hasSameSizeAs(geometry.faceVertexA());
+    assertThat(geometry.faceColorC()).hasSameSizeAs(geometry.faceVertexA());
+    assertThat(geometry.faceAlpha()).hasSameSizeAs(geometry.faceVertexA());
+    assertThat(geometry.faceRasterModes()).hasSameSizeAs(geometry.faceVertexA());
+    assertThat(geometry.faceTextureIds()).hasSameSizeAs(geometry.faceVertexA());
+    assertThat(geometry.textureVertexA()).hasSameSizeAs(geometry.faceVertexA());
+    assertThat(geometry.textureVertexB()).hasSameSizeAs(geometry.faceVertexA());
+    assertThat(geometry.textureVertexC()).hasSameSizeAs(geometry.faceVertexA());
+    assertThat(geometry.faceRasterModes()).contains(SceneRasterMode.GOURAUD);
+    for (int faceIndex = 0; faceIndex < geometry.faceVertexA().length; faceIndex++) {
+      assertThat(geometry.faceAlpha()[faceIndex]).isBetween(0, 255);
+      if (geometry.faceRasterModes()[faceIndex] == SceneRasterMode.TEXTURED) {
+        assertThat(geometry.faceTextureIds()[faceIndex]).isGreaterThanOrEqualTo(0);
+        assertThat(geometry.textureVertexA()[faceIndex]).isGreaterThanOrEqualTo(0);
+        assertThat(geometry.textureVertexB()[faceIndex]).isGreaterThanOrEqualTo(0);
+        assertThat(geometry.textureVertexC()[faceIndex]).isGreaterThanOrEqualTo(0);
+      } else {
+        assertThat(geometry.faceTextureIds()[faceIndex]).isEqualTo(-1);
+        assertThat(geometry.textureVertexA()[faceIndex]).isEqualTo(-1);
+        assertThat(geometry.textureVertexB()[faceIndex]).isEqualTo(-1);
+        assertThat(geometry.textureVertexC()[faceIndex]).isEqualTo(-1);
+      }
+    }
+  }
+
+  @Test
+  void cachesGeometryByAppearanceAndEquipmentKey() {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    CharacterModelAssembler assembler = new CharacterModelAssembler(
+        ItemDefinitionCatalog.load(manifest),
+        IdentityKitDefinitionCatalog.load(manifest),
+        new RawModelRepository(manifest.cacheStore())
+    );
+    BootstrapAppearance appearance = new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1));
+
+    WorldSceneObjectGeometry first = assembler.assemble(appearance, List.of());
+    WorldSceneObjectGeometry second = assembler.assemble(appearance, List.of());
+
+    assertThat(second).isSameAs(first);
+  }
+
+  @Test
+  void appliesAWalkPoseWhenAnimationStateIsActive() {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    CharacterModelAssembler assembler = new CharacterModelAssembler(
+        ItemDefinitionCatalog.load(manifest),
+        IdentityKitDefinitionCatalog.load(manifest),
+        new RawModelRepository(manifest.cacheStore())
+    );
+    BootstrapAppearance appearance = new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1));
+
+    WorldSceneObjectGeometry idleGeometry = assembler.assemble(appearance, List.of());
+    WorldSceneObjectGeometry walkingGeometry = assembler.assemble(
+        appearance,
+        List.of(),
+        new ActorAnimationState(1.0f, (float) (Math.PI / 2.0), 0.0f)
+    );
+
+    assertThat(walkingGeometry).isNotNull();
+    assertThat(walkingGeometry.faceVertexA()).containsExactly(idleGeometry.faceVertexA());
+    assertThat(walkingGeometry.faceVertexB()).containsExactly(idleGeometry.faceVertexB());
+    assertThat(walkingGeometry.faceVertexC()).containsExactly(idleGeometry.faceVertexC());
+
+    boolean anyAnimatedVertex = false;
+    for (int index = 0; index < walkingGeometry.vertexY().length; index++) {
+      if (Math.abs(walkingGeometry.vertexX()[index] - idleGeometry.vertexX()[index]) > 0.0001f
+          || Math.abs(walkingGeometry.vertexY()[index] - idleGeometry.vertexY()[index]) > 0.0001f
+          || Math.abs(walkingGeometry.vertexZ()[index] - idleGeometry.vertexZ()[index]) > 0.0001f) {
+        anyAnimatedVertex = true;
+        break;
+      }
+    }
+
+    assertThat(anyAnimatedVertex).isTrue();
+  }
+
+  @Test
+  void appliesDecodedReferenceFramesWhenAnActiveFrameIdIsPresent() {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    AnimationFrameCatalog animationFrames = AnimationFrameCatalog.load(manifest.cacheStore());
+    AnimationSequenceCatalog animationSequences = AnimationSequenceCatalog.load(manifest, animationFrames);
+    CharacterModelAssembler assembler = new CharacterModelAssembler(
+        ItemDefinitionCatalog.load(manifest),
+        IdentityKitDefinitionCatalog.load(manifest),
+        new RawModelRepository(manifest.cacheStore()),
+        animationSequences,
+        animationFrames
+    );
+    BootstrapAppearance appearance = new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1));
+    AnimationSequenceDefinition walkSequence = animationSequences.require(REFERENCE_WALK_SEQUENCE_ID);
+    int firstWalkFrameId = walkSequence.frameIdAt(0);
+
+    WorldSceneObjectGeometry idleGeometry = assembler.assemble(appearance, List.of());
+    WorldSceneObjectGeometry animatedGeometry = assembler.assemble(
+        appearance,
+        List.of(),
+        new ActorAnimationState(
+            1.0f,
+            0.0f,
+            0.0f,
+            0.0f,
+            ActorAnimationState.LocomotionMode.WALK_FORWARD,
+            REFERENCE_WALK_SEQUENCE_ID,
+            firstWalkFrameId,
+            0.0f,
+            0.0f
+        )
+    );
+
+    assertThat(firstWalkFrameId).isGreaterThanOrEqualTo(0);
+    assertThat(animatedGeometry).isNotNull();
+    assertThat(animatedGeometry.faceVertexA()).containsExactly(idleGeometry.faceVertexA());
+    assertThat(animatedGeometry.faceVertexB()).containsExactly(idleGeometry.faceVertexB());
+    assertThat(animatedGeometry.faceVertexC()).containsExactly(idleGeometry.faceVertexC());
+    assertThat(anyVertexMoved(idleGeometry, animatedGeometry)).isTrue();
+  }
+
+  @Test
+  void preservesReferenceFaceLightingAcrossAnimationFrames() {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    AnimationFrameCatalog animationFrames = AnimationFrameCatalog.load(manifest.cacheStore());
+    AnimationSequenceCatalog animationSequences = AnimationSequenceCatalog.load(manifest, animationFrames);
+    CharacterModelAssembler assembler = new CharacterModelAssembler(
+        ItemDefinitionCatalog.load(manifest),
+        IdentityKitDefinitionCatalog.load(manifest),
+        new RawModelRepository(manifest.cacheStore()),
+        animationSequences,
+        animationFrames
+    );
+    BootstrapAppearance appearance = new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1));
+    AnimationSequenceDefinition walkSequence = animationSequences.require(REFERENCE_WALK_SEQUENCE_ID);
+    int firstWalkFrameId = walkSequence.frameIdAt(0);
+
+    WorldSceneObjectGeometry idleGeometry = assembler.assemble(appearance, List.of());
+    WorldSceneObjectGeometry animatedGeometry = assembler.assemble(
+        appearance,
+        List.of(),
+        new ActorAnimationState(
+            1.0f,
+            0.0f,
+            0.0f,
+            0.0f,
+            ActorAnimationState.LocomotionMode.WALK_FORWARD,
+            REFERENCE_WALK_SEQUENCE_ID,
+            firstWalkFrameId,
+            0.0f,
+            0.0f
+        )
+    );
+
+    assertThat(animatedGeometry).isNotNull();
+    assertThat(animatedGeometry.faceColorA()).containsExactly(idleGeometry.faceColorA());
+    assertThat(animatedGeometry.faceColorB()).containsExactly(idleGeometry.faceColorB());
+    assertThat(animatedGeometry.faceColorC()).containsExactly(idleGeometry.faceColorC());
+  }
+
+  @Test
+  void blendsReferenceActionFramesWithMovementFramesUsingThePrimarySequenceInterleave() throws Exception {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    AnimationFrameCatalog animationFrames = AnimationFrameCatalog.load(manifest.cacheStore());
+    AnimationSequenceCatalog animationSequences = AnimationSequenceCatalog.load(manifest, animationFrames);
+    CharacterModelAssembler assembler = new CharacterModelAssembler(
+        ItemDefinitionCatalog.load(manifest),
+        IdentityKitDefinitionCatalog.load(manifest),
+        new RawModelRepository(manifest.cacheStore()),
+        animationSequences,
+        animationFrames
+    );
+    BootstrapAppearance appearance = new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1));
+    int movementFrameId = animationSequences.require(REFERENCE_WALK_SEQUENCE_ID).frameIdAt(0);
+
+    ActionBlendCandidate blendCandidate = findBlendCandidate(
+        animationSequences,
+        assembler,
+        appearance,
+        movementFrameId
+    );
+
+    assertThat(blendCandidate).isNotNull();
+    assertThat(blendCandidate.actionSequenceId()).isNotEqualTo(REFERENCE_WALK_SEQUENCE_ID);
+    assertThat(blendCandidate.actionFrameId()).isGreaterThanOrEqualTo(0);
+    assertThat(anyVertexMoved(blendCandidate.movementOnlyGeometry(), blendCandidate.blendedGeometry())).isTrue();
+    assertThat(anyVertexMoved(blendCandidate.actionOnlyGeometry(), blendCandidate.blendedGeometry())).isTrue();
+  }
+
+  @Test
+  void usesTheActiveMovementSequenceForEquipmentOverridesWhenNoActionFrameIsPresent() throws Exception {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    AnimationFrameCatalog animationFrames = AnimationFrameCatalog.load(manifest.cacheStore());
+    AnimationSequenceCatalog animationSequences = AnimationSequenceCatalog.load(manifest, animationFrames);
+    CharacterModelAssembler assembler = new CharacterModelAssembler(
+        ItemDefinitionCatalog.load(manifest),
+        IdentityKitDefinitionCatalog.load(manifest),
+        new RawModelRepository(manifest.cacheStore()),
+        animationSequences,
+        animationFrames
+    );
+    SequenceOverrideCandidate overrideCandidate = findSequenceOverrideCandidate(animationSequences);
+
+    assertThat(overrideCandidate).isNotNull();
+    CharacterModelSourceBuilder.SequenceEquipmentOverrides equipmentOverrides = resolveSequenceEquipmentOverrides(
+        assembler,
+        new ActorAnimationState(
+            0.0f,
+            0.0f,
+            0.0f,
+            0.0f,
+            ActorAnimationState.LocomotionMode.IDLE,
+            overrideCandidate.sequenceId(),
+            overrideCandidate.frameId(),
+            0.0f,
+            0.0f
+        )
+    );
+
+    assertThat(equipmentOverrides.mainhandAppearanceId()).isEqualTo(overrideCandidate.mainhandAppearanceId());
+    assertThat(equipmentOverrides.offhandAppearanceId()).isEqualTo(overrideCandidate.offhandAppearanceId());
+  }
+
+  @Test
+  void keepsTheAssembledActorOnAHumanSizedFootprint() {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    CharacterModelAssembler assembler = new CharacterModelAssembler(
+        ItemDefinitionCatalog.load(manifest),
+        IdentityKitDefinitionCatalog.load(manifest),
+        new RawModelRepository(manifest.cacheStore())
+    );
+
+    WorldSceneObjectGeometry geometry = assembler.assemble(
+        new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1)),
+        List.of()
+    );
+
+    assertThat(geometry).isNotNull();
+    float minX = Float.POSITIVE_INFINITY;
+    float minY = Float.POSITIVE_INFINITY;
+    float minZ = Float.POSITIVE_INFINITY;
+    float maxX = Float.NEGATIVE_INFINITY;
+    float maxY = Float.NEGATIVE_INFINITY;
+    float maxZ = Float.NEGATIVE_INFINITY;
+    for (int index = 0; index < geometry.vertexX().length; index++) {
+      minX = Math.min(minX, geometry.vertexX()[index]);
+      minY = Math.min(minY, geometry.vertexY()[index]);
+      minZ = Math.min(minZ, geometry.vertexZ()[index]);
+      maxX = Math.max(maxX, geometry.vertexX()[index]);
+      maxY = Math.max(maxY, geometry.vertexY()[index]);
+      maxZ = Math.max(maxZ, geometry.vertexZ()[index]);
+    }
+
+    assertThat(maxX - minX).isLessThanOrEqualTo(0.70f);
+    assertThat(maxZ - minZ).isLessThanOrEqualTo(0.70f);
+    assertThat(maxY - minY).isBetween(1.5f, 1.82f);
+    assertThat(minY).isBetween(-0.08f, 0.02f);
+  }
+
+  @Test
+  void preservesEquipmentSilhouetteInsteadOfRescalingEveryAppearanceToOneHeight() {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    CharacterModelAssembler assembler = new CharacterModelAssembler(
+        ItemDefinitionCatalog.load(manifest),
+        IdentityKitDefinitionCatalog.load(manifest),
+        new RawModelRepository(manifest.cacheStore())
+    );
+    BootstrapAppearance appearance = new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1));
+
+    WorldSceneObjectGeometry idleGeometry = assembler.assemble(appearance, List.of());
+    WorldSceneObjectGeometry partyhatGeometry = assembler.assemble(
+        appearance,
+        List.of(new BootstrapItemSlot(0, 1048, 1))
+    );
+
+    assertThat(partyhatGeometry).isNotNull();
+    assertThat(maxVertexY(partyhatGeometry) - minVertexY(partyhatGeometry))
+        .isGreaterThan(maxVertexY(idleGeometry) - minVertexY(idleGeometry));
+    assertThat(minVertexY(partyhatGeometry)).isBetween(-0.08f, 0.02f);
+  }
+
+  @Test
+  void assemblesMixedFaceRasterModesForTheRuntimeAmuletLoadout() {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    CharacterModelAssembler assembler = new CharacterModelAssembler(
+        ItemDefinitionCatalog.load(manifest),
+        IdentityKitDefinitionCatalog.load(manifest),
+        new RawModelRepository(manifest.cacheStore())
+    );
+
+    WorldSceneObjectGeometry geometry = assembler.assemble(
+        new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1)),
+        List.of(
+            new BootstrapItemSlot(0, 1048, 1),
+            new BootstrapItemSlot(2, 1712, 1),
+            new BootstrapItemSlot(3, 1265, 1),
+            new BootstrapItemSlot(4, 1115, 1),
+            new BootstrapItemSlot(7, 1067, 1),
+            new BootstrapItemSlot(9, 6110, 1),
+            new BootstrapItemSlot(10, 4121, 1)
+        )
+    );
+
+    assertThat(geometry).isNotNull();
+    assertThat(geometry.faceRasterModes()).contains(SceneRasterMode.FLAT, SceneRasterMode.GOURAUD);
+  }
+
+  @Test
+  void assemblesHighPriorityFacesForTheRuntimeAmuletLoadout() {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    CharacterModelAssembler assembler = new CharacterModelAssembler(
+        ItemDefinitionCatalog.load(manifest),
+        IdentityKitDefinitionCatalog.load(manifest),
+        new RawModelRepository(manifest.cacheStore())
+    );
+
+    WorldSceneObjectGeometry geometry = assembler.assemble(
+        new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1)),
+        List.of(
+            new BootstrapItemSlot(0, 1048, 1),
+            new BootstrapItemSlot(2, 1712, 1),
+            new BootstrapItemSlot(3, 1265, 1),
+            new BootstrapItemSlot(4, 1115, 1),
+            new BootstrapItemSlot(7, 1067, 1),
+            new BootstrapItemSlot(9, 6110, 1),
+            new BootstrapItemSlot(10, 4121, 1)
+        )
+    );
+
+    assertThat(geometry).isNotNull();
+    assertThat(geometry.facePriorities()).containsAnyOf(10, 11);
+  }
+
+  @Test
+  void matchesLegacyMergedLightingForTheAmuletSlotAgainstPlatebodyEquipment() throws Exception {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    ItemDefinitionCatalog itemDefinitions = ItemDefinitionCatalog.load(manifest);
+    IdentityKitDefinitionCatalog identityKitDefinitions = IdentityKitDefinitionCatalog.load(manifest);
+    RawModelRepository rawModelRepository = new RawModelRepository(manifest.cacheStore());
+    CharacterModelAssembler assembler = new CharacterModelAssembler(
+        itemDefinitions,
+        identityKitDefinitions,
+        rawModelRepository
+    );
+    BootstrapAppearance appearance = new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1));
+    List<BootstrapItemSlot> equipment = List.of(
+        new BootstrapItemSlot(2, 1712, 1),
+        new BootstrapItemSlot(4, 1115, 1),
+        new BootstrapItemSlot(7, 1067, 1),
+        new BootstrapItemSlot(9, 6110, 1),
+        new BootstrapItemSlot(10, 4121, 1)
+    );
+
+    WorldSceneObjectGeometry nativeGeometry = assembler.assemble(appearance, equipment);
+    LegacyLitModel legacyModel = buildLegacyPlayerModel(
+        manifest,
+        itemDefinitions,
+        identityKitDefinitions,
+        rawModelRepository,
+        appearance,
+        equipment
+    );
+    int amuletFaceCount = summedFaceCount(
+        rawModelRepository,
+        itemDefinitions.require(1712).bodyModelIds(false)
+    );
+
+    assertThat(nativeGeometry).isNotNull();
+    assertThat(legacyModel.faceColorA().length).isGreaterThanOrEqualTo(amuletFaceCount);
+    for (int faceIndex = 0; faceIndex < amuletFaceCount; faceIndex++) {
+      assertThat(nativeGeometry.faceColorA()[faceIndex]).isEqualTo(CharacterColorPalette.rgb(legacyModel.faceColorA()[faceIndex]));
+      assertThat(nativeGeometry.faceColorB()[faceIndex]).isEqualTo(CharacterColorPalette.rgb(legacyModel.faceColorB()[faceIndex]));
+      assertThat(nativeGeometry.faceColorC()[faceIndex]).isEqualTo(CharacterColorPalette.rgb(legacyModel.faceColorC()[faceIndex]));
+    }
+  }
+
+  @Test
+  void matchesLegacyGoldAmuletBodyModelBounds() throws Exception {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    ItemDefinitionCatalog itemDefinitions = ItemDefinitionCatalog.load(manifest);
+    IdentityKitDefinitionCatalog identityKitDefinitions = IdentityKitDefinitionCatalog.load(manifest);
+    RawModelRepository rawModelRepository = new RawModelRepository(manifest.cacheStore());
+
+    CharacterModelSourceBuilder sourceBuilder = new CharacterModelSourceBuilder(
+        itemDefinitions,
+        identityKitDefinitions,
+        rawModelRepository
+    );
+    int[] lookValues = sourceBuilder.normalizedLookValues(new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1)));
+    CharacterModelSourceBuilder.PreparedCharacterSource preparedCharacterSource = sourceBuilder.prepareSourceModel(
+        lookValues,
+        List.of(new BootstrapItemSlot(2, GOLD_AMULET_ITEM_ID, 1)),
+        CharacterModelSourceBuilder.SequenceEquipmentOverrides.none()
+    );
+
+    assertThat(preparedCharacterSource).isNotNull();
+    CharacterModelSourceBuilder.PreparedContribution amuletContribution = preparedCharacterSource.preparedContributions().get(0);
+    LegacyLitModel legacyAmuletModel = buildLegacyWornItemBodyModel(
+        manifest,
+        itemDefinitions,
+        identityKitDefinitions,
+        GOLD_AMULET_ITEM_ID,
+        false
+    );
+
+    VertexBounds nativeBounds = boundsOf(amuletContribution);
+    VertexBounds legacyBounds = boundsOf(legacyAmuletModel);
+
+    assertThat(nativeBounds.minX()).isCloseTo(legacyBounds.minX(), within(0.0001f));
+    assertThat(nativeBounds.maxX()).isCloseTo(legacyBounds.maxX(), within(0.0001f));
+    assertThat(nativeBounds.minY()).isCloseTo(legacyBounds.minY(), within(0.0001f));
+    assertThat(nativeBounds.maxY()).isCloseTo(legacyBounds.maxY(), within(0.0001f));
+    assertThat(nativeBounds.minZ()).isCloseTo(legacyBounds.minZ(), within(0.0001f));
+    assertThat(nativeBounds.maxZ()).isCloseTo(legacyBounds.maxZ(), within(0.0001f));
+  }
+
+  @Test
+  void matchesLegacyMergedVertexSetForTheAmuletAndPlatebodyLoadout() throws Exception {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    ItemDefinitionCatalog itemDefinitions = ItemDefinitionCatalog.load(manifest);
+    IdentityKitDefinitionCatalog identityKitDefinitions = IdentityKitDefinitionCatalog.load(manifest);
+    RawModelRepository rawModelRepository = new RawModelRepository(manifest.cacheStore());
+    CharacterModelAssembler assembler = new CharacterModelAssembler(
+        itemDefinitions,
+        identityKitDefinitions,
+        rawModelRepository
+    );
+    BootstrapAppearance appearance = new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1));
+    List<BootstrapItemSlot> equipment = List.of(
+        new BootstrapItemSlot(2, GOLD_AMULET_ITEM_ID, 1),
+        new BootstrapItemSlot(4, 1115, 1),
+        new BootstrapItemSlot(7, 1067, 1),
+        new BootstrapItemSlot(9, 6110, 1),
+        new BootstrapItemSlot(10, 4121, 1)
+    );
+
+    WorldSceneObjectGeometry nativeGeometry = assembler.assemble(appearance, equipment);
+    LegacyLitModel legacyModel = buildLegacyPlayerModel(
+        manifest,
+        itemDefinitions,
+        identityKitDefinitions,
+        rawModelRepository,
+        appearance,
+        equipment
+    );
+
+    assertThat(nativeGeometry).isNotNull();
+    assertThat(sortedVertexTriples(nativeGeometry)).containsExactlyElementsOf(sortedVertexTriples(legacyModel));
+  }
+
+  @Test
+  void matchesLegacyAnimatedMergedVertexSetForTheAmuletAndPlatebodyLoadout() throws Exception {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    ItemDefinitionCatalog itemDefinitions = ItemDefinitionCatalog.load(manifest);
+    IdentityKitDefinitionCatalog identityKitDefinitions = IdentityKitDefinitionCatalog.load(manifest);
+    RawModelRepository rawModelRepository = new RawModelRepository(manifest.cacheStore());
+    AnimationFrameCatalog animationFrames = AnimationFrameCatalog.load(manifest.cacheStore());
+    AnimationSequenceCatalog animationSequences = AnimationSequenceCatalog.load(manifest, animationFrames);
+    CharacterModelAssembler assembler = new CharacterModelAssembler(
+        itemDefinitions,
+        identityKitDefinitions,
+        rawModelRepository,
+        animationSequences,
+        animationFrames
+    );
+    BootstrapAppearance appearance = new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1));
+    List<BootstrapItemSlot> equipment = List.of(
+        new BootstrapItemSlot(2, GOLD_AMULET_ITEM_ID, 1),
+        new BootstrapItemSlot(4, 1115, 1),
+        new BootstrapItemSlot(7, 1067, 1),
+        new BootstrapItemSlot(9, 6110, 1),
+        new BootstrapItemSlot(10, 4121, 1)
+    );
+    AnimationSequenceDefinition walkSequence = animationSequences.require(REFERENCE_WALK_SEQUENCE_ID);
+    for (int movementFrameIndex = 0; movementFrameIndex < walkSequence.frameCount(); movementFrameIndex++) {
+      int movementFrameId = walkSequence.frameIdAt(movementFrameIndex);
+      WorldSceneObjectGeometry nativeGeometry = assembler.assemble(
+          appearance,
+          equipment,
+          new ActorAnimationState(
+              1.0f,
+              0.0f,
+              0.0f,
+              0.0f,
+              ActorAnimationState.LocomotionMode.WALK_FORWARD,
+              REFERENCE_WALK_SEQUENCE_ID,
+              movementFrameId,
+              0.0f,
+              0.0f
+          )
+      );
+      LegacyLitModel legacyModel = buildLegacyAnimatedPlayerModel(
+          manifest,
+          itemDefinitions,
+          identityKitDefinitions,
+          rawModelRepository,
+          animationFrames,
+          appearance,
+          equipment,
+          REFERENCE_WALK_SEQUENCE_ID,
+          movementFrameIndex
+      );
+
+      assertThat(nativeGeometry).isNotNull();
+      assertThat(sortedVertexTriples(nativeGeometry))
+          .as("walk frame %s", movementFrameIndex)
+          .containsExactlyElementsOf(sortedVertexTriples(legacyModel));
+    }
+  }
+
+  @Test
+  void matchesLegacyMergedModelBoundsForTheDefaultAppearance() throws Exception {
+    ContentManifest manifest = new ContentBootstrapService().bootstrapFromWorkingDirectory(Path.of("."));
+    ItemDefinitionCatalog itemDefinitions = ItemDefinitionCatalog.load(manifest);
+    IdentityKitDefinitionCatalog identityKitDefinitions = IdentityKitDefinitionCatalog.load(manifest);
+    RawModelRepository rawModelRepository = new RawModelRepository(manifest.cacheStore());
+    CharacterModelAssembler assembler = new CharacterModelAssembler(
+        itemDefinitions,
+        identityKitDefinitions,
+        rawModelRepository
+    );
+    BootstrapAppearance appearance = new BootstrapAppearance(List.of(-1, -1, -1, -1, -1, -1));
+
+    WorldSceneObjectGeometry nativeGeometry = assembler.assemble(appearance, List.of());
+    LegacyLitModel legacyModel = buildLegacyPlayerModel(
+        manifest,
+        itemDefinitions,
+        identityKitDefinitions,
+        rawModelRepository,
+        appearance,
+        List.of()
+    );
+
+    assertThat(nativeGeometry).isNotNull();
+    assertThat(nativeGeometry.vertexX()).hasSameSizeAs(legacyModel.vertexX());
+
+    VertexBounds nativeBounds = boundsOf(nativeGeometry);
+    VertexBounds legacyBounds = boundsOf(legacyModel);
+
+    assertThat(nativeBounds.minX()).isCloseTo(legacyBounds.minX(), within(0.0001f));
+    assertThat(nativeBounds.maxX()).isCloseTo(legacyBounds.maxX(), within(0.0001f));
+    assertThat(nativeBounds.minY()).isCloseTo(legacyBounds.minY(), within(0.0001f));
+    assertThat(nativeBounds.maxY()).isCloseTo(legacyBounds.maxY(), within(0.0001f));
+    assertThat(nativeBounds.minZ()).isCloseTo(legacyBounds.minZ(), within(0.0001f));
+    assertThat(nativeBounds.maxZ()).isCloseTo(legacyBounds.maxZ(), within(0.0001f));
+  }
+
+  private float minVertexY(WorldSceneObjectGeometry geometry) {
+    float minY = Float.POSITIVE_INFINITY;
+    for (float y : geometry.vertexY()) {
+      minY = Math.min(minY, y);
+    }
+    return minY;
+  }
+
+  private LegacyLitModel buildLegacyPlayerModel(
+      ContentManifest manifest,
+      ItemDefinitionCatalog itemDefinitions,
+      IdentityKitDefinitionCatalog identityKitDefinitions,
+      RawModelRepository rawModelRepository,
+      BootstrapAppearance appearance,
+      List<BootstrapItemSlot> equipment
+  ) throws Exception {
+    return buildLegacyPlayerModel(
+        manifest,
+        itemDefinitions,
+        identityKitDefinitions,
+        rawModelRepository,
+        appearance,
+        equipment,
+        -1,
+        -1
+    );
+  }
+
+  private LegacyLitModel buildLegacyAnimatedPlayerModel(
+      ContentManifest manifest,
+      ItemDefinitionCatalog itemDefinitions,
+      IdentityKitDefinitionCatalog identityKitDefinitions,
+      RawModelRepository rawModelRepository,
+      AnimationFrameCatalog animationFrames,
+      BootstrapAppearance appearance,
+      List<BootstrapItemSlot> equipment,
+      int movementSequenceId,
+      int movementFrameIndex
+  ) throws Exception {
+    return buildLegacyPlayerModel(
+        manifest,
+        itemDefinitions,
+        identityKitDefinitions,
+        rawModelRepository,
+        appearance,
+        equipment,
+        animationFrames,
+        movementSequenceId,
+        movementFrameIndex
+    );
+  }
+
+  private LegacyLitModel buildLegacyPlayerModel(
+      ContentManifest manifest,
+      ItemDefinitionCatalog itemDefinitions,
+      IdentityKitDefinitionCatalog identityKitDefinitions,
+      RawModelRepository rawModelRepository,
+      BootstrapAppearance appearance,
+      List<BootstrapItemSlot> equipment,
+      int movementSequenceId,
+      int movementFrameIndex
+  ) throws Exception {
+    return buildLegacyPlayerModel(
+        manifest,
+        itemDefinitions,
+        identityKitDefinitions,
+        rawModelRepository,
+        appearance,
+        equipment,
+        null,
+        movementSequenceId,
+        movementFrameIndex
+    );
+  }
+
+  private LegacyLitModel buildLegacyPlayerModel(
+      ContentManifest manifest,
+      ItemDefinitionCatalog itemDefinitions,
+      IdentityKitDefinitionCatalog identityKitDefinitions,
+      RawModelRepository rawModelRepository,
+      BootstrapAppearance appearance,
+      List<BootstrapItemSlot> equipment,
+      AnimationFrameCatalog animationFrames,
+      int movementSequenceId,
+      int movementFrameIndex
+  ) throws Exception {
+    CharacterModelSourceBuilder sourceBuilder = new CharacterModelSourceBuilder(
+        itemDefinitions,
+        identityKitDefinitions,
+        rawModelRepository
+    );
+    int[] lookValues = sourceBuilder.normalizedLookValues(appearance);
+    int[] appearanceEntries = sourceBuilder.resolveAppearanceEntries(
+        lookValues,
+        equipment,
+        CharacterModelSourceBuilder.SequenceEquipmentOverrides.none()
+    );
+    initializeLegacyPlayerContent(manifest, itemDefinitions, identityKitDefinitions, lookValues[0] == 1, appearanceEntries);
+
+    Class<?> playerClass = Class.forName("io.github.ffakira.moparscape.client.Player");
+    Class<?> actorClass = playerClass.getSuperclass();
+    clearLegacyPlayerModelCache(playerClass);
+    var playerConstructor = playerClass.getDeclaredConstructor();
+    playerConstructor.setAccessible(true);
+    Object legacyPlayer = playerConstructor.newInstance();
+    setField(playerClass, legacyPlayer, "aBoolean1710", true);
+    setField(playerClass, legacyPlayer, "anInt1702", lookValues[0]);
+    setField(playerClass, legacyPlayer, "anIntArray1700", new int[5]);
+    setField(playerClass, legacyPlayer, "anIntArray1717", toLegacyAppearanceValues(appearanceEntries));
+    if (movementSequenceId >= 0 && movementFrameIndex >= 0) {
+      initializeLegacyAnimationContent(manifest, animationFrames == null ? AnimationFrameCatalog.load(manifest.cacheStore()) : animationFrames);
+      setField(actorClass, legacyPlayer, "anInt1526", movementSequenceId);
+      setField(actorClass, legacyPlayer, "anInt1527", movementFrameIndex);
+      setField(actorClass, legacyPlayer, "anInt1529", 0);
+      setField(actorClass, legacyPlayer, "anInt1511", -1);
+      setField(actorClass, legacyPlayer, "anInt1517", -1);
+      setField(actorClass, legacyPlayer, "anInt1518", 0);
+    }
+
+    Method method452 = playerClass.getDeclaredMethod("method452", int.class);
+    method452.setAccessible(true);
+    Object legacyModel = method452.invoke(legacyPlayer, 0);
+    Class<?> modelClass = Class.forName("io.github.ffakira.moparscape.client.Model");
+    int legacyVertexCount = (int) getField(modelClass, legacyModel, "anInt1626");
+    int[] faceColorA = (int[]) getField(modelClass, legacyModel, "anIntArray1634");
+    int[] faceColorB = (int[]) getField(modelClass, legacyModel, "anIntArray1635");
+    int[] faceColorC = (int[]) getField(modelClass, legacyModel, "anIntArray1636");
+    return new LegacyLitModel(
+        worldCoordinates((int[]) getField(modelClass, legacyModel, "anIntArray1627"), legacyVertexCount, 1.0f),
+        worldCoordinates((int[]) getField(modelClass, legacyModel, "anIntArray1628"), legacyVertexCount, -1.0f),
+        worldCoordinates((int[]) getField(modelClass, legacyModel, "anIntArray1629"), legacyVertexCount, 1.0f),
+        faceColorA == null ? new int[0] : faceColorA.clone(),
+        faceColorB == null ? new int[0] : faceColorB.clone(),
+        faceColorC == null ? new int[0] : faceColorC.clone()
+    );
+  }
+
+  private LegacyLitModel buildLegacyWornItemBodyModel(
+      ContentManifest manifest,
+      ItemDefinitionCatalog itemDefinitions,
+      IdentityKitDefinitionCatalog identityKitDefinitions,
+      int itemId,
+      boolean female
+  ) throws Exception {
+    initializeLegacyPlayerContent(
+        manifest,
+        itemDefinitions,
+        identityKitDefinitions,
+        female,
+        new int[] {ITEM_APPEARANCE_BASE + itemId}
+    );
+    Class<?> legacyItemDefinitionClass = Class.forName("io.github.ffakira.moparscape.client.ItemDefinition");
+    Method itemLookup = legacyItemDefinitionClass.getDeclaredMethod("method198", int.class);
+    itemLookup.setAccessible(true);
+    Object legacyItemDefinition = itemLookup.invoke(null, itemId);
+    Method method196 = legacyItemDefinitionClass.getDeclaredMethod("method196", boolean.class, int.class);
+    method196.setAccessible(true);
+    Object legacyModel = method196.invoke(legacyItemDefinition, false, female ? 1 : 0);
+    Class<?> modelClass = Class.forName("io.github.ffakira.moparscape.client.Model");
+    int legacyVertexCount = (int) getField(modelClass, legacyModel, "anInt1626");
+    int[] faceColorA = (int[]) getField(modelClass, legacyModel, "anIntArray1634");
+    int[] faceColorB = (int[]) getField(modelClass, legacyModel, "anIntArray1635");
+    int[] faceColorC = (int[]) getField(modelClass, legacyModel, "anIntArray1636");
+    return new LegacyLitModel(
+        worldCoordinates((int[]) getField(modelClass, legacyModel, "anIntArray1627"), legacyVertexCount, 1.0f),
+        worldCoordinates((int[]) getField(modelClass, legacyModel, "anIntArray1628"), legacyVertexCount, -1.0f),
+        worldCoordinates((int[]) getField(modelClass, legacyModel, "anIntArray1629"), legacyVertexCount, 1.0f),
+        faceColorA == null ? new int[0] : faceColorA.clone(),
+        faceColorB == null ? new int[0] : faceColorB.clone(),
+        faceColorC == null ? new int[0] : faceColorC.clone()
+    );
+  }
+
+  private void initializeLegacyPlayerContent(
+      ContentManifest manifest,
+      ItemDefinitionCatalog itemDefinitions,
+      IdentityKitDefinitionCatalog identityKitDefinitions,
+      boolean female,
+      int[] appearanceEntries
+  ) throws Exception {
+    byte[] configArchiveBytes;
+    try (CacheStoreReader reader = new CacheStoreReader(manifest.cacheStore())) {
+      configArchiveBytes = reader.readArchive(0, TopLevelArchiveId.CONFIG.archiveId()).bytes();
+    }
+    Class<?> archiveClass = Class.forName("io.github.ffakira.moparscape.cache.Archive");
+    Object configArchive = archiveClass.getConstructor(int.class, byte[].class).newInstance(44820, configArchiveBytes);
+    Class<?> legacyItemDefinitionClass = Class.forName("io.github.ffakira.moparscape.client.ItemDefinition");
+    Method itemBootstrap = legacyItemDefinitionClass.getDeclaredMethod("method193", archiveClass);
+    itemBootstrap.setAccessible(true);
+    itemBootstrap.invoke(null, configArchive);
+    Class<?> legacyIdentityKitClass = Class.forName("io.github.ffakira.moparscape.client.IdentityKitDefinition");
+    Method identityBootstrap = legacyIdentityKitClass.getDeclaredMethod("method535", int.class, archiveClass);
+    identityBootstrap.setAccessible(true);
+    identityBootstrap.invoke(null, 0, configArchive);
+
+    Set<Integer> requiredModelIds = requiredLegacyModelIds(itemDefinitions, identityKitDefinitions, female, appearanceEntries);
+    int maxModelId = requiredModelIds.stream().mapToInt(Integer::intValue).max().orElse(0);
+    Class<?> resourceProviderClass = Class.forName("io.github.ffakira.moparscape.client.ResourceProvider");
+    Object resourceProvider = resourceProviderClass.getDeclaredConstructor().newInstance();
+    Class<?> modelClass = Class.forName("io.github.ffakira.moparscape.client.Model");
+    Method modelHeaderBootstrap = modelClass.getDeclaredMethod("method459", int.class, resourceProviderClass);
+    modelHeaderBootstrap.setAccessible(true);
+    modelHeaderBootstrap.invoke(null, maxModelId + 1, resourceProvider);
+    Method modelLoad = modelClass.getDeclaredMethod("method460", byte[].class, int.class, int.class);
+    modelLoad.setAccessible(true);
+    try (CacheStoreReader reader = new CacheStoreReader(manifest.cacheStore())) {
+      for (Integer modelId : requiredModelIds) {
+        byte[] modelBytes = reader.readArchive(1, modelId).bytes();
+        modelLoad.invoke(null, decompressGzipIfNeeded(modelBytes), -4036, modelId);
+      }
+    }
+  }
+
+  private void initializeLegacyAnimationContent(ContentManifest manifest, AnimationFrameCatalog animationFrames) throws Exception {
+    byte[] configArchiveBytes;
+    try (CacheStoreReader reader = new CacheStoreReader(manifest.cacheStore())) {
+      configArchiveBytes = reader.readArchive(0, TopLevelArchiveId.CONFIG.archiveId()).bytes();
+    }
+    Class<?> archiveClass = Class.forName("io.github.ffakira.moparscape.cache.Archive");
+    Object configArchive = archiveClass.getConstructor(int.class, byte[].class).newInstance(44820, configArchiveBytes);
+    Class<?> legacySequenceDefinitionClass = Class.forName("io.github.ffakira.moparscape.client.SequenceDefinition");
+    Method sequenceBootstrap = legacySequenceDefinitionClass.getDeclaredMethod("method257", int.class, archiveClass);
+    sequenceBootstrap.setAccessible(true);
+    sequenceBootstrap.invoke(null, 0, configArchive);
+    Class<?> legacyAnimationFrameClass = Class.forName("io.github.ffakira.moparscape.client.AnimationFrame");
+    Method frameCapacityBootstrap = legacyAnimationFrameClass.getDeclaredMethod("method528", int.class);
+    frameCapacityBootstrap.setAccessible(true);
+    Method frameArchiveBootstrap = legacyAnimationFrameClass.getDeclaredMethod("method529", byte[].class, boolean.class);
+    frameArchiveBootstrap.setAccessible(true);
+    try (CacheStoreReader reader = new CacheStoreReader(manifest.cacheStore())) {
+      int archiveCount = reader.archiveCount(AnimationFrameCatalog.ANIMATION_FRAME_STORE_INDEX);
+      frameCapacityBootstrap.invoke(null, maxAnimationFrameId(animationFrames) + 1);
+      for (int archiveId = 0; archiveId < archiveCount; archiveId++) {
+        if (!reader.readIndexEntry(AnimationFrameCatalog.ANIMATION_FRAME_STORE_INDEX, archiveId).exists()) {
+          continue;
+        }
+        frameArchiveBootstrap.invoke(
+            null,
+            decompressGzipIfNeeded(reader.readArchive(AnimationFrameCatalog.ANIMATION_FRAME_STORE_INDEX, archiveId).bytes()),
+            false
+        );
+      }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private int maxAnimationFrameId(AnimationFrameCatalog animationFrames) throws Exception {
+    Field field = AnimationFrameCatalog.class.getDeclaredField("framesById");
+    field.setAccessible(true);
+    return ((Map<Integer, ?>) field.get(animationFrames)).keySet().stream()
+        .mapToInt(Integer::intValue)
+        .max()
+        .orElse(0);
+  }
+
+  private void clearLegacyPlayerModelCache(Class<?> playerClass) throws Exception {
+    Object cache = getField(playerClass, null, "aClass12_1704");
+    cache.getClass().getDeclaredMethod("method224").invoke(cache);
+  }
+
+  private Set<Integer> requiredLegacyModelIds(
+      ItemDefinitionCatalog itemDefinitions,
+      IdentityKitDefinitionCatalog identityKitDefinitions,
+      boolean female,
+      int[] appearanceEntries
+  ) {
+    HashSet<Integer> modelIds = new HashSet<>();
+    for (int appearanceEntry : appearanceEntries) {
+      if (appearanceEntry >= ITEM_APPEARANCE_BASE) {
+        modelIds.addAll(itemDefinitions.require(appearanceEntry - ITEM_APPEARANCE_BASE).bodyModelIds(female));
+      } else if (appearanceEntry >= IDENTITY_KIT_APPEARANCE_BASE) {
+        modelIds.addAll(identityKitDefinitions.require(appearanceEntry - IDENTITY_KIT_APPEARANCE_BASE).bodyModelIds());
+      }
+    }
+    return modelIds;
+  }
+
+  private int[] toLegacyAppearanceValues(int[] appearanceEntries) {
+    int[] legacyValues = new int[appearanceEntries.length];
+    for (int index = 0; index < appearanceEntries.length; index++) {
+      int appearanceEntry = appearanceEntries[index];
+      if (appearanceEntry >= ITEM_APPEARANCE_BASE) {
+        legacyValues[index] = appearanceEntry - ITEM_APPEARANCE_BASE + 512;
+      } else if (appearanceEntry >= IDENTITY_KIT_APPEARANCE_BASE) {
+        legacyValues[index] = appearanceEntry - IDENTITY_KIT_APPEARANCE_BASE + 256;
+      } else {
+        legacyValues[index] = 0;
+      }
+    }
+    return legacyValues;
+  }
+
+  private int summedFaceCount(RawModelRepository rawModelRepository, List<Integer> modelIds) {
+    int faceCount = 0;
+    for (Integer modelId : modelIds) {
+      faceCount += rawModelRepository.loadModel(modelId).faceCount();
+    }
+    return faceCount;
+  }
+
+  private byte[] decompressGzipIfNeeded(byte[] bytes) throws Exception {
+    if (bytes.length < 2 || (bytes[0] & 0xff) != 0x1f || (bytes[1] & 0xff) != 0x8b) {
+      return bytes;
+    }
+    try (GZIPInputStream gzipInputStream = new GZIPInputStream(new ByteArrayInputStream(bytes))) {
+      return gzipInputStream.readAllBytes();
+    }
+  }
+
+  private void setField(Class<?> owner, Object target, String fieldName, Object value) throws Exception {
+    Field field = owner.getDeclaredField(fieldName);
+    field.setAccessible(true);
+    field.set(target, value);
+  }
+
+  private Object getField(Class<?> owner, Object target, String fieldName) throws Exception {
+    Field field = owner.getDeclaredField(fieldName);
+    field.setAccessible(true);
+    return field.get(target);
+  }
+
+  private float maxVertexY(WorldSceneObjectGeometry geometry) {
+    float maxY = Float.NEGATIVE_INFINITY;
+    for (float y : geometry.vertexY()) {
+      maxY = Math.max(maxY, y);
+    }
+    return maxY;
+  }
+
+  private boolean anyVertexMoved(WorldSceneObjectGeometry before, WorldSceneObjectGeometry after) {
+    for (int index = 0; index < before.vertexX().length; index++) {
+      if (Math.abs(after.vertexX()[index] - before.vertexX()[index]) > 0.0001f
+          || Math.abs(after.vertexY()[index] - before.vertexY()[index]) > 0.0001f
+          || Math.abs(after.vertexZ()[index] - before.vertexZ()[index]) > 0.0001f) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private float[] worldCoordinates(int[] source, int length, float axisSign) {
+    float[] coordinates = new float[length];
+    for (int index = 0; index < length; index++) {
+      coordinates[index] = source[index] / 128.0f * axisSign;
+    }
+    return coordinates;
+  }
+
+  private VertexBounds boundsOf(WorldSceneObjectGeometry geometry) {
+    float minX = Float.POSITIVE_INFINITY;
+    float minY = Float.POSITIVE_INFINITY;
+    float minZ = Float.POSITIVE_INFINITY;
+    float maxX = Float.NEGATIVE_INFINITY;
+    float maxY = Float.NEGATIVE_INFINITY;
+    float maxZ = Float.NEGATIVE_INFINITY;
+    for (int index = 0; index < geometry.vertexX().length; index++) {
+      minX = Math.min(minX, geometry.vertexX()[index]);
+      minY = Math.min(minY, geometry.vertexY()[index]);
+      minZ = Math.min(minZ, geometry.vertexZ()[index]);
+      maxX = Math.max(maxX, geometry.vertexX()[index]);
+      maxY = Math.max(maxY, geometry.vertexY()[index]);
+      maxZ = Math.max(maxZ, geometry.vertexZ()[index]);
+    }
+    return new VertexBounds(minX, minY, minZ, maxX, maxY, maxZ);
+  }
+
+  private VertexBounds boundsOf(CharacterModelSourceBuilder.PreparedContribution preparedContribution) {
+    float minX = Float.POSITIVE_INFINITY;
+    float minY = Float.POSITIVE_INFINITY;
+    float minZ = Float.POSITIVE_INFINITY;
+    float maxX = Float.NEGATIVE_INFINITY;
+    float maxY = Float.NEGATIVE_INFINITY;
+    float maxZ = Float.NEGATIVE_INFINITY;
+    for (int index = 0; index < preparedContribution.modelX().length; index++) {
+      minX = Math.min(minX, preparedContribution.modelX()[index] / 128.0f);
+      minY = Math.min(minY, -(preparedContribution.modelY()[index] / 128.0f));
+      minZ = Math.min(minZ, preparedContribution.modelZ()[index] / 128.0f);
+      maxX = Math.max(maxX, preparedContribution.modelX()[index] / 128.0f);
+      maxY = Math.max(maxY, -(preparedContribution.modelY()[index] / 128.0f));
+      maxZ = Math.max(maxZ, preparedContribution.modelZ()[index] / 128.0f);
+    }
+    return new VertexBounds(minX, minY, minZ, maxX, maxY, maxZ);
+  }
+
+  private VertexBounds boundsOf(LegacyLitModel legacyModel) {
+    float minX = Float.POSITIVE_INFINITY;
+    float minY = Float.POSITIVE_INFINITY;
+    float minZ = Float.POSITIVE_INFINITY;
+    float maxX = Float.NEGATIVE_INFINITY;
+    float maxY = Float.NEGATIVE_INFINITY;
+    float maxZ = Float.NEGATIVE_INFINITY;
+    for (int index = 0; index < legacyModel.vertexX().length; index++) {
+      minX = Math.min(minX, legacyModel.vertexX()[index]);
+      minY = Math.min(minY, legacyModel.vertexY()[index]);
+      minZ = Math.min(minZ, legacyModel.vertexZ()[index]);
+      maxX = Math.max(maxX, legacyModel.vertexX()[index]);
+      maxY = Math.max(maxY, legacyModel.vertexY()[index]);
+      maxZ = Math.max(maxZ, legacyModel.vertexZ()[index]);
+    }
+    return new VertexBounds(minX, minY, minZ, maxX, maxY, maxZ);
+  }
+
+  private List<String> sortedVertexTriples(WorldSceneObjectGeometry geometry) {
+    ArrayList<String> vertices = new ArrayList<>(geometry.vertexX().length);
+    for (int index = 0; index < geometry.vertexX().length; index++) {
+      vertices.add(vertexTriple(geometry.vertexX()[index], geometry.vertexY()[index], geometry.vertexZ()[index]));
+    }
+    vertices.sort(String::compareTo);
+    return vertices;
+  }
+
+  private List<String> sortedVertexTriples(LegacyLitModel legacyModel) {
+    ArrayList<String> vertices = new ArrayList<>(legacyModel.vertexX().length);
+    for (int index = 0; index < legacyModel.vertexX().length; index++) {
+      vertices.add(vertexTriple(legacyModel.vertexX()[index], legacyModel.vertexY()[index], legacyModel.vertexZ()[index]));
+    }
+    vertices.sort(String::compareTo);
+    return vertices;
+  }
+
+  private String vertexTriple(float x, float y, float z) {
+    return "%.6f,%.6f,%.6f".formatted(normalizeSignedZero(x), normalizeSignedZero(y), normalizeSignedZero(z));
+  }
+
+  private float normalizeSignedZero(float value) {
+    return Math.abs(value) < 0.0000005f ? 0.0f : value;
+  }
+
+  private ActionBlendCandidate findBlendCandidate(
+      AnimationSequenceCatalog animationSequences,
+      CharacterModelAssembler assembler,
+      BootstrapAppearance appearance,
+      int movementFrameId
+  ) throws ReflectiveOperationException {
+    WorldSceneObjectGeometry movementOnlyGeometry = assembler.assemble(
+        appearance,
+        List.of(),
+        new ActorAnimationState(
+            1.0f,
+            0.0f,
+            0.0f,
+            0.0f,
+            ActorAnimationState.LocomotionMode.WALK_FORWARD,
+            REFERENCE_WALK_SEQUENCE_ID,
+            movementFrameId,
+            0.0f,
+            0.0f
+        )
+    );
+    for (Map.Entry<Integer, AnimationSequenceDefinition> entry : sequenceDefinitions(animationSequences).entrySet()) {
+      AnimationSequenceDefinition sequence = entry.getValue();
+      int actionSequenceId = entry.getKey();
+      if (actionSequenceId == REFERENCE_WALK_SEQUENCE_ID || sequence.interleaveOrder() == null || sequence.frameCount() <= 0) {
+        continue;
+      }
+      int actionFrameId = sequence.frameIdAt(0);
+      if (actionFrameId < 0) {
+        continue;
+      }
+      WorldSceneObjectGeometry actionOnlyGeometry = assembler.assemble(
+          appearance,
+          List.of(),
+          new ActorAnimationState(
+              0.0f,
+              0.0f,
+              0.0f,
+              0.0f,
+              ActorAnimationState.LocomotionMode.IDLE,
+              -1,
+              -1,
+              actionSequenceId,
+              actionFrameId,
+              0.0f,
+              0.0f
+          )
+      );
+      WorldSceneObjectGeometry blendedGeometry = assembler.assemble(
+          appearance,
+          List.of(),
+          new ActorAnimationState(
+              1.0f,
+              0.0f,
+              0.0f,
+              0.0f,
+              ActorAnimationState.LocomotionMode.WALK_FORWARD,
+              REFERENCE_WALK_SEQUENCE_ID,
+              movementFrameId,
+              actionSequenceId,
+              actionFrameId,
+              0.0f,
+              0.0f
+          )
+      );
+      if (actionOnlyGeometry != null
+          && blendedGeometry != null
+          && anyVertexMoved(movementOnlyGeometry, blendedGeometry)
+          && anyVertexMoved(actionOnlyGeometry, blendedGeometry)) {
+        return new ActionBlendCandidate(
+            actionSequenceId,
+            actionFrameId,
+            movementOnlyGeometry,
+            actionOnlyGeometry,
+            blendedGeometry
+        );
+      }
+    }
+    return null;
+  }
+
+  private SequenceOverrideCandidate findSequenceOverrideCandidate(AnimationSequenceCatalog animationSequences)
+      throws ReflectiveOperationException {
+    for (Map.Entry<Integer, AnimationSequenceDefinition> entry : sequenceDefinitions(animationSequences).entrySet()) {
+      AnimationSequenceDefinition sequence = entry.getValue();
+      int frameId = sequence.frameIdAt(0);
+      if (frameId < 0) {
+        continue;
+      }
+      if (sequence.playerMainhandAppearanceId() < 0 && sequence.playerOffhandAppearanceId() < 0) {
+        continue;
+      }
+      return new SequenceOverrideCandidate(
+          entry.getKey(),
+          frameId,
+          sequence.playerMainhandAppearanceId(),
+          sequence.playerOffhandAppearanceId()
+      );
+    }
+    return null;
+  }
+
+  private CharacterModelSourceBuilder.SequenceEquipmentOverrides resolveSequenceEquipmentOverrides(
+      CharacterModelAssembler assembler,
+      ActorAnimationState animationState
+  ) throws ReflectiveOperationException {
+    Method method = CharacterModelAssembler.class.getDeclaredMethod(
+        "resolveSequenceEquipmentOverrides",
+        ActorAnimationState.class
+    );
+    method.setAccessible(true);
+    return (CharacterModelSourceBuilder.SequenceEquipmentOverrides) method.invoke(assembler, animationState);
+  }
+
+  @SuppressWarnings("unchecked")
+  private Map<Integer, AnimationSequenceDefinition> sequenceDefinitions(AnimationSequenceCatalog animationSequences)
+      throws ReflectiveOperationException {
+    Field field = AnimationSequenceCatalog.class.getDeclaredField("sequencesById");
+    field.setAccessible(true);
+    return (Map<Integer, AnimationSequenceDefinition>) field.get(animationSequences);
+  }
+
+  private record ActionBlendCandidate(
+      int actionSequenceId,
+      int actionFrameId,
+      WorldSceneObjectGeometry movementOnlyGeometry,
+      WorldSceneObjectGeometry actionOnlyGeometry,
+      WorldSceneObjectGeometry blendedGeometry
+  ) {
+  }
+
+  private record SequenceOverrideCandidate(
+      int sequenceId,
+      int frameId,
+      int mainhandAppearanceId,
+      int offhandAppearanceId
+  ) {
+  }
+
+  private record LegacyLitModel(
+      float[] vertexX,
+      float[] vertexY,
+      float[] vertexZ,
+      int[] faceColorA,
+      int[] faceColorB,
+      int[] faceColorC
+  ) {
+  }
+
+  private record VertexBounds(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
+  }
+}

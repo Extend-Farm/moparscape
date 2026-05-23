@@ -32,13 +32,15 @@ Use two terminals from the repo root.
 
 Notes:
 
-- `:emulator` maps to `client/`
-- `:game-client` maps to `server/moparscape/`
+- `:emulator` maps to `moparscape-reference/client/`
+- `:game-client` maps to `moparscape-reference/server/moparscape/`
 - start the server first or the legacy client will fail to log in
 
 ### Run the native LWJGL client
 
 ```bash
+docker compose up -d postgres
+./gradlew :rs-persistence-sql:migrateDevDatabase
 ./gradlew :rs-client-lwjgl:run
 ```
 
@@ -46,7 +48,7 @@ Notes:
 
 - this does **not** require `:emulator:run`
 - it boots against the native in-process runtime from `:rs-server-runtime`
-- default persistence is character files under `client/characters`
+- it uses PostgreSQL persistence through `:rs-persistence-sql`
 - set `RSPS_RUNTIME_MODE=quic` if you want the client to connect to the external QUIC server instead
 - current native status:
   - cache-backed title/login shell
@@ -85,7 +87,7 @@ Notes:
 ```bash
 docker compose up -d postgres
 ./gradlew :rs-persistence-sql:migrateDevDatabase
-RSPS_PERSISTENCE_MODE=postgres ./gradlew :rs-client-lwjgl:run
+./gradlew :rs-client-lwjgl:run
 ```
 
 ## Common Commands
@@ -122,11 +124,11 @@ Build the legacy desktop client jar:
 
 The preferred legacy desktop client jar is:
 
-- `server/moparscape/build/libs/game-client.jar`
+- `moparscape-reference/server/moparscape/build/libs/game-client.jar`
 
 Avoid relying on the stale checked-in legacy jar:
 
-- `server/moparscape/moparclient.jar`
+- `moparscape-reference/server/moparscape/moparclient.jar`
 
 ## Repository Layout
 
@@ -135,9 +137,9 @@ Avoid relying on the stale checked-in legacy jar:
 | Path | Purpose |
 | --- | --- |
 | `artifacts/` | Scratch output area for generated artifacts and one-off repo outputs. |
-| `client/` | Legacy Moparscape server/emulator module (`:emulator`). Sources are still in the old flat layout. |
-| `server/` | Container directory for the legacy desktop client module and its runtime assets. |
-| `server/moparscape/` | Legacy desktop game client module (`:game-client`). This is the decompiled/renamed reference client. |
+| `moparscape-reference/` | Wrapper for the reference Moparscape emulator and desktop client modules. |
+| `moparscape-reference/client/` | Reference Moparscape server/emulator module (`:emulator`). Sources are still in the old flat layout. |
+| `moparscape-reference/server/moparscape/` | Reference desktop game client module (`:game-client`). This is the decompiled/renamed reference client. |
 | `rs-model/` | Shared ids, world values, and low-level model types for the native rewrite. |
 | `rs-cache/` | Cache store readers, archive loading, raw model decode, and cache-side assets. |
 | `rs-content/` | Native content decoding on top of cache data, such as definitions and sequence metadata. |
@@ -158,10 +160,10 @@ Avoid relying on the stale checked-in legacy jar:
 
 ### Important legacy subfolders
 
-#### `client/`
+#### `moparscape-reference/client/`
 
 - `*.java`, `*.cfg`, `*.json`
-  - the legacy server keeps its source files and data files directly in `client/` instead of under `src/main/java`
+  - the reference emulator keeps its source files and data files directly in `moparscape-reference/client/` instead of under `src/main/java`
 - `characters/`
   - default character-file persistence for both the legacy server and the native runtime
 - `Bans/`
@@ -173,7 +175,7 @@ Avoid relying on the stale checked-in legacy jar:
 - `build/`, `bin/`
   - generated outputs; do not treat them as source of truth
 
-#### `server/moparscape/`
+#### `moparscape-reference/server/moparscape/`
 
 - `src/main/java/io/github/ffakira/moparscape/client`
   - legacy client runtime, scene graph, UI, rendering, login, and gameplay code
@@ -231,9 +233,10 @@ Avoid relying on the stale checked-in legacy jar:
 
 ## Persistence and Database
 
-Default persistence:
+Native PostgreSQL persistence:
 
-- character files under `client/characters`
+- stores canonical account and character state directly in PostgreSQL
+- does not import `moparscape-reference/client/characters/*.txt` through `:rs-persistence-sql`
 
 Repo-local PostgreSQL defaults:
 
@@ -241,7 +244,7 @@ Repo-local PostgreSQL defaults:
 - port: `55432`
 - database: `moparscape`
 - username: `moparscape`
-- password: `moparscape`
+- password: load from `RSPS_DB_PASSWORD` or `RSPS_DB_PASSWORD_FILE`
 
 Useful commands:
 
@@ -249,8 +252,46 @@ Useful commands:
 docker compose up -d postgres
 ./gradlew :rs-persistence-sql:testDevDatabaseConnection
 ./gradlew :rs-persistence-sql:migrateDevDatabase
-./gradlew :rs-persistence-sql:importCharacterToDevDatabase -Pcharacter=akira
+./gradlew :rs-persistence-sql:resetDevDatabase
 ```
+
+Create accounts directly from the native login frame:
+
+```bash
+docker compose up -d postgres
+./gradlew :rs-persistence-sql:migrateDevDatabase
+./gradlew :rs-client-lwjgl:run
+```
+
+The first successful native login for a new username provisions:
+
+- the account row
+- the password hash
+- the starter character
+
+Optional manual provisioning still exists if you want to seed accounts without opening the client:
+
+```bash
+RSPS_BOOTSTRAP_ACCOUNT_USERNAME=akira \
+RSPS_BOOTSTRAP_ACCOUNT_PASSWORD='choose-a-real-development-password' \
+RSPS_BOOTSTRAP_CHARACTER_NAME=Akira \
+./gradlew :rs-persistence-sql:provisionDevAccount
+```
+
+Containerized development migration:
+
+```bash
+docker compose up --build postgres postgres-init
+```
+
+Notes:
+
+- `.env.example` contains the compose variable set
+- native PostgreSQL login auto-creates the account and starter character on first login
+- the runtime hashes passwords before storing them
+- the default compose flow uses `RSPS_POSTGRES_PASSWORD` directly for local development
+- the SQL tooling still accepts either direct password env vars or `*_FILE` secret-file env vars, but not both at once
+- `postgres-init` is idempotent and only migrates the schema
 
 ## Current Architecture Boundary
 

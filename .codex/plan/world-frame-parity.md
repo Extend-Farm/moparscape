@@ -68,7 +68,7 @@ The change set is therefore **smaller and more localized** than the previous "fl
 
 ## Legacy reference frame
 
-From `server/moparscape/.../SceneGraph.method315` and `MapRegion`:
+From `moparscape-reference/server/moparscape/.../SceneGraph.method315` and `MapRegion`:
 
 - `+X = east` (anInt455 is cameraX, world points use `tileX << 7`)
 - `+Y = down in stored heights` (heights are stored as positive numbers that grow with depth, with `-anInt456` translating "lower stored Y" toward camera). Visually +Y still appears "up" on screen because the legacy software projection inverts before raster.

@@ -15,7 +15,7 @@ The rewrite rule is strict:
 - `:rs-model`
   - immutable ids and world-space value objects
 - `:rs-cache`
-  - live cache store discovery against `server/moparscape/cache/.file_store_32`
+  - live cache store discovery against `moparscape-reference/server/moparscape/cache/.file_store_32`
 - `:rs-content`
   - shared bootstrap manifest plus native definition/archive decoders
 - `:rs-sim-ecs`
@@ -76,7 +76,7 @@ What `rs-*` does **not** do yet:
 
 This means the current world viewport is a terrain-only preview. It is not a broken RuneScape scene renderer; the full scene pipeline simply is not implemented yet.
 
-See [native-world-pipeline.md](/home/akira/projects/moparscape/docs/native-world-pipeline.md:1) for the operational migration path.
+See [native-world-pipeline.md](/home/akira/projects/moparscape/.codex/docs/native-world-pipeline.md:1) for the operational migration path.
 
 ## What is intentionally not done yet
 
