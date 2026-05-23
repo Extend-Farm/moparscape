@@ -135,8 +135,20 @@ class PostgresPersistenceIntegrationTest {
     assertThat(character.skills()).hasSize(21);
     assertThat(character.skills()).anySatisfy(skill -> {
       assertThat(skill.skillId()).isEqualTo(3);
-      assertThat(skill.currentLevel()).isEqualTo(10);
+    assertThat(skill.currentLevel()).isEqualTo(10);
     });
+  }
+
+  @Test
+  void provisionForLoginCanonicalizesDisplayNameFromALowercaseLogin() {
+    boolean created = accountProvisioner.provisionForLogin("akira", "correct horse battery staple");
+
+    AccountRecord account = accountRepository.findByUsername("akira").orElseThrow();
+    CharacterSnapshot character = characterRepository.loadByAccountId(account.id()).orElseThrow();
+
+    assertThat(created).isTrue();
+    assertThat(account.username()).isEqualTo("akira");
+    assertThat(character.displayName()).isEqualTo("Akira");
   }
 
   @Test

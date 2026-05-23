@@ -12,7 +12,7 @@ record AccountProvisioningRequest(
       throw new IllegalArgumentException("account password cannot be blank");
     }
     characterDisplayName = characterDisplayName == null || characterDisplayName.isBlank()
-        ? loginName
+        ? SqlNamePolicy.characterDisplayName(loginName)
         : SqlNamePolicy.characterDisplayName(characterDisplayName);
   }
 }

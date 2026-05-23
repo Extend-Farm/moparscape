@@ -1,11 +1,11 @@
-package com.veyrmoor.client.desktop.gameplay.sidebar;
+package com.veyrmoor.client.desktop.gameplay.sidebar.widget;
 
 import com.veyrmoor.client.desktop.render.common.ScreenRect;
 import com.veyrmoor.content.InterfaceComponentDefinition;
 import java.util.HashMap;
 import java.util.Map;
 
-final class SidebarWidgetScrollState {
+public final class SidebarWidgetScrollState {
 
   static final int SCROLLBAR_ARROW_SCROLL_STEP = 4;
   static final int SCROLLBAR_WHEEL_SCROLL_STEP = 30;
@@ -124,12 +124,12 @@ final class SidebarWidgetScrollState {
     );
   }
 
-  static int scrollbarThumbHeight(int viewportHeight, int scrollContentHeight) {
+  public static int scrollbarThumbHeight(int viewportHeight, int scrollContentHeight) {
     int thumbHeight = ((viewportHeight - 32) * viewportHeight) / scrollContentHeight;
     return Math.max(8, thumbHeight);
   }
 
-  static int scrollbarThumbOffset(int scrollPosition, int viewportHeight, int scrollContentHeight, int thumbHeight) {
+  public static int scrollbarThumbOffset(int scrollPosition, int viewportHeight, int scrollContentHeight, int thumbHeight) {
     if (scrollContentHeight <= viewportHeight) {
       return 0;
     }

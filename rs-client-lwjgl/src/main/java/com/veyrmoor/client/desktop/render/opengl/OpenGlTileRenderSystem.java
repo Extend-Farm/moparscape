@@ -15,6 +15,7 @@ import com.veyrmoor.client.desktop.gameplay.GameplayFrameAssets;
 import com.veyrmoor.client.desktop.gameplay.GameplayLayout;
 import com.veyrmoor.client.desktop.gameplay.GameplayMenuAction;
 import com.veyrmoor.client.desktop.gameplay.GameplayMouseButton;
+import com.veyrmoor.client.desktop.gameplay.ReportAbuseController;
 import com.veyrmoor.client.desktop.itemicon.ItemIconRenderer;
 import com.veyrmoor.client.desktop.login.LoginScreenState;
 import com.veyrmoor.client.desktop.login.TitleScreenAssets;
@@ -212,6 +213,10 @@ public final class OpenGlTileRenderSystem implements RenderSystem, AutoCloseable
 
   public GameplayChatController gameplayChatController() {
     return gameplayChatController;
+  }
+
+  public ReportAbuseController reportAbuseController() {
+    return gameplayChromeRenderer.reportAbuseController();
   }
 
   public void setGameplayCameraInputs(

@@ -16,7 +16,10 @@ import com.veyrmoor.client.desktop.render.common.ScreenRect;
 import com.veyrmoor.client.desktop.gameplay.GameplayClickResult;
 import com.veyrmoor.client.desktop.gameplay.GameplayFrameAssets;
 import com.veyrmoor.client.desktop.gameplay.GameplayLayout;
+import com.veyrmoor.client.desktop.gameplay.ReportAbuseController;
 import com.veyrmoor.client.desktop.gameplay.GameplayTab;
+import com.veyrmoor.client.desktop.gameplay.sidebar.widget.SidebarWidgetRenderer;
+import com.veyrmoor.client.desktop.gameplay.sidebar.widget.SidebarWidgetScrollState;
 import com.veyrmoor.client.desktop.itemicon.ItemIconRenderer;
 import com.veyrmoor.client.desktop.login.TitleScreenBitmapFont;
 import com.veyrmoor.client.desktop.login.TitleScreenFonts;
@@ -54,6 +57,9 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
   private static final float CHAT_CROWN_BASELINE_OFFSET_Y = 12.0f;
   private static final float CHAT_CROWN_TEXT_GAP = 2.0f;
   private static final String CHAT_ELLIPSIS = "...";
+  private static final String REPORT_ABUSE_LABEL = "Report abuse";
+  private static final float REPORT_ABUSE_CENTER_X = 458.0f;
+  private static final float REPORT_ABUSE_BASELINE_Y = 486.0f;
   private static final NumberFormat LEGACY_NUMBER_FORMAT = NumberFormat.getIntegerInstance();
   private static final ClientChatMessage DEFAULT_WELCOME_MESSAGE =
       ClientChatMessage.system("Welcome to Veyrmoor! Have fun.");
@@ -61,6 +67,7 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
   private final ItemDefinitionCatalog itemDefinitionCatalog;
   private final ItemIconRenderer itemIconRenderer;
   private final GameplayChatController chatController;
+  private final ReportAbuseController reportAbuseController;
   private final TitleScreenBitmapFont inventoryAmountFont;
   private final TitleScreenBitmapFont chatFont;
   private final TitleScreenBitmapFont statsSmallFont;
@@ -82,6 +89,12 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
   private final CombatSidebarPanelRenderer combatPanelRenderer;
   private final PrayerSidebarPanelRenderer prayerPanelRenderer;
   private final MagicSidebarPanelRenderer magicPanelRenderer;
+  private final QuestSidebarPanelRenderer questPanelRenderer;
+  private final FriendsSidebarPanelRenderer friendsPanelRenderer;
+  private final IgnoresSidebarPanelRenderer ignoresPanelRenderer;
+  private final MusicSidebarPanelRenderer musicPanelRenderer;
+  private final SettingsSidebarPanelRenderer settingsPanelRenderer;
+  private final EmotesSidebarPanelRenderer emotesPanelRenderer;
   private final LogoutSidebarPanelRenderer logoutPanelRenderer;
   private final Map<BitmapGlyphKey, BitmapGlyphTexture> bitmapGlyphTextures = new HashMap<>();
   private boolean promptGlyphsPrewarmed;
@@ -90,6 +103,7 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
       ItemDefinitionCatalog itemDefinitionCatalog,
       ItemIconRenderer itemIconRenderer,
       GameplayChatController chatController,
+      ReportAbuseController reportAbuseController,
       GameplayFrameAssets gameplayFrameAssets,
       TitleScreenFonts titleScreenFonts,
       ImmediateModeRenderer2d primitives
@@ -97,6 +111,7 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
     this.itemDefinitionCatalog = itemDefinitionCatalog;
     this.itemIconRenderer = itemIconRenderer;
     this.chatController = chatController;
+    this.reportAbuseController = reportAbuseController;
     this.inventoryAmountFont = titleScreenFonts == null ? null : titleScreenFonts.plainSmall();
     this.chatFont = titleScreenFonts == null ? null : titleScreenFonts.plain();
     this.statsSmallFont = titleScreenFonts == null ? null : titleScreenFonts.plainSmall();
@@ -125,6 +140,12 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
     this.combatPanelRenderer = new CombatSidebarPanelRenderer(this);
     this.prayerPanelRenderer = new PrayerSidebarPanelRenderer(this);
     this.magicPanelRenderer = new MagicSidebarPanelRenderer(this);
+    this.questPanelRenderer = new QuestSidebarPanelRenderer(this);
+    this.friendsPanelRenderer = new FriendsSidebarPanelRenderer(this);
+    this.ignoresPanelRenderer = new IgnoresSidebarPanelRenderer(this);
+    this.musicPanelRenderer = new MusicSidebarPanelRenderer(this);
+    this.settingsPanelRenderer = new SettingsSidebarPanelRenderer(this);
+    this.emotesPanelRenderer = new EmotesSidebarPanelRenderer(this);
     this.logoutPanelRenderer = new LogoutSidebarPanelRenderer(this);
     prewarmChatPromptGlyphTextures();
   }
@@ -135,7 +156,25 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
       case STATS -> statsPanelRenderer.handleSidebarClick(sidebarRect, x, y)
           ? GameplayClickResult.handledClick()
           : GameplayClickResult.ignored();
+      case QUESTS -> questPanelRenderer.handleSidebarClick(sidebarRect, x, y)
+          ? GameplayClickResult.handledClick()
+          : GameplayClickResult.ignored();
       case MAGIC -> magicPanelRenderer.handleSidebarClick(sidebarRect, x, y)
+          ? GameplayClickResult.handledClick()
+          : GameplayClickResult.ignored();
+      case FRIENDS -> friendsPanelRenderer.handleSidebarClick(sidebarRect, x, y)
+          ? GameplayClickResult.handledClick()
+          : GameplayClickResult.ignored();
+      case IGNORES -> ignoresPanelRenderer.handleSidebarClick(sidebarRect, x, y)
+          ? GameplayClickResult.handledClick()
+          : GameplayClickResult.ignored();
+      case SETTINGS -> settingsPanelRenderer.handleSidebarClick(sidebarRect, x, y)
+          ? GameplayClickResult.handledClick()
+          : GameplayClickResult.ignored();
+      case EMOTES -> emotesPanelRenderer.handleSidebarClick(sidebarRect, x, y)
+          ? GameplayClickResult.handledClick()
+          : GameplayClickResult.ignored();
+      case MUSIC -> musicPanelRenderer.handleSidebarClick(sidebarRect, x, y)
           ? GameplayClickResult.handledClick()
           : GameplayClickResult.ignored();
       case LOGOUT -> logoutPanelRenderer.handleSidebarClick(sidebarRect, x, y);
@@ -144,6 +183,12 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
   }
 
   public GameplayClickResult handleChatboxClick(double x, double y) {
+    if (reportAbuseLabelRect().contains(x, y)) {
+      if (reportAbuseController != null) {
+        reportAbuseController.open();
+      }
+      return GameplayClickResult.handledClick();
+    }
     if (!GameplayLayout.chatboxPanelRect().contains(x, y)) {
       return GameplayClickResult.ignored();
     }
@@ -154,7 +199,13 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
   public boolean handleSidebarScroll(GameplayTab activeGameplayTab, double x, double y, double yOffset) {
     ScreenRect sidebarRect = GameplayLayout.sidebarPanelRect();
     return switch (activeGameplayTab) {
+      case QUESTS -> questPanelRenderer.handleSidebarScroll(sidebarRect, x, y, yOffset);
       case MAGIC -> magicPanelRenderer.handleSidebarScroll(sidebarRect, x, y, yOffset);
+      case FRIENDS -> friendsPanelRenderer.handleSidebarScroll(sidebarRect, x, y, yOffset);
+      case IGNORES -> ignoresPanelRenderer.handleSidebarScroll(sidebarRect, x, y, yOffset);
+      case SETTINGS -> settingsPanelRenderer.handleSidebarScroll(sidebarRect, x, y, yOffset);
+      case EMOTES -> emotesPanelRenderer.handleSidebarScroll(sidebarRect, x, y, yOffset);
+      case MUSIC -> musicPanelRenderer.handleSidebarScroll(sidebarRect, x, y, yOffset);
       default -> false;
     };
   }
@@ -162,13 +213,21 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
   public boolean handleSidebarPointerMove(GameplayTab activeGameplayTab, double x, double y) {
     ScreenRect sidebarRect = GameplayLayout.sidebarPanelRect();
     return switch (activeGameplayTab) {
+      case QUESTS -> questPanelRenderer.handleSidebarPointerMove(sidebarRect, x, y);
       case MAGIC -> magicPanelRenderer.handleSidebarPointerMove(sidebarRect, x, y);
+      case FRIENDS -> friendsPanelRenderer.handleSidebarPointerMove(sidebarRect, x, y);
+      case IGNORES -> ignoresPanelRenderer.handleSidebarPointerMove(sidebarRect, x, y);
+      case SETTINGS -> settingsPanelRenderer.handleSidebarPointerMove(sidebarRect, x, y);
+      case EMOTES -> emotesPanelRenderer.handleSidebarPointerMove(sidebarRect, x, y);
+      case MUSIC -> musicPanelRenderer.handleSidebarPointerMove(sidebarRect, x, y);
       default -> false;
     };
   }
 
   public void endSidebarPointerDrag() {
-    magicPanelRenderer.endSidebarPointerDrag();
+    if (sidebarWidgetRenderer != null) {
+      sidebarWidgetRenderer.endPointerDrag();
+    }
   }
 
   public void clearTransientState() {
@@ -185,25 +244,31 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
         && activeGameplayTab != GameplayTab.STATS
         && activeGameplayTab != GameplayTab.COMBAT
         && activeGameplayTab != GameplayTab.EQUIPMENT
+        && activeGameplayTab != GameplayTab.QUESTS
         && activeGameplayTab != GameplayTab.PRAYER
         && activeGameplayTab != GameplayTab.MAGIC
+        && activeGameplayTab != GameplayTab.FRIENDS
+        && activeGameplayTab != GameplayTab.IGNORES
+        && activeGameplayTab != GameplayTab.MUSIC
+        && activeGameplayTab != GameplayTab.SETTINGS
+        && activeGameplayTab != GameplayTab.EMOTES
         && activeGameplayTab != GameplayTab.LOGOUT) {
       primitives.drawText(left, top, activeGameplayTab.label(), 0.92f, 0.86f, 0.46f);
     }
     switch (activeGameplayTab) {
       case INVENTORY -> inventoryEquipmentPanelRenderer.drawInventorySidebar(viewModel, rect);
-      case EQUIPMENT -> inventoryEquipmentPanelRenderer.drawEquipmentSidebar(viewModel, left, top + 16.0f);
+      case EQUIPMENT -> inventoryEquipmentPanelRenderer.drawEquipmentSidebar(viewModel, rect);
       case STATS -> statsPanelRenderer.drawStatsSidebar(viewModel, rect, pointerX, pointerY);
       case COMBAT -> combatPanelRenderer.drawCombatSidebar(viewModel, rect);
-      case QUESTS -> drawSidebarPlaceholder(left, top + 16.0f, "Quest journal not synced yet.", "Native widget rendering is next.");
+      case QUESTS -> questPanelRenderer.drawQuestSidebar(viewModel, rect, pointerX, pointerY);
       case PRAYER -> prayerPanelRenderer.drawPrayerSidebar(viewModel, rect, pointerX, pointerY);
       case MAGIC -> magicPanelRenderer.drawMagicSidebar(viewModel, rect);
-      case FRIENDS -> drawSidebarPlaceholder(left, top + 16.0f, "Friends list not synced yet.", "Social state will move into protocol snapshots.");
-      case IGNORES -> drawSidebarPlaceholder(left, top + 16.0f, "Ignore list not synced yet.", "Legacy file import already stores social links.");
+      case FRIENDS -> friendsPanelRenderer.drawFriendsSidebar(viewModel, rect, pointerX, pointerY);
+      case IGNORES -> ignoresPanelRenderer.drawIgnoresSidebar(viewModel, rect, pointerX, pointerY);
       case LOGOUT -> logoutPanelRenderer.drawLogoutSidebar(viewModel, rect);
-      case SETTINGS -> drawSidebarPlaceholder(left, top + 16.0f, "Settings panel not implemented yet.", "Run energy and role are in chat status.");
-      case EMOTES -> drawSidebarPlaceholder(left, top + 16.0f, "Emote book not decoded yet.", "Runtime action sequence packets are ready; emote UI is still pending.");
-      case MUSIC -> drawSidebarPlaceholder(left, top + 16.0f, "Music player not decoded yet.", "Audio is outside the current world slice.");
+      case SETTINGS -> settingsPanelRenderer.drawSettingsSidebar(viewModel, rect, pointerX, pointerY);
+      case EMOTES -> emotesPanelRenderer.drawEmotesSidebar(viewModel, rect, pointerX, pointerY);
+      case MUSIC -> musicPanelRenderer.drawMusicSidebar(viewModel, rect, pointerX, pointerY);
     }
   }
 
@@ -215,6 +280,52 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
     drawChatPromptSeparator(chatboxRect);
     drawChatPrompt(viewModel, inputRect);
     drawChatOptionsBar();
+  }
+
+  public boolean canDrawReportAbuseModal() {
+    return reportAbuseController != null
+        && reportAbuseController.isAvailable()
+        && sidebarWidgetRenderer != null
+        && sidebarWidgetRenderer.canRender(reportAbuseController.interfaceId());
+  }
+
+  public boolean containsReportAbuseModal(double x, double y) {
+    return canDrawReportAbuseModal() && reportAbuseModalRect().contains(x, y);
+  }
+
+  public int reportAbuseActionWidgetIdAt(double x, double y) {
+    if (!canDrawReportAbuseModal()) {
+      return -1;
+    }
+    return sidebarWidgetRenderer.actionWidgetIdAt(reportAbuseController.interfaceId(), reportAbuseModalRect(), x, y);
+  }
+
+  public void drawReportAbuseModal(ClientViewModel viewModel, double pointerX, double pointerY) {
+    if (!canDrawReportAbuseModal()) {
+      return;
+    }
+    // The reference client mutates these component strings live instead of rebuilding the
+    // interface tree, so the native widget renderer needs the same narrow runtime override hook.
+    sidebarWidgetRenderer.draw(
+        reportAbuseModalRect(),
+        reportAbuseController.interfaceId(),
+        viewModel,
+        componentId -> {
+          if (componentId == reportAbuseController.nameFieldComponentId()) {
+            return new SidebarWidgetRenderer.WidgetOverride(reportAbuseController.nameFieldText(), null);
+          }
+          if (componentId == reportAbuseController.muteToggleComponentId()) {
+            return new SidebarWidgetRenderer.WidgetOverride(
+                reportAbuseController.muteToggleText(viewModel),
+                reportAbuseController.muteToggleRgb()
+            );
+          }
+          return null;
+        },
+        SidebarWidgetRenderer.WidgetInventoryGridResolver.NONE,
+        pointerX,
+        pointerY
+    );
   }
 
   @Override
@@ -463,7 +574,7 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
     drawBitmapTextCentered(chatFont, 184.0f, 494.0f, "On", 0x00ff00, true);
     drawBitmapTextCentered(chatFont, 324.0f, 481.0f, "Trade/compete", 0xffffff, true);
     drawBitmapTextCentered(chatFont, 324.0f, 494.0f, "On", 0x00ff00, true);
-    drawBitmapTextCentered(chatFont, 458.0f, 486.0f, "Report abuse", 0xffffff, true);
+    drawBitmapTextCentered(chatFont, REPORT_ABUSE_CENTER_X, REPORT_ABUSE_BASELINE_Y, REPORT_ABUSE_LABEL, 0xffffff, true);
   }
 
   private OpenGlTexture createInventoryAmountTexture(String text) {
@@ -690,6 +801,31 @@ public final class GameplaySidebarRenderer implements AutoCloseable {
       return 0.0f;
     }
     return font.measureText(text);
+  }
+
+  private ScreenRect reportAbuseLabelRect() {
+    float labelWidth = Math.max(80.0f, measureBitmapText(chatFont, REPORT_ABUSE_LABEL));
+    float labelLeft = REPORT_ABUSE_CENTER_X - labelWidth * 0.5f;
+    float labelTop = REPORT_ABUSE_BASELINE_Y - (chatFont == null ? 10.0f : chatFont.maxGlyphHeight());
+    float labelHeight = chatFont == null ? 12.0f : chatFont.maxGlyphHeight() + 2.0f;
+    return new ScreenRect(labelLeft, labelTop, labelWidth, labelHeight);
+  }
+
+  private ScreenRect reportAbuseModalRect() {
+    return centeredReportAbuseModalRect(
+        GameplayLayout.worldViewportInnerRect(),
+        reportAbuseController.interfaceWidth(),
+        reportAbuseController.interfaceHeight()
+    );
+  }
+
+  static ScreenRect centeredReportAbuseModalRect(ScreenRect worldViewportRect, float width, float height) {
+    return new ScreenRect(
+        worldViewportRect.left() + (worldViewportRect.width() - width) * 0.5f,
+        worldViewportRect.top() + (worldViewportRect.height() - height) * 0.5f,
+        width,
+        height
+    );
   }
 
   private static OpenGlTexture spriteTexture(

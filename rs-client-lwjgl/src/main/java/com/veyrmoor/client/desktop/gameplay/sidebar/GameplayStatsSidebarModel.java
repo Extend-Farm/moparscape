@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-final class GameplayStatsSidebarModel {
+public final class GameplayStatsSidebarModel {
 
   private static final int[] DISPLAY_ORDER = {
       0, 3, 14,
@@ -38,7 +38,7 @@ final class GameplayStatsSidebarModel {
     this.combatLevel = combatLevel;
   }
 
-  static GameplayStatsSidebarModel from(ClientViewModel viewModel) {
+  public static GameplayStatsSidebarModel from(ClientViewModel viewModel) {
     Map<Integer, SkillSnapshot> skillById = snapshots(viewModel);
     ArrayList<Entry> entries = new ArrayList<>(DISPLAY_ORDER.length);
     int totalLevel = 0;
@@ -56,19 +56,19 @@ final class GameplayStatsSidebarModel {
     return new GameplayStatsSidebarModel(entries, totalLevel, combatLevel(skillById));
   }
 
-  List<Entry> entries() {
+  public List<Entry> entries() {
     return entries;
   }
 
-  int totalLevel() {
+  public int totalLevel() {
     return totalLevel;
   }
 
-  int combatLevel() {
+  public int combatLevel() {
     return combatLevel;
   }
 
-  Entry entryForSkill(int skillId) {
+  public Entry entryForSkill(int skillId) {
     for (Entry entry : entries) {
       if (entry.skillId() == skillId) {
         return entry;
@@ -77,7 +77,7 @@ final class GameplayStatsSidebarModel {
     return null;
   }
 
-  static int experienceForLevel(int level) {
+  public static int experienceForLevel(int level) {
     int clampedLevel = Math.max(1, Math.min(level, EXPERIENCE_FOR_LEVEL.length - 1));
     return EXPERIENCE_FOR_LEVEL[clampedLevel];
   }
@@ -161,7 +161,7 @@ final class GameplayStatsSidebarModel {
     return SKILL_NAMES[skillId];
   }
 
-  record Entry(
+  public record Entry(
       int skillId,
       String name,
       int currentLevel,

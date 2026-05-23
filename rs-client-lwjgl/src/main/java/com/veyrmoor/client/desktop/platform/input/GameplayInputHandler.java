@@ -4,6 +4,7 @@ import com.veyrmoor.client.core.GameplayClientSession;
 import com.veyrmoor.client.desktop.gameplay.GameplayChatController;
 import com.veyrmoor.client.desktop.gameplay.GameplayClickResult;
 import com.veyrmoor.client.desktop.gameplay.GameplayMouseButton;
+import com.veyrmoor.client.desktop.gameplay.ReportAbuseController;
 import com.veyrmoor.client.desktop.render.opengl.OpenGlTileRenderSystem;
 import com.veyrmoor.model.MovementMode;
 import java.util.function.Supplier;
@@ -31,6 +32,7 @@ final class GameplayInputHandler {
   private final MovementPort movementPort;
   private final PublicChatPort publicChatPort;
   private final GameplayChatController chatController;
+  private final ReportAbuseController reportAbuseController;
   private final WindowClosePort windowClosePort;
   private final LogoutPort logoutPort;
   private boolean rotateLeftPressed;
@@ -54,6 +56,7 @@ final class GameplayInputHandler {
         (deltaX, deltaY, movementMode) -> gameplayClientSessionSupplier.get().move(deltaX, deltaY, movementMode),
         text -> gameplayClientSessionSupplier.get().sendPublicChat(text),
         renderSystem.gameplayChatController(),
+        renderSystem.reportAbuseController(),
         windowHandle -> glfwSetWindowShouldClose(windowHandle, true),
         logoutPort
     );
@@ -75,6 +78,7 @@ final class GameplayInputHandler {
         text -> {
         },
         new GameplayChatController(),
+        unavailableReportAbuseController(),
         windowHandle -> glfwSetWindowShouldClose(windowHandle, true),
         () -> {
         }
@@ -98,6 +102,7 @@ final class GameplayInputHandler {
         text -> {
         },
         new GameplayChatController(),
+        unavailableReportAbuseController(),
         windowClosePort,
         () -> {
         }
@@ -113,6 +118,7 @@ final class GameplayInputHandler {
       MovementPort movementPort,
       PublicChatPort publicChatPort,
       GameplayChatController chatController,
+      ReportAbuseController reportAbuseController,
       WindowClosePort windowClosePort,
       LogoutPort logoutPort
   ) {
@@ -126,6 +132,7 @@ final class GameplayInputHandler {
     this.movementPort = movementPort;
     this.publicChatPort = publicChatPort;
     this.chatController = chatController;
+    this.reportAbuseController = reportAbuseController == null ? unavailableReportAbuseController() : reportAbuseController;
     this.windowClosePort = windowClosePort;
     this.logoutPort = logoutPort;
   }
@@ -150,6 +157,7 @@ final class GameplayInputHandler {
         text -> {
         },
         new GameplayChatController(),
+        unavailableReportAbuseController(),
         windowClosePort,
         logoutPort
     );
@@ -173,6 +181,33 @@ final class GameplayInputHandler {
         text -> {
         },
         new GameplayChatController(),
+        unavailableReportAbuseController(),
+        windowClosePort,
+        logoutPort
+    );
+  }
+
+  GameplayInputHandler(
+      GameplayClickPort gameplayClickPort,
+      GameplayCameraInputPort gameplayCameraInputPort,
+      MovementPort movementPort,
+      PublicChatPort publicChatPort,
+      GameplayChatController chatController,
+      ReportAbuseController reportAbuseController,
+      WindowClosePort windowClosePort,
+      LogoutPort logoutPort
+  ) {
+    this(
+        gameplayClickPort,
+        (mouseX, mouseY, yOffset) -> false,
+        (mouseX, mouseY) -> false,
+        () -> {
+        },
+        gameplayCameraInputPort,
+        movementPort,
+        publicChatPort,
+        chatController,
+        reportAbuseController,
         windowClosePort,
         logoutPort
     );
@@ -197,6 +232,7 @@ final class GameplayInputHandler {
         movementPort,
         publicChatPort,
         chatController,
+        unavailableReportAbuseController(),
         windowClosePort,
         logoutPort
     );
@@ -243,6 +279,9 @@ final class GameplayInputHandler {
     if (action != GLFW_PRESS && action != GLFW_REPEAT && action != GLFW_RELEASE) {
       return;
     }
+    if (handleReportAbuseKey(key, action)) {
+      return;
+    }
     if (handleChatKey(key, action)) {
       return;
     }
@@ -278,6 +317,10 @@ final class GameplayInputHandler {
   }
 
   void handleCharacter(int codePoint) {
+    if (reportAbuseController.isOpen()) {
+      reportAbuseController.appendCodePoint(codePoint);
+      return;
+    }
     if (!chatController.isTyping()) {
       chatController.activateTyping();
     }
@@ -335,6 +378,27 @@ final class GameplayInputHandler {
     return action == GLFW_PRESS || action == GLFW_REPEAT;
   }
 
+  private boolean handleReportAbuseKey(int key, int action) {
+    if (!reportAbuseController.isOpen()) {
+      return false;
+    }
+    if (isCameraControlKey(key) || isModifierKey(key)) {
+      return false;
+    }
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+      reportAbuseController.close();
+      return true;
+    }
+    if (key == GLFW_KEY_BACKSPACE && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+      reportAbuseController.backspace();
+      return true;
+    }
+    if (isEnterKey(key)) {
+      return action == GLFW_PRESS || action == GLFW_REPEAT;
+    }
+    return action == GLFW_PRESS || action == GLFW_REPEAT;
+  }
+
   private static boolean isEnterKey(int key) {
     return key == GLFW_KEY_ENTER || key == GLFW_KEY_KP_ENTER;
   }
@@ -356,6 +420,10 @@ final class GameplayInputHandler {
       case GLFW_MOUSE_BUTTON_RIGHT -> GameplayMouseButton.RIGHT;
       default -> null;
     };
+  }
+
+  private static ReportAbuseController unavailableReportAbuseController() {
+    return new ReportAbuseController((com.veyrmoor.content.InterfaceComponentCatalog) null);
   }
 
   @FunctionalInterface

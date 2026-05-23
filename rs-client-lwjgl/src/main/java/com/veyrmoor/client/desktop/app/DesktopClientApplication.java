@@ -9,6 +9,9 @@ import com.veyrmoor.client.desktop.platform.window.DesktopWindowConfig;
 import com.veyrmoor.client.desktop.render.opengl.OpenGlTileRenderSystem;
 import com.veyrmoor.client.desktop.world.CacheBackedWorldSceneLoader;
 import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 
@@ -44,6 +47,12 @@ final class DesktopClientApplication implements AutoCloseable {
   private boolean glfwInitialized;
   private NativeClientRuntimeContext runtimeContext;
 
+  private record StartupLoadResult(
+      NativeClientAssets assets,
+      NativeClientRuntimeContext runtimeContext
+  ) {
+  }
+
   void run() {
     initializeGlfw();
 
@@ -57,27 +66,37 @@ final class DesktopClientApplication implements AutoCloseable {
     try (OpenGlTileRenderSystem loadingRenderSystem = createLoadingRenderSystem(windowConfig, titleScreenAssets)) {
       DesktopClientState loadingState = new DesktopClientState(LOADING_STATUS);
       glfwShowWindow(window);
-      updateLoadingScreen(loadingRenderSystem, loginScreenController, loadingState, 5, LOADING_STATUS);
-      if (glfwWindowShouldClose(window)) {
-        return;
-      }
-      assets = NativeClientBootstrap.loadAssets(
+      AtomicInteger loadingProgress = new AtomicInteger(5);
+      AtomicReference<String> loadingStatus = new AtomicReference<>(LOADING_STATUS);
+      CompletableFuture<StartupLoadResult> startupLoadFuture = loadStartupAsync(
           workingDirectory,
           titleScreenAssets,
-          (progressPercent, statusText) -> updateLoadingScreen(
-              loadingRenderSystem,
-              loginScreenController,
-              loadingState,
-              progressPercent,
-              statusText
-          )
+          loadingProgress,
+          loadingStatus
       );
+      while (!glfwWindowShouldClose(window) && !startupLoadFuture.isDone()) {
+        updateLoadingScreen(
+            loadingRenderSystem,
+            loginScreenController,
+            loadingState,
+            loadingProgress.get(),
+            loadingStatus.get()
+        );
+      }
       if (glfwWindowShouldClose(window)) {
+        startupLoadFuture.cancel(true);
         return;
       }
-      updateLoadingScreen(loadingRenderSystem, loginScreenController, loadingState, 95, "Connecting to fileserver");
-      runtimeContext = NativeClientBootstrap.openRuntimeContext(workingDirectory, CLIENT_DESCRIPTOR);
-      updateLoadingScreen(loadingRenderSystem, loginScreenController, loadingState, 100, "Login frame ready");
+      StartupLoadResult startupLoadResult = startupLoadFuture.join();
+      assets = startupLoadResult.assets();
+      runtimeContext = startupLoadResult.runtimeContext();
+      updateLoadingScreen(
+          loadingRenderSystem,
+          loginScreenController,
+          loadingState,
+          loadingProgress.get(),
+          loadingStatus.get()
+      );
     }
     if (glfwWindowShouldClose(window)) {
       return;
@@ -166,6 +185,31 @@ final class DesktopClientApplication implements AutoCloseable {
         null,
         null
     );
+  }
+
+  private CompletableFuture<StartupLoadResult> loadStartupAsync(
+      Path workingDirectory,
+      TitleScreenAssets titleScreenAssets,
+      AtomicInteger loadingProgress,
+      AtomicReference<String> loadingStatus
+  ) {
+    return CompletableFuture.supplyAsync(() -> {
+      NativeClientAssets assets = NativeClientBootstrap.loadAssets(
+          workingDirectory,
+          titleScreenAssets,
+          (progressPercent, statusText) -> {
+            loadingProgress.set(progressPercent);
+            loadingStatus.set(statusText);
+          }
+      );
+      loadingProgress.set(95);
+      loadingStatus.set("Connecting to fileserver");
+      NativeClientRuntimeContext startupRuntimeContext =
+          NativeClientBootstrap.openRuntimeContext(workingDirectory, CLIENT_DESCRIPTOR);
+      loadingProgress.set(100);
+      loadingStatus.set("Login frame ready");
+      return new StartupLoadResult(assets, startupRuntimeContext);
+    });
   }
 
   private void updateLoadingScreen(

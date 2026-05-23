@@ -37,6 +37,7 @@ public final class GameplayChromeRenderer implements AutoCloseable {
   private final GameplayChromeTextures chromeTextures;
   private final GameplayMinimapRenderer minimapRenderer;
   private final GameplaySidebarRenderer sidebarRenderer;
+  private final ReportAbuseController reportAbuseController;
   private final TitleScreenBitmapFont menuFont;
   private final LongSupplier nanoClock;
   private final GameplayCursorMarker cursorMarker = new GameplayCursorMarker();
@@ -46,6 +47,7 @@ public final class GameplayChromeRenderer implements AutoCloseable {
   private SceneActionHint sceneActionHint;
   private OverheadChatState overheadChatState;
   private ClientChatMessage lastSeenLocalPublicChatMessage;
+  private ClientViewModel lastRenderedViewModel;
   private GameplayTab activeGameplayTab = GameplayTab.INVENTORY;
   private double pointerX = Double.NaN;
   private double pointerY = Double.NaN;
@@ -81,6 +83,9 @@ public final class GameplayChromeRenderer implements AutoCloseable {
     this.primitives = primitives;
     this.menuFont = titleScreenFonts == null ? null : titleScreenFonts.bold();
     this.nanoClock = nanoClock == null ? System::nanoTime : nanoClock;
+    this.reportAbuseController = new ReportAbuseController(
+        gameplayFrameAssets == null ? null : gameplayFrameAssets.interfaceComponents()
+    );
     chromeTextures = new GameplayChromeTextures(gameplayFrameAssets);
     minimapRenderer = new GameplayMinimapRenderer(
         primitives,
@@ -92,6 +97,7 @@ public final class GameplayChromeRenderer implements AutoCloseable {
         itemDefinitionCatalog,
         itemIconRenderer,
         chatController,
+        reportAbuseController,
         gameplayFrameAssets,
         titleScreenFonts,
         primitives
@@ -99,6 +105,9 @@ public final class GameplayChromeRenderer implements AutoCloseable {
   }
 
   public GameplayClickResult handleClick(double x, double y) {
+    if (reportAbuseController.isOpen()) {
+      return handleReportAbuseClick(x, y);
+    }
     for (GameplayTab gameplayTab : GameplayTab.values()) {
       if (GameplayLayout.gameplayTabRect(gameplayTab).contains(x, y)) {
         activeGameplayTab = gameplayTab;
@@ -116,10 +125,16 @@ public final class GameplayChromeRenderer implements AutoCloseable {
   }
 
   public boolean handleScroll(double x, double y, double yOffset) {
+    if (reportAbuseController.isOpen()) {
+      return true;
+    }
     return sidebarRenderer.handleSidebarScroll(activeGameplayTab, x, y, yOffset);
   }
 
   public boolean handlePointerMove(double x, double y) {
+    if (reportAbuseController.isOpen()) {
+      return true;
+    }
     return sidebarRenderer.handleSidebarPointerMove(activeGameplayTab, x, y);
   }
 
@@ -130,6 +145,10 @@ public final class GameplayChromeRenderer implements AutoCloseable {
   public void resetToInventoryTab() {
     activeGameplayTab = GameplayTab.INVENTORY;
     sidebarRenderer.clearTransientState();
+  }
+
+  public ReportAbuseController reportAbuseController() {
+    return reportAbuseController;
   }
 
   public void activateCursorMarker(GameplayMouseButton button, double x, double y) {
@@ -170,6 +189,8 @@ public final class GameplayChromeRenderer implements AutoCloseable {
     sceneActionHint = null;
     overheadChatState = null;
     lastSeenLocalPublicChatMessage = null;
+    lastRenderedViewModel = null;
+    reportAbuseController.close();
     sidebarRenderer.clearTransientState();
   }
 
@@ -197,6 +218,7 @@ public final class GameplayChromeRenderer implements AutoCloseable {
       WorldSceneRenderSubmission worldSceneSubmission
   ) {
     renderFrameCounter++;
+    lastRenderedViewModel = viewModel;
     WorldCameraState cameraState = worldSceneSubmission == null ? null : worldSceneSubmission.cameraState();
     updateOverheadChat(viewModel);
     // Chrome is a deliberate mix today:
@@ -218,6 +240,9 @@ public final class GameplayChromeRenderer implements AutoCloseable {
     drawOverheadChat(worldSceneSubmission);
     sidebarRenderer.drawSidebar(viewModel, activeGameplayTab, pointerX, pointerY);
     sidebarRenderer.drawChatbox(viewModel);
+    if (reportAbuseController.isOpen()) {
+      sidebarRenderer.drawReportAbuseModal(viewModel, pointerX, pointerY);
+    }
     drawCursorMarker();
     drawSceneActionHint();
     drawContextMenu();
@@ -368,6 +393,22 @@ public final class GameplayChromeRenderer implements AutoCloseable {
     if (overheadChatState != null && now >= overheadChatState.expiresAtNanos()) {
       overheadChatState = null;
     }
+  }
+
+  private GameplayClickResult handleReportAbuseClick(double x, double y) {
+    if (!sidebarRenderer.canDrawReportAbuseModal()) {
+      reportAbuseController.close();
+      return GameplayClickResult.handledClick();
+    }
+    int actionWidgetId = sidebarRenderer.reportAbuseActionWidgetIdAt(x, y);
+    if (actionWidgetId >= 0) {
+      reportAbuseController.handleActionWidget(actionWidgetId, lastRenderedViewModel);
+      return GameplayClickResult.handledClick();
+    }
+    if (sidebarRenderer.containsReportAbuseModal(x, y)) {
+      return GameplayClickResult.handledClick();
+    }
+    return GameplayClickResult.handledClick();
   }
 
   private void drawOverheadChat(WorldSceneRenderSubmission worldSceneSubmission) {

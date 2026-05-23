@@ -7,7 +7,7 @@ import com.veyrmoor.protocol.bootstrap.BootstrapItemSlot;
 import java.util.List;
 import java.util.Locale;
 
-final class GameplayCombatSidebarModel {
+public final class GameplayCombatSidebarModel {
 
   private static final String UNARMED_NAME = "Unarmed";
   private static final String[] KNOWN_MATERIAL_PREFIXES = {
@@ -124,31 +124,31 @@ final class GameplayCombatSidebarModel {
     this.attackStyles = attackStyles;
   }
 
-  static GameplayCombatSidebarModel from(EquipmentLoadout equipmentLoadout, ItemDefinitionCatalog itemDefinitions) {
+  public static GameplayCombatSidebarModel from(EquipmentLoadout equipmentLoadout, ItemDefinitionCatalog itemDefinitions) {
     return fromWeaponItemId(equipmentLoadout.itemIdAt(EquipmentLoadout.WEAPON_SLOT), itemDefinitions);
   }
 
-  static GameplayCombatSidebarModel from(List<BootstrapItemSlot> equipment, ItemDefinitionCatalog itemDefinitions) {
+  public static GameplayCombatSidebarModel from(List<BootstrapItemSlot> equipment, ItemDefinitionCatalog itemDefinitions) {
     return fromWeaponItemId(weaponItemId(equipment), itemDefinitions);
   }
 
-  int weaponItemId() {
+  public int weaponItemId() {
     return weaponItemId;
   }
 
-  String weaponName() {
+  public String weaponName() {
     return weaponName;
   }
 
-  int interfaceId() {
+  public int interfaceId() {
     return interfaceId;
   }
 
-  int itemComponentId() {
+  public int itemComponentId() {
     return itemComponentId;
   }
 
-  int weaponNameComponentId() {
+  public int weaponNameComponentId() {
     return weaponNameComponentId;
   }
 

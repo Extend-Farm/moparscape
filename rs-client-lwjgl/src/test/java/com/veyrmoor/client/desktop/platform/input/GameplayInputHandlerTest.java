@@ -15,6 +15,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 import com.veyrmoor.client.desktop.gameplay.GameplayChatController;
 import com.veyrmoor.client.desktop.gameplay.GameplayClickResult;
 import com.veyrmoor.client.desktop.gameplay.GameplayMouseButton;
+import com.veyrmoor.client.desktop.gameplay.ReportAbuseController;
 import com.veyrmoor.model.MovementMode;
 import java.util.ArrayList;
 import java.util.List;
@@ -257,6 +258,42 @@ class GameplayInputHandlerTest {
 
     assertThat(publicChatPort.messages).containsExactly("Hi");
     assertThat(chatController.isTyping()).isFalse();
+  }
+
+  @Test
+  void routesPrintableCharactersIntoReportAbuseWhileTheModalIsOpen() {
+    GameplayChatController chatController = new GameplayChatController();
+    ReportAbuseController reportAbuseController = new ReportAbuseController(
+        new ReportAbuseController.ResolvedInterface(550, 488, 314)
+    );
+    TestPublicChatPort publicChatPort = new TestPublicChatPort();
+    TestWindowClosePort windowClosePort = new TestWindowClosePort();
+    GameplayInputHandler inputHandler = new GameplayInputHandler(
+        (mouseX, mouseY, button) -> GameplayClickResult.handledClick(),
+        new TestGameplayCameraInputPort(),
+        (deltaX, deltaY, movementMode) -> {
+        },
+        publicChatPort,
+        chatController,
+        reportAbuseController,
+        windowClosePort,
+        () -> {
+        }
+    );
+
+    reportAbuseController.open();
+    inputHandler.handleCharacter('A');
+    inputHandler.handleCharacter('k');
+    inputHandler.handleCharacter('!');
+    inputHandler.handleKey(0L, GLFW_KEY_BACKSPACE, GLFW_PRESS);
+    inputHandler.handleCharacter('i');
+    inputHandler.handleKey(0L, GLFW_KEY_ESCAPE, GLFW_PRESS);
+
+    assertThat(reportAbuseController.reportedName()).isEmpty();
+    assertThat(reportAbuseController.isOpen()).isFalse();
+    assertThat(chatController.isTyping()).isFalse();
+    assertThat(publicChatPort.messages).isEmpty();
+    assertThat(windowClosePort.lastWindowHandle).isEqualTo(-1L);
   }
 
   @Test

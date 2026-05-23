@@ -7,6 +7,7 @@ import com.veyrmoor.client.core.EquipmentLoadout;
 import com.veyrmoor.client.desktop.render.common.OpenGlTexture;
 import com.veyrmoor.client.desktop.render.common.ScreenRect;
 import com.veyrmoor.client.desktop.gameplay.GameplayTab;
+import com.veyrmoor.client.desktop.gameplay.sidebar.widget.SidebarWidgetRenderer;
 import com.veyrmoor.protocol.bootstrap.BootstrapItemSlot;
 import java.util.List;
 
@@ -27,11 +28,27 @@ final class InventoryEquipmentSidebarPanelRenderer {
   private static final float INVENTORY_ICON_SIZE = 32.0f;
   private static final float INVENTORY_STACK_TEXT_LEFT_OFFSET = 1.0f;
   private static final float INVENTORY_STACK_TEXT_BASELINE_Y = 9.0f;
+  private static final int EQUIPMENT_WIDGET_INTERFACE_ID = 1644;
+  private static final int EQUIPMENT_WIDGET_GRID_COMPONENT_ID = 1688;
+  private static final int ATTACK_STAB_COMPONENT_ID = 1675;
+  private static final int ATTACK_SLASH_COMPONENT_ID = 1676;
+  private static final int ATTACK_CRUSH_COMPONENT_ID = 1677;
+  private static final int ATTACK_MAGIC_COMPONENT_ID = 1678;
+  private static final int ATTACK_RANGE_COMPONENT_ID = 1679;
+  private static final int DEFENCE_STAB_COMPONENT_ID = 1680;
+  private static final int DEFENCE_SLASH_COMPONENT_ID = 1681;
+  private static final int DEFENCE_CRUSH_COMPONENT_ID = 1682;
+  private static final int DEFENCE_MAGIC_COMPONENT_ID = 1683;
+  private static final int DEFENCE_RANGE_COMPONENT_ID = 1684;
+  private static final int STRENGTH_COMPONENT_ID = 1686;
+  private static final int PRAYER_COMPONENT_ID = 1687;
 
   private final GameplaySidebarRenderer owner;
+  private final ItemBonusCatalog itemBonusCatalog;
 
   InventoryEquipmentSidebarPanelRenderer(GameplaySidebarRenderer owner) {
     this.owner = owner;
+    this.itemBonusCatalog = ItemBonusCatalog.loadFromWorkingDirectory();
   }
 
   void drawInventorySidebar(ClientViewModel viewModel, ScreenRect sidebarRect) {
@@ -59,7 +76,19 @@ final class InventoryEquipmentSidebarPanelRenderer {
     }
   }
 
-  void drawEquipmentSidebar(ClientViewModel viewModel, float left, float top) {
+  void drawEquipmentSidebar(ClientViewModel viewModel, ScreenRect sidebarRect) {
+    if (owner.sidebarWidgetRenderer() != null && owner.sidebarWidgetRenderer().canRender(EQUIPMENT_WIDGET_INTERFACE_ID)) {
+      owner.sidebarWidgetRenderer().draw(
+          sidebarRect,
+          EQUIPMENT_WIDGET_INTERFACE_ID,
+          viewModel,
+          equipmentWidgetOverrides(viewModel),
+          equipmentGridResolver(viewModel)
+      );
+      return;
+    }
+    float left = sidebarRect.left() + 12.0f;
+    float top = sidebarRect.top() + 38.0f;
     List<BootstrapEquipmentItemPresentation> equipment = viewModel.equipmentPresentation();
     if (!equipment.isEmpty()) {
       int row = 0;
@@ -78,6 +107,47 @@ final class InventoryEquipmentSidebarPanelRenderer {
       return;
     }
     drawEquipmentList(left, top, viewModel.equipment(), 2);
+  }
+
+  private SidebarWidgetRenderer.WidgetOverrideResolver equipmentWidgetOverrides(ClientViewModel viewModel) {
+    ItemBonusCatalog.EquipmentBonuses bonuses = itemBonusCatalog.totalBonuses(viewModel.equipment());
+    // The cache only ships placeholder bonus strings for 1644; the reference client rewrites them
+    // from item.cfg at runtime, so the native decoded widget needs the same compatibility override.
+    return componentId -> switch (componentId) {
+      case ATTACK_STAB_COMPONENT_ID -> widgetTextOverride("Stab", bonuses.attackStab());
+      case ATTACK_SLASH_COMPONENT_ID -> widgetTextOverride("Slash", bonuses.attackSlash());
+      case ATTACK_CRUSH_COMPONENT_ID -> widgetTextOverride("Crush", bonuses.attackCrush());
+      case ATTACK_MAGIC_COMPONENT_ID -> widgetTextOverride("Magic", bonuses.attackMagic());
+      case ATTACK_RANGE_COMPONENT_ID -> widgetTextOverride("Range", bonuses.attackRange());
+      case DEFENCE_STAB_COMPONENT_ID -> widgetTextOverride("Stab", bonuses.defenceStab());
+      case DEFENCE_SLASH_COMPONENT_ID -> widgetTextOverride("Slash", bonuses.defenceSlash());
+      case DEFENCE_CRUSH_COMPONENT_ID -> widgetTextOverride("Crush", bonuses.defenceCrush());
+      case DEFENCE_MAGIC_COMPONENT_ID -> widgetTextOverride("Magic", bonuses.defenceMagic());
+      case DEFENCE_RANGE_COMPONENT_ID -> widgetTextOverride("Range", bonuses.defenceRange());
+      case STRENGTH_COMPONENT_ID -> widgetTextOverride("Strength", bonuses.strength());
+      case PRAYER_COMPONENT_ID -> widgetTextOverride("Prayer", bonuses.prayer());
+      default -> null;
+    };
+  }
+
+  private SidebarWidgetRenderer.WidgetInventoryGridResolver equipmentGridResolver(ClientViewModel viewModel) {
+    EquipmentLoadout equipmentLoadout = viewModel.equipmentLoadout();
+    return (componentId, slotIndex) -> {
+      if (componentId != EQUIPMENT_WIDGET_GRID_COMPONENT_ID) {
+        return null;
+      }
+      return equipmentLoadout.itemInSlot(slotIndex)
+          .map(slot -> new SidebarWidgetRenderer.WidgetGridItem(slot.itemId(), slot.quantity()))
+          .orElse(null);
+    };
+  }
+
+  private SidebarWidgetRenderer.WidgetOverride widgetTextOverride(String label, int value) {
+    return new SidebarWidgetRenderer.WidgetOverride(label + ": " + signedValue(value), null);
+  }
+
+  private static String signedValue(int value) {
+    return value >= 0 ? "+" + value : Integer.toString(value);
   }
 
   private void drawInventoryTextFallback(ClientViewModel viewModel, float left, float top) {

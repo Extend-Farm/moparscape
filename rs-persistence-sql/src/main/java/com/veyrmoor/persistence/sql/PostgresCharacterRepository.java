@@ -178,7 +178,7 @@ public class PostgresCharacterRepository implements CharacterRepository {
     return new CharacterSnapshot(
         characterId,
         new AccountId(resultSet.getLong("account_id")),
-        resultSet.getString("display_name"),
+        SqlNamePolicy.characterDisplayName(resultSet.getString("display_name")),
         new WorldPoint(resultSet.getInt("world_x"), resultSet.getInt("world_y"), resultSet.getInt("plane")),
         mapProfile(resultSet),
         loadAppearance(connection, characterId),

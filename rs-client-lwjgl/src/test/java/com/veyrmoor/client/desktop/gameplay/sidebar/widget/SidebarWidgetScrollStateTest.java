@@ -1,4 +1,4 @@
-package com.veyrmoor.client.desktop.gameplay.sidebar;
+package com.veyrmoor.client.desktop.gameplay.sidebar.widget;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

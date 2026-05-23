@@ -1,8 +1,9 @@
-package com.veyrmoor.client.desktop.gameplay.sidebar;
+package com.veyrmoor.client.desktop.gameplay.sidebar.widget;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.veyrmoor.client.core.ClientViewModel;
+import com.veyrmoor.client.desktop.gameplay.sidebar.GameplayStatsSidebarModel;
 import com.veyrmoor.content.InterfaceComponentDefinition;
 import com.veyrmoor.model.StaffRole;
 import com.veyrmoor.model.WorldPoint;

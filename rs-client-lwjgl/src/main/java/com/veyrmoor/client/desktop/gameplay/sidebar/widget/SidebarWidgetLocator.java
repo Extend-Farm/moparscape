@@ -1,4 +1,4 @@
-package com.veyrmoor.client.desktop.gameplay.sidebar;
+package com.veyrmoor.client.desktop.gameplay.sidebar.widget;
 
 import com.veyrmoor.content.InterfaceComponentCatalog;
 import com.veyrmoor.content.InterfaceComponentDefinition;
@@ -83,6 +83,55 @@ final class SidebarWidgetLocator {
       }
     }
     return isActionable(component) && componentBounds(component, left, top).contains(x, y);
+  }
+
+  int actionWidgetIdAt(
+      InterfaceComponentDefinition component,
+      float left,
+      float top,
+      ScreenRect clipRect,
+      double x,
+      double y
+  ) {
+    if (component == null) {
+      return -1;
+    }
+    if (component.componentType() == 0 && component.container().hidden()) {
+      return -1;
+    }
+    ScreenRect componentRect = componentBounds(component, left, top);
+    ScreenRect effectiveClipRect = component.componentType() == 0
+        ? intersectClipRect(clipRect, componentRect)
+        : clipRect == null ? componentRect : intersectClipRect(clipRect, componentRect);
+    if (effectiveClipRect != null && effectiveClipRect.width() > 0.0f && effectiveClipRect.height() > 0.0f) {
+      if (component.componentType() == 0) {
+        int scrollPosition = scrollState.scrollPosition(component);
+        int[] childIds = component.container().childIds();
+        int[] childX = component.container().childX();
+        int[] childY = component.container().childY();
+        for (int childIndex = childIds.length - 1; childIndex >= 0; childIndex--) {
+          InterfaceComponentDefinition child = interfaceComponents.getOrNull(childIds[childIndex]);
+          if (child == null) {
+            continue;
+          }
+          int childActionWidgetId = actionWidgetIdAt(
+              child,
+              left + childX[childIndex],
+              top + childY[childIndex] - scrollPosition,
+              effectiveClipRect,
+              x,
+              y
+          );
+          if (childActionWidgetId >= 0) {
+            return childActionWidgetId;
+          }
+        }
+      }
+      if (isActionable(component) && effectiveClipRect.contains(x, y)) {
+        return component.id();
+      }
+    }
+    return -1;
   }
 
   ScrollTarget findScrollTarget(
@@ -185,6 +234,14 @@ final class SidebarWidgetLocator {
   }
 
   static ScreenRect componentBounds(InterfaceComponentDefinition component, float left, float top) {
+    if (component.componentType() == 2 || component.componentType() == 7) {
+      return new ScreenRect(
+          left,
+          top,
+          WidgetInventoryGridRenderer.measuredWidth(component),
+          WidgetInventoryGridRenderer.measuredHeight(component)
+      );
+    }
     return new ScreenRect(left, top, Math.max(0.0f, component.width()), Math.max(0.0f, component.height()));
   }
 

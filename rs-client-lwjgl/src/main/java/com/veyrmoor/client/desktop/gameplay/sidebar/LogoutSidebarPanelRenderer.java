@@ -3,10 +3,13 @@ package com.veyrmoor.client.desktop.gameplay.sidebar;
 import com.veyrmoor.client.core.ClientViewModel;
 import com.veyrmoor.client.desktop.render.common.ScreenRect;
 import com.veyrmoor.client.desktop.gameplay.GameplayClickResult;
+import com.veyrmoor.client.desktop.gameplay.sidebar.widget.SidebarWidgetRenderer;
 
 final class LogoutSidebarPanelRenderer {
 
   static final int LOGOUT_INTERFACE_ID = 2449;
+  static final int LOGOUT_BRANDING_COMPONENT_ID = 2451;
+  private static final String LOGOUT_BRANDING_TEXT = "Veyrmoor, always use the";
 
   private final GameplaySidebarRenderer owner;
 
@@ -16,7 +19,13 @@ final class LogoutSidebarPanelRenderer {
 
   void drawLogoutSidebar(ClientViewModel viewModel, ScreenRect sidebarRect) {
     if (owner.sidebarWidgetRenderer() != null && owner.sidebarWidgetRenderer().canRender(LOGOUT_INTERFACE_ID)) {
-      owner.sidebarWidgetRenderer().draw(sidebarRect, LOGOUT_INTERFACE_ID, viewModel);
+      owner.sidebarWidgetRenderer().draw(
+          sidebarRect,
+          LOGOUT_INTERFACE_ID,
+          viewModel,
+          LogoutSidebarPanelRenderer::logoutWidgetOverride,
+          SidebarWidgetRenderer.WidgetInventoryGridResolver.NONE
+      );
       return;
     }
     float left = sidebarRect.left() + 12.0f;
@@ -33,5 +42,12 @@ final class LogoutSidebarPanelRenderer {
       return GameplayClickResult.ignored();
     }
     return GameplayClickResult.logout();
+  }
+
+  static SidebarWidgetRenderer.WidgetOverride logoutWidgetOverride(int componentId) {
+    if (componentId != LOGOUT_BRANDING_COMPONENT_ID) {
+      return null;
+    }
+    return new SidebarWidgetRenderer.WidgetOverride(LOGOUT_BRANDING_TEXT, null);
   }
 }

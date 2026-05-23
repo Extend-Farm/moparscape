@@ -19,7 +19,9 @@ final class SqlNamePolicy {
   }
 
   static String characterDisplayName(String value) {
-    return requireStoredName(value, "character display name", CHARACTER_DISPLAY_NAME_MAX_LENGTH);
+    return normalizeDisplayNameCase(
+        requireStoredName(value, "character display name", CHARACTER_DISPLAY_NAME_MAX_LENGTH)
+    );
   }
 
   static String characterDisplayNameKey(String value) {
@@ -47,5 +49,22 @@ final class SqlNamePolicy {
       throw new IllegalArgumentException(label + " cannot be blank");
     }
     return trimmed;
+  }
+
+  private static String normalizeDisplayNameCase(String value) {
+    StringBuilder normalized = new StringBuilder(value.length());
+    boolean capitalizeNextLetter = true;
+    for (int index = 0; index < value.length(); ) {
+      int codePoint = value.codePointAt(index);
+      if (Character.isLetter(codePoint)) {
+        normalized.appendCodePoint(capitalizeNextLetter ? Character.toTitleCase(codePoint) : Character.toLowerCase(codePoint));
+        capitalizeNextLetter = false;
+      } else {
+        normalized.appendCodePoint(codePoint);
+        capitalizeNextLetter = !Character.isLetterOrDigit(codePoint);
+      }
+      index += Character.charCount(codePoint);
+    }
+    return normalized.toString();
   }
 }

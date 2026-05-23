@@ -1,6 +1,7 @@
-package com.veyrmoor.client.desktop.gameplay.sidebar;
+package com.veyrmoor.client.desktop.gameplay.sidebar.widget;
 
 import com.veyrmoor.client.core.ClientViewModel;
+import com.veyrmoor.client.desktop.gameplay.sidebar.GameplayStatsSidebarModel;
 import com.veyrmoor.content.InterfaceComponentDefinition;
 import com.veyrmoor.model.WorldPoint;
 import com.veyrmoor.protocol.bootstrap.BootstrapProfile;
