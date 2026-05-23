@@ -1,9 +1,9 @@
 package com.veyrmoor.client.desktop.gameplay.sidebar;
 
 import com.veyrmoor.client.core.ClientViewModel;
+import com.veyrmoor.client.desktop.login.TitleScreenBitmapFont;
 import com.veyrmoor.client.desktop.render.common.OpenGlTexture;
 import com.veyrmoor.client.desktop.render.common.ScreenRect;
-import com.veyrmoor.client.desktop.login.TitleScreenBitmapFont;
 
 final class CombatSidebarPanelRenderer {
 
@@ -40,7 +40,7 @@ final class CombatSidebarPanelRenderer {
   }
 
   void drawCombatSidebar(ClientViewModel viewModel, ScreenRect sidebarRect) {
-    GameplayCombatSidebarModel combatModel = owner.combatModelFor(viewModel);
+    GameplayCombatSidebarModel combatModel = owner.combatModels().combatModelFor(viewModel);
     if (owner.sidebarWidgetRenderer() != null && owner.sidebarWidgetRenderer().canRender(combatModel)) {
       owner.sidebarWidgetRenderer().draw(sidebarRect, combatModel, viewModel);
       return;
@@ -60,7 +60,7 @@ final class CombatSidebarPanelRenderer {
     if (weaponItemId < 0) {
       return;
     }
-    OpenGlTexture weaponTexture = owner.itemIconTexture(weaponItemId, 1);
+    OpenGlTexture weaponTexture = owner.textures().itemIconTexture(weaponItemId, 1);
     if (weaponTexture == null) {
       return;
     }
@@ -85,15 +85,15 @@ final class CombatSidebarPanelRenderer {
     float top = sidebarRect.top() + COMBAT_STYLE_BUTTON_TOP_OFFSET + styleIndex * COMBAT_STYLE_BUTTON_VERTICAL_STEP;
     float width = COMBAT_STYLE_BUTTON_WIDTH;
     float height = COMBAT_STYLE_BUTTON_HEIGHT;
-    owner.outlineRect(left, top, width, height, COMBAT_BUTTON_OUTLINE_RGB);
-    owner.outlineRect(
+    owner.primitives().outlineRect(left, top, width, height, COMBAT_BUTTON_OUTLINE_RGB);
+    owner.primitives().outlineRect(
         left + COMBAT_STYLE_BUTTON_OUTLINE_INSET,
         top + COMBAT_STYLE_BUTTON_OUTLINE_INSET,
         width - COMBAT_STYLE_BUTTON_OUTLINE_INSET * 2.0f,
         height - COMBAT_STYLE_BUTTON_OUTLINE_INSET * 2.0f,
         COMBAT_BUTTON_INNER_OUTLINE_RGB
     );
-    owner.fillRect(
+    owner.primitives().fillRect(
         left + COMBAT_STYLE_BUTTON_FILL_INSET,
         top + COMBAT_STYLE_BUTTON_FILL_INSET,
         width - COMBAT_STYLE_BUTTON_FILL_INSET * 2.0f,
@@ -133,35 +133,35 @@ final class CombatSidebarPanelRenderer {
     float bottom = top + 18.0f;
     switch (styleName) {
       case "Spike" -> {
-        owner.drawGlyphLine(left + 2.0f, bottom, left + 12.0f, top + 3.0f, rgb);
-        owner.drawGlyphLine(left + 12.0f, top + 3.0f, right - 2.0f, top + 9.0f, rgb);
-        owner.drawGlyphLine(left + 10.0f, top + 5.0f, left + 17.0f, bottom - 1.0f, rgb);
+        owner.primitives().drawGlyphLine(left + 2.0f, bottom, left + 12.0f, top + 3.0f, rgb);
+        owner.primitives().drawGlyphLine(left + 12.0f, top + 3.0f, right - 2.0f, top + 9.0f, rgb);
+        owner.primitives().drawGlyphLine(left + 10.0f, top + 5.0f, left + 17.0f, bottom - 1.0f, rgb);
       }
       case "Impale" -> {
-        owner.drawGlyphLine(left + 3.0f, bottom - 1.0f, right - 5.0f, top + 3.0f, rgb);
-        owner.drawGlyphLine(right - 5.0f, top + 3.0f, right - 2.0f, top + 8.0f, rgb);
-        owner.drawGlyphLine(right - 5.0f, top + 3.0f, right - 10.0f, top + 7.0f, rgb);
+        owner.primitives().drawGlyphLine(left + 3.0f, bottom - 1.0f, right - 5.0f, top + 3.0f, rgb);
+        owner.primitives().drawGlyphLine(right - 5.0f, top + 3.0f, right - 2.0f, top + 8.0f, rgb);
+        owner.primitives().drawGlyphLine(right - 5.0f, top + 3.0f, right - 10.0f, top + 7.0f, rgb);
       }
       case "Smash" -> {
-        owner.outlineRect(left + 2.0f, top + 2.0f, 9.0f, 7.0f, rgb);
-        owner.drawGlyphLine(left + 10.0f, top + 8.0f, right - 3.0f, bottom - 1.0f, rgb);
+        owner.primitives().outlineRect(left + 2.0f, top + 2.0f, 9.0f, 7.0f, rgb);
+        owner.primitives().drawGlyphLine(left + 10.0f, top + 8.0f, right - 3.0f, bottom - 1.0f, rgb);
       }
       case "Block" -> {
-        owner.outlineRect(left + 4.0f, top + 2.0f, 14.0f, 14.0f, rgb);
-        owner.drawGlyphLine(left + 4.0f, top + 2.0f, left + 11.0f, top - 1.0f, rgb);
-        owner.drawGlyphLine(left + 18.0f, top + 2.0f, left + 11.0f, top - 1.0f, rgb);
+        owner.primitives().outlineRect(left + 4.0f, top + 2.0f, 14.0f, 14.0f, rgb);
+        owner.primitives().drawGlyphLine(left + 4.0f, top + 2.0f, left + 11.0f, top - 1.0f, rgb);
+        owner.primitives().drawGlyphLine(left + 18.0f, top + 2.0f, left + 11.0f, top - 1.0f, rgb);
       }
-      default -> owner.drawGlyphLine(left + 3.0f, bottom - 1.0f, right - 3.0f, top + 2.0f, rgb);
+      default -> owner.primitives().drawGlyphLine(left + 3.0f, bottom - 1.0f, right - 3.0f, top + 2.0f, rgb);
     }
   }
 
   private void drawCombatText(float left, float top, String text, int rgb, boolean small) {
     TitleScreenBitmapFont font = small ? owner.statsSmallFont() : owner.statsLabelFont();
     if (font != null) {
-      owner.drawLegacyStatsText(font, left, top, text, rgb);
+      owner.primitives().drawLegacyStatsText(font, left, top, text, rgb);
       return;
     }
-    owner.drawShadowedText(
+    owner.primitives().drawShadowedText(
         left,
         top,
         text,
@@ -176,10 +176,10 @@ final class CombatSidebarPanelRenderer {
     TitleScreenBitmapFont font = small ? owner.statsSmallFont() : owner.statsLabelFont();
     if (font != null) {
       float centeredLeft = left + width * 0.5f - font.measureText(text) * 0.5f;
-      owner.drawLegacyStatsText(font, centeredLeft, top, text, rgb);
+      owner.primitives().drawLegacyStatsText(font, centeredLeft, top, text, rgb);
       return;
     }
-    owner.drawShadowedText(
+    owner.primitives().drawShadowedText(
         left + width * 0.5f - text.length() * (small ? 2.2f : 3.0f),
         top,
         text,

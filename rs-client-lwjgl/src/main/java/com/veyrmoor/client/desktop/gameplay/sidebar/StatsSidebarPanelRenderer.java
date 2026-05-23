@@ -86,11 +86,23 @@ final class StatsSidebarPanelRenderer {
       GameplayStatsTabLayout.StatsSlotLayout slot,
       GameplayStatsSidebarModel.Entry entry
   ) {
-    owner.drawTextureAt(owner.statsButtonLeftTexture(), sidebarRect.left() + slot.buttonLeftX(), sidebarRect.top() + slot.buttonLeftY());
-    owner.drawTextureAt(owner.statsButtonRightTexture(), sidebarRect.left() + slot.buttonRightX(), sidebarRect.top() + slot.buttonRightY());
-    owner.drawTextureAt(owner.statIconTexture(slot.skillId()), sidebarRect.left() + slot.iconX(), sidebarRect.top() + slot.iconY());
+    owner.primitives().drawTextureAt(
+        owner.statsButtonLeftTexture(),
+        sidebarRect.left() + slot.buttonLeftX(),
+        sidebarRect.top() + slot.buttonLeftY()
+    );
+    owner.primitives().drawTextureAt(
+        owner.statsButtonRightTexture(),
+        sidebarRect.left() + slot.buttonRightX(),
+        sidebarRect.top() + slot.buttonRightY()
+    );
+    owner.primitives().drawTextureAt(
+        owner.statIconTexture(slot.skillId()),
+        sidebarRect.left() + slot.iconX(),
+        sidebarRect.top() + slot.iconY()
+    );
 
-    owner.drawLegacyStatsTextCentered(
+    owner.primitives().drawLegacyStatsTextCentered(
         owner.statsSmallFont(),
         sidebarRect.left() + slot.currentTextX(),
         sidebarRect.top() + slot.currentTextY(),
@@ -98,7 +110,7 @@ final class StatsSidebarPanelRenderer {
         Integer.toString(entry.currentLevel()),
         LEGACY_TEXT_RGB
     );
-    owner.drawLegacyStatsTextCentered(
+    owner.primitives().drawLegacyStatsTextCentered(
         owner.statsSmallFont(),
         sidebarRect.left() + slot.baseTextX(),
         sidebarRect.top() + slot.baseTextY(),
@@ -109,28 +121,28 @@ final class StatsSidebarPanelRenderer {
   }
 
   private void drawLegacyStatsSummary(ScreenRect sidebarRect, GameplayStatsSidebarModel statsModel) {
-    owner.outlineRect(
+    owner.primitives().outlineRect(
         sidebarRect.left() + GameplayStatsTabLayout.SUMMARY_RECT_X + GameplayStatsTabLayout.SUMMARY_OUTER_X,
         sidebarRect.top() + GameplayStatsTabLayout.SUMMARY_RECT_Y + GameplayStatsTabLayout.SUMMARY_OUTER_Y,
         178.0f,
         36.0f,
         LEGACY_PANEL_OUTLINE_RGB
     );
-    owner.outlineRect(
+    owner.primitives().outlineRect(
         sidebarRect.left() + GameplayStatsTabLayout.SUMMARY_RECT_X + GameplayStatsTabLayout.SUMMARY_INNER_ONE_X,
         sidebarRect.top() + GameplayStatsTabLayout.SUMMARY_RECT_Y + GameplayStatsTabLayout.SUMMARY_INNER_ONE_Y,
         176.0f,
         34.0f,
         LEGACY_PANEL_OUTLINE_RGB
     );
-    owner.outlineRect(
+    owner.primitives().outlineRect(
         sidebarRect.left() + GameplayStatsTabLayout.SUMMARY_RECT_X + GameplayStatsTabLayout.SUMMARY_INNER_TWO_X,
         sidebarRect.top() + GameplayStatsTabLayout.SUMMARY_RECT_Y + GameplayStatsTabLayout.SUMMARY_INNER_TWO_Y,
         177.0f,
         35.0f,
         LEGACY_PANEL_INNER_OUTLINE_RGB
     );
-    owner.fillRect(
+    owner.primitives().fillRect(
         sidebarRect.left() + GameplayStatsTabLayout.SUMMARY_RECT_X + GameplayStatsTabLayout.SUMMARY_FILL_X,
         sidebarRect.top() + GameplayStatsTabLayout.SUMMARY_RECT_Y + GameplayStatsTabLayout.SUMMARY_FILL_Y,
         174.0f,
@@ -138,21 +150,21 @@ final class StatsSidebarPanelRenderer {
         LEGACY_PANEL_FILL_RGB
     );
 
-    owner.drawLegacyStatsText(
+    owner.primitives().drawLegacyStatsText(
         owner.statsLabelFont(),
         sidebarRect.left() + GameplayStatsTabLayout.SUMMARY_RECT_X + 90.0f,
         sidebarRect.top() + GameplayStatsTabLayout.SUMMARY_RECT_Y + 12.0f,
         "Combat Lvl: " + statsModel.combatLevel(),
         LEGACY_TEXT_RGB
     );
-    owner.drawLegacyStatsText(
+    owner.primitives().drawLegacyStatsText(
         owner.statsLabelFont(),
         sidebarRect.left() + GameplayStatsTabLayout.SUMMARY_RECT_X + 91.0f,
         sidebarRect.top() + GameplayStatsTabLayout.SUMMARY_RECT_Y + 27.0f,
         "Total Lvl: " + statsModel.totalLevel(),
         LEGACY_TEXT_RGB
     );
-    owner.drawLegacyStatsText(
+    owner.primitives().drawLegacyStatsText(
         owner.statsLabelFont(),
         sidebarRect.left() + GameplayStatsTabLayout.SUMMARY_RECT_X + 18.0f,
         sidebarRect.top() + GameplayStatsTabLayout.SUMMARY_RECT_Y + 20.0f,
@@ -166,39 +178,39 @@ final class StatsSidebarPanelRenderer {
       GameplayStatsTabLayout.StatsSlotLayout slot,
       GameplayStatsSidebarModel.Entry entry
   ) {
-    owner.fillRect(
+    owner.primitives().fillRect(
         sidebarRect.left() + GameplayStatsTabLayout.HOVER_FILL_X,
         sidebarRect.top() + GameplayStatsTabLayout.HOVER_FILL_Y,
         174.0f,
         32.0f,
         LEGACY_PANEL_FILL_RGB
     );
-    owner.drawLegacyStatsText(
+    owner.primitives().drawLegacyStatsText(
         owner.statsLabelFont(),
         sidebarRect.left() + GameplayStatsTabLayout.HOVER_FIRST_LINE_X,
         sidebarRect.top() + GameplayStatsTabLayout.HOVER_FIRST_LINE_Y,
         entry.name() + " XP:",
         LEGACY_TEXT_RGB
     );
-    owner.drawLegacyStatsText(
+    owner.primitives().drawLegacyStatsText(
         owner.statsLabelFont(),
         sidebarRect.left() + slot.hoverFirstValueX(),
         sidebarRect.top() + GameplayStatsTabLayout.HOVER_FIRST_LINE_Y,
-        owner.formatLegacyNumber(entry.experience()),
+        owner.textFormatter().formatLegacyNumber(entry.experience()),
         LEGACY_TEXT_RGB
     );
-    owner.drawLegacyStatsText(
+    owner.primitives().drawLegacyStatsText(
         owner.statsLabelFont(),
         sidebarRect.left() + GameplayStatsTabLayout.HOVER_SECOND_LINE_X,
         sidebarRect.top() + GameplayStatsTabLayout.HOVER_SECOND_LINE_Y,
         "Next Level At:",
         LEGACY_TEXT_RGB
     );
-    owner.drawLegacyStatsText(
+    owner.primitives().drawLegacyStatsText(
         owner.statsLabelFont(),
         sidebarRect.left() + GameplayStatsTabLayout.HOVER_SECOND_VALUE_X,
         sidebarRect.top() + GameplayStatsTabLayout.HOVER_SECOND_LINE_Y,
-        owner.formatLegacyNumber(GameplayStatsSidebarModel.experienceForLevel(entry.baseLevel())),
+        owner.textFormatter().formatLegacyNumber(GameplayStatsSidebarModel.experienceForLevel(entry.baseLevel())),
         LEGACY_TEXT_RGB
     );
   }
@@ -217,8 +229,16 @@ final class StatsSidebarPanelRenderer {
   }
 
   private void drawStatsSummary(float left, float top, GameplayStatsSidebarModel statsModel) {
-    owner.drawShadowedText(left, top, "Combat", GameplaySidebarRenderer.rgbUnit(STATS_LABEL_RGB, 16), GameplaySidebarRenderer.rgbUnit(STATS_LABEL_RGB, 8), GameplaySidebarRenderer.rgbUnit(STATS_LABEL_RGB, 0), 0.85f);
-    owner.drawShadowedText(
+    owner.primitives().drawShadowedText(
+        left,
+        top,
+        "Combat",
+        GameplaySidebarRenderer.rgbUnit(STATS_LABEL_RGB, 16),
+        GameplaySidebarRenderer.rgbUnit(STATS_LABEL_RGB, 8),
+        GameplaySidebarRenderer.rgbUnit(STATS_LABEL_RGB, 0),
+        0.85f
+    );
+    owner.primitives().drawShadowedText(
         left + 46.0f,
         top,
         Integer.toString(statsModel.combatLevel()),
@@ -227,8 +247,16 @@ final class StatsSidebarPanelRenderer {
         GameplaySidebarRenderer.rgbUnit(STATS_VALUE_RGB, 0),
         0.85f
     );
-    owner.drawShadowedText(left + 86.0f, top, "Total", GameplaySidebarRenderer.rgbUnit(STATS_LABEL_RGB, 16), GameplaySidebarRenderer.rgbUnit(STATS_LABEL_RGB, 8), GameplaySidebarRenderer.rgbUnit(STATS_LABEL_RGB, 0), 0.85f);
-    owner.drawShadowedText(
+    owner.primitives().drawShadowedText(
+        left + 86.0f,
+        top,
+        "Total",
+        GameplaySidebarRenderer.rgbUnit(STATS_LABEL_RGB, 16),
+        GameplaySidebarRenderer.rgbUnit(STATS_LABEL_RGB, 8),
+        GameplaySidebarRenderer.rgbUnit(STATS_LABEL_RGB, 0),
+        0.85f
+    );
+    owner.primitives().drawShadowedText(
         left + 122.0f,
         top,
         Integer.toString(statsModel.totalLevel()),
@@ -252,14 +280,14 @@ final class StatsSidebarPanelRenderer {
   }
 
   private void drawStatsCell(float left, float top, GameplayStatsSidebarModel.Entry entry) {
-    owner.fillRect(left, top, STATS_CELL_WIDTH - 3.0f, STATS_CELL_HEIGHT - 4.0f, STATS_PANEL_RGB);
-    owner.outlineRect(left, top, STATS_CELL_WIDTH - 3.0f, STATS_CELL_HEIGHT - 4.0f, STATS_PANEL_OUTLINE_RGB);
+    owner.primitives().fillRect(left, top, STATS_CELL_WIDTH - 3.0f, STATS_CELL_HEIGHT - 4.0f, STATS_PANEL_RGB);
+    owner.primitives().outlineRect(left, top, STATS_CELL_WIDTH - 3.0f, STATS_CELL_HEIGHT - 4.0f, STATS_PANEL_OUTLINE_RGB);
 
     float badgeLeft = left + 4.0f;
     float badgeTop = top + 4.0f;
-    owner.fillRect(badgeLeft, badgeTop, STATS_BADGE_SIZE, STATS_BADGE_SIZE, fallbackAccentRgb(entry.skillId()));
-    owner.outlineRect(badgeLeft, badgeTop, STATS_BADGE_SIZE, STATS_BADGE_SIZE, STATS_BADGE_OUTLINE_RGB);
-    owner.drawShadowedText(
+    owner.primitives().fillRect(badgeLeft, badgeTop, STATS_BADGE_SIZE, STATS_BADGE_SIZE, fallbackAccentRgb(entry.skillId()));
+    owner.primitives().outlineRect(badgeLeft, badgeTop, STATS_BADGE_SIZE, STATS_BADGE_SIZE, STATS_BADGE_OUTLINE_RGB);
+    owner.primitives().drawShadowedText(
         badgeLeft + 2.0f,
         badgeTop + 4.0f,
         fallbackShortSkillName(entry.skillId()),
@@ -270,7 +298,7 @@ final class StatsSidebarPanelRenderer {
     );
 
     int levelRgb = levelRgb(entry);
-    owner.drawShadowedText(
+    owner.primitives().drawShadowedText(
         left + 21.0f,
         top + 5.0f,
         levelText(entry),
@@ -279,7 +307,7 @@ final class StatsSidebarPanelRenderer {
         GameplaySidebarRenderer.rgbUnit(levelRgb, 0),
         0.70f
     );
-    owner.drawShadowedText(
+    owner.primitives().drawShadowedText(
         left + 4.0f,
         top + 21.0f,
         truncate(entry.name(), 9),

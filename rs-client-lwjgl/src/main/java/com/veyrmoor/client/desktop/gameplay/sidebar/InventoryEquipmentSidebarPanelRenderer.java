@@ -4,10 +4,10 @@ import com.veyrmoor.client.core.BootstrapEquipmentItemPresentation;
 import com.veyrmoor.client.core.BootstrapInventoryItemPresentation;
 import com.veyrmoor.client.core.ClientViewModel;
 import com.veyrmoor.client.core.EquipmentLoadout;
-import com.veyrmoor.client.desktop.render.common.OpenGlTexture;
-import com.veyrmoor.client.desktop.render.common.ScreenRect;
 import com.veyrmoor.client.desktop.gameplay.GameplayTab;
 import com.veyrmoor.client.desktop.gameplay.sidebar.widget.SidebarWidgetRenderer;
+import com.veyrmoor.client.desktop.render.common.OpenGlTexture;
+import com.veyrmoor.client.desktop.render.common.ScreenRect;
 import com.veyrmoor.protocol.bootstrap.BootstrapItemSlot;
 import java.util.List;
 
@@ -52,7 +52,7 @@ final class InventoryEquipmentSidebarPanelRenderer {
   }
 
   void drawInventorySidebar(ClientViewModel viewModel, ScreenRect sidebarRect) {
-    if (!owner.canRenderItemIcons()) {
+    if (!owner.textures().canRenderItemIcons()) {
       drawInventoryTextFallback(viewModel, sidebarRect.left() + 12.0f, sidebarRect.top() + 38.0f);
       return;
     }
@@ -66,12 +66,12 @@ final class InventoryEquipmentSidebarPanelRenderer {
         continue;
       }
       ScreenRect slotRect = inventorySlotRect(sidebarRect, item.slotIndex());
-      OpenGlTexture itemTexture = owner.itemIconTexture(item.itemId(), item.quantity());
+      OpenGlTexture itemTexture = owner.textures().itemIconTexture(item.itemId(), item.quantity());
       if (itemTexture != null) {
         owner.primitives().drawTexturedQuad(itemTexture, slotRect);
       }
       if (showsStackAmount(item)) {
-        drawInventoryStackAmount(slotRect, owner.formatQuantity(item.quantity()));
+        drawInventoryStackAmount(slotRect, owner.textFormatter().formatQuantity(item.quantity()));
       }
     }
   }
@@ -160,7 +160,7 @@ final class InventoryEquipmentSidebarPanelRenderer {
         owner.primitives().drawText(
             left,
             top + index * 12.0f,
-            truncate(item.name(), 18) + " x" + owner.formatQuantity(item.quantity()),
+            truncate(item.name(), 18) + " x" + owner.textFormatter().formatQuantity(item.quantity()),
             0.95f,
             0.96f,
             0.98f
@@ -188,7 +188,9 @@ final class InventoryEquipmentSidebarPanelRenderer {
       owner.primitives().drawText(
           left,
           top + index * 12.0f,
-          truncate(owner.resolveItemName(slot.itemId()), 18) + " x" + owner.formatQuantity(slot.quantity()),
+          truncate(owner.textFormatter().resolveItemName(slot.itemId()), 18)
+              + " x"
+              + owner.textFormatter().formatQuantity(slot.quantity()),
           0.95f,
           0.96f,
           0.98f
@@ -217,13 +219,20 @@ final class InventoryEquipmentSidebarPanelRenderer {
       float columnLeft = left + column * 82.0f;
       float rowTop = top + row * 24.0f;
       owner.primitives().drawText(columnLeft, rowTop, EquipmentLoadout.slotName(slot.slotIndex()), 0.84f, 0.88f, 0.94f);
-      owner.primitives().drawText(columnLeft, rowTop + 12.0f, truncate(owner.resolveItemName(slot.itemId()), 11), 0.95f, 0.96f, 0.98f);
+      owner.primitives().drawText(
+          columnLeft,
+          rowTop + 12.0f,
+          truncate(owner.textFormatter().resolveItemName(slot.itemId()), 11),
+          0.95f,
+          0.96f,
+          0.98f
+      );
       rowCount++;
     }
   }
 
   private void drawInventoryStackAmount(ScreenRect slotRect, String text) {
-    if (owner.inventoryAmountFont() == null) {
+    if (owner.textures().inventoryAmountFont() == null) {
       owner.primitives().drawText(
           slotRect.left() + INVENTORY_STACK_TEXT_LEFT_OFFSET,
           slotRect.top() + INVENTORY_STACK_TEXT_BASELINE_Y + 1.0f,
@@ -244,7 +253,7 @@ final class InventoryEquipmentSidebarPanelRenderer {
       );
       return;
     }
-    OpenGlTexture amountTexture = owner.inventoryAmountTexture(text);
+    OpenGlTexture amountTexture = owner.textures().inventoryAmountTexture(text);
     if (amountTexture == null) {
       return;
     }
@@ -252,7 +261,7 @@ final class InventoryEquipmentSidebarPanelRenderer {
         amountTexture,
         new ScreenRect(
             slotRect.left(),
-            slotRect.top() + INVENTORY_STACK_TEXT_BASELINE_Y - owner.inventoryAmountFont().maxGlyphHeight(),
+            slotRect.top() + INVENTORY_STACK_TEXT_BASELINE_Y - owner.textures().inventoryAmountFont().maxGlyphHeight(),
             amountTexture.width(),
             amountTexture.height()
         )
